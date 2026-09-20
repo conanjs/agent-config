@@ -1,0 +1,29 @@
+# Source -> destination routing table for installers/install.sh and installers/install.ps1.
+# Format is intentionally flat/fixed (one flow-mapping per line) so it can be
+# parsed with plain grep/sed (bash) or a regex (PowerShell) — no yq/python
+# YAML dependency required. Do not reformat entries across multiple lines;
+# installers/lib/link-or-copy.{sh,ps1} expect exactly this single-line
+# "- { source: ..., target: ..., strategy: ... }" shape.
+#
+# strategy: symlink   -> ln -s the repo file/dir at the target path (existing
+#                         real file/dir at target is backed up first, once).
+# strategy: seed-once  -> copy the repo file to target ONLY if target doesn't
+#                         already exist. Never touched again after that —
+#                         for files that accumulate machine-local state
+#                         (e.g. ~/.claude/settings.json permissions, or
+#                         global-variables.md's machine-specific values).
+
+- { source: copilot/instructions,            target: ~/.copilot/instructions,            strategy: symlink }
+- { source: copilot/knowledge,               target: ~/.copilot/knowledge,               strategy: symlink }
+- { source: copilot/companies,               target: ~/.copilot/companies,               strategy: symlink }
+- { source: copilot/frameworks,               target: ~/.copilot/frameworks,               strategy: symlink }
+- { source: copilot/procedures,               target: ~/.copilot/procedures,               strategy: symlink }
+- { source: copilot/patterns,                 target: ~/.copilot/patterns,                 strategy: symlink }
+- { source: copilot/agents,                  target: ~/.copilot/agents,                  strategy: symlink }
+- { source: copilot/prompts,                  target: ~/.copilot/prompts,                 strategy: symlink }
+- { source: copilot/hooks,                   target: ~/.copilot/hooks,                   strategy: symlink }
+- { source: claude/CLAUDE.md,                target: ~/.claude/CLAUDE.md,                strategy: symlink }
+- { source: claude/plugins/blocklist.json,   target: ~/.claude/plugins/blocklist.json,   strategy: symlink }
+- { source: claude/settings.json,            target: ~/.claude/settings.json,            strategy: seed-once }
+- { source: codex/AGENTS.md,                 target: ~/.codex/AGENTS.md,                 strategy: symlink }
+- { source: global-variables.md,             target: ~/.copilot/global-variables.md,     strategy: seed-once }

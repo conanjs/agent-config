@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": []
+  },
+  "model": "sonnet",
+  "effortLevel": "high",
+  "agentPushNotifEnabled": true
+}

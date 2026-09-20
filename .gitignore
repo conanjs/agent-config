@@ -1,0 +1,18 @@
+.DS_Store
+*.log
+
+# Defensive: these must never be committed even if someone copies them in later.
+# They live at ~/.copilot/{config.json,mcp-config.json,permissions-config.json}
+# and are intentionally excluded from this repo — see README "What's excluded".
+config.json
+mcp-config.json
+permissions-config.json
+
+# Ephemeral/session state, never portable — see README.
+session-state/
+session-store.db*
+logs/
+*.jsonl
+
+# Install-time backups now live entirely outside the repo, at
+# ~/.agent-config-backups/ — nothing to ignore here for that anymore.

@@ -1,0 +1,152 @@
+# agent-config
+
+A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, GitHub Copilot CLI, OpenAI Codex CLI, and future agents) — single source of truth, symlinked into place per machine instead of copy-pasted by hand.
+
+## Where to go
+
+| If you want to... | Go to |
+|---|---|
+| Set this repo up on a new machine | [`SETUP.md`](SETUP.md) |
+| Reuse a design technique before improvising a one-off | [`copilot/patterns/index.md`](copilot/patterns/index.md) |
+| Understand or extend the Company KB Framework | [`copilot/frameworks/company-kb/index.md`](copilot/frameworks/company-kb/index.md) |
+| Work inside a specific company's KB (e.g. OTS) | [`copilot/companies/ots/index.md`](copilot/companies/ots/index.md) |
+| Look up a path/preference variable (`{{AGENT_HOME}}` etc.) | [`global-variables.md`](global-variables.md) |
+| See exactly what gets installed where | [`mapping.yaml`](mapping.yaml), and "What's included" below |
+
+This file (`README.md`) is the general reference for everything else — structure, install mechanics, what's excluded and why.
+
+## How it works
+
+`copilot/` and `claude/` mirror the *real*, non-ephemeral parts of `~/.copilot` and `~/.claude` (on Windows: `%USERPROFILE%\.copilot` and `%USERPROFILE%\.claude` — same relative layout, verified in both products' own docs, see References). `mapping.yaml` is the **one** source/destination routing table both platforms read — bash and PowerShell each have their own installer logic, but neither hardcodes a path; both just interpret the same file.
+
+```
+agent-config/
+├── SETUP.md                        # onboarding task list for a new machine — start here
+├── mapping.yaml                    # source -> destination routing table (shared by every OS)
+├── global-variables.md             # shipped template for {{AGENT_HOME}}/{{AGENT_CONFIG_REPO}}/{{LANGUAGE}} etc.
+├── installers/                     # every installer/uninstaller, grouped by OS
+│   ├── install.sh / uninstall.sh       # macOS/Linux entrypoints (bash) — dispatch by OS
+│   ├── install.ps1 / uninstall.ps1     # Windows entrypoint (PowerShell)
+│   ├── macos/install.sh                # macOS-specific implementation
+│   ├── linux/install.sh                # Linux-specific implementation (stub)
+│   └── lib/
+│       ├── os.sh, link-or-copy.sh      # bash: OS detection + symlink/seed logic
+│       └── link-or-copy.ps1            # PowerShell: symlink/seed logic + Windows fallbacks
+├── copilot/                        # -> ~/.copilot/* (or %USERPROFILE%\.copilot on Windows)
+│   ├── instructions/                   # incl. personal-defaults.instructions.md
+│   ├── knowledge/                      # cross-project knowledge base (general-purpose content, kept here for naming consistency — see note below)
+│   ├── companies/                      # per-company knowledge base INSTANCES (content only — e.g. companies/ots/)
+│   ├── frameworks/                     # framework DEFINITIONS — shared, not per-company (one subfolder per framework)
+│   │   └── company-kb/                     # currently the only framework
+│   │       ├── index.md                        # start here: concise overview of this folder
+│   │       ├── conventions.md
+│   │       └── schemas/                        # one <type>.schema.md per document type
+│   ├── procedures/                     # one <name>.procedure.md per recurring task — grouped by artifact type, not by which framework it's about
+│   ├── patterns/                       # reusable design techniques, globally available (not agent-config-specific)
+│   │   ├── index.md                        # catalog — start here for pattern #3+
+│   │   ├── shared-procedure-thin-wrapper.pattern.md
+│   │   └── backup-before-overwrite.pattern.md
+│   ├── prompts/                        # Copilot slash-command prompts (thin wrappers, see patterns/)
+│   └── agents/, hooks/                 # genuinely Copilot-CLI-specific features
+├── claude/                         # -> ~/.claude/* (or %USERPROFILE%\.claude on Windows)
+└── codex/AGENTS.md                 # -> ~/.codex/AGENTS.md (or %USERPROFILE%\.codex on Windows)
+```
+
+**A naming note, since this moved twice during design:** `knowledge/`, `companies/`, and `frameworks/company-kb/` aren't actually Copilot-specific — no tool reads them automatically, they only work because an instructions file tells an agent to go read a path there. They briefly lived at the repo's top level for that reason. They're under `copilot/` because the user wants to be able to say "global Copilot knowledge" in conversation and have that phrase map directly onto both the folder name and the concept (see `personal-defaults.instructions.md`'s term-recognition rules). Functionally this changes nothing — the deployed destination has always been `~/.copilot/knowledge` (and now `~/.copilot/frameworks/company-kb`) either way, since `mapping.yaml`'s `source` (repo-internal) and `target` (disk destination) are independent of each other.
+
+## Path & preference variables
+
+Docs across this repo and the deployed knowledge base reference `{{AGENT_HOME}}`, `{{AGENT_CONFIG_REPO}}`, `{{LANGUAGE}}`, and per-company variables like `{{OTS_REPOS_ROOT}}` instead of hardcoding literal paths. All of these are defined in exactly one place: `global-variables.md` (shipped template here in the repo; deployed to `~/.copilot/global-variables.md` via the `seed-once` strategy, so a machine's filled-in values are never clobbered by a later `git pull`). `personal-defaults.instructions.md` — the one file always loaded by both Claude Code and Copilot CLI — points at it, so any agent reading a `{{VAR}}` placeholder knows where to resolve it.
+
+Why not just keep hardcoding `~/.copilot/knowledge/...` everywhere? Mostly future-proofing: if that live path is ever renamed (see "Related" below), there's one line to edit instead of 23. It does **not** fix a live problem today — agents already translate `~/.copilot/...` to `%USERPROFILE%\.copilot\...` on Windows correctly on their own.
+
+## Company KB Framework
+
+A reusable pattern for a per-company knowledge base — split into a shared *definition* (`copilot/frameworks/company-kb/`) and one *instance* per company (`copilot/companies/<company>/`), so a second company can be onboarded later without copying the schema system. **Full explanation, structure, and how to bootstrap a new repo's KB entry: [`copilot/frameworks/company-kb/index.md`](copilot/frameworks/company-kb/index.md)** — not restated here.
+
+OTS is the current worked instance: [`copilot/companies/ots/index.md`](copilot/companies/ots/index.md). `personal-defaults.instructions.md` is what tells an agent this framework exists in the first place — without that pointer, the framework existing on disk doesn't mean an agent knows to look for it.
+
+## Usage
+
+**macOS / Linux:**
+```bash
+./installers/install.sh       # detects OS, applies mapping.yaml
+./installers/uninstall.sh      # removes the symlinks it created (seed-once files are left alone)
+```
+
+**Windows (PowerShell):**
+```powershell
+.\installers\install.ps1       # applies mapping.yaml
+.\installers\uninstall.ps1      # removes the links it created (seed-once files are left alone)
+```
+
+You only ever run **one** of `install.sh` / `install.ps1` on a given machine — whichever matches the OS you're currently on. They're not alternatives for the same OS; bash can't execute PowerShell syntax and vice versa. Each file also says so in its own header comment now.
+
+Existing real content at a destination path is backed up before a link replaces it — nothing is deleted outright. All backups from one install run land in a single folder, `~/.agent-config-backups/<timestamp>/`, mirroring each entry's `mapping.yaml` source path (e.g. a pre-existing `~/.claude/CLAUDE.md` backs up to `~/.agent-config-backups/<timestamp>/claude/CLAUDE.md`) — not scattered `path.backup-<timestamp>` siblings next to each real path. The folder is only created if something actually needs backing up; a clean run creates nothing.
+
+## What's included
+
+| Path | What it is |
+|---|---|
+| `copilot/instructions/` | Global Copilot instruction files (incl. `personal-defaults.instructions.md`, loaded by `~/.claude/CLAUDE.md` too) |
+| `copilot/knowledge/` | The cross-project knowledge base (ai-agents, analytics, documentation, gcp, grpc, etc.) |
+| `copilot/frameworks/company-kb/` | The **Company KB Framework** definition (conventions, schemas, procedures) — shared, not tied to any one company. Start at its own [`index.md`](copilot/frameworks/company-kb/index.md). |
+| `copilot/companies/ots/` | The **OTS Knowledge Base** — the current instance of the framework above: schema-typed docs (flow/feature/repo-overview/domain/infra/api-surface) so an agent can navigate a multi-repo system without full codebase exploration. Start at [`index.md`](copilot/companies/ots/index.md). |
+| `copilot/agents/` | Custom agent definitions |
+| `copilot/prompts/` | Copilot slash-command prompts — currently `init-repo-kb`, which bootstraps `repo-overview` KB docs for one, several, or all undocumented repos in a company. VS Code Copilot Chat only (Local or Copilot mode) — Copilot CLI's terminal tool doesn't support prompts/agents at all, per `github-copilot/copilot-cli-internals.md`. |
+| `copilot/hooks/` | User-authored hooks (e.g. `desktop-notify`) |
+| `claude/CLAUDE.md` | Claude Code's global entrypoint. `@import`s all three `copilot/instructions/*.instructions.md` files explicitly — Claude Code's `@import` requires individual file paths, unlike Copilot CLI which auto-loads every `.instructions.md` in the folder natively. Missing an `@import` here silently means Claude Code never sees that file. |
+| `claude/plugins/blocklist.json` | Plugin blocklist (contains what look like test entries — worth reviewing before this repo is shared with anyone) |
+| `codex/AGENTS.md` | Codex CLI's global entrypoint — a thin pointer to the same `copilot/instructions/*.instructions.md` files, not duplicated content. **Unverified**: unlike the other two tools, this hasn't been tested against a real Codex CLI session — see the file's own note. |
+| `claude/settings.json` | **Not a copy of the real one.** The real `~/.claude/settings.json` on this Mac is ~150 permission entries full of this machine's absolute paths — not portable. This repo ships a minimal generic seed instead; see `seed-once` below. |
+| `global-variables.md` | `{{AGENT_HOME}}` (OS-fixed, no setup), `{{AGENT_CONFIG_REPO}}` (this machine's clone path), `{{LANGUAGE}}` (default: English), and one company-repo-root variable per company (e.g. `{{OTS_REPOS_ROOT}}`) — all filled in / kept current by SETUP.md, extensible for more. |
+
+## What's deliberately excluded
+
+- **Ephemeral/cache/session state** — `~/.copilot/session-state/` (179M), `session-store.db*` (11M), `logs/`, `command-history-state.json`, `copilot.zip`, `sidebar-sessions-state/`, `ide/`; `~/.claude/cache/`, `backups/`, `file-history/`, `shell-snapshots/`, `sessions/`, `telemetry/`, `session-env/`, `downloads/`, `ide/`. None of this is config — it's local runtime state, regenerated automatically.
+- **Conversation transcripts** — `~/.claude/projects/*/*.jsonl` (24M total). Full chat history, large and not meant to be portable.
+- **Secrets / machine-specific config** — `~/.copilot/config.json`, `mcp-config.json`, `permissions-config.json`. Never inspected or copied by this repo (deliberately not read while building this, to avoid handling tokens unnecessarily). Set these up manually per machine.
+- **`~/.copilot/memory/`** — was included as an empty stub (`knowledge.md`, 0 bytes) in an earlier pass; removed since there was nothing real to track. Re-add to `mapping.yaml` if it ever holds real content.
+- **Per-project memory** (`~/.claude/projects/*/memory/*.md` — e.g. this repo's own `MEMORY.md`) — deferred. It's keyed by a hash of the absolute working-directory path, so it only round-trips correctly if every machine clones each project repo to an identical path. Revisit once that's either guaranteed or a path-independent scheme is designed.
+
+## Install strategies (`mapping.yaml`)
+
+- **`symlink`** — target becomes a symlink into this repo. Edit either place, both stay in sync. Any existing real file/dir at the target is backed up first, once. **On Windows**, if symlink creation is denied (see below), the installer automatically falls back to a **Junction** (directories) or **Hard Link** (files) instead — same effect for reading/writing, but see the caveat below.
+- **`seed-once`** — copied in only if the target doesn't already exist; never touched again after that. Used for `claude/settings.json` (accumulates machine-local permission grants) and `global-variables.md` (accumulates machine-specific variable values) — a symlink would sync those values across every machine, which isn't what you want.
+
+## OS support
+
+macOS is implemented (`installers/macos/install.sh`) and tested (idempotent re-runs, `uninstall.sh` safety, all re-verified after both the `installers/` reorg and the `knowledge/`/`companies/` move). Linux is stubbed (`installers/linux/install.sh`) — the underlying logic in `installers/lib/link-or-copy.sh` is plain POSIX-ish bash and should work unmodified.
+
+**Windows** is implemented via `installers/install.ps1`/`uninstall.ps1` + `installers/lib/link-or-copy.ps1` (PowerShell 5.1+), tested with PowerShell 7.6 against a throwaway fake `$env:USERPROFILE`. Two things to know:
+
+- **Symlinks need admin rights or Developer Mode.** `New-Item -ItemType SymbolicLink` requires either an elevated PowerShell session, or Windows 10 (build 14972+)/11 with Developer Mode turned on (Settings → Privacy & Security → For developers) — verified against the PowerShell project's own issue tracker, see References. When neither is available, the installer catches the failure and automatically creates a **Junction** (for a directory mapping) or a **Hard Link** (for a file mapping) instead, and says so in its output. This part is logic-tested but not tested under an actual denied-symlink Windows session, since this Mac can't reproduce that failure — worth a real check on first use on Windows.
+- **Hard Link caveat:** a hard link points at the same on-disk data as the source file, not at its path. If a file is later *replaced* (many editors/Git save by writing a new file and renaming it over the old one), the hard link at the target keeps pointing at the old, orphaned data. A Junction (used for directories) doesn't have this problem. If this bites you, delete the stale hard link and re-run `install.ps1`.
+- `uninstall.ps1` deliberately never passes `-Recurse` to `Remove-Item` when removing a directory link — verified that `-Recurse` on a symlink/junction directory follows the link and deletes the *real* target's contents, not just the link entry (see References). Checked directly: uninstalling in a test run left the repo's real `copilot/knowledge/` file count unchanged.
+
+No native Windows support was attempted via Git Bash / WSL — `install.sh` detects that environment and points you at `install.ps1` instead.
+
+## References
+
+**Local artifacts:**
+- `{{AGENT_HOME}}/knowledge/ai-agents/loop-engineering.md`, `loop-engineering-playbook.md` — the loop-engineering concept this repo's own draft→check→decide-style install/verify flow borrows vocabulary from.
+- `{{AGENT_HOME}}/knowledge/documentation/doc-template-base.md` — the format-redirect-table pattern `mapping.yaml` reuses at the filesystem level.
+- `SETUP.md` — the onboarding flow that fills in `global-variables.md`'s machine-specific values.
+- `copilot/patterns/shared-procedure-thin-wrapper.pattern.md` (catalogued in `copilot/patterns/index.md`) — the pattern this file's own `claude/CLAUDE.md`/`codex/AGENTS.md`/Copilot-native split follows.
+
+**External authoritative sources:**
+- [Claude Code — Advanced setup docs](https://code.claude.com/docs/en/setup) and [ClaudeLog — Where is Claude Code installed?](https://claudelog.com/faqs/where-is-claude-code-installed/) — confirm Windows native config lives at `%USERPROFILE%\.claude`.
+- [GitHub Copilot CLI configuration directory — GitHub Docs](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference) — confirms Windows native config lives at `%USERPROFILE%\.copilot`.
+- [PowerShell/PowerShell issue #5000](https://github.com/PowerShell/PowerShell/issues/5000) and [Winaero — Create Symbolic Link in Windows 10 with PowerShell](https://winaero.com/create-symbolic-link-windows-10-powershell/) — symlink creation needs admin or Developer Mode (Windows 10 build 14972+).
+- [PowerShell/PowerShell issue #621](https://github.com/powershell/powershell/issues/621) and [zaur.it — Delete a symbolic link on Windows safely](https://zaur.it/delete-symbolic-link-windows/) — `Remove-Item -Recurse` on a symlink/junction directory deletes the real target's contents; never pass `-Recurse` when removing a link.
+
+## Related
+
+- `SETUP.md` — onboarding task list for a new machine.
+- `copilot/patterns/index.md` — reusable design patterns, deployed globally to `{{AGENT_HOME}}/patterns/`, e.g. before adding another cross-tool capability or writing another "overwrite this path" script.
+- `global-variables.md` — path/preference variable definitions.
+- `copilot/companies/ots/index.md` — worked instance of the Company KB Framework.
+- **Deferred (2026-09-20):** renaming the live disk destination itself — e.g. `{{AGENT_HOME}}` from `~/.copilot` to something neutral — was explicitly considered and declined. `{{AGENT_HOME}}` now makes this cheap *if* it's ever revisited (one line in `global-variables.md`), but there's still no live problem motivating it today.
+- Consider a real Windows machine/VM test of the symlink-denied → Junction/HardLink fallback path — this Mac can't reproduce a denied-symlink PowerShell session to test it end-to-end.
+- Consider a future pass on Linux support once actually needed on a second machine (stub exists, untested).
+- Consider a path-independent scheme for per-project memory once cross-machine repo paths are settled.
