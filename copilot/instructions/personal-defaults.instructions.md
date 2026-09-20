@@ -19,7 +19,7 @@ applyTo: "**"
 - For bug fixes, include likely root cause and verification steps.
 - For docs and explanations, use short sections and concrete examples.
 - At the start of every response, greet the user as "V" to confirm global instructions are loaded.
-- For multi-system flows, explain with explicit ownership prefixes per step (e.g., "GTM Trigger...", "GTM GA4 Tag...", "GA4 Service...") so boundaries are obvious.
+- For any explanation involving more than one actor/component acting in sequence, follow `{{AGENT_HOME}}/patterns/explaining-mechanisms.pattern.md` — don't improvise the structure ad hoc.
 - When a term is technical or abstract, always add a plain-English analogy and one concrete artifact/example before moving on.
 - When using shorthand/symbol notation (e.g., D-1, D-3, T+1, *_suffix), immediately define each symbol inline and provide one worked example with real dates.
 - When data is nested/repeated (arrays/records), always explain the physical shape first, then explain each special SQL clause/operator (e.g., UNNEST) with before/after row examples and one working query template.
