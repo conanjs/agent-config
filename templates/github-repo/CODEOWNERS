@@ -1,0 +1,8 @@
+# CODEOWNERS — pull requests touching a matched path require review from the listed owner(s).
+# Syntax: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# This alone does not block merging — pair it with a branch protection rule that requires
+# code owner review, or CODEOWNERS is advisory only. See init-github-governance.procedure.md.
+
+# Default owner for everything not matched below.
+* <OWNER_GITHUB_USERNAME>

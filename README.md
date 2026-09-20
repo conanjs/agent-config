@@ -10,6 +10,8 @@ A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, Git
 | Reuse a design technique before improvising a one-off | [`copilot/patterns/index.md`](copilot/patterns/index.md) |
 | Understand or extend the Company KB Framework | [`copilot/frameworks/company-kb/index.md`](copilot/frameworks/company-kb/index.md) |
 | Work inside a specific company's KB (e.g. OTS) | [`copilot/companies/ots/index.md`](copilot/companies/ots/index.md) |
+| Bootstrap Spec-Driven Development (Spec Kit) in a project | [`copilot/procedures/spec-driven-development.procedure.md`](copilot/procedures/spec-driven-development.procedure.md) |
+| Add standard GitHub repo governance to a repo | [`copilot/procedures/init-github-governance.procedure.md`](copilot/procedures/init-github-governance.procedure.md) |
 | Look up a path/preference variable (`{{AGENT_HOME}}` etc.) | [`global-variables.md`](global-variables.md) |
 | See exactly what gets installed where | [`mapping.yaml`](mapping.yaml), and "What's included" below |
 
@@ -42,14 +44,22 @@ agent-config/
 │   │       ├── conventions.md
 │   │       └── schemas/                        # one <type>.schema.md per document type
 │   ├── procedures/                     # one <name>.procedure.md per recurring task — grouped by artifact type, not by which framework it's about
+│   │   ├── init-repo-kb.procedure.md
+│   │   ├── spec-driven-development.procedure.md    # bootstrap GitHub Spec Kit in a project
+│   │   └── init-github-governance.procedure.md     # add standard GitHub lifecycle/contribution files
 │   ├── patterns/                       # reusable design techniques, globally available (not agent-config-specific)
-│   │   ├── index.md                        # catalog — start here for pattern #3+
+│   │   ├── index.md                        # catalog — start here for pattern #4+
 │   │   ├── shared-procedure-thin-wrapper.pattern.md
-│   │   └── backup-before-overwrite.pattern.md
+│   │   ├── backup-before-overwrite.pattern.md
+│   │   └── explaining-mechanisms.pattern.md
 │   ├── prompts/                        # Copilot slash-command prompts (thin wrappers, see patterns/)
 │   └── agents/, hooks/                 # genuinely Copilot-CLI-specific features
 ├── claude/                         # -> ~/.claude/* (or %USERPROFILE%\.claude on Windows)
-└── codex/AGENTS.md                 # -> ~/.codex/AGENTS.md (or %USERPROFILE%\.codex on Windows)
+├── codex/AGENTS.md                 # -> ~/.codex/AGENTS.md (or %USERPROFILE%\.codex on Windows)
+└── templates/github-repo/          # NOT deployed via mapping.yaml — copied into OTHER repos on demand by
+                                     # init-github-governance.procedure.md, not into ~/.copilot at all
+    ├── CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CODEOWNERS
+    └── .github/ISSUE_TEMPLATE/*.md, .github/PULL_REQUEST_TEMPLATE.md
 ```
 
 **A naming note, since this moved twice during design:** `knowledge/`, `companies/`, and `frameworks/company-kb/` aren't actually Copilot-specific — no tool reads them automatically, they only work because an instructions file tells an agent to go read a path there. They briefly lived at the repo's top level for that reason. They're under `copilot/` because the user wants to be able to say "global Copilot knowledge" in conversation and have that phrase map directly onto both the folder name and the concept (see `personal-defaults.instructions.md`'s term-recognition rules). Functionally this changes nothing — the deployed destination has always been `~/.copilot/knowledge` (and now `~/.copilot/frameworks/company-kb`) either way, since `mapping.yaml`'s `source` (repo-internal) and `target` (disk destination) are independent of each other.

@@ -20,6 +20,8 @@ applyTo: "**"
 - For docs and explanations, use short sections and concrete examples.
 - At the start of every response, greet the user as "V" to confirm global instructions are loaded.
 - For any explanation involving more than one actor/component acting in sequence, follow `{{AGENT_HOME}}/patterns/explaining-mechanisms.pattern.md` — don't improvise the structure ad hoc.
+- When asked to set up spec-driven development / Spec Kit for a project, follow `{{AGENT_HOME}}/procedures/spec-driven-development.procedure.md` — don't invent the install/workflow steps ad hoc.
+- When asked to add standard GitHub repo governance (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CODEOWNERS, issue/PR templates, branch protection) to a repo, follow `{{AGENT_HOME}}/procedures/init-github-governance.procedure.md` — the actual file contents live once at `{{AGENT_CONFIG_REPO}}/templates/github-repo/`, never restate or fork them.
 - When a term is technical or abstract, always add a plain-English analogy and one concrete artifact/example before moving on.
 - When using shorthand/symbol notation (e.g., D-1, D-3, T+1, *_suffix), immediately define each symbol inline and provide one worked example with real dates.
 - When data is nested/repeated (arrays/records), always explain the physical shape first, then explain each special SQL clause/operator (e.g., UNNEST) with before/after row examples and one working query template.
