@@ -8,6 +8,12 @@ This is one instance of the **Company KB Framework**, defined at [`{{AGENT_HOME}
 
 **Structure:** flat (see `{{AGENT_HOME}}/frameworks/company-kb/schemas/_system.md#structure-options` for what this means and the alternative).
 
+## System
+
+| System | Purpose | Path | Docs |
+|---|---|---|---|
+| OTS Shipment | System-level context map and service catalog for the four OTS repos | `system/` | [architecture](system/architecture.md), [service catalog](system/service-catalog.yaml) |
+
 ## Repos
 
 | Repo | Purpose | Path | Doc |

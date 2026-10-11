@@ -68,6 +68,10 @@ function Backup-IfExists {
       Remove-Item -LiteralPath $Target -Force
     } else {
       $dest = Join-Path (Get-BackupRoot) ($SourceRel -replace '/', '\')
+      # One source can map to several targets (e.g. skills -> ~/.claude/skills
+      # and ~/.agents/skills); never let a second backup land on the first.
+      $base = $dest; $n = 2
+      while (Test-Path -LiteralPath $dest) { $dest = "$base.$n"; $n++ }
       $destParent = Split-Path $dest -Parent
       if (-not (Test-Path -LiteralPath $destParent)) { New-Item -ItemType Directory -Path $destParent -Force | Out-Null }
       Write-Host "  existing content at $Target -> backing up to $dest"

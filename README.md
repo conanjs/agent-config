@@ -9,6 +9,7 @@ A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, Git
 | Set this repo up on a new machine | [`SETUP.md`](SETUP.md) |
 | Reuse a design technique before improvising a one-off | [`copilot/patterns/index.md`](copilot/patterns/index.md) |
 | Understand or extend the Company KB Framework | [`copilot/frameworks/company-kb/index.md`](copilot/frameworks/company-kb/index.md) |
+| Write or check a global knowledge doc (schemas, deep dives, validator) | [`copilot/frameworks/knowledge/index.md`](copilot/frameworks/knowledge/index.md) |
 | Work inside a specific company's KB (e.g. OTS) | [`copilot/companies/ots/index.md`](copilot/companies/ots/index.md) |
 | Bootstrap Spec-Driven Development (Spec Kit) in a project | [`copilot/procedures/spec-driven-development.procedure.md`](copilot/procedures/spec-driven-development.procedure.md) |
 | Add standard GitHub repo governance to a repo | [`copilot/procedures/init-github-governance.procedure.md`](copilot/procedures/init-github-governance.procedure.md) |
@@ -39,14 +40,26 @@ agent-config/
 │   ├── knowledge/                      # cross-project knowledge base (general-purpose content, kept here for naming consistency — see note below)
 │   ├── companies/                      # per-company knowledge base INSTANCES (content only — e.g. companies/ots/)
 │   ├── frameworks/                     # framework DEFINITIONS — shared, not per-company (one subfolder per framework)
-│   │   └── company-kb/                     # currently the only framework
-│   │       ├── index.md                        # start here: concise overview of this folder
-│   │       ├── conventions.md
-│   │       └── schemas/                        # one <type>.schema.md per document type
+│   │   ├── company-kb/                     # per-company knowledge base framework
+│   │   │   ├── index.md                        # start here: concise overview of this folder
+│   │   │   ├── conventions.md
+│   │   │   └── schemas/                        # one <type>.schema.md per document type
+│   │   ├── knowledge/                      # knowledge framework for copilot/knowledge/ (store B)
+│   │   │   ├── index.md                        # start here
+│   │   │   ├── schemas/                        # knowledge-doc, deep-dive, topic-index
+│   │   │   └── tools/validate-knowledge.mjs
+│   │   └── agentic-sdlc/                   # hierarchical multi-agent, spec-driven engineering framework
+│   │       ├── index.md                        # start here
+│   │       ├── conventions.md, schemas/, agents/ (role definitions)
+│   │       ├── foundations/                    # preset knowledge by subject: code/, design/, quality/, delivery/, review/
+│   │       ├── trees/, stacks/<id>/, paradigms/ # decision trees; stack + paradigm profiles
+│   │       └── tools/validate.mjs              # framework validator (node, no deps)
 │   ├── procedures/                     # one <name>.procedure.md per recurring task — grouped by artifact type, not by which framework it's about
 │   │   ├── init-repo-kb.procedure.md
 │   │   ├── spec-driven-development.procedure.md    # bootstrap GitHub Spec Kit in a project
-│   │   └── init-github-governance.procedure.md     # add standard GitHub lifecycle/contribution files
+│   │   ├── init-github-governance.procedure.md     # add standard GitHub lifecycle/contribution files
+│   │   ├── bootstrap-agentic-sdlc.procedure.md     # adopt agentic-sdlc in one project repo
+│   │   └── init-system-workspace.procedure.md      # Company KB system/ docs + standard clone layout for a multi-repo system
 │   ├── patterns/                       # reusable design techniques, globally available (not agent-config-specific)
 │   │   ├── index.md                        # catalog — start here for pattern #4+
 │   │   ├── shared-procedure-thin-wrapper.pattern.md
@@ -54,8 +67,10 @@ agent-config/
 │   │   └── explaining-mechanisms.pattern.md
 │   ├── prompts/                        # Copilot slash-command prompts (thin wrappers, see patterns/)
 │   └── agents/, hooks/                 # genuinely Copilot-CLI-specific features
-├── claude/                         # -> ~/.claude/* (or %USERPROFILE%\.claude on Windows)
+├── claude/                         # -> ~/.claude/* (or %USERPROFILE%\.claude on Windows), incl. agents/ (sdlc-* role wrappers)
 ├── codex/AGENTS.md                 # -> ~/.codex/AGENTS.md (or %USERPROFILE%\.codex on Windows)
+├── codex/agents/                   # -> ~/.codex/agents (sdlc-* role wrappers, TOML)
+├── skills/                         # -> ~/.claude/skills AND ~/.agents/skills (Copilot + Codex) — tool-neutral SKILL.md
 └── templates/github-repo/          # NOT deployed via mapping.yaml — copied into OTHER repos on demand by
                                      # init-github-governance.procedure.md, not into ~/.copilot at all
     ├── CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CODEOWNERS
@@ -92,7 +107,7 @@ OTS is the current worked instance: [`copilot/companies/ots/index.md`](copilot/c
 
 You only ever run **one** of `install.sh` / `install.ps1` on a given machine — whichever matches the OS you're currently on. They're not alternatives for the same OS; bash can't execute PowerShell syntax and vice versa. Each file also says so in its own header comment now.
 
-Existing real content at a destination path is backed up before a link replaces it — nothing is deleted outright. All backups from one install run land in a single folder, `~/.agent-config-backups/<timestamp>/`, mirroring each entry's `mapping.yaml` source path (e.g. a pre-existing `~/.claude/CLAUDE.md` backs up to `~/.agent-config-backups/<timestamp>/claude/CLAUDE.md`) — not scattered `path.backup-<timestamp>` siblings next to each real path. The folder is only created if something actually needs backing up; a clean run creates nothing.
+Existing real content at a destination path is backed up before a link replaces it — nothing is deleted outright. All backups from one install run land in a single folder, `~/.agent-config-backups/<timestamp>/`, mirroring each entry's `mapping.yaml` source path (e.g. a pre-existing `~/.claude/CLAUDE.md` backs up to `~/.agent-config-backups/<timestamp>/claude/CLAUDE.md`) — not scattered `path.backup-<timestamp>` siblings next to each real path. The folder is only created if something actually needs backing up; a clean run creates nothing. One source can map to several targets (`skills/` does); if more than one of them needs backing up in the same run, later backups get a `.2`, `.3`… suffix instead of overwriting the first.
 
 ## What's included
 
@@ -101,8 +116,12 @@ Existing real content at a destination path is backed up before a link replaces 
 | `copilot/instructions/` | Global Copilot instruction files (incl. `personal-defaults.instructions.md`, loaded by `~/.claude/CLAUDE.md` too) |
 | `copilot/knowledge/` | The cross-project knowledge base (ai-agents, analytics, documentation, gcp, grpc, etc.) |
 | `copilot/frameworks/company-kb/` | The **Company KB Framework** definition (conventions, schemas, procedures) — shared, not tied to any one company. Start at its own [`index.md`](copilot/frameworks/company-kb/index.md). |
+| `copilot/frameworks/knowledge/` | The **Knowledge Framework** for `copilot/knowledge/` (store B): doc schemas (`knowledge-doc`, `deep-dive`, `topic-index`) and `tools/validate-knowledge.mjs`. New docs only; legacy docs are never retrofitted. |
 | `copilot/companies/ots/` | The **OTS Knowledge Base** — the current instance of the framework above: schema-typed docs (flow/feature/repo-overview/domain/infra/api-surface) so an agent can navigate a multi-repo system without full codebase exploration. Start at [`index.md`](copilot/companies/ots/index.md). |
-| `copilot/agents/` | Custom agent definitions |
+| `copilot/frameworks/agentic-sdlc/` | The **Agentic SDLC Framework**: an Orchestrator plus department roles that run projects through Spec Kit phases using decision trees, per-language stack profiles and swappable paradigms. Start at its [`index.md`](copilot/frameworks/agentic-sdlc/index.md); design rationale in [`proposals/agentic-sdlc-architecture.md`](proposals/agentic-sdlc-architecture.md). |
+| `copilot/agents/` | Custom agent definitions (incl. `sdlc-*.agent.md` wrappers for agentic-sdlc roles) |
+| `claude/agents/`, `codex/agents/` | `sdlc-*` role wrappers for Claude Code (markdown) and Codex (TOML) — each only points at `copilot/frameworks/agentic-sdlc/agents/<role>.md` |
+| `skills/` | Tool-neutral Agent Skills (`SKILL.md`): the `agentic-sdlc` entry point, `sdlc-<role>-preset` role presets, and the `sdlc-stack-<id>` / `sdlc-paradigm-<id>` profiles. Linked to `~/.claude/skills` (Claude Code) and `~/.agents/skills` (read by both Copilot and Codex). |
 | `copilot/prompts/` | Copilot slash-command prompts — currently `init-repo-kb`, which bootstraps `repo-overview` KB docs for one, several, or all undocumented repos in a company. VS Code Copilot Chat only (Local or Copilot mode) — Copilot CLI's terminal tool doesn't support prompts/agents at all, per `github-copilot/copilot-cli-internals.md`. |
 | `copilot/hooks/` | User-authored hooks (e.g. `desktop-notify`) |
 | `claude/CLAUDE.md` | Claude Code's global entrypoint. `@import`s all three `copilot/instructions/*.instructions.md` files explicitly — Claude Code's `@import` requires individual file paths, unlike Copilot CLI which auto-loads every `.instructions.md` in the folder natively. Missing an `@import` here silently means Claude Code never sees that file. |

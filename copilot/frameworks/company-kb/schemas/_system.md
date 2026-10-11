@@ -1,6 +1,6 @@
 # KB Schema System
 
-_Last updated: 2026-09-20_
+_Last updated: 2026-10-04_
 
 ## What This Is
 
@@ -40,7 +40,9 @@ last-updated: YYYY-MM-DD
 # <Title>
 ```
 
-Valid schema names: `flow`, `feature`, `repo-overview`, `domain`, `infra`, `api-surface`
+Valid schema names: `flow`, `feature`, `repo-overview`, `domain`, `infra`, `api-surface`, `system-architecture`, `service-catalog`, `cross-repo-feature`
+
+`service-catalog` is YAML, so its `schema:` and `last-updated:` are top-level keys in the file instead of a front-matter block.
 
 ## Compliance Rule
 
@@ -71,6 +73,11 @@ Paths below use flat structure; under grouped-by-project, prepend `{project}/` t
 | `domain` | `schemas/domain.schema.md` | `domain/*.md` |
 | `infra` | _(no strict schema yet)_ | `infra/*.md` |
 | `api-surface` | `schemas/api-surface.schema.md` | `repos/{repo}/api-surface.md` |
+| `system-architecture` | `schemas/system-architecture.schema.md` | `system/architecture.md` (optional) |
+| `service-catalog` | `schemas/service-catalog.schema.md` | `system/service-catalog.yaml` (optional) |
+| `cross-repo-feature` | `schemas/cross-repo-feature.schema.md` | `system/features/*.md` (optional) |
+
+**The `system/` folder (added 2026-10-04)** is optional. Create it only when a company's repos form one multi-repo system and you plan cross-repo work. It replaces a separate "system repo": the map between repos lives here, while contracts stay in their provider repos. `system/` is not under `repos/`, so its path is the same in flat and grouped-by-project layouts.
 
 ## References
 
