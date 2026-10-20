@@ -42,6 +42,7 @@ This is one instance of the **Company KB Framework**, defined at [`{{AGENT_HOME}
 - [GKE Clusters](infra/gke-clusters.md)
 - [Local Dev Testing Setup](infra/local-dev-testing.md) — IPv6/Citrix workaround, auth stubs, full test cycle, quick revert
 - [Container+ Test Data Lookup](infra/container-plus-test-data-lookup.md) — recipe for finding real upstream Apigee test bookings covering the 8 Container+ display scenarios
+- [Stage Secrets Migration to GSM](infra/stage-secrets-gsm-migration.md) — how the two shipment APIs get secrets and service-account files in stage, the GSM-backed ExternalSecrets, live-cluster findings and open items
 
 ## Conventions
 

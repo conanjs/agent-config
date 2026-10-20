@@ -17,6 +17,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [js-runtime/](js-runtime/index.md) | V8 and Node.js runtime behavior that shapes how TypeScript/JavaScript code is written: hidden classes, promise rejections, AbortSignal | topic index |
 | [concurrency/](concurrency/index.md) | Cross-language concurrency: structured concurrency, blocking inside async runtimes, shared state and data races (Go, Python, Rust, TypeScript) | topic index |
 | [error-handling/](error-handling/index.md) | Cross-language error design: handle errors once, library vs. application errors | topic index |
+| [kubernetes/](kubernetes/index.md) | How workloads get configuration and credentials from the cluster (Secret vs volume vs mounted folder, `secret:` vs `projected:` volumes, external secret stores), and how container CPU/memory limits work: vCPU, CPU throttling, OOM kills, eviction | topic index |
 | [operations/](operations/index.md) | Runtime operation concerns in code: config at startup, structured logging | topic index |
 | [web-apis/](web-apis/index.md) | HTTP API design: mapping errors to status codes and problem details | topic index |
 | [ai-agents/](ai-agents/) | *legacy* — loop engineering for AI agents | 3 |
