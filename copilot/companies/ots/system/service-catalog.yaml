@@ -1,0 +1,77 @@
+schema: service-catalog
+last-updated: 2026-10-04
+system: ots-shipment
+services:
+  - id: manage-shipment-frontend
+    repo: ne-manage-shipment-frontend
+    url: TODO-unknown
+    owner: TODO-unknown
+    stack: typescript-nextjs
+    owns: []
+    provides: []
+    consumes:
+      - api-gateway:REST /v1/cargo-release/*@1
+      - api-gateway:REST /v2/cargo-release/*@2
+      - api-gateway:REST /v2/shipments/{bookingNo}@2
+    external:
+      - launchdarkly
+    kb: repos/ne-manage-shipment-frontend/overview.md
+  - id: api-gateway
+    repo: ne-api-gateway
+    url: TODO-unknown
+    owner: TODO-unknown
+    stack: typescript-nestjs
+    owns: []
+    provides:
+      - REST /v1/cargo-release/*@1
+      - REST /v2/cargo-release/*@2
+      - REST /v2/shipments/{bookingNo}@2
+    consumes:
+      - import-shipment-api:src/modules/cargo-release/protos/cargo-release.proto@TODO-major
+      - shipment-api:src/modules/shipment-dashboard/protos/shipment.proto@TODO-major
+    external:
+      - auth0
+    kb: repos/ne-api-gateway/overview.md
+  - id: import-shipment-api
+    repo: ne-import-shipment-api
+    url: TODO-unknown
+    owner: TODO-unknown
+    stack: typescript-nestjs
+    owns:
+      - CargoRelease
+      - CargoReleaseRequest
+      - CargoReleaseMail
+      - EmailQueue
+      - FileAttachment
+    provides:
+      - src/modules/cargo-release/protos/cargo-release.proto@TODO-major
+    consumes: []
+    external:
+      - apigee
+      - sendgrid
+      - gcp-cloud-storage
+      - launchdarkly
+      - postgresql
+      - redis
+    kb: repos/ne-import-shipment-api/overview.md
+  - id: shipment-api
+    repo: ne-shipment-api
+    url: TODO-unknown
+    owner: TODO-unknown
+    stack: typescript-nestjs
+    owns:
+      - ExportShipmentDashboard
+      - ExportShipmentDetail
+      - Booking
+      - Container
+      - OSL
+      - Invoice
+      - SAPReceivable
+    provides:
+      - src/modules/shipment-dashboard/protos/shipment.proto@TODO-major
+    consumes: []
+    external:
+      - apigee-fronted-ecommerce-shipment-api
+      - postgresql
+      - sap
+    kb: repos/ne-shipment-api/overview.md

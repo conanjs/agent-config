@@ -20,6 +20,11 @@ Every document must declare its schema. **See `{{AGENT_HOME}}/frameworks/company
 | **flow** | `flows/{flow}.md` | Cross-repo sequence diagram + API version map |
 | **domain** | `domain/{concept}.md` | Business terminology, status enums, rules (no code) |
 | **infra** | `infra/{topic}.md` | Clusters, namespaces, env mappings — no strict schema yet |
+| **system-architecture** | `system/architecture.md` | *Optional.* Context map between repos, integration rules, system principles, feature list — see `{{AGENT_HOME}}/frameworks/company-kb/schemas/system-architecture.schema.md` |
+| **service-catalog** | `system/service-catalog.yaml` | *Optional.* Every service: repo, owner, stack, owned entities, contracts provided/consumed — see `schemas/service-catalog.schema.md` |
+| **cross-repo-feature** | `system/features/{NNN-slug}.md` | *Optional.* System-level plan for one feature spanning repos: behaviour, contract changes, decisions, per-repo slices — see `schemas/cross-repo-feature.schema.md` |
+
+**Note (2026-10-04):** the three `system/` types replace the separate "system repo" from agentic-sdlc v1. `flows/` stays the place for *request* sequences; `system/architecture.md` is the static *topology* and links to flows rather than repeating them.
 
 **Note (2026-09-20):** `architecture` as a separate doc type was removed from this table — its scope (module structure, DB schema, external integrations) overlapped with `repo-overview`'s `Module Map`/`External Integrations` sections. The one genuinely new piece, DB schema, is now `repo-overview.schema.md`'s optional `## Data Model` section instead of a whole separate file.
 
@@ -39,10 +44,15 @@ After every feature implementation:
 - Update the relevant `flows/{flow}.md` if the cross-repo contract changed.
 - Update `domain/{concept}.md` if a new status or business rule was added.
 
+If the company has a `system/` folder:
+- When a cross-repo feature is planned, create `system/features/{NNN-slug}.md`. Update its Slices table as each slice progresses.
+- When a service, a repo-to-repo edge or a contract version changes, update `system/architecture.md` and `system/service-catalog.yaml`, and add 1 to `system-ref`.
+- When a repo is added to `index.md`, add it to the catalog too.
+
 ## How an Agent Uses These Docs
 
 At the start of each task:
-1. Check `flows/` — understand cross-repo chain.
+1. Check `flows/` — understand cross-repo chain. If `system/` exists and the task may touch more than one service, check `system/service-catalog.yaml` and `system/features/` first.
 2. Check `repos/{repo}/features/{feature}.md` — understand what already exists.
 3. Do targeted source reads only for unknowns.
 4. Implement, then update docs.
