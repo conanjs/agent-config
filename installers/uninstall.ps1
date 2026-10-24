@@ -19,7 +19,8 @@ foreach ($entry in Get-MappingEntries -MappingFile (Join-Path $RepoRoot 'mapping
   $item = Get-Item -LiteralPath $target -Force
   if ($item.LinkType) {
     Write-Host "removing $($item.LinkType.ToLower()) $target"
-    Remove-Item -LiteralPath $target -Force   # no -Recurse: see header
+    # Remove-Item on a directory link throws on Windows PowerShell 5.1; delete the link entry via .NET (never recursive)
+    if ($item.PSIsContainer) { [IO.Directory]::Delete($target) } else { [IO.File]::Delete($target) }
   }
 }
 

@@ -20,6 +20,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [kubernetes/](kubernetes/index.md) | How workloads get configuration and credentials from the cluster (Secret vs volume vs mounted folder, `secret:` vs `projected:` volumes, external secret stores), and how container CPU/memory limits work: vCPU, CPU throttling, OOM kills, eviction | topic index |
 | [operations/](operations/index.md) | Runtime operation concerns in code: config at startup, structured logging | topic index |
 | [web-apis/](web-apis/index.md) | HTTP API design: mapping errors to status codes and problem details | topic index |
+| [windows/](windows/index.md) | Windows specifics: creating symlinks needs admin, Developer Mode or the symlink user right regardless of shell or PowerShell version | 1 |
 | [ai-agents/](ai-agents/) | *legacy* — loop engineering for AI agents | 3 |
 | [analytics/](analytics/) | *legacy* — GTM → GA4 → BigQuery → Looker Studio pipeline | 5 |
 | [blink/](blink/) | *legacy* — rollout notes | 1 |
