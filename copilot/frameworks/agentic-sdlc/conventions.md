@@ -141,7 +141,23 @@ Framework validator (`tools/validate.mjs`) checks:
 - V6: files outside stack profiles do not name stack-specific tools;
 - wrappers and skills match role presets when present.
 
-Per-repo validator (`tools/validate-project.mjs`, planned) checks repo architecture, task-line suffixes, integration docs, decision records, profile ids, references, and cross-repo system links.
+Per-repo validator (`tools/validate-project.mjs`, planned) checks repo architecture, task-line suffixes, integration docs, decision records, profile ids, references, and cross-repo system links. It already fails a project whose `paradigm: <id>@<major>` pin (architecture §3/§4 or constitution default) has no matching paradigm file.
+
+## 13. Versioning
+Two numbers, two jobs (`knowledge/versioning/semantic-versioning.md`):
+
+| Where | Form | Meaning |
+|---|---|---|
+| Paradigm, stack overlay and schema **changelog rows** | `MAJOR.MINOR.PATCH` | Full history: patch = wording fix, minor = new guidance compatible with old code, major = existing compliant code now fails |
+| Paradigm front-matter `version:` and every **pin** (`class-modeled@1`, `schema: paradigm/v1`) | `MAJOR` only | The compatibility promise. A project pins the major, and minor and patch changes reach it automatically. This is the same idea as `actions/checkout@v4` |
+
+**Phase 1: unpublished (now).** The framework has no outside consumers, so nothing is bumped. Breaking changes are folded into the current major and marked "breaking in substance" in the changelog. The only consumer is a local demo repo, which is updated in the same change.
+
+**Phase 2: after the first published release.**
+1. The framework is released as a git tag equal to `framework-version` in `index.md`. A project records the commit SHA of the release it was built against in `docs/architecture.md` §2. The `framework-ref` field is added to `repo-architecture` at that point, not before. An upgrade is a reviewed change to that SHA.
+2. A major bump never edits the old text in place. The old major's file is frozen as `paradigms/<id>@<old-major>.md` and its stack overlays as `stacks/<s>/paradigms/<id>@<old-major>.md`, and it receives fixes only. The validator learns to register both files before the first such bump.
+3. The current and previous majors are supported. Removing a major needs a changelog note with migration steps, and a check that no known project still pins it.
+4. A project moves to a new major only through a decision record (`schemas/paradigm.schema.md`, Changelog rules).
 
 ## References
 **Local artifacts:**
@@ -152,6 +168,8 @@ Per-repo validator (`tools/validate-project.mjs`, planned) checks repo architect
 - `proposals/agentic-sdlc-v2/README.md`: source framework summary.
 **External authoritative sources:**
 - [github/spec-kit](https://github.com/github/spec-kit): phase model integrated by this framework.
+- [Semantic Versioning 2.0.0](https://semver.org/): MAJOR.MINOR.PATCH meaning; item 4, anything may change before a first stable release.
+- [GitHub Actions, secure use](https://docs.github.com/en/actions/reference/security/secure-use): pin a full commit SHA because tags can move.
 
 ## Related
 - `index.md`: framework overview.

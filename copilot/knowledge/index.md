@@ -13,7 +13,8 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 ## Topics
 | Topic | Summary | Docs |
 |---|---|---|
-| [software-design/](software-design/index.md) | Design principles (SOLID, DRY, KISS/YAGNI, separation of concerns, least astonishment, cohesion/coupling) and domain modeling: OOP (core concepts, encapsulation, polymorphism, composition over inheritance, Law of Demeter, DI, design by contract), DDD (building blocks, aggregates, layering, bounded contexts) and functional modeling (immutability, functional core, types as rules, pipelines, testing) | 4 subtopics |
+| [software-design/](software-design/index.md) | Design principles (SOLID, DRY, KISS/YAGNI, separation of concerns, least astonishment, cohesion/coupling) and domain modeling: OOP (core concepts, encapsulation, polymorphism, composition over inheritance, Law of Demeter, DI, design by contract), DDD (building blocks, aggregates, layering, bounded contexts), architecture styles (hexagonal, clean, onion, how they combine) and functional modeling (immutability, functional core, types as rules, pipelines, testing) | 5 subtopics |
+| [versioning/](versioning/index.md) | Semantic versioning: MAJOR.MINOR.PATCH meaning, frozen releases, pre-1.0 rules, pinning by major or commit SHA | topic index |
 | [js-runtime/](js-runtime/index.md) | V8 and Node.js runtime behavior that shapes how TypeScript/JavaScript code is written: hidden classes, promise rejections, AbortSignal | topic index |
 | [concurrency/](concurrency/index.md) | Cross-language concurrency: structured concurrency, blocking inside async runtimes, shared state and data races (Go, Python, Rust, TypeScript) | topic index |
 | [error-handling/](error-handling/index.md) | Cross-language error design: handle errors once, library vs. application errors | topic index |

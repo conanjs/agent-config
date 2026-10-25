@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: js-runtime
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 ---
 
 # JavaScript runtime internals
@@ -14,6 +14,7 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 |---|---|---|---|
 | [v8-hidden-classes.md](v8-hidden-classes.md) | concept | Object shapes, V8 Maps, inline caches, dictionary mode, and stable-field construction | verified |
 | [promise-rejections.md](promise-rejections.md) | concept | Floating promises, unhandled rejection behavior, and why linting promise handling matters | verified |
+| [private-fields.md](private-fields.md) | concept | `#x` versus TypeScript `private`: runtime privacy, serialization leaks, measured performance | verified |
 | [abort-signal.md](abort-signal.md) | concept | AbortController and AbortSignal as a cancellation contract across fetch and own APIs | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 

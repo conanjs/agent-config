@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 rule-prefix: CS
 subject: code
 ---
@@ -13,7 +13,7 @@ How engineering writes code in any language: readable, small, explicit, and mech
 
 | Id | Rule | Holds when | Typical violation | Enforced by | Source |
 |---|---|---|---|---|---|
-| CS-1 | Names reveal intent and use the ubiquitous language (`../design/domain-driven-design.md`, DDD-1). Booleans read as predicates (`isActive`, `hasAccess`); functions as verbs. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
+| CS-1 | Names reveal intent and use the ubiquitous language (`../design/domain-driven-design.md`, DDD-1). Booleans read as predicates (`isActive`, `hasAccess`); functions as verbs. Detailed naming rules, role suffixes and the project glossary are in `naming.md` (NAM-1 to NAM-12). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CS-2 | Small units. A function does one thing at one level of abstraction; respect the constitution's size/complexity thresholds (default ≤ 50 lines, complexity ≤ 10). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
 | CS-3 | Few parameters. More than 3–4 parameters, or any boolean flag parameter, becomes a named options structure or separate functions. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CS-4 | Isolate effects at the edges in the form the assigned paradigm prescribes. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
@@ -25,9 +25,9 @@ How engineering writes code in any language: readable, small, explicit, and mech
 | CS-10 | Dependencies are injected per `idiom.di`; no hidden globals or service locators in domain/application code. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CS-11 | Configuration per `idiom.config`: read once at startup, validated, typed, passed in; no scattered environment reads; no secrets in code. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CS-12 | Logging per `idiom.logging`: structured, levelled, with correlation id; no sensitive data; log at the boundary where an error is handled, not at every layer. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
-| CS-13 | Comments explain why, not what. Delete commented-out code; link decisions to their decision record. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
+| CS-13 | Comments explain why, not what; orchestration code carries step comments. The rules, examples and enforcement are in `comments.md` (CMT-1 to CMT-11). There is no blanket per-function comment. Delete commented-out code; link decisions to their decision record. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CS-14 | No magic numbers/strings. Named constants with units in the name (`timeoutMs`, `maxRetries`). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
-| CS-15 | Public surfaces are documented (doc comment on exported types/functions stating contract, errors, and side effects). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
+| CS-15 | Public surfaces are documented (doc comment on exported types/functions stating contract, errors, and side effects), per `comments.md` CMT-5 and CMT-6. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
 | CS-16 | New dependencies need a reason. Adding a third-party package requires a decision record and passing `cmd.audit`. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | script | — |
 | CS-17 | Each commit leaves the build green and is scoped to one task. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 
@@ -82,5 +82,8 @@ When a stack profile's idiom conflicts with a rule above, the stack profile wins
 ## Related
 
 - `error-handling.md`, `refactoring.md` — sibling engineering procedures.
+- `comments.md` — CS-13, CS-15 detail (CMT-n).
+- `naming.md` — CS-1, CS-14 detail (NAM-n).
+- `../design/import-paths.md` — how files refer to each other (IMP-n).
 - `../design/design-principles.md` — the principles behind these rules.
 - `../quality/maintainability.md` — the quality contract reviews check.

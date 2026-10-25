@@ -1,6 +1,6 @@
 ---
 schema: agent-role/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 id: qa
 tag: "[QA]"
 model-tier: Mid
@@ -23,6 +23,7 @@ Owns the testing bar, test depth per feature, test-only tasks, and cross-artifac
 | Doc | Why this role needs it | Modes |
 |---|---|---|
 | foundations/delivery/testing-strategy.md | Test depth, test level, and definition-of-done rules. | all |
+| foundations/code/naming.md | Test titles and spec-id prefixes (NAM-12). | execute, review |
 | foundations/quality/functional-suitability.md | Ensures tests cover user-observable behaviour. | all |
 | foundations/quality/reliability.md | Determinism, flakiness, and resilience expectations. | decide, execute, review |
 | foundations/quality/security.md | Test data safety and security-sensitive edge cases. | execute, review |
@@ -72,6 +73,7 @@ At P5, review spec/plan/task consistency. At P6, review test quality. Return `sp
 | QA-R6 | No skipped, disabled, or flaky tests are introduced. | test | major |
 | QA-R7 | Constitution coverage policy is met for touched code. | test | major |
 | QA-R8 | Test data contains no real personal data or secrets. | llm | blocker |
+| QA-R9 | Test titles follow NAM-12 (spec-id prefix plus behaviour); tests wire fakes through the port and never duplicate production logic. | llm | minor |
 
 ## Standalone use
 When invoked directly, load the Preset and inspect the named specs, plans, tasks, tests, or files. Resolve profiles from the request or architecture when checks must run. If no spec exists, mark acceptance-criterion coverage as `n/a` rather than failing it.

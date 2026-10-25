@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 rule-prefix: CA
 subject: design
 ---
@@ -22,6 +22,7 @@ What is true of a well-layered component: source dependencies point inward towar
 | CA-7 | Side effects are injected. Time, randomness, id generation, environment, and configuration reach inner layers through ports or parameters (`idiom.config`). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CA-8 | No cycles between layers or modules (`../review/fitness-functions.md`, FF-2). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CA-9 | Testability follows from layering. Domain is unit-tested with no doubles; application is unit-tested with fake ports; adapters are integration-tested against the real dependency. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
+| CA-10 | Adapters do not depend on each other. A driving adapter (controller, CLI handler, consumer) reaches a driven adapter (repository, client, publisher) only through an application use case and its port. Only the composition root names both. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | knowledge/software-design/architecture-styles/hexagonal-architecture.md |
 
 ## Interpreting
 
@@ -31,7 +32,7 @@ What is true of a well-layered component: source dependencies point inward towar
 |---|---|---|---|
 | **Domain** (entities, value objects, domain services) | Business rules and invariants | Nothing outside the domain | I/O, framework types, serialization annotations, clock/randomness read directly |
 | **Application** (use cases) | Orchestration of one user intent; transaction scope; port interfaces | Domain | Transport (HTTP, queue) details, query strings |
-| **Adapters / Infrastructure** | Port implementations: repositories, clients, publishers, controllers | Application, Domain | Business rules |
+| **Adapters / Infrastructure** | Port implementations: repositories, clients, publishers, controllers | Application, Domain; never another adapter (CA-10) | Business rules |
 | **Composition root** | Wiring, configuration loading, process startup | Everything | Logic beyond wiring |
 
 The stack profile's `project_layout` slot gives the concrete folder names; `idiom.di` gives the wiring form.
@@ -43,6 +44,7 @@ The stack profile's `project_layout` slot gives the concrete folder names; `idio
 - **Driving (primary) ports:** use-case interfaces called by controllers, CLI handlers, message consumers.
 - **Driven (secondary) ports:** interfaces the application calls — persistence, external APIs, messaging, clock.
 - Each driven port has at least one production adapter and, where useful, an in-memory adapter for tests.
+- The application is the hub (CA-10). A controller that calls a repository directly skips the use case and every check the use case runs, such as authorization. For a security-relevant use case this means failing open.
 
 **Boundaries**
 
@@ -76,9 +78,11 @@ Any simplification is stated in `docs/architecture.md`; an unstated one is a rev
 - `foundations/design/clean-architecture.md`: this foundation file.
 
 **External authoritative sources:**
-- Robert C. Martin, *Clean Architecture: A Craftsman's Guide to Software Structure and Design* (2017).
-- Alistair Cockburn, "Hexagonal Architecture" (Ports and Adapters), 2005.
-- Jeffrey Palermo, "The Onion Architecture" (2008).
+- Robert C. Martin, *Clean Architecture: A Craftsman's Guide to Software Structure and Design* (2017); [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) (2012).
+- [Alistair Cockburn, "Hexagonal Architecture"](https://alistair.cockburn.us/hexagonal-architecture/) (Ports and Adapters), 2005. Backs CA-10: adapters talk to the application, not to each other.
+- [Jeffrey Palermo, "The Onion Architecture"](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/) (2008).
+
+**Knowledge docs:** `knowledge/software-design/architecture-styles/` — hexagonal, clean, and how they combine with DDD.
 
 ## Related
 

@@ -5,7 +5,7 @@ topic: software-design/ddd
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 tags: [ddd, layering, hexagonal-architecture, ports-and-adapters]
 ---
 
@@ -80,6 +80,7 @@ Dependency direction should point inward: domain code defines or consumes abstra
 | Where | Id / path | How |
 |---|---|---|
 | paradigm rule | PDM-class-modeled-R4 | Source: |
+| paradigm rule | PDM-class-modeled-R7 | Source: |
 
 ## Verification status
 - Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
@@ -96,5 +97,6 @@ Dependency direction should point inward: domain code defines or consumes abstra
 
 ## Related
 - `software-design/oop/dependency-injection.md`
+- `software-design/architecture-styles/combining-styles.md` — how this layering relates to onion, hexagonal and clean
 - `software-design/ddd/aggregates.md`
 - `software-design/ddd/building-blocks.md`

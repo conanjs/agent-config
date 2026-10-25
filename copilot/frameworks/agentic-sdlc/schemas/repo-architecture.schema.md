@@ -40,7 +40,7 @@ components:
 ## 4. Layers & dependency rules
 ```yaml
 layers:
-  - { name: <id>, path: <dir>/, may-depend-on: [<layer names>], paradigm: <id>@<major> }   # paradigm optional override
+  - { name: <id>, path: <dir>/, may-depend-on: [<layer names>], paradigm: <id>@<major>, alias: <prefix> }   # paradigm and alias optional
 ```
 
 ## 5. Data
@@ -73,7 +73,8 @@ layers:
   - `framework` must be listed in that stack's front-matter.
   - `paradigm` is `<id>@<major>`, and that paradigm's `supports` must include the stack.
   - `decisions` is required when `stack` or `paradigm` is set.
-- **§4:** `may-depend-on` names only layers from the same list. The stack turns it into FF-1 boundary rules.
+- **§4:** `may-depend-on` names only layers from the same list. The stack turns it into FF-1 boundary rules. An optional `alias: <prefix>` on a layer or module is its import alias (`foundations/design/import-paths.md`, IMP-7); the stack turns it into runtime and type-check alias config.
+- **§7 (optional):** when a component's paradigm is tiered (`paradigms/class-modeled.md`), a bullet `Tier B files:` lists the globs where free functions are allowed, one reason each. It is the allow-list the stack's lint config mirrors (PDM-class-modeled-R7).
 - **§6:** every external service the code calls has a row. Every row of kind other than `none` has a `Doc` that complies with `integration/v1`.
 - **§8** links to records and never restates them.
 - **§2 drift:** P0 flags it stale when `ref` ≠ `system-ref` in `<kb>/architecture.md`. There is no separate system repo (D8): system topology lives in the Company KB `system/` folder (`../company-kb-changes/`).

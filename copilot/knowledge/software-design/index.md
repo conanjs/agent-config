@@ -20,6 +20,7 @@ Software design covers design principles, model structure, boundaries, and depen
 | [design-principles/](design-principles/) | Paradigm-neutral design principles: SOLID, DRY, KISS/YAGNI, separation of concerns, least astonishment, cohesion and coupling. |
 | [oop/](oop/) | Object-oriented modeling practices for behavior-owning types, dependency wiring, and contracts. |
 | [ddd/](ddd/) | Domain-Driven Design tactical and strategic patterns for business-model boundaries. |
+| [architecture-styles/](architecture-styles/) | Hexagonal (ports and adapters), clean architecture's dependency rule, onion, and how they combine with DDD. |
 | [functional-modeling/](functional-modeling/) | Functional modeling practices for immutable data, pipelines, and effects at the edge. |
 
 ## References
@@ -34,3 +35,4 @@ Software design covers design principles, model structure, boundaries, and depen
 - `software-design/oop/`
 - `software-design/ddd/`
 - `software-design/functional-modeling/`
+- `software-design/architecture-styles/`

@@ -5,7 +5,7 @@ topic: software-design/oop
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 tags: [oop, dependency-injection, composition-root, ports]
 ---
 
@@ -78,6 +78,7 @@ The HTTP adapter parses `{ roleId: "admin", permission: "shipment:approve" }` an
 | Where | Id / path | How |
 |---|---|---|
 | paradigm rule | PDM-class-modeled-R3 | Source: |
+| paradigm rule | PDM-class-modeled-R9 | Source: |
 
 ## Verification status
 - Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04

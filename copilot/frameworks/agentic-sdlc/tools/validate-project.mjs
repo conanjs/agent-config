@@ -169,7 +169,10 @@ function parseYamlListBlock(yaml, key) {
     const item = line.match(/^\s*-\s*(.*)$/);
     if (item) {
       if (cur) rows.push(cur);
-      const rest = item[1].trim();
+      let rest = item[1].trim();
+      // Formatters (e.g. Prettier) wrap a long flow map over several lines; join until the braces balance.
+      const depth = (s) => (s.match(/\{/g) || []).length - (s.match(/\}/g) || []).length;
+      while (rest.startsWith('{') && depth(rest) > 0 && i + 1 < lines.length) rest += ` ${lines[++i].trim()}`;
       cur = rest.startsWith('{') ? parseFlowMap(rest) : {};
       if (rest && !rest.startsWith('{')) {
         const idx = rest.indexOf(':');
@@ -325,7 +328,8 @@ if (!exists(architecturePath)) {
       for (const id of decisions) { archDecisionRefs.add(id); if (!decisionExists(id)) fail('ARCH', `${label}: decision ${id} not found in specs/*/research.md`); }
     }
     if (exists(path.join(projectRoot, 'src'))) {
-      const srcCovered = components.some((c) => String(c.path || '').replace(/\/$/, '') === 'src' && ['service', 'library'].includes(c.kind));
+      // `./` (the repo root) covers src/ just as `src/` does.
+      const srcCovered = components.some((c) => ['src', '.'].includes(String(c.path || '').replace(/\/$/, '')) && ['service', 'library'].includes(c.kind));
       const childDirs = fs.readdirSync(path.join(projectRoot, 'src'), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => `src/${e.name}`);
       for (const d of childDirs) {
         const covered = srcCovered || components.some((c) => d === String(c.path || '').replace(/\/$/, '') || d.startsWith(String(c.path || '').replace(/\/$/, '') + '/'));

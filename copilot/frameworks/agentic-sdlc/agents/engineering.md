@@ -1,6 +1,6 @@
 ---
 schema: agent-role/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 id: engineering
 tag: "[Eng]"
 model-tier: Mid
@@ -23,6 +23,9 @@ Owns how code is written inside the boundaries `architecture` sets: standards, i
 | Doc | Why this role needs it | Modes |
 |---|---|---|
 | foundations/code/coding-standards.md | Baseline code clarity, naming, and maintainability rules. | all |
+| foundations/code/comments.md | Comments explain why, step comments in orchestration code, doc comments on public API (CMT-n). | execute, review |
+| foundations/code/naming.md | Intention-revealing names, role suffixes, one term per concept, test titles (NAM-n). | execute, review |
+| foundations/design/import-paths.md | How files refer to each other: aliases, public entry points, no deep `../` (IMP-n). | execute, review |
 | foundations/code/error-handling.md | Required error semantics and fail-closed behaviour. | all |
 | foundations/code/refactoring.md | Safe improvement rules without unrelated rewrites. | execute, review |
 | foundations/design/design-principles.md | General design rules applied inside assigned boundaries. | all |
@@ -45,6 +48,7 @@ Owns how code is written inside the boundaries `architecture` sets: standards, i
 | state.research | yes for decisions and implementation context | launch prompt |
 | state.tasks | yes for execute/review | launch prompt |
 | state.integrations | when task line lists touches | launch prompt |
+| project glossary | yes for code tasks; read before writing code, extend it when a new domain term appears (NAM-2) | docs/glossary.md |
 | state.references | when task line lists refs | launch prompt |
 | context.feedback | retries only | launch prompt |
 
@@ -64,7 +68,7 @@ At P2, return constitution clauses for coding standards, error handling, task ch
 Implement one `[Eng] [llm]` task. Read the task, acceptance criteria, plan, decision records, profiles, and retry feedback. Produce code and task-owned tests inside the assigned boundary; then run the profile checks named by the launch packet before replying. Done when checks pass, task acceptance criteria are covered, no dead/debug leftovers remain, and artifacts list every changed path.
 
 ### mode: review
-Review implementation output against ENG-R1 through ENG-R10. Confirm tier-1 results for checks enforced by tools, and directly judge only `llm` checks. Fast-path fixes must restore the cited behaviour without changing other behaviour.
+Review implementation output against ENG-R1 through ENG-R13. Confirm tier-1 results for checks enforced by tools, and directly judge only `llm` checks. Fast-path fixes must restore the cited behaviour without changing other behaviour.
 
 ## Review rubric
 | Id | Check | Enforced by | Severity if failed |
@@ -79,6 +83,9 @@ Review implementation output against ENG-R1 through ENG-R10. Confirm tier-1 resu
 | ENG-R8 | Public interfaces are documented where the active profile or constitution requires it. | llm | minor |
 | ENG-R9 | Fast path only: behaviour is restored to the cited acceptance criterion and no other behaviour changes. | llm | blocker |
 | ENG-R10 | Assigned paradigm rules are followed, or an explicit escape hatch is named with rationale. | llm | major |
+| ENG-R11 | Comments follow `foundations/code/comments.md`: why not what, step comments in orchestration code, doc comments on public API, no commented-out code, TODOs with an owner. Cite the CMT id. | llm | minor |
+| ENG-R12 | Names follow `foundations/code/naming.md` and the project `docs/glossary.md`; new domain terms are added to the glossary. Cite the NAM id. | llm | minor |
+| ENG-R13 | References between files follow `foundations/design/import-paths.md`: aliases or public entry points across boundaries, no deep `../`, no cycles. Cite the IMP id. | llm | major |
 
 ## Standalone use
 When invoked directly, load this role and its Preset first. Resolve profiles from the request, then docs/architecture.md, then detected manifests; if still unknown, state what cannot be checked. Paradigm remains empty unless the request or repo declares it. With no Spec flow, report spec-dependent checks as `n/a`; do not write decision records, task files, or architecture records.

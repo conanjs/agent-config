@@ -72,5 +72,6 @@ An objective, repeatable, automated test of an architectural characteristic, wit
 
 - `review-rubrics.md` — what remains a human/agent review check.
 - `../design/clean-architecture.md`, `../design/module-boundaries.md` — the rules FF-1 to FF-5 enforce.
+- `../design/import-paths.md` — IMP-2, IMP-3, IMP-6 and IMP-8 are checked by FF-1 to FF-3.
 - `../design/contract-design.md` — FF-6, FF-7.
 - `../delivery/release-pipeline.md` — where each trigger runs.

@@ -89,3 +89,4 @@ Only when an independent deployment, scaling, ownership, or failure-isolation ne
 - `../quality/maintainability.md` — Q-MAINT-1, Q-MAINT-2.
 - `../review/fitness-functions.md` — automated boundary checks.
 - `../design/contract-design.md` — when boundaries become service contracts.
+- `../design/import-paths.md` — how module references are written and checked (IMP-n).

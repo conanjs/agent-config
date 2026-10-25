@@ -1,6 +1,6 @@
 ---
 schema: stack-idioms/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 stack: typescript-node
 rule-prefix: TSN
 ---
@@ -114,6 +114,11 @@ function handle(req: Request, log = rootLogger) {
 | TSN-4 | Return discriminated Results for expected domain failures | Callers narrow on `ok` and handle every expected case | A validation conflict is thrown as a generic Error | typecheck | — |
 | TSN-5 | Throw only Error instances for unexpected failures | Thrown values have stack, name and optional `cause` | Code throws a string or plain object | lint | — |
 | TSN-6 | Inject use-case dependencies through constructors | A use case can be constructed with fake ports in tests | A use case imports a singleton client | llm | — |
+| TSN-13 | Exported API carries a TSDoc comment that adds information (contract, errors, side effects) | Every exported type, function and method has a doc comment that is not a paraphrase of its name; param and return tags appear only when they add meaning (CMT-5, CMT-6) | An exported use case has no doc comment, or `@param roleId The role id` | lint | — |
+| TSN-14 | TODO and FIXME carry an owner or task id | Every marker looks like `TODO(PROJ-123): ...` (CMT-10) | A bare `// TODO fix later` | script | — |
+| TSN-15 | Aliases are `package.json` `imports` entries with a `#` prefix, never `tsconfig` `paths` alone | The same import specifier resolves under Node, the dev runner, the test runner, the lint resolver and the type checker (IMP-4, IMP-7) | `paths` is set, the type checker passes, and the built output fails to load with module-not-found | script | — |
+| TSN-16 | No climbing out with `../../`, no cycles | A parent step reaches at most one folder up; the import graph is acyclic (IMP-1, IMP-6) | `import { Role } from "../../../domain/role"` | lint | — |
+| TSN-17 | Each layer imports other layers only through their alias entry point | Layer aliases come from `docs/architecture.md` §4; only the composition root imports adapters (IMP-2, IMP-3, PDM-class-modeled-R9) | A use case imports `#infrastructure/pg-user-repo` | lint | — |
 
 ## Runtime & performance
 
@@ -136,8 +141,76 @@ function handle(req: Request, log = rootLogger) {
 | TSN-5 | ESLint `no-throw-literal` / `@typescript-eslint/only-throw-error` |
 | TSN-7 | `@typescript-eslint/no-floating-promises` |
 | TSN-10 | ESLint `no-console` scoped to `src/**` |
+| TSN-13 | `eslint-plugin-jsdoc`: `jsdoc/require-jsdoc` with `publicOnly: true`; `jsdoc/informative-docs`; set `jsdoc/require-param` and `jsdoc/require-returns` off so tags are written only when they add meaning |
+| TSN-14 | CI script: fail on `grep -rnP '\b(TODO\|FIXME)\b(?!\([A-Za-z0-9_-]+\))' src` (ESLint `no-warning-comments` cannot allow a valid format, so use it only for `xxx` and `hack`) |
+| TSN-15 | Smoke script: build, then import one aliased module from `dist/` with plain `node`, and once from `src/` under the dev runner with `--conditions=source`. `tsc --noEmit` alone cannot catch this failure; config as in the snippet below |
+| TSN-16 | ESLint `no-restricted-imports` with `patterns: [{ regex: "^\\.\\./\\.\\./", message: "Use a #alias" }]`, repeated in every later block that sets `no-restricted-imports` (see the flat-config note below); `import-x/no-cycle`; optionally `import-x/no-relative-parent-imports` for the stricter zero-parent form |
+| TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `#application/*`, `#infrastructure/*`, `#interface/*`); adapters allowed only in the composition root block |
 | CS-2 (unit size) | ESLint `complexity` and `max-lines-per-function`, or `llm (fallback)` if not configured |
 | FF-1 (layer deps) | ESLint `no-restricted-imports`/boundaries rules generated from `docs/architecture.md` §4 |
+| FF-2 (cycles) | `import-x/no-cycle` (TSN-16) or a graph script |
+| PDM-class-modeled-R7 | ESLint `no-restricted-syntax` allow-list, see `paradigms/class-modeled.md` |
+
+### Import alias and lint configuration
+
+Verified 2026-10-25 on a copy of `rbac-demo` (Node 24.22, TypeScript 6.0, tsx 4.23, Vitest 5.0 on Vite 8, eslint-plugin-import-x 4.17, NodeNext with `.js` relative specifiers). With this config, `tsc --noEmit`, `tsc` build, `node dist/…`, tsx and the full Vitest suite all pass.
+
+```jsonc
+// package.json
+{
+  "type": "module",
+  "imports": {
+    "#domain/*": { "source": "./src/domain/*.ts", "default": "./dist/domain/*.js" },
+    "#application/*": { "source": "./src/application/*.ts", "default": "./dist/application/*.js" }
+  },
+  "scripts": {
+    // Every tsx entry needs the condition, including `node --import tsx …` and child processes that tests spawn.
+    "dev": "tsx watch --conditions=source src/main.ts"
+  }
+}
+// tsconfig.json: "moduleResolution": "nodenext", "rootDir": "./src", "outDir": "./dist", "customConditions": ["source"]
+// Specifiers carry no extension: `#domain/role` (the pattern adds `.ts` or `.js`).
+```
+
+```ts
+// vitest.config.ts: since Vite 6, node-environment tests resolve through `ssr.resolve`,
+// and setting conditions replaces Vite's defaults, so list them after "source".
+export default defineConfig({
+  resolve: { conditions: ["source", "module", "browser", "development|production"] }, // happy-dom/jsdom projects
+  ssr: { resolve: { conditions: ["source", "module", "node", "development|production"] } }, // node projects
+});
+```
+
+Pitfalls found in that check:
+
+| Setup | What happens |
+|---|---|
+| Vitest with only `resolve.conditions` | Node-environment tests fail: `Cannot find module '#domain/…'` |
+| tsx without `--conditions=source`, with `dist/` present | Runs silently against the stale build, mixed with the `src/` files it loaded directly |
+| tsx without `--conditions=source`, no `dist/` | `ERR_MODULE_NOT_FOUND` |
+| `node --conditions=source` (built-in type stripping) | Fails whenever relative specifiers say `.js`: Node requires the real `.ts` extension and ignores tsconfig. Use tsx unless the repo writes `.ts` specifiers |
+| import-x resolver without `conditionNames` | `#…` resolves to `dist/`, so `import-x/no-restricted-paths` zones on `src/` never match: FF-1 **fails open** |
+| A later flat-config block sets `no-restricted-imports` again | Its options replace the earlier ones, so the `../../` pattern silently disappears for that folder |
+
+```js
+// eslint.config.js (excerpt)
+settings: {
+  "import-x/resolver-next": [createNodeResolver({
+    extensions: [".ts", ".js"],
+    extensionAlias: { ".js": [".ts", ".js"] },
+    conditionNames: ["source", "import", "node", "default"], // without this, aliased layer violations pass lint
+  })],
+},
+{
+  files: ["src/**/*.ts"],
+  rules: {
+    "no-restricted-imports": ["error", { patterns: [{ regex: "^\\.\\./\\.\\./", message: "Use a #alias (IMP-2)" }] }],
+    "import-x/no-cycle": "error",
+    "jsdoc/require-jsdoc": ["error", { publicOnly: true }],
+    "jsdoc/informative-docs": "warn",
+  },
+},
+```
 
 ## References
 
@@ -152,6 +225,19 @@ function handle(req: Request, log = rootLogger) {
 - https://nodejs.org/api/globals.html#class-abortsignal
 - https://zod.dev/
 - https://getpino.io/
+- https://nodejs.org/api/packages.html#subpath-imports
+- https://www.typescriptlang.org/docs/handbook/modules/reference.html
+- https://www.typescriptlang.org/tsconfig/
+- https://vite.dev/config/shared-options
+- https://v6.vite.dev/guide/migration — "`ssr.resolve.conditions` no longer uses `resolve.conditions` as the default value"
+- https://nodejs.org/api/typescript.html — type stripping: file extensions are mandatory; tsconfig `paths` unsupported
+- https://eslint.org/docs/latest/use/configure/rules — a later config object's rule options replace earlier ones
+- https://tsx.is/
+- https://github.com/gajus/eslint-plugin-jsdoc
+- https://github.com/un-ts/eslint-plugin-import-x
+- https://eslint.org/docs/latest/rules/no-restricted-imports
+- https://eslint.org/docs/latest/rules/no-warning-comments
+- https://tsdoc.org/
 
 ## Related
 

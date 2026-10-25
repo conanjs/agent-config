@@ -18,6 +18,7 @@ Object-oriented modeling covers objects, identity, state, behavior, messaging, c
 | [composition-over-inheritance.md](composition-over-inheritance.md) | concept | Reusing behavior through collaborators, delegation, strategies, embedding, traits, and functions before inheritance. | verified |
 | [law-of-demeter.md](law-of-demeter.md) | concept | Limiting object-graph knowledge, avoiding train wrecks, and distinguishing fluent APIs from coupling leaks. | verified |
 | [dependency-injection.md](dependency-injection.md) | concept | Constructor injection, composition roots, consumer-owned ports, and why service locator hides dependencies. | verified |
+| [modules-vs-static-classes.md](modules-vs-static-classes.md) | concept | Why C# groups stateless functions in static classes and TypeScript groups them in modules; where static-only classes stop. | verified |
 | [design-by-contract.md](design-by-contract.md) | concept | Preconditions, postconditions, invariants, blame, and the boundary between expected rule failures and contract violations. | verified |
 
 ## References

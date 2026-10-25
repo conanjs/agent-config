@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 rule-prefix: RUB
 subject: review
 ---
@@ -22,6 +22,7 @@ How any role in `mode: review` evaluates an artifact: the shared structure of a 
 | RUB-7 | Documentation affected by the change (`docs/architecture.md`, contract, README section) is updated or a P7 task exists | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | RUB-8 | No unexplained new dependency, suppression, or threshold change | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | RUB-9 | Assumptions the author made are stated, not hidden | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
+| RUB-10 | Code artifacts follow the comment, naming and import-path rules: `../code/comments.md` (CMT-n), `../code/naming.md` (NAM-n, including the project glossary) and `../design/import-paths.md` (IMP-n). Cite the specific id in the finding. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 
 ## Interpreting
 
@@ -85,3 +86,4 @@ Each finding is one `findings` entry in the role message (`../../schemas/message
 - `fitness-functions.md` — checks that are automated instead of reviewed.
 - `../quality/` — quality contracts whose `Q-*` ids reviews cite.
 - `../code/coding-standards.md`, `../delivery/testing-strategy.md` — role-specific rules cited in reviews.
+- `../code/comments.md`, `../code/naming.md`, `../design/import-paths.md` — the CMT, NAM and IMP rules RUB-10 points to.
