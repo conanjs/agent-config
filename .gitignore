@@ -17,3 +17,4 @@ logs/
 # Install-time backups now live entirely outside the repo, at
 # ~/.agent-config-backups/ — nothing to ignore here for that anymore.
 
+**/synced
