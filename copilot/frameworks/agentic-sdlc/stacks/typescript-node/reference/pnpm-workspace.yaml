@@ -1,0 +1,4 @@
+# Dependencies allowed to run install scripts; everything else is blocked.
+allowBuilds:
+  esbuild: false
+  unrs-resolver: false

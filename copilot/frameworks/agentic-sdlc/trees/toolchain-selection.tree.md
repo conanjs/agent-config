@@ -1,6 +1,6 @@
 ---
 schema: tree/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 prefix: TC
 owner: tech-stack
 phases: [P4]
@@ -45,12 +45,13 @@ TC-Q1 Repo already has tool config?
 - **Branches:**
   - Slot has a stack default → use it verbatim
   - Slot is `n/a — <reason>` in the stack → leave unfilled; the script worker skips it and the reason is recorded
-- **Default:** the stack default for every remaining slot.
+  - The stack's `idioms.md` has an `## Options` table → propose each choice's default and present the alternatives to the human at the gate; never pick an alternative silently
+- **Default:** the stack default for every remaining slot, and each Option's default unless the human picks another.
 - **Escalate when:** the constitution's QA bar needs a capability the stack default lacks (coverage threshold, mutation testing, contract testing) — qa's bar is fixed; the tooling must change, and the change is surfaced at the gate.
 
 ## Recording
 
-One decision record per component, `DR-<NNN>: Toolchain for <component>`, in the feature's `specs/<NNN-feature>/research.md`, listing slot → source (existing config / constitution / stack default). Rejected alternatives name the other source that was considered (e.g. "stack default — repo already configured").
+One decision record per component, `DR-<NNN>: Toolchain for <component>`, in the feature's `specs/<NNN-feature>/research.md`, listing slot → source (existing config / constitution / stack default), and each stack Option → the chosen value. An alias-mechanism choice is also reflected in the `alias:` prefixes of `docs/architecture.md` §4. Rejected alternatives name the other source that was considered (e.g. "stack default — repo already configured").
 
 ## References
 

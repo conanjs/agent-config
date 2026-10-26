@@ -42,6 +42,7 @@ How engineering names types, functions, files, tests and terms so the code reads
 | `Adapter` | Translates between the app and an external system; suffix used for external systems only | `HrDirectoryAdapter` |
 | `Handler` | Handles one inbound message, command, event or route | `GrantPermissionHandler` |
 | `Middleware` | One step in a request pipeline that handles a cross-cutting concern | `RequestIdMiddleware` |
+| `Mapper` | Translates internal results or errors into one outer protocol's terms (status codes, wire codes); no I/O, no business rules | `HttpErrorMapper` |
 | port (no suffix) | The capability the app needs, named for what it does | `Clock`, `PasswordHasher` |
 
 Choose `Repository` or `Store` once per project and record it in `docs/glossary.md`.

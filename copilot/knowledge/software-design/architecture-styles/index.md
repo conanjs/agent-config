@@ -14,6 +14,10 @@ How the code inside one deployable is arranged so that business rules stay indep
 |---|---|---|---|
 | [hexagonal-architecture.md](hexagonal-architecture.md) | concept | Ports, driving and driven adapters; the application as the hub, so adapters never call each other. | verified |
 | [clean-architecture.md](clean-architecture.md) | concept | Concentric rings, the inward dependency rule, crossing boundaries by inversion, and what a presenter is. | verified |
+| [clean-architecture-deep-dive.md](clean-architecture-deep-dive.md) | deep-dive | The whole story: analogies, circles, the official diagram, input/output/gateway ports, driving vs. driven, data across boundaries, principles, critics, and a review of the stack reference. Not yet synthesized. | verified |
+| [hexagonal-architecture-deep-dive.md](hexagonal-architecture-deep-dive.md) | deep-dive | Cockburn's ports and adapters: driving vs. driven with his own code, the configurator, staged examples, known uses, costs. | verified |
+| [onion-architecture-deep-dive.md](onion-architecture-deep-dive.md) | deep-dive | Palermo's four tenets, why traditional layering ages, his CodeCampServer example, the 2013 retrospective. | verified |
+| [screaming-architecture-deep-dive.md](screaming-architecture-deep-dive.md) | deep-dive | Folders that show the business, not the framework: packaging options and when to switch to feature-first. | verified |
 | [combining-styles.md](combining-styles.md) | concept | What DDD, layered, onion, hexagonal and clean each contribute, and which one a given import rule comes from. | verified |
 
 ## References

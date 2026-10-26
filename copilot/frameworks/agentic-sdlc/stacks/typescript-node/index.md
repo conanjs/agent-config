@@ -1,6 +1,6 @@
 ---
 schema: stack/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 id: typescript-node
 detect-by: [package.json, pnpm-lock.yaml, tsconfig.json]
 frameworks: [express]
@@ -43,7 +43,7 @@ paradigms: [class-modeled, functional-pipeline]
 | `ci_template` | see below |
 | `tools` | `pnpm, corepack, prettier, eslint, tsc, vitest` |
 
-Notes: `pnpm run build` must be defined in `package.json` (e.g. `"build": "tsc -p tsconfig.build.json"`). `vitest.config.ts` must restrict `include` to `src/**/*.test.ts` so `cmd.test_unit` never picks up integration tests. Commands assume a POSIX shell (bash, Git Bash).
+Notes: `pnpm run build` must be defined in `package.json` (e.g. `"build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"` with the default alias option; plain `tsc -p tsconfig.build.json` with `package.json` `imports`; see idioms "Options"). `vitest.config.ts` must restrict `include` to `src/**/*.test.ts` so `cmd.test_unit` never picks up integration tests. Commands assume a POSIX shell (bash, Git Bash).
 
 ## Foundation mapping
 | Foundation rule | How it's expressed in this stack |

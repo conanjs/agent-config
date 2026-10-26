@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "rootDir": ".",
+    "noEmit": true,
+    "paths": {
+      "@/test/*": ["./test/*"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "test", "*.ts"]
+}

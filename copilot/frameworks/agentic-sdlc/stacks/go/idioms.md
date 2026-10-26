@@ -1,6 +1,6 @@
 ---
 schema: stack-idioms/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 stack: go
 rule-prefix: GO
 ---
@@ -139,12 +139,24 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 ## Enforcement
 
+A project fails `tools/validate-project.mjs` unless the first config file found contains every string below. This makes the documentation (CMT-5, CMT-12) and import-path (IMP-1, IMP-2) rules part of every repo on this stack, not something each author remembers.
+
+```lint-baseline
+config: .golangci.yml | .golangci.yaml
+require:
+  - exported
+  - package-comments
+```
+
+
 | Rule | Tool config |
 |---|---|
 | GO-2 | `containedctx`/custom `golangci-lint` rule where available; otherwise `llm (fallback)` for exported blocking APIs |
 | GO-3 | `gofmt -l .` via `cmd.format`; `golangci-lint run ./...` with `errcheck`, `staticcheck` and `govet` enabled |
 | GO-6 | `go vet ./...` plus `golangci-lint` concurrency rules where configured |
 | CS-2 (unit size) | `gocyclo`/`cyclop` and `funlen` in `.golangci.yml`, or `llm (fallback)` if not configured |
+| CMT-5, CMT-12 (doc comments) | `revive` rules `exported` (doc comment on every exported function and method) and `package-comments`, enabled in `.golangci.yml`. Interface methods carry the contract; implementations reference the interface in their comment |
+| IMP-1, IMP-2 (import paths) | Imports use the full module path (`<module>/core/role`), which is the Go form of an alias; any relative import path is a review finding (`llm (fallback)`) |
 | FF-1 (layer deps) | `depguard` rules generated from `docs/architecture.md` §4 `may-depend-on` |
 
 ## References
@@ -154,6 +166,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 - `schemas/stack-idioms.schema.md`: schema for this file.
 
 **External authoritative sources:**
+- https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md (rules `exported`, `package-comments`)
 - https://go.dev/blog/go1.13-errors
 - https://pkg.go.dev/errors
 - https://pkg.go.dev/context

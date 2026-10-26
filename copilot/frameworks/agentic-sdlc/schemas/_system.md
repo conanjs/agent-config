@@ -164,6 +164,7 @@ Store letters follow `README.md` §4: **A** framework rules · **B** global know
 | `stack-idioms/v1` | `stack-idioms.schema.md` | `stacks/<id>/idioms.md` |
 | `stack-framework/v1` | `stack-framework.schema.md` | `stacks/<id>/frameworks/<fw>.md` |
 | `stack-paradigm/v1` | `stack-paradigm.schema.md` | `stacks/<id>/paradigms/<pdm>.md` |
+| `stack-reference/v1` | `stack-reference.schema.md` | `stacks/<id>/reference/index.md`; the project files around it follow the store-D schemas (§4.3) |
 | `paradigm/v1` | `paradigm.schema.md` | `paradigms/<id>.md` |
 | `tree/v2` | `tree.schema.md` | `trees/<name>.tree.md` |
 | — (code) | — | `tools/*.mjs`: code, documented by its header comment |

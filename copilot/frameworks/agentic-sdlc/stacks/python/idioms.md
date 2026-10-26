@@ -1,6 +1,6 @@
 ---
 schema: stack-idioms/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 stack: python
 rule-prefix: PY
 ---
@@ -121,12 +121,25 @@ def handle_register(email: str, request_id: str) -> None:
 
 ## Enforcement
 
+A project fails `tools/validate-project.mjs` unless the first config file found contains every string below. This makes the documentation (CMT-5, CMT-12) and import-path (IMP-1, IMP-2) rules part of every repo on this stack, not something each author remembers.
+
+```lint-baseline
+config: pyproject.toml | ruff.toml
+require:
+  - "D1"
+  - TID252
+  - ban-relative-imports = "all"
+```
+
+
 | Rule | Tool config |
 |---|---|
 | PY-1 | `mypy src tests` with `strict = true` in `[tool.mypy]` |
 | PY-2 | `mypy` structural checks for `typing.Protocol` ports |
 | PY-3 | `ruff format --check .` and `ruff check .` |
 | CS-2 (unit size) | Ruff `C901` complexity and configured line/function-size rules, or `llm (fallback)` if not configured |
+| CMT-5, CMT-12 (doc comments) | Ruff `D1` rules (pydocstyle "undocumented public …", e.g. `D103` for public functions) in `select`, with one docstring convention set in `[tool.ruff.lint.pydocstyle]`. `Protocol` ports carry the contract; implementations reference it |
+| IMP-1, IMP-2 (import paths) | Ruff `TID252` with `[tool.ruff.lint.flake8-tidy-imports] ban-relative-imports = "all"` (the default `"parents"` still allows sibling imports): every import names the package, e.g. `from app.core.role import Role` |
 | FF-1 (layer deps) | Ruff `flake8-tidy-imports` banned-module rules or import-contract script generated from `docs/architecture.md` §4 |
 
 ## References
@@ -136,6 +149,7 @@ def handle_register(email: str, request_id: str) -> None:
 - `schemas/stack-idioms.schema.md`: schema for this file.
 
 **External authoritative sources:**
+- https://docs.astral.sh/ruff/rules/undocumented-public-function/ (D103, pydocstyle D1 family)
 - https://docs.python.org/3/tutorial/errors.html#exception-chaining
 - https://docs.python.org/3/library/asyncio-task.html#task-groups
 - https://docs.python.org/3/library/typing.html#typing.Protocol

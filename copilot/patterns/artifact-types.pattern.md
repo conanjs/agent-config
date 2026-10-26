@@ -20,7 +20,7 @@ These types are **not one list**. They sit on three axes. Pick the axis first, t
 | **Skill** | A capability the model finds by its `description` | When the description matches the task | `skills/<name>/SKILL.md` (flat) | `sdlc-stack-go` |
 | **Prompt** | A shortcut a human invokes, with arguments | When the user types it | `copilot/prompts/` | `init-repo-kb.prompt.md` |
 | **Agent** | A persona with its own context, tools and model | When delegated to | `copilot/agents/` (+ per-tool wrappers) | `sdlc-qa` |
-| **Procedure** | The ordered steps of one repeatable task; **has no trigger of its own** | When a skill or prompt points at it | `copilot/procedures/` | `init-repo-kb.procedure.md` |
+| **Procedure** | The ordered steps of one repeatable task; **has no trigger of its own** | When a skill or prompt points at it | `copilot/procedures/`; procedures for one stack in `copilot/procedures/<stack-id>/` | `init-repo-kb.procedure.md`, `typescript-node/add-port-and-adapter.procedure.md` |
 | **Framework** | Rules and schemas for a domain | When a role or procedure cites it | `copilot/frameworks/<name>/` | `agentic-sdlc` |
 | **Knowledge** | Explanations of how things work, not orders | When cited | `copilot/knowledge/<topic>/` | `grpc/stale-connection-keepalive.md` |
 | **Pattern** | A named way to build things in this repo | When designing a new artifact | `copilot/patterns/` | `shared-procedure-thin-wrapper` |

@@ -1,0 +1,89 @@
+---
+schema: knowledge-doc/v1
+type: reference
+topic: code-documentation
+status: verified
+applies-to: ["C#", "TypeScript (TSDoc)", "JavaScript (JSDoc)", "Python", "Go", "Rust"]
+last-verified: 2026-10-25
+last-updated: 2026-10-25
+tags: [doc-comments, tsdoc, jsdoc, xml-documentation, csharp, linting]
+---
+
+# Doc-comment standards across languages
+
+## Summary
+**TL;DR:** Every mainstream language has one standard way to document a public declaration, and a tool that reports a public declaration with no doc comment. C# uses `///` XML tags and compiler warning CS1591. TypeScript uses TSDoc `/** … */` with ESLint plugins. Python, Go and Rust each have their own form and lint. The parts are the same everywhere: summary, details, parameters, return, errors, example, and inherit-from-interface.
+**Use this when:** choosing or reviewing doc-comment syntax, mapping a C# habit to another stack, or wiring the lint that enforces it.
+**Not this doc:** when a comment is worth writing at all, which is the framework foundation `foundations/code/comments.md`.
+
+## Scope
+Doc comments on public declarations (types, functions, methods, properties, interface members). Implementation comments inside function bodies are out of scope. Versions as checked on 2026-10-25.
+
+## Catalog
+
+**Part-by-part mapping**
+
+| Part | C# XML doc (`///`) | TSDoc (`/** */`) | JSDoc (`/** */`) | Python docstring | Go | Rust (`///`) |
+|---|---|---|---|---|---|---|
+| Summary | `<summary>` ✅[^1] | first paragraph ✅[^3] | first paragraph | first line | first sentence, naming the symbol ✅[^6] | first paragraph |
+| Details | `<remarks>` ✅[^1] | `@remarks` ✅[^3] | description | body | further paragraphs | further paragraphs |
+| Parameter | `<param name="x">` ✅[^1] | `@param x - …` ✅[^3] | `@param {T} x …` | `Args:` (Google) or `Parameters` (NumPy) section | prose | prose |
+| Return | `<returns>` ✅[^1] | `@returns` ✅[^3] | `@returns` | `Returns:` section | prose | prose |
+| Errors | `<exception cref="X">` ✅[^1] | `@throws` ✅[^3] | `@throws` | `Raises:` section | prose | `# Errors` section |
+| Example | `<example>` ✅[^1] | `@example` ✅[^3] | `@example` | `Examples` section | `Example…` functions | `# Examples` section ✅[^8] |
+| Inherit from interface | `<inheritdoc/>` ✅[^1] | `{@inheritDoc Port.member}` ✅[^3] | — | — | — | — |
+| Cross-reference | `<see cref>` ✅[^1] | `{@link X}` ✅[^3] | `{@link X}` | — | `[Name]` | `` [`Name`] `` |
+
+**"Every public declaration is documented": who enforces it**
+
+| Language | Tool | What it reports |
+|---|---|---|
+| C# | Compiler warning CS1591 when a documentation file is generated | Missing XML comment for a publicly visible type or member ✅[^2] |
+| TypeScript | `eslint-plugin-jsdoc` `require-jsdoc` (presence) plus `eslint-plugin-tsdoc` `tsdoc/syntax` (format) | Missing comment; malformed tag, e.g. `@param` with no hyphen ✅[^4] ✅[^5] |
+| Python | Ruff `D1xx` (pydocstyle), e.g. `D103` | Public function with no docstring ✅[^7] |
+| Go | `revive` `exported`, `package-comments` | Exported function or method with no comment; package with no comment ✅[^9] |
+| Rust | rustc `missing_docs` (allow-by-default, so turn it on) | Public item with no docs ✅[^10] |
+
+**C# recommendations worth copying anywhere** ✅[^1]
+- Document all publicly visible types and their public members.
+- At a bare minimum, every type and member has a summary.
+- Write complete sentences that end with a full stop.
+- Put the comment on the interface or base type, and inherit it in implementations, so copies cannot drift.
+
+## Lookup notes
+- TSDoc is "loosely based on JSDoc" but has a strict grammar. Its reference parser and ESLint plugin come from Microsoft's `@microsoft/tsdoc` project. ✅[^3]
+- `tsdoc/syntax` requires `@param name - description` (with the hyphen) and the inline form `{@inheritDoc X.y}`. A bare `@inheritDoc` is an error. Tested 2026-10-25 with eslint-plugin-tsdoc 0.5.4.
+- Presence lint cannot judge meaning. `jsdoc/informative-docs` rejects `/** Delete. */` on `delete()`, but accepts `/** Gets the probe adapter. */`. Tested 2026-10-25 with eslint-plugin-jsdoc 65.4.2.
+- In the C# compiler, `<param>` names and `cref` targets are checked against the code. ✅[^1] TSDoc tools do not check names against the signature.
+- `{@inheritDoc}` copies the summary, `@remarks`, `@param`, `@typeParam` and `@returns`; the same comment may not add its own summary or `@remarks`, but may add other tags such as `@throws` or `@example`. ✅[^11] `tsdoc/syntax` reports a violation as `tsdoc-inheritdoc-incompatible-tag` (tested 2026-10-25).
+- The TypeScript language service (editor hover) does not resolve the inline `{@inheritDoc X}` form and shows it as literal text. It does follow the JSDoc block tag `@inheritDoc`, and inherits automatically when a member has no comment. Tested 2026-10-25 on TypeScript 6.0.3.
+
+## Takeaways
+- Require a doc comment on every public declaration, enforced by lint, in every stack. [rule-candidate]
+- Write the contract once on the interface or port, and inherit it in implementations. [rule-candidate]
+
+## Used by
+- _Not cited by any rule yet._
+
+## Verification status
+- Verified: 28 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
+
+## References
+- [Recommended XML documentation tags](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags) — Microsoft, living. Backs: C# column, recommendations, inheritdoc. [^1]
+- [Compiler Warning CS1591](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs1591) — Microsoft, living. Backs: C# enforcement. [^2]
+- [TSDoc](https://tsdoc.org/) — TSDoc project (Microsoft), living. Backs: TSDoc column, relation to JSDoc. [^3]
+- [eslint-plugin-jsdoc: require-jsdoc](https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-jsdoc.md) — eslint-plugin-jsdoc maintainers, living. Backs: TypeScript enforcement. [^4]
+- [eslint-plugin-tsdoc](https://tsdoc.org/pages/packages/eslint-plugin-tsdoc/) — TSDoc project, living. Backs: TypeScript format check. [^5]
+- [Go Doc Comments](https://go.dev/doc/comment) — Go team, living. Backs: Go summary convention. [^6]
+- [undocumented-public-function (D103)](https://docs.astral.sh/ruff/rules/undocumented-public-function/) — Astral, living. Backs: Python enforcement. [^7]
+- [How to write documentation](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html) — Rust project, living. Backs: Rust examples section. [^8]
+- [revive rule descriptions](https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md) — revive maintainers, living. Backs: Go enforcement. [^9]
+- [Allowed-by-default lints: missing_docs](https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html) — Rust project, living. Backs: Rust enforcement. [^10]
+- [TSDoc: @inheritDoc](https://tsdoc.org/pages/tags/inheritdoc/) — TSDoc project (Microsoft), living. Backs: what `{@inheritDoc}` copies and forbids. [^11]
+- [TypeDoc: {@inheritDoc}](https://typedoc.org/documents/Tags.__inheritDoc_.html) — TypeDoc maintainers, living. TypeDoc accepts both the inline and the block form.
+- `copilot/frameworks/agentic-sdlc/foundations/code/comments.md` — CMT-5 and CMT-12 apply this.
+- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — TSN-13 and its tested lint config.
+
+## Related
+- `js-runtime/subpath-imports.md`
+- `software-design/architecture-styles/clean-architecture.md`

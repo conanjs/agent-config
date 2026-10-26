@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 ---
 
 # Schema: Stack Idioms (`stack-idioms/v1`)
@@ -38,7 +38,17 @@ How the stack-agnostic rules **look in this language**, plus rules that are true
 ## Runtime & performance
 | Id | Rule | Holds when | Typical violation | Enforced by | Source |
 
+## Options                     <!-- optional -->
+| Choice | Default | Alternative | Choose the alternative when |
+
 ## Enforcement
+```lint-baseline
+config: <candidate config file> | <another>
+require:
+  - <string that must appear in the project's config>
+require-if: <project file> <json key>     # optional, repeatable
+  - <string required only when that file has that key>
+```
 | Rule | Tool config |
 |---|---|
 | <foundation/stack rule id> | <lint rule / test / config that enforces it in this stack> |
@@ -53,6 +63,8 @@ How the stack-agnostic rules **look in this language**, plus rules that are true
 - Rule tables follow `_system.md` §1.2, with ids `<rule-prefix>-<n>`.
 - **Enforcement** maps every foundation rule marked `lint`, `typecheck` or `test` to concrete config for this stack, or says `llm (fallback): <reason>`. Paradigm rules are mapped in the paradigm overlay instead.
 - Runtime-internals rules (V8, GC, GIL…) must have a `Source` into `{{AGENT_HOME}}/knowledge/`. The explanation is never written here.
+- **lint-baseline** (required): one fenced block naming the project config file (`config:`, the first file found wins) and the strings it must contain (`require:`). The list covers at least the lint rules for CMT-5/CMT-12 (doc comments) and IMP-1/IMP-2 (import paths). Prefer a name that only the up-to-date snippet uses (e.g. `noRelativeOutsideFolder`) over a generic rule id an old config also contains. It turns "this stack enforces X" into a check on every project. A `require-if: <file> <key>` group applies only when that project file contains that JSON key; use it for strings that belong to one Option (e.g. `require-if: tsconfig.json paths`).
+- **Options** (optional): per-repo choices the stack supports, each with one default. The tech-stack role proposes the default and shows the alternatives at the P4 gate (TC-Q3); the choice is recorded in the toolchain decision record. Every option has a tested configuration in this file.
 
 ## Example
 
@@ -76,3 +88,4 @@ How the stack-agnostic rules **look in this language**, plus rules that are true
 | Five idiom sections present | `validate.mjs` |
 | Every foundation rule with `lint`, `typecheck` or `test` is mapped or has a fallback | `validate.mjs` (warning) |
 | Runtime & performance rules have a `Source` | `validate.mjs` |
+| The project's lint config contains every `lint-baseline` string that applies to it (`require`, plus each `require-if` whose key is present) | `validate-project.mjs` (LINT) |

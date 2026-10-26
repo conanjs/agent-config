@@ -31,7 +31,7 @@
 ## Checklist when adding something new
 
 1. Does more than one tool need this? If no, just write it directly where that one tool expects it — this pattern is overhead you don't need yet.
-2. If yes: write the tool-neutral version first, in the location that matches its *artifact type*, not its subject matter — e.g. a repeatable task goes in `copilot/procedures/` even if it's entirely about one specific framework (like `init-repo-kb.procedure.md`, which is company-KB-specific content but lives alongside all other procedures, not nested inside `frameworks/company-kb/`) — same reasoning `copilot/prompts/` and `copilot/agents/` already follow.
+2. If yes: write the tool-neutral version first, in the location that matches its *artifact type*, not its subject matter — e.g. a repeatable task goes in `copilot/procedures/` even if it's entirely about one specific framework (like `init-repo-kb.procedure.md`, which is company-KB-specific content but lives alongside all other procedures, not nested inside `frameworks/company-kb/`) — same reasoning `copilot/prompts/` and `copilot/agents/` already follow. Procedures that apply to one stack only are grouped in a subfolder named by the stack id (`copilot/procedures/typescript-node/`): still the procedures home, just grouped, and the stack's existing skill points at that folder's `index.md` instead of one skill per procedure.
 3. For each tool, check whether it needs a wrapper at all (rule 4) and whether a wrapper is even possible (rule 5) before writing one.
 4. Before finishing, re-read every wrapper and confirm none of them restate more than a sentence of the shared content.
 

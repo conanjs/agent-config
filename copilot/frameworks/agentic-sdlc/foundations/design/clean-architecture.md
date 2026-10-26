@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-25
+last-updated: 2026-10-26
 rule-prefix: CA
 subject: design
 ---
@@ -16,7 +16,7 @@ What is true of a well-layered component: source dependencies point inward towar
 | CA-1 | Dependency rule. Source-code dependencies point only inward (Adapters → Application → Domain). Nothing in an inner layer names anything in an outer layer. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CA-2 | Ports are owned by the inside. The interface for a repository, gateway, or publisher is declared in the application (or domain) layer, in its vocabulary; adapters implement it. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CA-3 | Adapters are thin. An adapter translates (transport ↔ use-case input/output, row ↔ entity) and makes no business decision. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
-| CA-4 | Boundary-specific data. Data crosses a boundary as plain structures owned by that boundary — persistence models and transport DTOs never leak inward. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
+| CA-4 | Boundary-specific data, in both directions. Data crosses a boundary as plain structures owned by that boundary. Persistence models and transport DTOs never leak inward, and entities never leak outward: a use case returns an output model, not an entity. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md |
 | CA-5 | One intent, one use case. Each user intent in `spec.md` maps to one application-layer use case; controllers do not compose use cases ad hoc. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CA-6 | Frameworks are details. Framework types appear only in adapters and the composition root. Domain and application build and test without the framework. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
 | CA-7 | Side effects are injected. Time, randomness, id generation, environment, and configuration reach inner layers through ports or parameters (`idiom.config`). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |

@@ -114,11 +114,19 @@ function handle(req: Request, log = rootLogger) {
 | TSN-4 | Return discriminated Results for expected domain failures | Callers narrow on `ok` and handle every expected case | A validation conflict is thrown as a generic Error | typecheck | — |
 | TSN-5 | Throw only Error instances for unexpected failures | Thrown values have stack, name and optional `cause` | Code throws a string or plain object | lint | — |
 | TSN-6 | Inject use-case dependencies through constructors | A use case can be constructed with fake ports in tests | A use case imports a singleton client | llm | — |
-| TSN-13 | Exported API carries a TSDoc comment that adds information (contract, errors, side effects) | Every exported type, function and method has a doc comment that is not a paraphrase of its name; param and return tags appear only when they add meaning (CMT-5, CMT-6) | An exported use case has no doc comment, or `@param roleId The role id` | lint | — |
+| TSN-13 | Every exported declaration and public member carries a TSDoc comment (`/** … */`), the TypeScript equivalent of C# XML doc comments: summary sentence, then `@remarks`, `@param name - …`, `@returns`, `@throws`, `@example` as needed. Implementations of a port use `{@inheritDoc Port.member}`, followed only by tags it does not copy (`@throws`, `@example`, `@deprecated`); implementation notes go in a why-comment in the body | Lint reports nothing for `tsdoc/syntax`, `jsdoc/require-jsdoc` and `jsdoc/informative-docs` (CMT-5, CMT-6, CMT-12) | A port method with no contract; `@param roleId The role id`; a bare `@inheritDoc`; a summary or `@remarks` next to `{@inheritDoc}` | lint | — |
 | TSN-14 | TODO and FIXME carry an owner or task id | Every marker looks like `TODO(PROJ-123): ...` (CMT-10) | A bare `// TODO fix later` | script | — |
-| TSN-15 | Aliases are `package.json` `imports` entries with a `#` prefix, never `tsconfig` `paths` alone | The same import specifier resolves under Node, the dev runner, the test runner, the lint resolver and the type checker (IMP-4, IMP-7) | `paths` is set, the type checker passes, and the built output fails to load with module-not-found | script | — |
-| TSN-16 | No climbing out with `../../`, no cycles | A parent step reaches at most one folder up; the import graph is acyclic (IMP-1, IMP-6) | `import { Role } from "../../../domain/role"` | lint | — |
-| TSN-17 | Each layer imports other layers only through their alias entry point | Layer aliases come from `docs/architecture.md` §4; only the composition root imports adapters (IMP-2, IMP-3, PDM-class-modeled-R9) | A use case imports `#infrastructure/pg-user-repo` | lint | — |
+| TSN-15 | Aliases use the repo's chosen mechanism (Options below): tsconfig `paths` with an `@/` prefix plus a build-time rewrite (default), or `package.json` `imports` with a `#` prefix. Never `paths` without the rewrite | The same import specifier resolves under the type checker, the dev runner, the test runner, the lint resolver and `node dist/…` (IMP-4, IMP-7) | `paths` is set, the type checker passes, and the built output fails to load with module-not-found | script | `knowledge/js-runtime/subpath-imports.md` |
+| TSN-16 | Relative imports name only same-folder files; everything else uses an alias, in `src` and `test` alike; no cycles | No relative specifier starts with `../` or contains a folder after `./`; the import graph is acyclic (IMP-1, IMP-2, IMP-6) | `../errors.js`, `./http/createApp.js` from a root file, `../support/fixtures.js` in a test | lint | — |
+| TSN-17 | Each layer imports other layers only through their alias entry point | Layer aliases come from `docs/architecture.md` §4; only the composition root imports adapters (IMP-2, IMP-3, PDM-class-modeled-R9) | A use case imports `@/infrastructure/pg-user-repo` | lint | — |
+
+## Options
+
+Per-repo choices this stack offers. The tech-stack role proposes the default at P4 (TC-Q3), shows the alternatives at the gate, and records the human's choice in the toolchain decision record and in the `alias:` prefixes of `docs/architecture.md` §4.
+
+| Choice | Default | Alternative | Choose the alternative when |
+|---|---|---|---|
+| Alias mechanism (TSN-15) | **tsconfig `paths`**, prefix `@/`, build rewritten by `tsc-alias` (or a bundler that reads `paths`) | **`package.json` `imports`**, prefix `#` or `#/` | No build-time rewrite wanted, or code runs without a build step (Node type stripping, published library sources) |
 
 ## Runtime & performance
 
@@ -133,6 +141,25 @@ function handle(req: Request, log = rootLogger) {
 
 ## Enforcement
 
+A project fails `tools/validate-project.mjs` unless the first config file found contains every string under `require`, plus the strings under each `require-if` whose file has that key. This makes the documentation (CMT-5, CMT-12) and import-path (IMP-1, IMP-2) rules part of every repo on this stack, not something each author remembers.
+
+```lint-baseline
+config: eslint.config.mjs | eslint.config.js | eslint.config.ts
+require:
+  - tsdoc/syntax
+  - jsdoc/require-jsdoc
+  - jsdoc/informative-docs
+  - noRelativeOutsideFolder
+  - import-x/no-cycle
+  - import-x/extensions
+  - @typescript-eslint/no-extraneous-class
+require-if: tsconfig.json paths
+  - createTypeScriptImportResolver
+require-if: package.json imports
+  - conditionNames
+```
+
+
 | Rule | Tool config |
 |---|---|
 | TSN-1 | `tsc --noEmit`; `tsconfig.json` with `strict: true` and `noUncheckedIndexedAccess: true` |
@@ -141,11 +168,12 @@ function handle(req: Request, log = rootLogger) {
 | TSN-5 | ESLint `no-throw-literal` / `@typescript-eslint/only-throw-error` |
 | TSN-7 | `@typescript-eslint/no-floating-promises` |
 | TSN-10 | ESLint `no-console` scoped to `src/**` |
-| TSN-13 | `eslint-plugin-jsdoc`: `jsdoc/require-jsdoc` with `publicOnly: true`; `jsdoc/informative-docs`; set `jsdoc/require-param` and `jsdoc/require-returns` off so tags are written only when they add meaning |
+| TSN-13 | `eslint-plugin-tsdoc` (`tsdoc/syntax`) plus `eslint-plugin-jsdoc` in `typescript` mode: `jsdoc/require-jsdoc` (`publicOnly`, classes, methods, functions, getters, and the TS contexts in the snippet below) and `jsdoc/informative-docs`. `require-param` and `require-returns` stay off, so tags appear only when they add meaning. Snippet: "Documentation lint configuration" below |
 | TSN-14 | CI script: fail on `grep -rnP '\b(TODO\|FIXME)\b(?!\([A-Za-z0-9_-]+\))' src` (ESLint `no-warning-comments` cannot allow a valid format, so use it only for `xxx` and `hack`) |
-| TSN-15 | Smoke script: build, then import one aliased module from `dist/` with plain `node`, and once from `src/` under the dev runner with `--conditions=source`. `tsc --noEmit` alone cannot catch this failure; config as in the snippet below |
-| TSN-16 | ESLint `no-restricted-imports` with `patterns: [{ regex: "^\\.\\./\\.\\./", message: "Use a #alias" }]`, repeated in every later block that sets `no-restricted-imports` (see the flat-config note below); `import-x/no-cycle`; optionally `import-x/no-relative-parent-imports` for the stricter zero-parent form |
-| TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `#application/*`, `#infrastructure/*`, `#interface/*`); adapters allowed only in the composition root block |
+| TSN-15 | Smoke script: build, then import one aliased module from `dist/` with plain `node`, and once from `src/` under the dev runner. `tsc --noEmit` alone cannot catch this failure; config per option in "Import alias and lint configuration" below |
+| IMP-1, IMP-2 | TSN-16 configuration: relative paths only within the folder, aliases everywhere else |
+| TSN-16 | ESLint `no-restricted-imports` with the `noRelativeOutsideFolder` pattern from the snippet below, on `src/**` and `test/**`, repeated in every later block that sets `no-restricted-imports` (see the flat-config note below); `import-x/no-cycle`. Exceptions (root tool config, pre-build scripts) only by file name, mirroring `docs/architecture.md` §4 |
+| TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `@/application/*`, `@/infrastructure/*`, `@/interface/*`); adapters allowed only in the composition root block |
 | CS-2 (unit size) | ESLint `complexity` and `max-lines-per-function`, or `llm (fallback)` if not configured |
 | FF-1 (layer deps) | ESLint `no-restricted-imports`/boundaries rules generated from `docs/architecture.md` §4 |
 | FF-2 (cycles) | `import-x/no-cycle` (TSN-16) or a graph script |
@@ -153,7 +181,62 @@ function handle(req: Request, log = rootLogger) {
 
 ### Import alias and lint configuration
 
-Verified 2026-10-25 on a copy of `rbac-demo` (Node 24.22, TypeScript 6.0, tsx 4.23, Vitest 5.0 on Vite 8, eslint-plugin-import-x 4.17, NodeNext with `.js` relative specifiers). With this config, `tsc --noEmit`, `tsc` build, `node dist/…`, tsx and the full Vitest suite all pass.
+A complete project using option B and every snippet in this file: `reference/` (`reference/index.md`).
+
+Both options were verified on 2026-10-25 with Node 24.22, TypeScript 6.0, tsx 4.23, Vitest 5.0 on Vite 8, ESLint 10, eslint-plugin-import-x 4.17, NodeNext with `.js` relative specifiers. Option A on a copy of `rbac-demo` (full suite passing); option B on a small ESM project, step by step in the table under its config.
+
+**Shared by both options:** the relative-path rule, the cycle rule, and the setting that lets import-x parse `.ts` files.
+
+```js
+// eslint.config.js (excerpt)
+const noRelativeOutsideFolder = { regex: "^(\.\./|\./[^/]+/)", message: "Use an alias (IMP-1)" };
+settings: {
+  "import-x/extensions": [".ts", ".js"], // without this, import-x/no-cycle silently reports nothing
+  "import-x/resolver-next": [/* the option's resolver, below */],
+},
+{
+  files: ["src/**/*.ts", "test/**/*.ts"],
+  rules: {
+    // Spread this pattern into every later block that sets no-restricted-imports.
+    "no-restricted-imports": ["error", { patterns: [noRelativeOutsideFolder] }],
+    "import-x/no-cycle": "error",
+  },
+},
+```
+
+#### Option B (default): tsconfig `paths` + `tsc-alias`
+
+```jsonc
+// tsconfig.json: include the test files, or Vitest ignores the paths for them
+{ "compilerOptions": { "module": "nodenext", "moduleResolution": "nodenext", "paths": { "@/test/*": ["./test/*"], "@/*": ["./src/*"] } },
+  "include": ["src", "test"] }
+// package.json scripts
+{ "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+  "dev": "tsx watch src/main.ts" }  // tsx reads tsconfig paths itself
+// Specifiers keep the NodeNext extension: `@/core/domain/role.js`.
+```
+
+```ts
+// vitest.config.ts
+export default defineConfig({ resolve: { tsconfigPaths: true } });
+```
+
+```js
+// eslint.config.js: resolve through tsconfig, so aliased imports reach the boundary and cycle rules
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+settings: { "import-x/resolver-next": [createTypeScriptImportResolver({ project: "tsconfig.json" })] },
+```
+
+| Step | Without the setting | With it |
+|---|---|---|
+| `tsc --noEmit`, `tsx src/main.ts` | Pass | — |
+| Vitest | `Cannot find package '@/core/role.js'` | Pass with `resolve.tsconfigPaths: true` and tests in `include` |
+| `node dist/main.js` after `tsc` | `ERR_MODULE_NOT_FOUND: Cannot find package '@/core'`: `dist/` still says `@/core/role.js` | Pass after `tsc-alias`, which rewrites it to `./core/role.js` |
+| ESLint with the Node resolver | An aliased cycle and an aliased `http → store` import both pass: FF-1 and FF-2 **fail open** | Both reported with `createTypeScriptImportResolver` |
+
+`tsconfig-paths` is a different tool: it resolves `paths` at runtime through a `require` hook (`node -r tsconfig-paths/register`, with `TS_NODE_BASEURL=./dist` for built output). Its README documents only that CommonJS route, so it is not used here. NestJS uses the same build-time approach as this option: its CLI rewrites `paths` aliases while compiling.
+
+#### Option A: `package.json` `imports`
 
 ```jsonc
 // package.json
@@ -181,19 +264,8 @@ export default defineConfig({
 });
 ```
 
-Pitfalls found in that check:
-
-| Setup | What happens |
-|---|---|
-| Vitest with only `resolve.conditions` | Node-environment tests fail: `Cannot find module '#domain/…'` |
-| tsx without `--conditions=source`, with `dist/` present | Runs silently against the stale build, mixed with the `src/` files it loaded directly |
-| tsx without `--conditions=source`, no `dist/` | `ERR_MODULE_NOT_FOUND` |
-| `node --conditions=source` (built-in type stripping) | Fails whenever relative specifiers say `.js`: Node requires the real `.ts` extension and ignores tsconfig. Use tsx unless the repo writes `.ts` specifiers |
-| import-x resolver without `conditionNames` | `#…` resolves to `dist/`, so `import-x/no-restricted-paths` zones on `src/` never match: FF-1 **fails open** |
-| A later flat-config block sets `no-restricted-imports` again | Its options replace the earlier ones, so the `../../` pattern silently disappears for that folder |
-
 ```js
-// eslint.config.js (excerpt)
+// eslint.config.js
 settings: {
   "import-x/resolver-next": [createNodeResolver({
     extensions: [".ts", ".js"],
@@ -201,16 +273,81 @@ settings: {
     conditionNames: ["source", "import", "node", "default"], // without this, aliased layer violations pass lint
   })],
 },
+```
+
+Node requires every `imports` key to start with `#`, "to ensure they are disambiguated from external package specifiers"; since Node 24.14 a key may also start with `#/`. This `#` is unrelated to `#private` class fields. Detail: `knowledge/js-runtime/subpath-imports.md`.
+
+**Pitfalls**
+
+| Option | Setup | What happens |
+|---|---|---|
+| Both | import-x without `import-x/extensions` (or `import-x/parsers`) for `.ts` | `import-x/no-cycle` reports nothing, even for a direct two-file cycle |
+| Both | A later flat-config block sets `no-restricted-imports` again | Its options replace the earlier ones, so the relative-path pattern silently disappears for that folder |
+| B | tsconfig without the test files in `include` | Vitest cannot resolve aliases in tests, even with `resolve.tsconfigPaths` |
+| B | Build without `tsc-alias` | Type check and dev pass; the built app fails to start |
+| A | Vitest with only `resolve.conditions` | Node-environment tests fail: `Cannot find module '#domain/…'` |
+| A | tsx without `--conditions=source`, with `dist/` present | Runs silently against the stale build, mixed with the `src/` files it loaded directly |
+| A | tsx without `--conditions=source`, no `dist/` | `ERR_MODULE_NOT_FOUND` |
+| A | `node --conditions=source` (built-in type stripping) | Fails whenever relative specifiers say `.js`: Node requires the real `.ts` extension and ignores tsconfig. Use tsx unless the repo writes `.ts` specifiers |
+| A | import-x resolver without `conditionNames` | `#…` resolves to `dist/`, so `import-x/no-restricted-paths` zones on `src/` never match: FF-1 **fails open** |
+
+### Documentation lint configuration
+
+Verified 2026-10-25 on a copy of `rbac-demo` with ESLint 10, eslint-plugin-jsdoc 65.4 and eslint-plugin-tsdoc 0.5. It found every undocumented port member, exported constant and public method (232 in that repo), plus 3 TSDoc syntax errors.
+
+```js
+// eslint.config.js (excerpt): C#-parity documentation for TypeScript (TSN-13, CMT-5, CMT-12)
+import jsdoc from "eslint-plugin-jsdoc";
+import tsdoc from "eslint-plugin-tsdoc";
 {
   files: ["src/**/*.ts"],
+  plugins: { jsdoc, tsdoc },
+  settings: { jsdoc: { mode: "typescript" } },
   rules: {
-    "no-restricted-imports": ["error", { patterns: [{ regex: "^\\.\\./\\.\\./", message: "Use a #alias (IMP-2)" }] }],
-    "import-x/no-cycle": "error",
-    "jsdoc/require-jsdoc": ["error", { publicOnly: true }],
-    "jsdoc/informative-docs": "warn",
+    "tsdoc/syntax": "error",
+    "jsdoc/require-jsdoc": ["error", {
+      publicOnly: true,
+      require: { ClassDeclaration: true, MethodDefinition: true, FunctionDeclaration: true },
+      checkGetters: true,
+      contexts: ["TSInterfaceDeclaration", "TSTypeAliasDeclaration", "TSMethodSignature",
+                 "TSPropertySignature", "ExportNamedDeclaration > VariableDeclaration"],
+    }],
+    "jsdoc/informative-docs": "error",
   },
 },
 ```
+
+| C# XML doc | TSDoc | Note |
+|---|---|---|
+| `/// <summary>…</summary>` | first sentence of `/** … */` | Required on every public declaration |
+| `<remarks>` | `@remarks` | |
+| `<param name="id">` | `@param id - …` | The hyphen is required by `tsdoc/syntax` |
+| `<returns>` | `@returns` | |
+| `<exception cref="X">` | `@throws X when …` | One per expected failure |
+| `<example>` | `@example` | |
+| `<inheritdoc cref="Port.M"/>` | `{@inheritDoc Port.member}` | A bare `@inheritDoc` is rejected by `tsdoc/syntax`. It copies summary, `@remarks`, `@param`, `@returns`; a summary or `@remarks` next to it is rejected, so add only `@throws`, `@example` or `@deprecated` |
+| `<see cref>` | `{@link X}` | |
+
+What lint cannot judge: `jsdoc/informative-docs` rejects `/** The update. */` on `update()`, but accepts `/** Gets the probe adapter. */`. Whether a summary states a real contract stays an `llm` review check (RUB-10).
+
+An adapter method, inheriting its port's contract (tested 2026-10-25: passes `tsdoc/syntax` and `jsdoc/require-jsdoc`):
+
+```ts
+/** {@link DocumentStore} backed by one SQLite file. */
+export class SqliteDocumentStore implements DocumentStore {
+  /**
+   * {@inheritDoc DocumentStore.update}
+   *
+   * @throws `SqliteError` when the file stays locked past the busy timeout.
+   */
+  public async update(id: DocumentId, body: string, expectedVersion: number): Promise<Document> {
+    // One transaction, so the version check and the write cannot interleave with another writer.
+    …
+  }
+}
+```
+
+Known gap, accepted: the editor (TypeScript language service, checked on 6.0.3) does not resolve the inline `{@inheritDoc}` form, so hovering the adapter's own method shows the literal text. Call sites hold the port type, so their hover shows the port's contract. TypeDoc resolves the inline form.
 
 ## References
 
@@ -238,6 +375,17 @@ settings: {
 - https://eslint.org/docs/latest/rules/no-restricted-imports
 - https://eslint.org/docs/latest/rules/no-warning-comments
 - https://tsdoc.org/
+- https://tsdoc.org/pages/packages/eslint-plugin-tsdoc/
+- https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/require-jsdoc.md
+- https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags
+- https://nodejs.org/api/packages.html#self-referencing-a-package-using-its-name
+- https://github.com/justkey007/tsc-alias — rewrites `paths` aliases in emitted JavaScript (option B)
+- https://github.com/import-js/eslint-import-resolver-typescript — resolves `paths` for import-x (option B)
+- https://github.com/dividab/tsconfig-paths — runtime `require` hook; documented for CommonJS only
+- https://docs.nestjs.com/cli/libraries — NestJS maps aliases "through tsconfig path mapping"
+- https://github.com/nestjs/nest-cli/blob/master/lib/compiler/hooks/tsconfig-paths.hook.ts — the Nest CLI rewrites aliases at build time
+- https://tsdoc.org/pages/tags/inheritdoc/ — what `{@inheritDoc}` copies; no summary or `@remarks` beside it
+- https://typedoc.org/documents/Tags.__inheritDoc_.html — TypeDoc accepts inline and block forms
 
 ## Related
 

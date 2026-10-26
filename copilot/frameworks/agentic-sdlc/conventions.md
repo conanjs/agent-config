@@ -141,7 +141,7 @@ Framework validator (`tools/validate.mjs`) checks:
 - V6: files outside stack profiles do not name stack-specific tools;
 - wrappers and skills match role presets when present.
 
-Per-repo validator (`tools/validate-project.mjs`, planned) checks repo architecture, task-line suffixes, integration docs, decision records, profile ids, references, and cross-repo system links. It already fails a project whose `paradigm: <id>@<major>` pin (architecture §3/§4 or constitution default) has no matching paradigm file.
+Per-repo validator (`tools/validate-project.mjs`, planned) checks repo architecture, task-line suffixes, integration docs, decision records, profile ids, references, and cross-repo system links. It already fails a project whose `paradigm: <id>@<major>` pin (architecture §3/§4 or constitution default) has no matching paradigm file. It also fails a project whose lint config lacks a string from its stack's `lint-baseline` block (stack idioms, Enforcement). That is how documentation and import-path rules reach every repo instead of depending on who writes the code.
 
 ## 13. Versioning
 Two numbers, two jobs (`knowledge/versioning/semantic-versioning.md`):

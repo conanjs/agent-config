@@ -278,6 +278,20 @@ for (const stack of stackIds) {
     if (s && !['knowledge-doc/v1', 'deep-dive/v1'].includes(s)) warn('STACK', `stacks/${stack}: Reference topic ${stripCode(row.Path)} has unknown schema ${s}`);
   }
 
+  // reference/index.md (optional; the project around it is checked by validate-project.mjs)
+  const refPath = path.join(dir, 'reference', 'index.md');
+  if (exists(refPath)) {
+    const rtext = read(refPath);
+    const rfm = frontMatter(rtext) || {};
+    if (rfm.schema !== 'stack-reference/v1') fail('REF', `stacks/${stack}/reference/index.md: schema must be stack-reference/v1`);
+    if (rfm.stack !== stack) fail('REF', `stacks/${stack}/reference/index.md: stack ${rfm.stack} does not match folder`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(rfm.verified ?? ''))) fail('REF', `stacks/${stack}/reference/index.md: verified must be a YYYY-MM-DD date`);
+    const rhs = headings(rtext);
+    for (const s of ['What it shows', 'Choices', 'File map', 'How to check', 'Using it in a repo', 'References', 'Related']) {
+      if (!rhs.includes(s)) fail('REF', `stacks/${stack}/reference/index.md: section "## ${s}" missing`);
+    }
+  }
+
   // idioms.md
   const idiomsPath = path.join(dir, 'idioms.md');
   if (!exists(idiomsPath)) { fail('STACK', `stacks/${stack}: missing idioms.md`); continue; }

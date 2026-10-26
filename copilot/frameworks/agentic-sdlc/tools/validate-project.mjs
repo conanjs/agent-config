@@ -186,6 +186,41 @@ function parseYamlListBlock(yaml, key) {
   if (cur) rows.push(cur);
   return rows;
 }
+// A stack's idioms.md declares a ```lint-baseline block: `config:` candidate files (first found wins)
+// and `require:` strings that must appear in it. A project missing them fails, so the rules that
+// keep comments and imports consistent cannot be silently left out of a repo.
+function checkLintBaseline(stack, comps) {
+  const idioms = path.join(frameworkRoot, 'stacks', stack, 'idioms.md');
+  if (!exists(idioms)) return;
+  const block = fs.readFileSync(idioms, 'utf8').match(/```lint-baseline\s*\r?\n([\s\S]*?)\r?\n```/);
+  if (!block) return;
+  const configs = (block[1].match(/^config:\s*(.+)$/m)?.[1] ?? '').split('|').map((s) => s.trim()).filter(Boolean);
+  // Items under `require:` always apply; items under `require-if: <file> <key>` apply when that file has that key.
+  const groups = [];
+  for (const line of block[1].split(/\r?\n/)) {
+    const cond = line.match(/^require-if:\s*(\S+)\s+(\S+)\s*$/);
+    if (/^require:\s*$/.test(line)) groups.push({ when: null, items: [] });
+    else if (cond) groups.push({ when: { file: cond[1], key: cond[2] }, items: [] });
+    else if (groups.length && /^\s+-\s+/.test(line)) groups.at(-1).items.push(line.replace(/^\s+-\s+/, '').trim());
+  }
+  for (const c of comps) {
+    const root = path.join(projectRoot, ...String(c.path || '.').replace(/\/$/, '').split('/'));
+    const found = configs.map((f) => path.join(root, f)).find(exists);
+    const label = `component ${c.name || '<unnamed>'} (stack ${stack})`;
+    if (!found) { fail('LINT', `${label}: none of ${configs.join(', ')} found; stacks/${stack}/idioms.md lint-baseline requires one`); continue; }
+    const cfg = fs.readFileSync(found, 'utf8');
+    const applies = (w) => {
+      if (!w) return true;
+      const f = path.join(root, w.file);
+      return exists(f) && new RegExp(`"${w.key}"\\s*:`).test(fs.readFileSync(f, 'utf8'));
+    };
+    for (const g of groups.filter((g) => applies(g.when))) {
+      const why = g.when ? `, because ${g.when.file} has "${g.when.key}"` : '';
+      for (const r of g.items) if (!cfg.includes(r)) fail('LINT', `${label}: ${path.basename(found)} lacks "${r}" (stacks/${stack}/idioms.md lint-baseline${why})`);
+    }
+  }
+}
+
 function fencedYaml(sec) {
   const m = String(sec ?? '').match(/```yaml\s*\r?\n([\s\S]*?)\r?\n```/);
   return m ? m[1] : null;
@@ -230,8 +265,9 @@ for (const p of walk(path.join(frameworkRoot, 'paradigms')).filter((f) => f.ends
 
 const ruleIds = new Set();
 for (const p of walk(frameworkRoot).filter((f) => /[\\/](foundations|stacks|paradigms)[\\/].+\.md$/.test(f))) {
-  const rules = section(read(p), 'Rules') ?? '';
-  for (const row of tables(rules, 'Id').flat()) if (row.Id) ruleIds.add(stripTicks(row.Id));
+  // Every rule table counts, not only `## Rules`: stack idioms keep theirs under
+  // "Language conventions" and "Runtime & performance".
+  for (const row of tables(read(p), 'Id').flat()) if (row.Id) ruleIds.add(stripTicks(row.Id));
 }
 function checkRuleCitations(fileLabel, text) {
   const candidates = new Set();
@@ -327,6 +363,7 @@ if (!exists(architecturePath)) {
       if ((c.stack || c.paradigm) && !decisions.length) fail('ARCH', `${label}: decisions are required when stack or paradigm is set`);
       for (const id of decisions) { archDecisionRefs.add(id); if (!decisionExists(id)) fail('ARCH', `${label}: decision ${id} not found in specs/*/research.md`); }
     }
+    for (const stack of new Set(components.map((c) => c.stack).filter((s) => s && stacks.has(s)))) checkLintBaseline(stack, components.filter((c) => c.stack === stack));
     if (exists(path.join(projectRoot, 'src'))) {
       // `./` (the repo root) covers src/ just as `src/` does.
       const srcCovered = components.some((c) => ['src', '.'].includes(String(c.path || '').replace(/\/$/, '')) && ['service', 'library'].includes(c.kind));

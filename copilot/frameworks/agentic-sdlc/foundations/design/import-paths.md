@@ -13,9 +13,9 @@ How one source file refers to another: when a relative path is fine, when it mus
 
 | Id | Rule | Holds when | Typical violation | Enforced by | Source |
 |---|---|---|---|---|---|
-| IMP-1 | Same-folder references use `./`. A parent step (`../`) climbs at most one level and stays inside the same module. | No reference has two or more parent steps | `../../../domain/role` | llm (fallback) | — |
-| IMP-2 | Crossing a layer or module boundary goes through a stable alias or the target module's public entry point, never a relative path through folders (MOD-3, FF-1). | Every cross-boundary import uses an alias or entry point | `../../infrastructure/pg-role-repository` from `application/` | script | — |
-| IMP-3 | Import another module only through its public entry point (MOD-3, FF-3); never its internal files. | No import targets a non-public path of another module | `#roles/internal/role-validator` from another module | script | — |
+| IMP-1 | A relative path may name only a file in the importing file's own folder (`./role`). Any other folder, whether parent, sibling or child, is reached through an alias (IMP-2). One mechanical rule, so no judgment about module edges is needed and nothing can drift. | No relative reference contains a parent step or a folder | `../errors`, `../../domain/role`, `./http/createApp` from a root file | lint | — |
+| IMP-2 | Every reference outside the file's own folder goes through the alias of its layer or module, or the target module's public entry point (MOD-3, FF-1). The same rule applies to production code and tests. | Every non-same-folder import uses an alias or entry point | `../../infrastructure/pg-role-repository` from `application/`; `../support/fixtures` in a test | lint | — |
+| IMP-3 | Import another module only through its public entry point (MOD-3, FF-3); never its internal files. | No import targets a non-public path of another module | `@/roles/internal/role-validator` from another module | script | — |
 | IMP-4 | An alias resolves identically wherever code runs: type-check, build output at runtime, tests and the dev runner. One definition is the source for all of them. | Each alias is exercised by a smoke check that imports it from the built output and from tests | An alias the type checker accepts but the runtime cannot find | script | — |
 | IMP-5 | An index file or barrel exists only as a module's public surface and re-exports only that surface. Internal folders have none. | Each barrel lists exactly the module's public API | An `index.ts` in an internal folder that re-exports every file | llm | — |
 | IMP-6 | No circular imports between files, modules or layers (MOD-2, FF-2). | The import graph is acyclic | `role.ts` and `permission.ts` import each other | script | — |
@@ -24,17 +24,23 @@ How one source file refers to another: when a relative path is fine, when it mus
 
 ## Interpreting
 
-**When each form is right**
+**When each form is right.** Examples write the alias prefix as `@/`. The stack decides the real mechanism and prefix (TypeScript: TSN-15 and its Options).
 
 | Situation | Use | Example |
 |---|---|---|
 | Same folder | `./` | `./role` |
-| Sibling folder inside one module | one `../` | `../value-objects/permission-key` |
-| Another layer of the same module | alias | `#domain/role` |
-| Another module | alias to its public entry | `#billing` |
+| Sibling or parent folder inside one layer | alias | `@/domain/value-objects/permission-key` |
+| Child folder (e.g. the composition root reaching into a layer) | alias | `@/http/createApp` |
+| Another layer of the same module | alias | `@/domain/role` |
+| Another module | alias to its public entry | `@/billing` |
+| Test reaching production code or a test helper | alias | `@/core/domain/Role`, `@/test/support/fixtures` |
 | Third-party package | package name | `zod` |
 
-**The type-checker-only alias pitfall (IMP-4).** Many type checkers let you declare aliases that only inform the checker. They do not change the import text in the emitted code, so the check passes and the program crashes with "module not found". In TypeScript this is the `paths` setting: it does not change the emitted import path, so aliases that type-check can fail at runtime unless a runtime resolver knows the same mapping.
+**Allowed exceptions.** Only files the alias mechanism cannot serve: tool configuration at the repo root and scripts run before or without the build. Each exception is listed with its reason in `docs/architecture.md` §4 and excluded by name from the lint rule. Anything else is a finding.
+
+**Which alias mechanism.** Any mechanism works if every tool resolves it the same way: the type checker, the dev runner, the test runner, the lint resolver and the built program (IMP-4). That leaves two kinds: the runtime owns the mapping, or the build rewrites aliases into real paths. Which one, and so the prefix, is a stack Option chosen per repo (TypeScript: TSN-15). Either way the prefix must not read as a package name (IMP-7): a bare `core/role` is looked up as an installed package called `core`.
+
+**The type-checker-only alias pitfall (IMP-4).** Many type checkers let you declare aliases that only inform the checker. They do not change the import text in the emitted code, so the check passes and the program crashes with "module not found". In TypeScript this is the `paths` setting: it does not change the emitted import path, so aliases that type-check can fail at runtime unless a runtime resolver knows the same mapping or the build rewrites them.
 
 ```json
 { "compilerOptions": { "paths": { "@domain/*": ["./src/domain/*"] } } }
@@ -45,27 +51,27 @@ How one source file refers to another: when a relative path is fine, when it mus
 // Node cannot resolve "@domain/role" → runtime error
 ```
 
-The fix is to let the runtime own the mapping and the checker follow it. For Node and TypeScript the platform's own mechanism is the `imports` field of `package.json`, with keys starting with `#`; see `stacks/typescript-node/idioms.md` (TSN-15, TSN-16). Other stacks use their module system's equivalent.
+Two fixes: let the runtime own the mapping (Node: the `imports` field of `package.json`), or let the build rewrite the aliases into real paths in its output. Each stack documents its options with a tested configuration; see `stacks/typescript-node/idioms.md` (TSN-15, TSN-16).
 
-**Boundary checks must resolve aliases (IMP-4, IMP-8).** A lint rule or a custom import scan that cannot resolve a specifier usually skips it. That means introducing aliases can turn an enforced boundary into an unchecked one with no error at all. Concrete case: a test named "http does not import store (relative path or alias)" that resolves only paths starting with `.` passes `import … from "#store/…"`. Treat an unresolved internal specifier as a failure, and add one deliberately violating aliased import to the check's own test.
+**Boundary checks must resolve aliases (IMP-4, IMP-8).** A lint rule or a custom import scan that cannot resolve a specifier usually skips it. That means introducing aliases can turn an enforced boundary into an unchecked one with no error at all. Concrete case: a test named "http does not import store (relative path or alias)" that resolves only paths starting with `.` passes an aliased import of `store`. Treat an unresolved internal specifier as a failure, and add one deliberately violating aliased import to the check's own test.
 
-**Adopting in an existing repo.** IMP-1 and IMP-2 apply to new and touched files. Rewriting existing deep relative imports is its own task (`../code/refactoring.md`). Do not switch the lint rule to `error` until that task lands.
+**Adopting in an existing repo.** Converting the relative imports is one mechanical task (`../code/refactoring.md`), done for the whole repo at once. Half-converted code is the drift this rule exists to prevent: one reviewed repo had 279 alias imports next to 190 relative ones that crossed folders. The lint rule is switched to `error` in the same change.
 
 **Barrels.** A barrel is useful at the edge of a module because it is the public surface (MOD-3). Inside a module it hides real dependencies and creates cycles (IMP-6), so do not add one per folder.
 
 **Resolving a violation**
 
 1. Importing a sibling's internals? Export what is needed from that module's entry point, or move the code.
-2. Needing `../../`? The file likely sits in the wrong module (`module-boundaries.md`) or needs an alias.
+2. Needing a relative path outside the folder? Use the alias. If no alias reaches the target, the file likely sits in the wrong module (`module-boundaries.md`), or the layer is missing its alias (IMP-7).
 3. A cycle? Extract the shared concept into the layer below both, or invert one edge with a port (`clean-architecture.md`).
 
 ## Tensions
 
 | Rule A | Rule B | Default resolution |
 |---|---|---|
-| IMP-2 aliases | Move-friendly relative imports | Relative inside a module, alias across modules; a module can move without edits to its own files. |
-| IMP-5 barrels | IMP-6 no cycles | Import from the barrel only across modules; inside a module import files directly. |
-| IMP-7 one alias table | Small repos | A single-module repo may skip aliases if it has no cross-layer imports beyond one `../`; record this simplification under MOD-8. |
+| IMP-1, IMP-2 aliases everywhere | Move-friendly relative imports inside a module | Aliases win. Moving a folder means a search-and-replace on one alias prefix. A rule that needs a judgment about where a module ends drifts in practice. |
+| IMP-5 barrels | IMP-6 no cycles | Import from the barrel only across modules; inside a module import the file directly through its alias. |
+| IMP-7 one alias table | Small repos | Every repo with more than one folder of source declares aliases. The cost is one config entry per layer. |
 
 ## References
 
@@ -77,9 +83,10 @@ The fix is to let the runtime own the mapping and the checker follow it. For Nod
 
 **External authoritative sources:**
 - [Node.js packages, "Subpath imports"](https://nodejs.org/api/packages.html#subpath-imports) — `imports` entries must start with `#` and apply only inside the package.
-- [TypeScript Modules Reference, "paths does not affect emit"](https://www.typescriptlang.org/docs/handbook/modules/reference.html) — path aliases that type-check can crash at runtime; `package.json` `imports` is the standard replacement.
+- [TypeScript Modules Reference, "paths does not affect emit"](https://www.typescriptlang.org/docs/handbook/modules/reference.html) — path aliases that type-check can crash at runtime unless the runtime or the build resolves them.
 - [TypeScript TSConfig reference, `paths`](https://www.typescriptlang.org/tsconfig/) — the option "does not change how import paths are emitted".
-- [Google TypeScript Style Guide, "Imports"](https://google.github.io/styleguide/tsguide.html) — prefer relative imports within a project and limit parent steps.
+- [Google TypeScript Style Guide, "Imports"](https://google.github.io/styleguide/tsguide.html) — prefers relative imports within a project. Deliberately not followed here (see Tensions): one mechanical rule is chosen over move-friendliness.
+- Knowledge: `knowledge/js-runtime/subpath-imports.md` — why Node aliases start with `#`, and the alternatives.
 - Robert C. Martin, *Clean Architecture* (2017) — acyclic dependencies principle.
 
 ## Related

@@ -1,6 +1,6 @@
 ---
 schema: stack-idioms/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-25
 stack: rust
 rule-prefix: RS
 ---
@@ -132,12 +132,23 @@ pub async fn handle_register(&self, req_id: RequestId, email: Email) -> Result<U
 
 ## Enforcement
 
+A project fails `tools/validate-project.mjs` unless the first config file found contains every string below. This makes the documentation (CMT-5, CMT-12) and import-path (IMP-1, IMP-2) rules part of every repo on this stack, not something each author remembers.
+
+```lint-baseline
+config: src/lib.rs | src/main.rs
+require:
+  - missing_docs
+```
+
+
 | Rule | Tool config |
 |---|---|
 | RS-1 | Rust visibility rules plus `clippy::missing_errors_doc`/API review where configured |
 | RS-2 | Compiler type checking through `cargo check --workspace --all-targets --locked` |
 | RS-3 | `#![forbid(unsafe_code)]`; any exception documented in a decision record |
 | RS-4 | `cargo fmt --all --check`; `cargo clippy --workspace --all-targets --locked -- -D warnings` |
+| CMT-5, CMT-12 (doc comments) | `#![deny(missing_docs)]` at each crate root (the rustc lint is allow-by-default) plus `clippy::missing_errors_doc`. Trait items carry the contract; implementations reference the trait |
+| IMP-1, IMP-2 (import paths) | `use crate::core::role::Role` for anything outside the current module; `super::` only from an inline `#[cfg(test)]` module to its parent. No lint covers this, so it is `llm (fallback)` |
 | RS-7 | Rust `Send`/`Sync` trait bounds checked by `cargo check` |
 | FF-1 (layer deps) | Cargo workspace dependency graph checked from crate `Cargo.toml` files against `docs/architecture.md` §4 |
 
@@ -148,6 +159,7 @@ pub async fn handle_register(&self, req_id: RequestId, email: Email) -> Result<U
 - `schemas/stack-idioms.schema.md`: schema for this file.
 
 **External authoritative sources:**
+- https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html#missing-docs
 - https://doc.rust-lang.org/book/ch09-00-error-handling.html
 - https://docs.rs/thiserror
 - https://docs.rs/anyhow
