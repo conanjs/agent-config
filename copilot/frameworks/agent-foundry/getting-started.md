@@ -1,11 +1,11 @@
 ---
 schema: guide/v1
-last-updated: 2026-10-24
+last-updated: 2026-10-25
 ---
 
 # Getting started with the Agent Foundry
 
-> **Short answer:** a **Charter** is one agent's job description. The Foundry holds many Charters and the parts they **share**. Two Charters exist now: `pr-reviewer` (reviews pull requests) and `ci-failure-triager` (explains failed CI runs).
+> **Short answer:** a **Charter** is one agent's job description. The Foundry holds many Charters and the parts they **share**. Three Charters exist now: `pr-reviewer` (reviews pull requests), `ci-failure-triager` (explains failed CI runs) and `knowledge-researcher` (writes source-traced deep dives).
 
 ## 1. What is shared and what is per-agent
 
@@ -25,9 +25,9 @@ The decision tree is the **only big piece you write per agent**, because "how to
 
 | Piece | Status |
 |---|---|
-| Schemas, floors, principles, resolver rules, trees, two Charters, example Lens | **Written and validated** |
+| Schemas, floors, principles, resolver rules, trees, three Charters, example Lens | **Written and validated** |
 | `validate-foundry.mjs` | **Works** (`node tools/validate-foundry.mjs`) |
-| Tool wrappers: `foundry-pr-reviewer` and `foundry-ci-failure-triager` as Claude (`claude/agents/`), Copilot (`copilot/agents/`) and Codex (`codex/agents/`) agents | **Written, not yet run on a real case.** They deploy with the existing `mapping.yaml` routes |
+| Tool wrappers: `foundry-pr-reviewer`, `foundry-ci-failure-triager` and `foundry-knowledge-researcher` as Claude (`claude/agents/`), Copilot (`copilot/agents/`) and Codex (`codex/agents/`) agents | **Written, not yet run on a real case.** They deploy with the existing `mapping.yaml` routes |
 | The Resolver as code | **Not built.** Today the agent follows `resolver.md` by reading it |
 | The Observer (turns human reactions into candidate lessons) | **Not built** |
 | Golden set for evals | **Not built** (so no lesson can be promoted yet) |

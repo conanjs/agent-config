@@ -1,6 +1,6 @@
 ---
 schema: framework-index/v1
-last-updated: 2026-10-24
+last-updated: 2026-10-25
 ---
 
 # Agent Foundry (alias: Charter)
@@ -25,12 +25,13 @@ An agent has no single "brain file". Its intelligence comes from **five parts wo
 | **Principles** | Values | Eight rules every Foundry agent obeys | [`principles.md`](principles.md) |
 | **Floors** | Conscience | Rules no team preference can lower | [`floors.md`](floors.md) |
 
-**Where is the decision/logical flow?** In `trees/`. Three trees:
+**Where is the decision/logical flow?** In `trees/`. The main ones:
 
 | Tree | Prefix | Decides | File |
 |---|---|---|---|
 | PR review | `PRV` | The whole review: zones, floors, rules, lenses, confidence, synthesis | [`trees/pr-review.tree.md`](trees/pr-review.tree.md) |
 | Zone classification | `ZN` | Is a file `owned`, `adopted` or `foreign`? | [`trees/zone-classification.tree.md`](trees/zone-classification.tree.md) |
+| Knowledge research | `KRS` | Scope, source tiers, claim tracing, the understanding check, saturation | [`trees/knowledge-research.tree.md`](trees/knowledge-research.tree.md) |
 | Lesson promotion | `PRM` | Can a learned habit become part of the Lens? | [`trees/lesson-promotion.tree.md`](trees/lesson-promotion.tree.md) |
 
 Trees use the same format as `agentic-sdlc` (`tree/v2`): every node has a `Default` and an `Escalate when`.
@@ -80,11 +81,13 @@ copilot/frameworks/agent-foundry/
 ├── trees/                         the decision flow
 │   ├── pr-review.tree.md          (pr-reviewer)
 │   ├── ci-triage.tree.md          (ci-failure-triager)
+│   ├── knowledge-research.tree.md (knowledge-researcher)
 │   ├── zone-classification.tree.md
 │   └── lesson-promotion.tree.md
 ├── charters/                      one file per agent
 │   ├── pr-reviewer.charter.md
-│   └── ci-failure-triager.charter.md
+│   ├── ci-failure-triager.charter.md
+│   └── knowledge-researcher.charter.md
 ├── examples/
 │   └── orders-team/               EXAMPLE Lens: lessons, waiver, zone map (invented team)
 └── tools/
