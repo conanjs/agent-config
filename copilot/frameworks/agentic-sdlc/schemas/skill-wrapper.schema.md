@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 ---
 
 # Schema: Skill Wrapper (`skill-wrapper/v1`)
@@ -19,7 +19,7 @@ Fixed by the Agent Skills format: `name`, `description`. The framework's `schema
 |---|---|---|---|
 | Entry | `agentic-sdlc` | `agents/orchestrator.md`, `conventions.md` | user invokes it |
 | Role preset (①) | `sdlc-<role>-preset` | the role's Preset list, in order | Claude wrapper `skills:` |
-| Stack (②) | `sdlc-stack-<id>` | `stacks/<id>/index.md`, `idioms.md`, the `frameworks/<fw>.md` named in the task, then, when they exist, `reference/index.md` and `{{AGENT_HOME}}/procedures/<id>/index.md` | launch prompt `profiles.stack` |
+| Stack (②) | `sdlc-stack-<id>` | `stacks/<id>/index.md`, `idioms.md`, the `frameworks/<fw>.md` named in the task, then, when they exist, `reference.md` (pointer to the pinned reference repo) and `{{AGENT_HOME}}/procedures/<id>/index.md` | launch prompt `profiles.stack` |
 | Paradigm (②) | `sdlc-paradigm-<id>` | `paradigms/<id>.md`, plus the overlay `stacks/<stack>/paradigms/<id>.md` for the task's stack | launch prompt `profiles.paradigm` |
 
 ## Required structure

@@ -20,6 +20,8 @@ paradigms: [class-modeled, functional-pipeline]
 - `paradigms/class-modeled.md`
 - `paradigms/functional-pipeline.md`
 
+**Reference implementation:** `reference.md` — pointer to `conanjs/agentic-sdlc-reference-typescript-node`, pinned by tag and commit.
+
 **Procedures:** `{{AGENT_HOME}}/procedures/typescript-node/index.md` — bounded code tasks the planner assigns with a task line's `procedure:` (D11).
 
 ## Slots

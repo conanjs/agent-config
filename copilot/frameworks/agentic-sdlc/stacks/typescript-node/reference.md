@@ -1,8 +1,11 @@
 ---
 schema: stack-reference/v1
-last-updated: 2026-10-26
+last-updated: 2026-10-27
 stack: typescript-node
-verified: 2026-10-26
+repo: conanjs/agentic-sdlc-reference-typescript-node
+pinned: v1.0.1
+commit: 9323ccd662f566ea33fd93b55b99453b8e537cea
+verified: 2026-10-27
 ---
 
 # Reference: TypeScript on Node.js
@@ -11,7 +14,11 @@ verified: 2026-10-26
 
 A small Express service with one feature, "revise a document without overwriting a newer change" (`PUT /documents/:id`, optimistic concurrency), built through every layer: entity, port, use case, adapter, HTTP handler, error mapper, composition root, entry point, unit and integration tests. It exists to be read and copied, not deployed. Every file passes the stack's lint, including the documentation and import-path rules.
 
+The code lives in its own repo, [`conanjs/agentic-sdlc-reference-typescript-node`](https://github.com/conanjs/agentic-sdlc-reference-typescript-node), pinned above by tag and full commit SHA (a tag can move; a SHA cannot). This file is the framework's map of it: the Choices table below says which rule each file shows, so a role can find the right file before cloning anything. The repo's own records — `docs/architecture.md`, `.specify/memory/constitution.md`, `docs/glossary.md` — live only in the repo.
+
 ## Choices
+
+All paths are relative to the reference repo's root, at the pinned commit.
 
 | Concern | Choice | Rule | Where |
 |---|---|---|---|
@@ -31,6 +38,8 @@ A small Express service with one feature, "revise a document without overwriting
 | Config | Parsed once, frozen, nothing else reads the environment | TSN-9 | `src/infrastructure/config.ts` |
 | Logging | One pino logger made in `main.ts` and injected; `no-console` | TSN-10 | `src/main.ts`, `src/CompositionRoot.ts` |
 | Tests | Unit tests next to the code; integration tests in `test/integration/`; helpers in `test/support/` via `@/test/*` | testing-strategy | `vitest.config.ts`, `vitest.integration.config.ts` |
+| Framework sections of the constitution | Default paradigm, unit-size defaults, no deviations, budgets | constitution-sdlc/v1 | `.specify/memory/constitution.md` |
+| Task-line suffixes | `touches:`, `refs:`, `procedure:` (+ `inputs:`) on every `[llm]` task; T002 names `typescript-node/add-port-and-adapter` | task-line/v1, D11 | `specs/001-revise-document/tasks.md` |
 
 ## File map
 
@@ -49,11 +58,22 @@ A small Express service with one feature, "revise a document without overwriting
 | `src/main.ts` | Tier B entry | Config, logger, listen |
 | `src/**/*.test.ts`, `test/integration/*.int.test.ts` | tests | Unit, concurrency and HTTP tests |
 | `eslint.config.mjs` | lint | Every lint rule of the stack, with the flat-config pitfalls handled |
-| `docs/`, `specs/` | records | Architecture, glossary, decision records, as any project has |
+| `docs/`, `.specify/`, `specs/` | records | Architecture, glossary, constitution, decision records, task plan, as any project has |
+| `.github/workflows/check.yml` | CI | `pnpm run check`, then this framework's `validate-project.mjs` at a pinned framework commit |
+
+## How to fetch
+
+Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
+
+1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet 9323ccd662f566ea33fd93b55b99453b8e537cea`.
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/9323ccd662f566ea33fd93b55b99453b8e537cea/<path>`.
+
+A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 
 ## How to check
 
-From this folder: `pnpm install`, then `pnpm run check`. It runs format, lint, typecheck, unit tests, integration tests, the build and a smoke import of `dist/`. Then `node ../../../tools/validate-project.mjs .` from this folder. A failure means the reference no longer matches the stack's rules; fix the reference or the rule in the same change.
+In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, unit and integration tests, build, smoke import of `dist/`). Then `node {{AGENT_HOME}}/frameworks/agentic-sdlc/tools/validate-project.mjs .`. The repo's CI runs both on every push, the second at a pinned framework commit. A failure means the reference no longer matches the stack's rules; fix the reference or the rule, as a pair of pull requests (below).
 
 ## Using it in a repo
 
@@ -62,16 +82,20 @@ From this folder: `pnpm install`, then `pnpm run check`. It runs format, lint, t
 3. Record the repo's own decisions (alias Option, paradigm, Tier B files) in its `specs/<feature>/research.md` and `docs/architecture.md`; do not copy this reference's records.
 4. Anything done differently goes in the constitution's "style deviations" table.
 
+**Changing a rule that the reference shows:** one pull request in the reference repo (its CI can be pointed at the framework branch with the workflow's `framework-ref` input), then one here that changes the rule and bumps `pinned`, `commit` and `verified` together.
+
 ## References
 
-- `../idioms.md` — TSN rules and the tested lint snippets this code follows.
-- `../paradigms/class-modeled.md` — the paradigm overlay.
-- `../frameworks/express.md` — EXP rules.
-- `../../../schemas/stack-reference.schema.md` — schema for this file.
+- `idioms.md` — TSN rules and the tested lint snippets this code follows.
+- `paradigms/class-modeled.md` — the paradigm overlay.
+- `frameworks/express.md` — EXP rules.
+- `../../schemas/stack-reference.schema.md` — schema for this file.
+- `{{AGENT_CONFIG_REPO}}/proposals/agentic-sdlc-reference-repos-and-procedures.md` — Part A, why the code moved to its own repo.
 - [Express 5 error handling](https://expressjs.com/en/guide/error-handling.html) — rejected promises from handlers reach the error middleware.
 - [TSDoc](https://tsdoc.org/) — doc-comment syntax.
+- [GitHub Actions secure use](https://docs.github.com/en/actions/reference/security/secure-use) — pin a full commit SHA because tags can move.
 
 ## Related
 
 - `{{AGENT_HOME}}/procedures/typescript-node/index.md` — step-by-step procedures that produce code shaped like this reference.
-- `../index.md` — the stack's command slots.
+- `index.md` — the stack's command slots.

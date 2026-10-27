@@ -49,6 +49,7 @@ If a statement can fail a review, it is a Rule. If it explains a concept general
 |---|---|---|---|
 | A1 Foundations | frameworks/agentic-sdlc/foundations/<subject>/ | Stack-neutral rules | ① preset |
 | A2 Profiles | frameworks/agentic-sdlc/stacks/<id>/ and paradigms/<id>.md | Stack and paradigm rules | ② profile |
+| Stack reference | its own repo per stack, pinned by `stacks/<id>/reference.md`; cloned read-only into `{{REFERENCE_REPOS_ROOT}}/<id>` | One small project showing every stack rule in working code, with its own architecture, constitution and glossary | ② via the stack skill, when code is needed |
 | B Global knowledge | {{AGENT_HOME}}/knowledge/<topic>/ | References | ③ state when cited |
 | C Company KB | {{AGENT_HOME}}/companies/<company>/ | Company facts and optional system maps | ③ state through repo links |
 | D Project repo | docs/, .specify/, specs/ | Repo facts and mission artifacts | ③ state |
@@ -139,6 +140,7 @@ Open design item: at P7, the framework should collect lessons from repeated revi
 | A2 | stacks/<id>/idioms.md | stack-idioms/v1 |
 | A2 | stacks/<id>/frameworks/<fw>.md | stack-framework/v1 |
 | A2 | stacks/<id>/paradigms/<pdm>.md | stack-paradigm/v1 |
+| A2 | stacks/<id>/reference.md (pointer to the pinned reference repo) | stack-reference/v1 |
 | A2 | paradigms/<id>.md | paradigm/v1 |
 | A | trees/<name>.tree.md | tree/v2 |
 | A | tools/validate.mjs | framework validator: every store A file above |
@@ -156,7 +158,7 @@ Open design item: at P7, the framework should collect lessons from repeated revi
 
 ## 13. How to extend
 1. Add a role: update conventions.md §1, create agents/<id>.md, wrappers, preset skill, and any tree/foundation docs it needs.
-2. Add a stack: add stacks/<id>/index.md, idioms.md, overlays, skill, and TS tree leaf.
+2. Add a stack: add stacks/<id>/index.md, idioms.md, overlays, skill, and TS tree leaf. Optionally a reference: a repo `agentic-sdlc-reference-<id>` whose CI runs the stack's `check` and `validate-project.mjs`, and a `stacks/<id>/reference.md` pinning its tag and commit (`stack-reference/v1`).
 3. Add a paradigm: add paradigms/<id>.md, stack overlays, skill, and PDM tree leaf.
 4. Add a foundation: create foundations/<subject>/<name>.md and add it to role Preset tables deliberately.
 5. Add a profile dimension: add one conventions.md §4 row, folder, tree, skill pattern, and architecture field support.
@@ -184,7 +186,7 @@ Open design item: at P7, the framework should collect lessons from repeated revi
 ## 15. Status & decisions
 Version 2.0.0 is live and active. Phase 1 migration completed 2026-10-04 for the live framework files in this scope.
 
-Decisions: D1 stack naming; D2 paradigm as its own dimension; D3 paradigm inferred or asked at G0 and locked at G3; D4 design approved before migration; D5 routing via Preset plus profiles plus state; D6 no Preset cap; D7 `touches:` and `refs:` copied from task lines; D8 system context in Company KB; D9 legacy knowledge docs are not retrofitted; D10 deep dives synthesize into structured knowledge docs; D11 (2026-10-27) stack procedures are bounded task scopes assigned on task lines (`procedure:`) and checked by `validate-project.mjs --task` (`{{AGENT_CONFIG_REPO}}/proposals/agentic-sdlc-reference-repos-and-procedures.md` Part B).
+Decisions: D1 stack naming; D2 paradigm as its own dimension; D3 paradigm inferred or asked at G0 and locked at G3; D4 design approved before migration; D5 routing via Preset plus profiles plus state; D6 no Preset cap; D7 `touches:` and `refs:` copied from task lines; D8 system context in Company KB; D9 legacy knowledge docs are not retrofitted; D10 deep dives synthesize into structured knowledge docs; D11 (2026-10-27) stack procedures are bounded task scopes assigned on task lines (`procedure:`) and checked by `validate-project.mjs --task` (`{{AGENT_CONFIG_REPO}}/proposals/agentic-sdlc-reference-repos-and-procedures.md` Part B); D12 (2026-10-27) each stack reference lives in its own repo, pinned by tag and full commit SHA in `stacks/<id>/reference.md` (same proposal, Part A).
 
 Completed 2026-10-04 after phase 1: `validate-project.mjs`; the knowledge framework deployed with `validate-knowledge.mjs`; 23 verified knowledge docs seeded (OOP, DDD, functional modeling, JS runtime, concurrency, error handling, operations, web APIs), so every paradigm and stack runtime rule has a `Source`; rbac-demo piloted on the v2 store D schemas (paradigm `functional-pipeline@1`, kept under PDM-Q1); OTS Company KB `system/` created.
 

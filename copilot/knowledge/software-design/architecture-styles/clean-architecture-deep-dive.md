@@ -21,7 +21,7 @@ tags: [clean-architecture, dependency-rule, ports, interactor, presenter, hexago
 - treating the database, web and frameworks as details.
 
 **Use this when:** you need the whole picture: vocabulary and analogies, where the idea came from, what each circle holds, the official diagram and how a request crosses the boundaries step by step, what each port is, what data may cross, how to package the code, which principles sit underneath, what critics say, and how the stack reference measures up.
-**Depth:** words used; analogies; origin timeline; the goal; the rule; every circle defined; diagrams of the circles, of source dependencies and of the flow of control; the full boundary-crossing flow; input/output/gateway ports, the interactor, driving vs. driven; the request/response form side by side with the output-port form; data across boundaries, with a real before/after mistake, what the authors say, and Martin's own demo code as a counter-example; Screaming Architecture and the four packaging options (from Simon Brown's own text); "details"; SOLID and the six component principles with a worked instability calculation; the book's mechanism chapters; a comparison with peer styles; criticism; an edge-case matrix; a review of `stacks/typescript-node/reference/`; self-check questions.
+**Depth:** words used; analogies; origin timeline; the goal; the rule; every circle defined; diagrams of the circles, of source dependencies and of the flow of control; the full boundary-crossing flow; input/output/gateway ports, the interactor, driving vs. driven; the request/response form side by side with the output-port form; data across boundaries, with a real before/after mistake, what the authors say, and Martin's own demo code as a counter-example; Screaming Architecture and the four packaging options (from Simon Brown's own text); "details"; SOLID and the six component principles with a worked instability calculation; the book's mechanism chapters; a comparison with peer styles; criticism; an edge-case matrix; a review of the stack reference (`stacks/typescript-node/reference.md`); self-check questions.
 
 **Dedicated deep dives** for three of the sources: `hexagonal-architecture-deep-dive.md`, `onion-architecture-deep-dive.md`, `screaming-architecture-deep-dive.md`. This doc keeps its own summary of each and links to the dedicated doc for more.
 
@@ -758,7 +758,7 @@ Microsoft's .NET architecture guide treats Hexagonal, Ports-and-Adapters, Onion 
 
 ## 15. The stack reference, reviewed against the sources
 
-Target: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`.
+Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea). Until 2026-10-27 this code lived in-tree at `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`; it moved unchanged (same files and line numbers) to its own repo, pinned by `stacks/typescript-node/reference.md`.
 
 | Aspect | Verdict | Evidence |
 |---|---|---|
@@ -844,7 +844,7 @@ Target: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`.
 - [^27]: [Implementing Clean Architecture – Of controllers and presenters](http://www.plainionist.net/Implementing-Clean-Architecture-Controller-Presenter/) — Plainionist, 2018 (updated 2023). Backs: §6.6 "Who backs form B" (the strict reading).
 - [^28]: [techexcellenceio community discussion #3](https://github.com/techexcellenceio/community/discussions/3) — community discussion that identifies the `openchat-unclebob` branch as Uncle Bob's version, using "use case handlers WITHOUT presenters". Backs: §6.6 "Who backs form B".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules (§14, §15).
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/` — the code reviewed in §15.
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
 
 ## Related
 - `software-design/architecture-styles/hexagonal-architecture-deep-dive.md`

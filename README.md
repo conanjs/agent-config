@@ -12,7 +12,7 @@ A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, Git
 | Write or check a global knowledge doc (schemas, deep dives, validator) | [`copilot/frameworks/knowledge/index.md`](copilot/frameworks/knowledge/index.md) |
 | Work inside a specific company's KB (e.g. OTS) | [`copilot/companies/ots/index.md`](copilot/companies/ots/index.md) |
 | Bootstrap Spec-Driven Development (Spec Kit) in a project | [`copilot/procedures/spec-driven-development.procedure.md`](copilot/procedures/spec-driven-development.procedure.md) |
-| Review a knowledge doc or procedure before committing (validators + the checks they can't do) | [`copilot/procedures/review-docs.procedure.md`](copilot/procedures/review-docs.procedure.md); enable the automatic checks with `git config core.hooksPath .githooks` (see `SETUP.md` step 9) |
+| Review a knowledge doc or procedure before committing (validators + the checks they can't do) | [`copilot/procedures/review-docs.procedure.md`](copilot/procedures/review-docs.procedure.md); enable the automatic checks with `git config core.hooksPath .githooks` (see `SETUP.md` step 10) |
 | Add standard GitHub repo governance to a repo | [`copilot/procedures/init-github-governance.procedure.md`](copilot/procedures/init-github-governance.procedure.md) |
 | Install/update the eight Windows apps after a restart | Select `/agent windows-software`, then send `run`; see [`copilot/agents/windows-software.agent.md`](copilot/agents/windows-software.agent.md). Installers stay in Downloads; nvm, Notepad++, Git, and WinRAR go under `D:\win11 software`. |
 | Look up a path/preference variable (`{{AGENT_HOME}}` etc.) | [`global-variables.md`](global-variables.md) |

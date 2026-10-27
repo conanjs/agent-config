@@ -4,7 +4,9 @@
 // Roles, profile dimensions, rule prefixes and tree prefixes are read from the
 // docs themselves (conventions.md §1/§4, front-matter) — never hardcoded here.
 //
-// Usage: node tools/validate.mjs [frameworkRoot] [--repo <agent-config repo root>]
+// Usage: node tools/validate.mjs [frameworkRoot] [--repo <agent-config repo root>] [--upstream]
+//   --upstream also asks GitHub for the latest tag of every stack reference repo (stacks/<id>/reference.md)
+//   and warns when it differs from the pinned tag (network; uses GITHUB_TOKEN when set).
 //   frameworkRoot defaults to this script's parent dir. The repo root (for
 //   wrappers and skills) defaults to <frameworkRoot>/../../.. when it holds
 //   skills/; otherwise wrapper/skill checks are skipped with a notice.
@@ -17,6 +19,8 @@ import { fileURLToPath } from 'node:url';
 const args = process.argv.slice(2);
 const repoFlag = args.indexOf('--repo');
 const repoArg = repoFlag >= 0 ? args.splice(repoFlag, 2)[1] : undefined;
+const upstream = args.includes('--upstream'); if (upstream) args.splice(args.indexOf('--upstream'), 1);
+const refPins = []; // [stack, repo, pinned] for --upstream
 const root = fs.realpathSync(path.resolve(args[0] ?? path.join(path.dirname(fileURLToPath(import.meta.url)), '..')));
 const guessRepo = path.resolve(root, '..', '..', '..');
 const repo = repoArg ? path.resolve(repoArg) : (fs.existsSync(path.join(guessRepo, 'skills')) ? guessRepo : null);
@@ -278,18 +282,27 @@ for (const stack of stackIds) {
     if (s && !['knowledge-doc/v1', 'deep-dive/v1'].includes(s)) warn('STACK', `stacks/${stack}: Reference topic ${stripCode(row.Path)} has unknown schema ${s}`);
   }
 
-  // reference/index.md (optional; the project around it is checked by validate-project.mjs)
-  const refPath = path.join(dir, 'reference', 'index.md');
+  // reference.md (optional): a pointer to the stack's reference repo, pinned by tag and commit (stack-reference/v1).
+  // The code lives in its own repo and is checked there (pnpm run check + validate-project.mjs in its CI).
+  if (exists(path.join(dir, 'reference'))) fail('REF', `stacks/${stack}/reference/: in-tree reference projects were replaced by stack-reference pointers (reference.md); move the code to its own repo`);
+  const refPath = path.join(dir, 'reference.md');
   if (exists(refPath)) {
     const rtext = read(refPath);
     const rfm = frontMatter(rtext) || {};
-    if (rfm.schema !== 'stack-reference/v1') fail('REF', `stacks/${stack}/reference/index.md: schema must be stack-reference/v1`);
-    if (rfm.stack !== stack) fail('REF', `stacks/${stack}/reference/index.md: stack ${rfm.stack} does not match folder`);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(rfm.verified ?? ''))) fail('REF', `stacks/${stack}/reference/index.md: verified must be a YYYY-MM-DD date`);
+    const label = `stacks/${stack}/reference.md`;
+    if (rfm.schema !== 'stack-reference/v1') fail('REF', `${label}: schema must be stack-reference/v1`);
+    if (rfm.stack !== stack) fail('REF', `${label}: stack ${rfm.stack} does not match folder`);
+    if (!/^[\w.-]+\/[\w.-]+$/.test(String(rfm.repo ?? ''))) fail('REF', `${label}: repo must be owner/name`);
+    if (!rfm.pinned) fail('REF', `${label}: pinned (the release tag) missing`);
+    if (!/^[0-9a-f]{40}$/.test(String(rfm.commit ?? ''))) fail('REF', `${label}: commit must be a full 40-character SHA (a tag can move)`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(rfm.verified ?? ''))) fail('REF', `${label}: verified must be a YYYY-MM-DD date`);
+    else if ((Date.now() - Date.parse(rfm.verified)) / 86400000 > 90) warn('REF', `${label}: verified ${rfm.verified}, more than 90 days ago; re-run the reference's checks at the pin and update verified`);
     const rhs = headings(rtext);
-    for (const s of ['What it shows', 'Choices', 'File map', 'How to check', 'Using it in a repo', 'References', 'Related']) {
-      if (!rhs.includes(s)) fail('REF', `stacks/${stack}/reference/index.md: section "## ${s}" missing`);
+    for (const s of ['What it shows', 'Choices', 'File map', 'How to fetch', 'How to check', 'Using it in a repo', 'References', 'Related']) {
+      if (!rhs.includes(s)) fail('REF', `${label}: section "## ${s}" missing`);
     }
+    if (rfm.commit && !rtext.replace(/^---[\s\S]*?\n---/, '').includes(String(rfm.commit))) fail('REF', `${label}: How to fetch must check out the pinned commit ${rfm.commit}`);
+    if (rfm.repo && rfm.pinned) refPins.push([stack, rfm.repo, rfm.pinned]);
   }
 
   // idioms.md
@@ -493,6 +506,21 @@ if (repo) {
     if (/^sdlc-binding-|^sdlc-engineering-principles$/.test(d)) fail('SKILL', `skills/${d} is a v1 skill; remove it`);
   }
 } else warn('WRAP', 'agent-config repo not found; wrapper and skill checks skipped (pass --repo <path>)');
+
+// ---- reference pins vs upstream (--upstream) ----------------------------------------------------
+if (upstream) {
+  const headers = { 'user-agent': 'agentic-sdlc-validate', accept: 'application/vnd.github+json', ...(process.env.GITHUB_TOKEN ? { authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) };
+  for (const [stack, repoName, pinned] of refPins) {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${repoName}/tags?per_page=100`, { headers, signal: AbortSignal.timeout(15000) });
+      if (!res.ok) { warn('REF', `stacks/${stack}/reference.md: ${repoName} tags → HTTP ${res.status}`); continue; }
+      const tags = (await res.json()).map((t) => t.name).filter((t) => /^v?\d+\.\d+\.\d+$/.test(t));
+      const num = (t) => t.replace(/^v/, '').split('.').map(Number);
+      const latest = tags.sort((a, b) => { const x = num(a), y = num(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2]; }).at(-1);
+      if (latest && latest !== pinned) warn('REF', `stacks/${stack}/reference.md: pinned ${pinned}, the reference repo's latest tag is ${latest}; review it and bump pinned/commit/verified`);
+    } catch (e) { warn('REF', `stacks/${stack}/reference.md: ${repoName} → ${e.name}: ${e.message}`); }
+  }
+}
 
 // ---- report ------------------------------------------------------------------------------------
 console.log(`agentic-sdlc validate (v2): ${roles.length} roles, ${dims.length} profile dimensions, ${foundationFiles.length} foundations, ` +

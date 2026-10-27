@@ -91,7 +91,7 @@ A login request (an illustration, not code in the repo).
 
 Step 5 uses form B (item 7): `Login` returns, and no output port is involved. Here the user has roles, so the presenter includes them; the `{ id, username }` example above has none.
 
-**The same flow in the stack reference** (`copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`), for `PUT /documents/42` with `{"body":"new text","expectedVersion":2}`:
+**The same flow in the stack reference** ([conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea)), for `PUT /documents/42` with `{"body":"new text","expectedVersion":2}`:
 
 | Step | Ring | What happens (file:line) | Import direction |
 |---|---|---|---|
@@ -147,7 +147,7 @@ Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mista
 - [GUI Architectures](https://martinfowler.com/eaaDev/uiArchs.html) — Martin Fowler, 2006. Backs: the Model-View-Presenter meaning of "presenter".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules this doc explains.
 - `copilot/frameworks/agentic-sdlc/foundations/code/naming.md` — the `Presenter` role suffix.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/src/` — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example.
+- [`src/` of the stack reference at v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`.
 - `copilot/knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md` — the deep dive this doc was distilled from (§6.3, §6.6, §6.7, §7).
 
 ## Related

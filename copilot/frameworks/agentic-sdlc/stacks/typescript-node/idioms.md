@@ -1,6 +1,6 @@
 ---
 schema: stack-idioms/v1
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 stack: typescript-node
 rule-prefix: TSN
 ---
@@ -181,7 +181,7 @@ require-if: package.json imports
 
 ### Import alias and lint configuration
 
-A complete project using option B and every snippet in this file: `reference/` (`reference/index.md`).
+A complete project using option B and every snippet in this file: the stack reference repo, pinned in `reference.md`.
 
 Both options were verified on 2026-10-25 with Node 24.22, TypeScript 6.0, tsx 4.23, Vitest 5.0 on Vite 8, ESLint 10, eslint-plugin-import-x 4.17, NodeNext with `.js` relative specifiers. Option A on a copy of `rbac-demo` (full suite passing); option B on a small ESM project, step by step in the table under its config.
 

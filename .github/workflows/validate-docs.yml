@@ -24,4 +24,6 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node copilot/procedures/tools/validate-procedures.mjs --upstream
+        run: |
+          node copilot/procedures/tools/validate-procedures.mjs --upstream
+          node copilot/frameworks/agentic-sdlc/tools/validate.mjs --upstream

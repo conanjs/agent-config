@@ -3,7 +3,7 @@ schema: deep-dive/v1
 topic: software-design/architecture-styles
 status: verified
 applies-to: ["any"]
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 last-verified: 2026-10-25
 synthesized-into: []
 tags: [onion, palermo, domain-model, repository-interface, dependency-inversion, layering]
@@ -128,7 +128,7 @@ The core depends on interfaces, so the implementations must arrive from outside:
 - [^5]: [Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) — Microsoft, living. Backs: §1.
 - [^6]: [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: §8.
 - [^7]: [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012 (text and figure). Backs: §8.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/` — mapped in §10.
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea) — mapped in §10 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
 
 ## Related
 - `software-design/architecture-styles/clean-architecture-deep-dive.md`
