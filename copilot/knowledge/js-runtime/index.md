@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: js-runtime
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 ---
 
 # JavaScript runtime internals
@@ -16,6 +16,7 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [promise-rejections.md](promise-rejections.md) | concept | Floating promises, unhandled rejection behavior, and why linting promise handling matters | verified |
 | [subpath-imports.md](subpath-imports.md) | concept | `package.json` `imports`: why internal aliases start with `#`, versus `paths`, self-reference and relative paths | verified |
 | [private-fields.md](private-fields.md) | concept | `#x` versus TypeScript `private`: runtime privacy, serialization leaks, measured performance | verified |
+| [barrel-files.md](barrel-files.md) | concept | Re-export files (`index.ts`): measured load cost, cycles, and the alternative of importing the declaring file | verified |
 | [abort-signal.md](abort-signal.md) | concept | AbortController and AbortSignal as a cancellation contract across fetch and own APIs | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 

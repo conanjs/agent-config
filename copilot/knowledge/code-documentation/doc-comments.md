@@ -17,7 +17,7 @@ tags: [doc-comments, tsdoc, jsdoc, xml-documentation, csharp, linting]
 **Not this doc:** when a comment is worth writing at all, which is the framework foundation `foundations/code/comments.md`.
 
 ## Scope
-Doc comments on public declarations (types, functions, methods, properties, interface members). Implementation comments inside function bodies are out of scope. Versions as checked on 2026-10-25.
+Doc comments on public declarations (types, functions, methods, properties, interface members). Implementation comments inside function bodies are out of scope. Versions as checked on 2026-10-25; the editor-hover table and the summary-lint notes on 2026-10-27.
 
 ## Catalog
 
@@ -44,6 +44,20 @@ Doc comments on public declarations (types, functions, methods, properties, inte
 | Go | `revive` `exported`, `package-comments` | Exported function or method with no comment; package with no comment ✅[^9] |
 | Rust | rustc `missing_docs` (allow-by-default, so turn it on) | Public item with no docs ✅[^10] |
 
+**What the TypeScript editor shows on hover over an implementing method**
+
+Measured 2026-10-27 on TypeScript 6.0.3, calling `getQuickInfoAtPosition` (the language-service call editors make) on `InMemoryDocumentStore.find`, which implements `DocumentStore.find`, in the stack reference `conanjs/agentic-sdlc-reference-typescript-node`.
+
+| Comment on the implementing method | Summary shown | `@param` / `@returns` / `@remarks` shown |
+|---|---|---|
+| `/** {@inheritDoc DocumentStore.find} */` | Literal `{@inheritDoc DocumentStore.find}` text | The interface's |
+| None | The interface's summary | The interface's |
+| Own summary, no block tag (`/** {@link DocumentStore.find} against this process's memory: … */`) | The method's own summary | The interface's |
+| Own summary plus `@see` or `@throws` | The method's own summary | None |
+| Own summary plus `{@inheritDoc}` | — (`tsdoc/syntax` rejects it: `tsdoc-inheritdoc-incompatible-summary`) | — |
+
+To re-run it, create a language service over the repo's `tsconfig.json` (`ts.createLanguageService`), call `getQuickInfoAtPosition(file, offsetOfMethodName)`, and print `displayPartsToString(info.documentation)` and `info.tags`.
+
 **C# recommendations worth copying anywhere** ✅[^1]
 - Document all publicly visible types and their public members.
 - At a bare minimum, every type and member has a summary.
@@ -54,17 +68,20 @@ Doc comments on public declarations (types, functions, methods, properties, inte
 - TSDoc is "loosely based on JSDoc" but has a strict grammar. Its reference parser and ESLint plugin come from Microsoft's `@microsoft/tsdoc` project. ✅[^3]
 - `tsdoc/syntax` requires `@param name - description` (with the hyphen) and the inline form `{@inheritDoc X.y}`. A bare `@inheritDoc` is an error. Tested 2026-10-25 with eslint-plugin-tsdoc 0.5.4.
 - Presence lint cannot judge meaning. `jsdoc/informative-docs` rejects `/** Delete. */` on `delete()`, but accepts `/** Gets the probe adapter. */`. Tested 2026-10-25 with eslint-plugin-jsdoc 65.4.2.
+- `jsdoc/informative-docs` compares a summary with the documented symbol's own name only, not the enclosing class: `/** Applies one revision. */` on `ReviseDocument.run` passes it, although it only restates the class name. Tested 2026-10-27 with eslint-plugin-jsdoc 65.4.2. The framework's local rule `local-docs/specific-summary` also strips class and interface names (CMT-13).
 - In the C# compiler, `<param>` names and `cref` targets are checked against the code. ✅[^1] TSDoc tools do not check names against the signature.
-- `{@inheritDoc}` copies the summary, `@remarks`, `@param`, `@typeParam` and `@returns`; the same comment may not add its own summary or `@remarks`, but may add other tags such as `@throws` or `@example`. ✅[^11] `tsdoc/syntax` reports a violation as `tsdoc-inheritdoc-incompatible-tag` (tested 2026-10-25).
+- `{@inheritDoc}` copies the summary, `@remarks`, `@param`, `@typeParam` and `@returns`; the same comment may not add its own summary or `@remarks`, but may add other tags such as `@throws` or `@example`. ✅[^11] `tsdoc/syntax` reports a violation as `tsdoc-inheritdoc-incompatible-tag` (tested 2026-10-25), and a summary beside it as `tsdoc-inheritdoc-incompatible-summary` (tested 2026-10-27).
 - The TypeScript language service (editor hover) does not resolve the inline `{@inheritDoc X}` form and shows it as literal text. It does follow the JSDoc block tag `@inheritDoc`, and inherits automatically when a member has no comment. Tested 2026-10-25 on TypeScript 6.0.3.
 - The same language service also inherits an interface member's `@param`, `@returns` and `@remarks` when the implementing method has its **own summary but no block tag**; one block tag (`@see`, `@throws`) stops that. So an implementation can carry its own summary, link the contract with `{@link Port.member}`, and still show the contract's notes on hover. Tested 2026-10-27 on TypeScript 6.0.3 through `getQuickInfoAtPosition`, the call editors make. The framework uses this form (CMT-12, TSN-13).
 
 ## Takeaways
 - Require a doc comment on every public declaration, enforced by lint, in every stack. [rule-candidate]
-- Write the contract once on the interface or port, and inherit it in implementations. [rule-candidate]
+- Write the contract once on the interface or port. An implementation keeps a summary of its own that links the contract and says what it adds; in TypeScript it carries no block tag, so the editor still shows the contract's notes. [rule-candidate]
 
 ## Used by
-- _Not cited by any rule yet._
+| Where | Id / path | How |
+|---|---|---|
+| foundation | CMT-12 | Source: |
 
 ## Verification status
 - Verified: 28 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27

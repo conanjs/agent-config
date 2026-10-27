@@ -80,7 +80,7 @@ In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, un
 ## Using it in a repo
 
 1. Copy the configs (`package.json` scripts, `tsconfig*.json`, `vitest*.config.ts`, `eslint.config.mjs`, `.prettierrc.json`) and adjust names.
-2. Start feature-first (MOD-9, the default): put the four layer folders inside one folder per feature area, `src/<feature>/{domain,application,infrastructure,interface}/`, with the composition root at `src/`. The pinned code is the layer-first variant until v2.0.0, so read its `src/<layer>/` as `src/<feature>/<layer>/`. Keep the four layers at the top only when the owner opts in to layer-first with a decision record.
+2. Start feature-first (MOD-9, the default): put the four layer folders inside one folder per feature area, `src/<feature>/{domain,application,infrastructure,interface}/`, plus `src/shared/` with the same four folders from day one (even empty), with the composition root at `src/`. The pinned code is the layer-first variant until v2.0.0, so read its `src/<layer>/` as `src/<feature>/<layer>/`. Keep the four layers at the top only when the owner opts in to layer-first with a decision record.
 3. Record the repo's own decisions (alias Option, paradigm, Tier B files) in its `specs/<feature>/research.md` and `docs/architecture.md`; do not copy this reference's records.
 4. Anything done differently goes in the constitution's "style deviations" table.
 

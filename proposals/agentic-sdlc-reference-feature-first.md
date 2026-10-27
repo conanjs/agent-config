@@ -40,7 +40,7 @@ src/
 │   ├── interface/http/            DocumentRoutes.ts, handlers, request schemas
 ├── comments/                      ← second module; imports only documents' public use-case files (§A5)
 │   └── …same four folders…
-├── shared/                        ← no feature code; every module may use it, it uses no module
+├── shared/                        ← no feature code; every module may use it, it uses no module; created from day one, even empty
 │   ├── domain/                    Result.ts
 │   ├── interface/http/            HttpErrorMapper.ts, problem details, status codes (Part B)
 │   └── infrastructure/            config.ts, logger.ts
