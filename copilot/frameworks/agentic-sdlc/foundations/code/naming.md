@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 rule-prefix: NAM
 subject: code
 ---
@@ -25,6 +25,7 @@ How engineering names types, functions, files, tests and terms so the code reads
 | NAM-10 | Units and currency are in the name or the type (`timeoutMs`, `sizeBytes`, `Money`). | No bare numeric quantity has an unstated unit (CS-14) | `timeout = 30`, `price` with no currency | llm | — |
 | NAM-11 | Error types name the failed condition (`PermissionAlreadyGranted`); domain events are past tense (`RoleCreated`); commands are imperative (`GrantPermission`). | Each name says whether it is a failure, a fact, or a request | `RoleError`, `RoleEvent`, `DoRole` | llm | — |
 | NAM-12 | Test titles state behaviour per `../delivery/testing-strategy.md` (TST-3) and start with the spec id they verify: `<ac-id> <behaviour sentence>`. | Each title starts with an id found in `spec.md` and reads as one behaviour | `it("works")`, or a title with no AC id | llm | — |
+| NAM-13 | Name and describe from concepts, not from words. First list the concepts (the contract questions below), then keep the one to three that tell this thing apart from its neighbours for the name, and put the rest in the doc summary (CMT-13). A generic verb (`apply`, `handle`, `process`, `do`, `run`, `manage`, `execute`) is allowed only where a role fixes its meaning (`run` on a use case, `handle` on a `Handler`), and then the summary carries the specifics. | The name plus its summary answer every contract question that applies, and no word is there only because it is the first one that came to mind | `applyRevision()` documented as "Applies one revision."; `processData()`; a use case whose summary could not be written without "and" joining two unrelated effects | llm | — |
 
 ## Interpreting
 
@@ -48,6 +49,28 @@ How engineering names types, functions, files, tests and terms so the code reads
 Choose `Repository` or `Store` once per project and record it in `docs/glossary.md`.
 
 **Presenter in plain English.** A presenter is the mailroom clerk who copies only the public fields from an internal file onto an outgoing form. It maps an internal entity to the public response shape so secrets cannot leak by accident. Concrete example: the `User` entity holds `id`, `email` and `passwordHash`. `UserPresenter.toResponse(user)` returns `{ id, email }`. Because the response is built field by field, a later `passwordHash` field can never reach the client unless someone adds it to the presenter on purpose.
+
+**The contract questions (NAM-13, CMT-13)**
+
+A practical form of "who does what, by which means, into where, when". Ask every question; answer in the name only what distinguishes the thing, and in the summary everything else that applies. Not every question applies to every member.
+
+| Question | Asks | Goes in | `ReviseDocument.run` answers |
+|---|---|---|---|
+| What (effect) | The precise change or result: a specific verb and object | Name (verb + object), summary (exact effect) | Replaces the document's body |
+| When / only if (condition) | Precondition, trigger or guard the caller must know | Summary | Only if nobody revised it since `expectedVersion` |
+| Where (destination) | Where the change lands or what it touches outside itself | Summary; the name only for adapters (NAM-7) | In the store |
+| Otherwise (failure) | What happens when the condition fails | Summary, then `@returns`/`@throws` | Changes nothing and returns why |
+| Returns | What the caller gets back | `@returns` (CMT-6) | The new version, or the refusal reason |
+| Who (actor) | Who calls it or on whose behalf, only when that constrains use | Summary | Not needed: any caller may |
+| By which (means) | A collaborator or protocol, only when it is part of the contract the caller sees | Summary when observable, otherwise a body comment | The version check in `save` is mechanism: body comment |
+
+Two corrections to the plain "who/what/how/where/when" list:
+- **"How" is usually not contract.** The algorithm or internal collaborator belongs in a body comment; Go's guide says doc comments "should not explain internal details such as the algorithm". Name the means only when the caller can observe it (for example "sends an email", "writes to the audit log").
+- **"Otherwise" and "returns" are missing from it** and are often the most important answers: Swift's guideline is to say "what a function or method does and what it returns".
+
+**Why concepts first.** Feitelson et al. found that developers name in three steps: choose the concepts, choose a word for each, assemble the words. Developers taught this model produced names two independent judges rated better by two to one. Agents skip the first step and reach for the first verb that fits: "apply", "handle", "process". The questions above are that first step written down.
+
+**When no specific summary can be written.** If the honest summary needs "and" between unrelated effects, or the questions have no answer, the unit is doing too much or nothing of its own. Fix the design (`coding-standards.md` CS-2, `../design/design-principles.md`), not the sentence.
 
 **One verb per kind of operation.** Record the project's choice, for example "build" for assembling an object graph from config and "create" for new domain objects. Then `composeApp()` and `createApp()` cannot both exist (NAM-3).
 
@@ -84,12 +107,17 @@ Choose `Repository` or `Store` once per project and record it in `docs/glossary.
 - [Google TypeScript Style Guide, "Naming"](https://google.github.io/styleguide/tsguide.html) — descriptive names, no ambiguous abbreviations, do not mark interfaces specially unless idiomatic.
 - [Martin Fowler, "Repository" (PoEAA)](https://martinfowler.com/eaaCatalog/repository.html) — collection-like access to aggregates.
 - [Alistair Cockburn, "Hexagonal architecture"](https://alistair.cockburn.us/hexagonal-architecture/) — ports and adapters.
+- [Dror G. Feitelson et al., "How Developers Choose Names"](https://arxiv.org/abs/2103.07487) — IEEE TSE 48(1), 2022: the three-step model (concepts, words, construction); names from subjects who used it were judged better two to one (NAM-13).
+- [Go Doc Comments, "Funcs"](https://go.dev/doc/comment) — say what a function returns or does; no algorithm details (contract questions, "by which").
+- [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/) — "Clarity at the point of use"; describe what a function does and what it returns; name by role, not type (NAM-13).
+- John Ousterhout, *A Philosophy of Software Design* (2nd ed., 2021), ch. "Choosing Names" — precise names that create a clear image; a hard-to-name thing signals a design problem.
+- Oracle, "How to Write Doc Comments for the Javadoc Tool" — advises adding description beyond the API name. Unverified here: the page refused automated fetches on 2026-10-27, so this is cited from memory and should be checked before quoting.
 - [Martin Fowler, "Data Transfer Object" (PoEAA)](https://martinfowler.com/eaaCatalog/dataTransferObject.html) — the public shape a presenter produces.
 
 ## Related
 
 - `coding-standards.md` — CS-1 and CS-14 point here.
-- `comments.md` — comments add what names cannot.
+- `comments.md` — comments add what names cannot; CMT-13 applies the contract questions to doc summaries.
 - `../design/domain-driven-design.md` — DDD-1 ubiquitous language.
 - `../delivery/testing-strategy.md` — TST-3 test naming.
 - `../../paradigms/class-modeled.md` — which role-suffixed types must be classes.

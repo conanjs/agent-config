@@ -25,6 +25,7 @@ When code gets a comment, what that comment says, and which comments are mandato
 | CMT-10 | TODO and FIXME carry an owner or task id: `TODO(<owner-or-task-id>): <what>`. | Every marker matches the format and its task is open | A bare `// TODO fix later` | script | — |
 | CMT-11 | Comments are changed with the code they describe. A comment that contradicts the code is a defect. | Changed lines and their nearby comments agree after the change | A step comment says "validate" after the validation moved elsewhere | llm | — |
 | CMT-12 | A contract is written once, on the declaration that owns it: the port, interface or base type. An implementation references it with the format's inherit-doc form. It adds only parts the reference does not copy, such as extra errors or an example; implementation detail (storage, performance) goes in a why-comment in the body (CMT-1). Formats that copy the summary and remarks reject a second one next to the reference (TS: TSN-13). | No implementation repeats a contract its port already states, and every port member has one | Two adapters each say "returns null when the document does not exist" while the port says nothing | lint + llm | — |
+| CMT-13 | A summary is specific: it states what the member does in terms the names around it do not already give. It answers the contract questions in `naming.md` ("The contract questions"): the effect, the condition it depends on, where the change lands, and what happens otherwise. Mechanism stays out (CMT-1, body comment). If no specific summary can be written, the unit's design is suspect, not the wording (NAM-13). | The summary passes the swap test: it would be false for a different member with the same name and signature, such as a last-write-wins `run()` | `/** Applies one revision. */` on `ReviseDocument.run`; `/** Handles the request. */`; `/** Processes the order. */` | llm (fallback); stacks add a lint floor where one exists (TypeScript: TSN-13) | — |
 
 ## Interpreting
 
@@ -106,12 +107,27 @@ Good: doc comment on a public use case (CMT-5, CMT-6).
 
 ```ts
 /**
- * Grants a permission to a role and persists the result.
+ * Grants a permission to a role and saves the role, unless the role already holds it.
  *
  * @returns `already_granted` when the role already holds it; nothing is saved then.
  * @throws RepositoryError when the role cannot be saved.
  */
 ```
+
+**Specific summaries (CMT-13)**
+
+`jsdoc/informative-docs` and its equivalents only compare a summary with its own symbol name. A method called `run` inside `ReviseDocument` therefore passes with `Applies one revision.`, because none of those words is `run`. Yet the summary says nothing the class and method names did not: "revise document" is "apply a revision". Worse, it is also true of an implementation that overwrites a newer change, so it hides the one promise the use case exists to keep.
+
+| Version | Summary | Swap test |
+|---|---|---|
+| Before | `Applies one revision.` | Also true of a last-write-wins `run()`: fails |
+| After | `Replaces the document's body in the store, but only if nobody revised it since the caller read expectedVersion; otherwise changes nothing and returns why.` | False for last-write-wins: passes |
+
+The "after" answers four contract questions (`naming.md`): effect (replaces the body), destination (in the store), condition (only if nobody revised it since `expectedVersion`), otherwise (changes nothing, returns why). It names no mechanism: the version check inside `save` is a body comment.
+
+Two checks, cheapest first:
+1. **Lint floor (stacks that have it; TS: TSN-13).** Remove stop words and every word of the member, class and interface names from the summary. Fewer than three words left fails. This catches verb-plus-object summaries, nothing more.
+2. **Review (RUB-10).** The swap test above, plus: does the summary answer the questions a caller must know before calling? A long summary can still be vague, so lint never replaces this.
 
 **TODO format.** `TODO(RBAC-142): remove after the v2 token migration`. A task id or an owner handle is enough. A marker whose task is closed is stale and counts as a CMT-11 finding.
 
@@ -121,9 +137,9 @@ Good: doc comment on a public use case (CMT-5, CMT-6).
 
 | Part | Checked by | Where it is configured |
 |---|---|---|
-| Doc comment present on every public declaration (CMT-5), valid format, not a pure paraphrase (CMT-6), inherit-doc on implementations (CMT-12) | Lint, required in every stack profile | Stack idioms (TS: TSN-13; Python, Go and Rust: their Enforcement tables) |
+| Doc comment present on every public declaration (CMT-5), valid format, not a pure paraphrase (CMT-6), inherit-doc on implementations (CMT-12), summary longer than its surrounding names (CMT-13 floor) | Lint, required in every stack profile | Stack idioms (TS: TSN-13; Python, Go and Rust: their Enforcement tables) |
 | TODO and FIXME format (CMT-10) | Script over source | Stack idioms (TS: TSN-14) |
-| Why-not-what, step comments, headers, deviations, commented-out code, stale comments (CMT-1 to CMT-4, CMT-7 to CMT-9, CMT-11) | `llm` review | `../review/review-rubrics.md` RUB-10; the engineering role's ENG-R11 |
+| Why-not-what, step comments, headers, deviations, commented-out code, stale comments, specific summaries beyond the lint floor (CMT-1 to CMT-4, CMT-7 to CMT-9, CMT-11, CMT-13) | `llm` review | `../review/review-rubrics.md` RUB-10; the engineering role's ENG-R11 |
 
 ## Tensions
 
@@ -148,12 +164,14 @@ Good: doc comment on a public use case (CMT-5, CMT-6).
 - [TSDoc](https://tsdoc.org/) — the doc-comment standard for TypeScript.
 - [Recommended XML documentation tags (C#)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags) — "document all publicly visible types and their public members"; `<inheritdoc>` keeps implementations in sync with interfaces (CMT-5, CMT-12).
 - [Compiler warning CS1591](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs1591) — missing XML comment for a publicly visible type or member: the enforcement bar CMT-5 copies.
+- [Go Doc Comments, "Funcs"](https://go.dev/doc/comment) — a function's doc comment "should explain what the function returns or, for functions called for side effects, what it does", and not the algorithm (CMT-13).
+- [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/) — describe "what a function or method does and what it returns"; trouble describing an API simply suggests the wrong API (CMT-13).
 - Knowledge: `knowledge/code-documentation/doc-comments.md` — C# XML tags, TSDoc, JSDoc and other stacks side by side.
 
 ## Related
 
 - `coding-standards.md` — CS-13, CS-15 point here.
-- `naming.md` — names carry intent so comments do not have to.
+- `naming.md` — names carry intent so comments do not have to; "The contract questions" that CMT-13 summaries answer.
 - `error-handling.md` — what a doc comment lists under errors.
 - `../review/review-rubrics.md` — RUB-10, the shared review check.
 - `../review/fitness-functions.md` — FF-12 counts suppressions that lack a reason comment (CMT-8).

@@ -114,7 +114,7 @@ function handle(req: Request, log = rootLogger) {
 | TSN-4 | Return discriminated Results for expected domain failures | Callers narrow on `ok` and handle every expected case | A validation conflict is thrown as a generic Error | typecheck | — |
 | TSN-5 | Throw only Error instances for unexpected failures | Thrown values have stack, name and optional `cause` | Code throws a string or plain object | lint | — |
 | TSN-6 | Inject use-case dependencies through constructors | A use case can be constructed with fake ports in tests | A use case imports a singleton client | llm | — |
-| TSN-13 | Every exported declaration and public member carries a TSDoc comment (`/** … */`), the TypeScript equivalent of C# XML doc comments: summary sentence, then `@remarks`, `@param name - …`, `@returns`, `@throws`, `@example` as needed. Implementations of a port use `{@inheritDoc Port.member}`, followed only by tags it does not copy (`@throws`, `@example`, `@deprecated`); implementation notes go in a why-comment in the body | Lint reports nothing for `tsdoc/syntax`, `jsdoc/require-jsdoc`, `jsdoc/informative-docs`, `jsdoc/require-param`, `jsdoc/check-param-names` and `jsdoc/require-returns` (CMT-5, CMT-6, CMT-12) | A port method with no contract; a public method missing `@param` for one parameter; `@param roleId The role id`; a bare `@inheritDoc`; a summary or `@remarks` next to `{@inheritDoc}` | lint | — |
+| TSN-13 | Every exported declaration and public member carries a TSDoc comment (`/** … */`), the TypeScript equivalent of C# XML doc comments: summary sentence, then `@remarks`, `@param name - …`, `@returns`, `@throws`, `@example` as needed. Implementations of a port use `{@inheritDoc Port.member}`, followed only by tags it does not copy (`@throws`, `@example`, `@deprecated`); implementation notes go in a why-comment in the body | Lint reports nothing for `tsdoc/syntax`, `jsdoc/require-jsdoc`, `jsdoc/informative-docs`, `jsdoc/require-param`, `jsdoc/check-param-names`, `jsdoc/require-returns` and `local-docs/specific-summary` (CMT-5, CMT-6, CMT-12, CMT-13) | A port method with no contract; `/** Applies one revision. */` on `ReviseDocument.run`; a public method missing `@param` for one parameter; `@param roleId The role id`; a bare `@inheritDoc`; a summary or `@remarks` next to `{@inheritDoc}` | lint | — |
 | TSN-14 | TODO and FIXME carry an owner or task id | Every marker looks like `TODO(PROJ-123): ...` (CMT-10) | A bare `// TODO fix later` | script | — |
 | TSN-15 | Aliases use the repo's chosen mechanism (Options below): tsconfig `paths` with an `@/` prefix plus a build-time rewrite (default), or `package.json` `imports` with a `#` prefix. Never `paths` without the rewrite | The same import specifier resolves under the type checker, the dev runner, the test runner, the lint resolver and `node dist/…` (IMP-4, IMP-7) | `paths` is set, the type checker passes, and the built output fails to load with module-not-found | script | `knowledge/js-runtime/subpath-imports.md` |
 | TSN-16 | Relative imports name only same-folder files; everything else uses an alias, in `src` and `test` alike; no cycles | No relative specifier starts with `../` or contains a folder after `./`; the import graph is acyclic (IMP-1, IMP-2, IMP-6) | `../errors.js`, `./http/createApp.js` from a root file, `../support/fixtures.js` in a test | lint | — |
@@ -151,6 +151,7 @@ require:
   - jsdoc/informative-docs
   - jsdoc/require-param
   - jsdoc/require-returns
+  - local-docs/specific-summary
   - noRelativeOutsideFolder
   - import-x/no-cycle
   - import-x/extensions
@@ -170,7 +171,7 @@ require-if: package.json imports
 | TSN-5 | ESLint `no-throw-literal` / `@typescript-eslint/only-throw-error` |
 | TSN-7 | `@typescript-eslint/no-floating-promises` |
 | TSN-10 | ESLint `no-console` scoped to `src/**` |
-| TSN-13 | `eslint-plugin-tsdoc` (`tsdoc/syntax`) plus `eslint-plugin-jsdoc` in `typescript` mode: `jsdoc/require-jsdoc` (`publicOnly`, classes, methods, functions, getters, and the TS contexts in the snippet below) and `jsdoc/informative-docs`, plus `jsdoc/require-param`, `require-param-description`, `check-param-names`, `require-returns` and `require-returns-description` (CMT-6: every parameter and non-void return documented, C# parity with StyleCop SA1611/SA1615). Getters are exempt from `require-returns` (the summary describes the value), and so is a comment that is only `{@inheritDoc Port.member}`, through a `comment` selector, because the inherited contract carries the notes (CMT-12). Snippet: "Documentation lint configuration" below |
+| TSN-13 | `eslint-plugin-tsdoc` (`tsdoc/syntax`) plus `eslint-plugin-jsdoc` in `typescript` mode: `jsdoc/require-jsdoc` (`publicOnly`, classes, methods, functions, getters, and the TS contexts in the snippet below) and `jsdoc/informative-docs`, plus `jsdoc/require-param`, `require-param-description`, `check-param-names`, `require-returns` and `require-returns-description` (CMT-6: every parameter and non-void return documented, C# parity with StyleCop SA1611/SA1615). Getters are exempt from `require-returns` (the summary describes the value), and so is a comment that is only `{@inheritDoc Port.member}`, through a `comment` selector, because the inherited contract carries the notes (CMT-12). `local-docs/specific-summary` (CMT-13): a small local plugin, copied from the stack reference's `eslint/specific-summary.mjs`, that fails a method or function summary with fewer than three words left after removing stop words and the member, class and interface names. Snippet: "Documentation lint configuration" below |
 | TSN-14 | CI script: fail on `grep -rnP '\b(TODO\|FIXME)\b(?!\([A-Za-z0-9_-]+\))' src` (ESLint `no-warning-comments` cannot allow a valid format, so use it only for `xxx` and `hack`) |
 | TSN-15 | Smoke script: build, then import one aliased module from `dist/` with plain `node`, and once from `src/` under the dev runner. `tsc --noEmit` alone cannot catch this failure; config per option in "Import alias and lint configuration" below |
 | IMP-1, IMP-2 | TSN-16 configuration: relative paths only within the folder, aliases everywhere else |
@@ -301,12 +302,15 @@ Verified 2026-10-25 on a copy of `rbac-demo` with ESLint 10, eslint-plugin-jsdoc
 // eslint.config.js (excerpt): C#-parity documentation for TypeScript (TSN-13, CMT-5, CMT-12)
 import jsdoc from "eslint-plugin-jsdoc";
 import tsdoc from "eslint-plugin-tsdoc";
+import localDocs from "./eslint/specific-summary.mjs"; // copied from the stack reference
 {
   files: ["src/**/*.ts"],
-  plugins: { jsdoc, tsdoc },
+  plugins: { jsdoc, tsdoc, "local-docs": localDocs },
   settings: { jsdoc: { mode: "typescript" } },
   rules: {
     "tsdoc/syntax": "error",
+    // CMT-13: a summary must add facts beyond the member and class names.
+    "local-docs/specific-summary": ["error", { minWords: 3 }],
     "jsdoc/require-jsdoc": ["error", {
       publicOnly: true,
       require: { ClassDeclaration: true, MethodDefinition: true, FunctionDeclaration: true },
@@ -330,7 +334,7 @@ const notInheriting = ["ArrowFunctionExpression", "FunctionDeclaration", "Functi
 }));
 ```
 
-The `require-param` / `require-returns` additions were verified on 2026-10-27 in the stack reference (eslint-plugin-jsdoc 65.4): with the rules on, 12 gaps were reported; the `comment` selector removed exactly the 5 on `{@inheritDoc}`-only adapters; a removed `@param` and a misnamed `@param` were each reported.
+The `require-param` / `require-returns` additions were verified on 2026-10-27 in the stack reference (eslint-plugin-jsdoc 65.4): with the rules on, 12 gaps were reported; the `comment` selector removed exactly the 5 on `{@inheritDoc}`-only adapters; a removed `@param` and a misnamed `@param` were each reported. `local-docs/specific-summary` was verified the same day there: it inspected all 15 method and function summaries and reported only `Applies one revision.` on `ReviseDocument.run`.
 
 | C# XML doc | TSDoc | Note |
 |---|---|---|
@@ -343,7 +347,7 @@ The `require-param` / `require-returns` additions were verified on 2026-10-27 in
 | `<inheritdoc cref="Port.M"/>` | `{@inheritDoc Port.member}` | A bare `@inheritDoc` is rejected by `tsdoc/syntax`. It copies summary, `@remarks`, `@param`, `@returns`; a summary or `@remarks` next to it is rejected, so add only `@throws`, `@example` or `@deprecated` |
 | `<see cref>` | `{@link X}` | |
 
-What lint cannot judge: `jsdoc/informative-docs` rejects `/** The update. */` on `update()`, but accepts `/** Gets the probe adapter. */`. Whether a summary states a real contract stays an `llm` review check (RUB-10).
+What lint cannot judge: `jsdoc/informative-docs` rejects `/** The update. */` on `update()`, but accepts `/** Gets the probe adapter. */`, and it compares a summary with its own symbol only, so `/** Applies one revision. */` on `ReviseDocument.run` passes it. `local-docs/specific-summary` closes that case by also removing the class and interface names, but it is a floor: it counts words, so a long vague summary still passes. Whether a summary states a real contract stays an `llm` review check (RUB-10, the swap test in CMT-13).
 
 An adapter method, inheriting its port's contract (tested 2026-10-25: passes `tsdoc/syntax` and `jsdoc/require-jsdoc`):
 
