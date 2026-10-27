@@ -182,7 +182,7 @@ AWS also shows one port with two adapters: adding a GraphQL adapter beside a RES
 - [^5]: [Presentation Domain Data Layering](https://martinfowler.com/bliki/PresentationDomainDataLayering.html) — Martin Fowler, 2015. Backs: §8.
 - [^6]: [Functional architecture is Ports and Adapters](https://blog.ploeh.dk/2016/03/18/functional-architecture-is-ports-and-adapters/) — Mark Seemann, 2016. Backs: §8.
 - [^7]: [Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) — Microsoft, living. Backs: §8.
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea) — mapped in §11 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e) — mapped in §11 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
 
 ## Related
 - `software-design/architecture-styles/hexagonal-architecture.md` — the short concept doc.

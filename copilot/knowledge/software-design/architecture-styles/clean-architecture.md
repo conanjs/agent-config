@@ -91,15 +91,15 @@ A login request (an illustration, not code in the repo).
 
 Step 5 uses form B (item 7): `Login` returns, and no output port is involved. Here the user has roles, so the presenter includes them; the `{ id, username }` example above has none.
 
-**The same flow in the stack reference** ([conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea)), for `PUT /documents/42` with `{"body":"new text","expectedVersion":2}`:
+**The same flow in the stack reference** ([conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e)), for `PUT /documents/42` with `{"body":"new text","expectedVersion":2}`:
 
 | Step | Ring | What happens (file:line) | Import direction |
 |---|---|---|---|
 | 1 | Frameworks | Express calls `revise.handle(req, res)` (`CompositionRoot.ts:38`) | Framework glue → controller |
 | 2 | Adapters | `ReviseDocumentHandler` checks the body and calls the input port: `this.reviseDocument.run({ id: req.params.id, ...parsed.data })` (`ReviseDocumentHandler.ts:31`) | Adapter → use case ✓ |
-| 3 | Use cases | `ReviseDocument` loads and saves through the gateway port `DocumentStore` (`ReviseDocument.ts:44,52`) | Use case → its own port ✓ |
-| 4 | Entities | `current.revise(input.body, input.expectedVersion)` applies the rule (`ReviseDocument.ts:47`) | Use case → entity ✓ |
-| 5 | Use cases | Returns the plain output `{ id, body, version }`, not the entity (`ReviseDocument.ts:55–56`) | Form B: no outward name |
+| 3 | Use cases | `ReviseDocument` loads and saves through the gateway port `DocumentStore` (`ReviseDocument.ts:46,54`) | Use case → its own port ✓ |
+| 4 | Entities | `current.revise(input.body, input.expectedVersion)` applies the rule (`ReviseDocument.ts:49`) | Use case → entity ✓ |
+| 5 | Use cases | Returns the plain output `{ id, body, version }`, not the entity (`ReviseDocument.ts:57–58`) | Form B: no outward name |
 | 6 | Adapters | The handler presents it: `res.json(result.value)` → `{"id":"42","body":"new text","version":3}`; a refusal gets its status from `HttpErrorMapper` (`ReviseDocumentHandler.ts:33,37`) | Adapter → use-case output type ✓ |
 
 Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mistake under item 8, and it is now guarded by a test (`ReviseDocument.test.ts:25`).
@@ -147,7 +147,7 @@ Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mista
 - [GUI Architectures](https://martinfowler.com/eaaDev/uiArchs.html) — Martin Fowler, 2006. Backs: the Model-View-Presenter meaning of "presenter".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules this doc explains.
 - `copilot/frameworks/agentic-sdlc/foundations/code/naming.md` — the `Presenter` role suffix.
-- [`src/` of the stack reference at v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`.
+- [`src/` of the stack reference at v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`.
 - `copilot/knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md` — the deep dive this doc was distilled from (§6.3, §6.6, §6.7, §7).
 
 ## Related

@@ -27,7 +27,7 @@ A use case needs something from outside the core: storage, the clock, an externa
 
 **Scope:** a task that follows this procedure changes only the `allowed-paths` above (relative to the component's path). `package.json` and the lockfile are in scope only to add the one library the **technology** input names (already chosen in the plan). Anything else it seems to need — a new layer, a change in `src/domain/`, any other dependency — is out of scope: stop and escalate, so the planner can add a task for it.
 
-**Shape to copy** (paths in the stack reference repo at its pinned commit; fetch it as `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/typescript-node/reference.md` "How to fetch" says, or open one file at `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/9323ccd662f566ea33fd93b55b99453b8e537cea/<path>`):
+**Shape to copy** (paths in the stack reference repo at its pinned commit; fetch it as `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/typescript-node/reference.md` "How to fetch" says, or open one file at `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/0f899099b469a63262fd113f2b0a88414c08f30e/<path>`):
 - Port: `src/application/ports/DocumentStore.ts`
 - Adapter: `src/infrastructure/InMemoryDocumentStore.ts`
 - Consumer: `src/application/ReviseDocument.ts`

@@ -329,13 +329,13 @@ await this.reviseDocument.run(input, new ReviseDocumentPresenter(res));
 **Form B: the use case returns its result (the stack reference).**
 
 ```ts
-// src/application/ReviseDocument.ts, lines 41–56
+// src/application/ReviseDocument.ts, lines 43–58
 public async run(input: ReviseDocumentInput): Promise<Result<ReviseDocumentOutput, ReviseDocumentError>> {
   // … find, revise, save …
   return { ok: true, value: { id, body, version } };   // no call outward at all
 }
 
-// src/interface/routes/ReviseDocumentHandler.ts, lines 31–37 — the handler presents the value
+// src/interface/routes/ReviseDocumentHandler.ts, lines 35–41 — the handler presents the value
 const result = await this.reviseDocument.run({ id: req.params.id, ...parsed.data });
 if (!result.ok) { res.status(this.errors.statusFor(result.error)).json({ error: result.error }); return; }
 res.json(result.value);
@@ -355,7 +355,7 @@ To **call** a function, your code must write its name, and that name is a source
 
 **Analogy:** a phone call vs. answering a question. To phone someone you must know their number. When someone asks you a question face to face, you simply answer; you do not need their name.
 
-**Evidence in the reference.** `ReviseDocument.ts` imports only `DocumentStore` and `Result` (lines 1–2); it has no import from `src/interface/`. Yet its result reaches `ReviseDocumentHandler` at line 31. A CLI controller could call the same `run()` and receive the same value, with no change to `ReviseDocument`.
+**Evidence in the reference.** `ReviseDocument.ts` imports only `DocumentStore` and `Result` (lines 1–2); it has no import from `src/interface/`. Yet its result reaches `ReviseDocumentHandler` at line 35. A CLI controller could call the same `run()` and receive the same value, with no change to `ReviseDocument`.
 
 The output port exists only to solve form ✗: inner code that must *call* outward. Form B never calls outward, so there is nothing to invert.
 
@@ -399,9 +399,9 @@ The easy mix-up: `DocumentStore` is **not** the input port. It is the **gateway*
 
 | Port role | In the reference | Written as | Implemented by | Called by |
 |---|---|---|---|---|
-| **Input port** | The public method `run(input: ReviseDocumentInput)` of `ReviseDocument` (`src/application/ReviseDocument.ts`, line 41) | **No separate interface.** The class's own public signature plays the role; the handler depends on the concrete class | `ReviseDocument` itself | `ReviseDocumentHandler`, line 31: `this.reviseDocument.run({ id: req.params.id, ...parsed.data })` |
-| **Gateway port** | `DocumentStore` (`src/application/ports/DocumentStore.ts`): `find(id)` and `save(document, replaces)` | An explicit `interface` | `InMemoryDocumentStore` (`src/infrastructure/`): `implements DocumentStore` | `ReviseDocument`, lines 44 and 52: `this.documents.find(…)`, `this.documents.save(…)` |
-| **Output port** | None. The result comes back as the **return value** `Promise<Result<ReviseDocumentOutput, ReviseDocumentError>>`, plain data since 2026-10-26 (§15 G1) | — | — | The handler reads the return value at lines 32–37 and acts as the presenter |
+| **Input port** | The public method `run(input: ReviseDocumentInput)` of `ReviseDocument` (`src/application/ReviseDocument.ts`, line 43) | **No separate interface.** The class's own public signature plays the role; the handler depends on the concrete class | `ReviseDocument` itself | `ReviseDocumentHandler`, line 35: `this.reviseDocument.run({ id: req.params.id, ...parsed.data })` |
+| **Gateway port** | `DocumentStore` (`src/application/ports/DocumentStore.ts`): `find(id)` and `save(document, replaces)` | An explicit `interface` | `InMemoryDocumentStore` (`src/infrastructure/`): `implements DocumentStore` | `ReviseDocument`, lines 46 and 54: `this.documents.find(…)`, `this.documents.save(…)` |
+| **Output port** | None. The result comes back as the **return value** `Promise<Result<ReviseDocumentOutput, ReviseDocumentError>>`, plain data since 2026-10-26 (§15 G1) | — | — | The handler reads the return value at lines 36–41 and acts as the presenter |
 
 **Restaurant analogy (A11, applied to the ports):**
 - The **menu** is the input port. The kitchen (the use case) offers it; waiters (controllers) order from it.
@@ -758,7 +758,7 @@ Microsoft's .NET architecture guide treats Hexagonal, Ports-and-Adapters, Onion 
 
 ## 15. The stack reference, reviewed against the sources
 
-Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea). Until 2026-10-27 this code lived in-tree at `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`; it moved unchanged (same files and line numbers) to its own repo, pinned by `stacks/typescript-node/reference.md`.
+Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e). Until 2026-10-27 this code lived in-tree at `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`; it moved unchanged (same files and line numbers) to its own repo, pinned by `stacks/typescript-node/reference.md`. v1.1.0 added `@param` notes and rewrote three summaries (CMT-6, CMT-13), so line numbers below are those of v1.1.0.
 
 | Aspect | Verdict | Evidence |
 |---|---|---|
@@ -770,14 +770,14 @@ Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github
 | Frameworks at the edges | ✓ | `express` only in `interface/` and the root; `zod` only in `interface/` and `infrastructure/config.ts` |
 | Boundaries enforced by tools | ✓ | Lint zones play the role Brown gives the compiler ✅[^23] |
 | **G1: the entity crosses outward (response model missing)** | ✗ → ✓ fixed 2026-10-26 | **Was:** `ReviseDocument.run()` returned `Result<Document, …>`, and the handler destructured the entity. The post forbids passing entities across boundaries ✅[^1]. CA-4 only covered the *inward* direction ("persistence models and transport DTOs never leak inward"), so the rule text had the gap too. **Now:** `run()` returns `Result<ReviseDocumentOutput, …>`; the handler does `res.json(result.value)`; a unit test asserts the value is not a `Document`. CA-4 reads "…and entities never leak outward: a use case returns an output model, not an entity". Worked as a teaching example in §7.1 |
-| **G2: top level does not scream** | ~ | `src/domain/ application/ …` is layer-first, which is fine for one feature. At scale it goes against Screaming Architecture ✅[^2], Fowler ✅[^9] and Brown ✅[^23]. The reference does not say when to switch to feature-first |
+| **G2: top level does not scream** | ~ → ✓ rule adopted 2026-10-27 | **Was:** `src/domain/ application/ …` is layer-first, which is fine for one feature. At scale it goes against Screaming Architecture ✅[^2], Fowler ✅[^9] and Brown ✅[^23]. The reference did not say when to switch to feature-first. **Now:** MOD-9 in `foundations/design/module-boundaries.md` states the switch: layer-first while the repo is one bounded context with at most three feature areas; feature-first (modules at the top, the same layers inside each) from the fourth area or the second bounded context, recorded as a decision. The reference keeps layer-first on branch `layout/layer-first` (v1.x); a feature-first `main` (v2.0.0) follows (`proposals/agentic-sdlc-reference-feature-first.md`) |
 | G3: no output port / presenter | ~ → ✓ recorded 2026-10-26 | The request/response variant (§6.6). `docs/architecture.md` §4 now lists the port roles, the no-output-port choice, and when to extract explicit ports |
 | G4: the handler names Express types | ✓ under CA-6 | Under the strict circle reading, framework types belong in the outer circle; the foundation deliberately allows them in adapters (CA-6) |
 
 **Proposed fixes:**
 - **CA-4** — *applied 2026-10-26:* "plain structures cross in **both** directions; entities, persistence rows and transport DTOs never cross". Now in `foundations/design/clean-architecture.md`.
 - **Reference** — *applied 2026-10-26:* add `ReviseDocumentOutput`, map entity → output in the use case, and record G3 in `docs/architecture.md`. `pnpm run check` passes.
-- **CA foundation** — *not applied yet:* add a packaging note: "feature-first top level, layers inside, once more than ~3 features".
+- **Packaging rule** — *applied 2026-10-27, as MOD-9 in `foundations/design/module-boundaries.md` rather than in the CA foundation, since packaging is a module-boundary concern:* "feature-first top level, layers inside, once more than ~3 features".
 
 ---
 
@@ -844,7 +844,7 @@ Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github
 - [^27]: [Implementing Clean Architecture – Of controllers and presenters](http://www.plainionist.net/Implementing-Clean-Architecture-Controller-Presenter/) — Plainionist, 2018 (updated 2023). Backs: §6.6 "Who backs form B" (the strict reading).
 - [^28]: [techexcellenceio community discussion #3](https://github.com/techexcellenceio/community/discussions/3) — community discussion that identifies the `openchat-unclebob` branch as Uncle Bob's version, using "use case handlers WITHOUT presenters". Backs: §6.6 "Who backs form B".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules (§14, §15).
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.0.1](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/9323ccd662f566ea33fd93b55b99453b8e537cea) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
 
 ## Related
 - `software-design/architecture-styles/hexagonal-architecture-deep-dive.md`

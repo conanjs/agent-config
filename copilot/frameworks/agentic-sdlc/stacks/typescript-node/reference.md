@@ -3,8 +3,8 @@ schema: stack-reference/v1
 last-updated: 2026-10-27
 stack: typescript-node
 repo: conanjs/agentic-sdlc-reference-typescript-node
-pinned: v1.0.1
-commit: 9323ccd662f566ea33fd93b55b99453b8e537cea
+pinned: v1.1.0
+commit: 0f899099b469a63262fd113f2b0a88414c08f30e
 verified: 2026-10-27
 ---
 
@@ -33,7 +33,7 @@ All paths are relative to the reference repo's root, at the pinned commit.
 | Data across boundaries | Plain `<UseCase>Input` in, plain `<UseCase>Output` out; the entity never leaves the use case | CA-4 | `src/application/ReviseDocument.ts` (`ReviseDocumentOutput`) |
 | Expected failures | `Result` union; thrown `Error` only for the unexpected | TSN-4, TSN-5 | `src/domain/Result.ts` |
 | Error to HTTP | One mapper; a `Record` over the error union makes a missing status a compile error | TSN-11, EXP-5 | `src/interface/errors/HttpErrorMapper.ts` |
-| Doc comments | TSDoc on every export and public member; contract on the port, `{@inheritDoc}` on the adapter | CMT-5, CMT-12, TSN-13 | `src/application/ports/DocumentStore.ts`, `src/infrastructure/InMemoryDocumentStore.ts` |
+| Doc comments | TSDoc on every export and public member; contract on the port, `{@inheritDoc}` on the adapter; every parameter and return documented; summaries answer the contract questions | CMT-5, CMT-6, CMT-12, CMT-13, TSN-13 | `src/application/ports/DocumentStore.ts`, `src/infrastructure/InMemoryDocumentStore.ts`, `src/application/ReviseDocument.ts` (`run`) |
 | Naming | File name equals the class; suffixes only from the role glossary (`Store`, `Handler`, `Mapper`) | NAM-8, NAM-6 | `docs/glossary.md` |
 | Config | Parsed once, frozen, nothing else reads the environment | TSN-9 | `src/infrastructure/config.ts` |
 | Logging | One pino logger made in `main.ts` and injected; `no-console` | TSN-10 | `src/main.ts`, `src/CompositionRoot.ts` |
@@ -58,6 +58,7 @@ All paths are relative to the reference repo's root, at the pinned commit.
 | `src/main.ts` | Tier B entry | Config, logger, listen |
 | `src/**/*.test.ts`, `test/integration/*.int.test.ts` | tests | Unit, concurrency and HTTP tests |
 | `eslint.config.mjs` | lint | Every lint rule of the stack, with the flat-config pitfalls handled |
+| `eslint/specific-summary.mjs` | lint plugin | The CMT-13 floor: a summary must add words beyond the member and class names; copy it into each repo |
 | `docs/`, `.specify/`, `specs/` | records | Architecture, glossary, constitution, decision records, task plan, as any project has |
 | `.github/workflows/check.yml` | CI | `pnpm run check`, then this framework's `validate-project.mjs` at a pinned framework commit |
 
@@ -66,8 +67,8 @@ All paths are relative to the reference repo's root, at the pinned commit.
 Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
 
 1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
-2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet 9323ccd662f566ea33fd93b55b99453b8e537cea`.
-3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/9323ccd662f566ea33fd93b55b99453b8e537cea/<path>`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet 0f899099b469a63262fd113f2b0a88414c08f30e`.
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/0f899099b469a63262fd113f2b0a88414c08f30e/<path>`.
 
 A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 

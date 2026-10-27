@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 rule-prefix: MOD
 subject: design
 ---
@@ -21,6 +21,7 @@ How the architecture role defines modules and layers inside one repo, checks dep
 | MOD-6 | One owner per table/collection. Only the owning module reads/writes its storage directly. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-7 | The composition root wires modules; modules don't instantiate each other's adapters (`idiom.di`). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-8 | Simplifications are recorded. Collapsing a layer or skipping a module boundary is stated in `docs/architecture.md` with the reason. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
+| MOD-9 | Choose the top-level packaging by size, and record the switch. **Layer-first** (`domain/`, `application/`, `infrastructure/`, `interface/` at the top of `src/`) while the repo serves one bounded context with at most three feature areas: the repo is then one module, layered inside, which satisfies MOD-1. **Feature-first** (one folder per feature area, the same layers inside each, plus `shared/` under MOD-4) from the fourth feature area or the second bounded context. The switch is a decision record in `docs/architecture.md`, done as a pure move with no behaviour change. | `docs/architecture.md` names the layout and the feature-area count, and the tree matches it | Five feature areas whose files are spread across four top-level layer folders; or a one-feature service split into `documents/` and `shared/` with nothing else | llm | — |
 
 ## Interpreting
 
@@ -63,6 +64,19 @@ Merge when two modules always change together, call each other in both direction
 
 Only when an independent deployment, scaling, ownership, or failure-isolation need exists **and** the module already has a clean public surface and owned data. Module first, service later — escalate to system-architecture.
 
+**Packaging: layer-first or feature-first (MOD-9)**
+
+A *feature area* is a group of use cases around one aggregate or business capability, with its own vocabulary: for example `documents` (create, get, list, revise, delete, history) or `comments`. A use case is not a feature area; ten use cases on documents are still one.
+
+| Repo | Layout | Top of `src/` | Why |
+|---|---|---|---|
+| One bounded context, 1–3 feature areas | Layer-first | `domain/ application/ infrastructure/ interface/` + composition root | Every layer is small; the layers themselves teach the rule. The repo is one module (MOD-1 holds at repo level) |
+| 4+ feature areas, or a second bounded context | Feature-first | `documents/ comments/ … shared/` + composition root; each module has the four layers | A change to one feature touches one folder; module boundaries (MOD-3, MOD-5) can be enforced per folder |
+
+Analogy: a small shop keeps all tools on four shelves sorted by kind; a workshop with ten benches gives each bench its own shelves plus one shared shelf.
+
+**Switching:** write the decision record, then move files without changing behaviour (all tests pass unchanged), then add the module-boundary checks (MOD-3, FF-1). The stack reference shows both layouts: `stacks/<stack>/reference.md`.
+
 **Application note:** stack profiles define concrete commands and idioms; this foundation defines stack-agnostic intent.
 
 ## Tensions
@@ -70,6 +84,7 @@ Only when an independent deployment, scaling, ownership, or failure-isolation ne
 | Rule A | Rule B | Default resolution |
 |---|---|---|
 | Simplicity | Explicit boundaries | Add boundaries only where change rate, ownership or risk justifies them. |
+| MOD-1 modules by domain | A one-feature repo | MOD-9: below the threshold the whole repo is one module, so layer folders at the top satisfy MOD-1. Technical-role folders that cut across features (`controllers/`, `services/`) still do not. |
 
 ## References
 
@@ -82,6 +97,8 @@ Only when an independent deployment, scaling, ownership, or failure-isolation ne
 - David Parnas, "On the Criteria To Be Used in Decomposing Systems into Modules" (CACM, 1972).
 - Robert C. Martin, *Clean Architecture* (2017) — component principles (ADP, SDP, SAP).
 - Simon Brown, "Modular Monoliths" and the C4 model (c4model.com).
+- [Robert C. Martin, "Screaming Architecture"](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) (2011) — the top level should show the use cases, not the framework (MOD-9).
+- [Martin Fowler, "PresentationDomainDataLayering"](https://martinfowler.com/bliki/PresentationDomainDataLayering.html) (2015) — for a larger system, split the top level into domain-oriented modules, each layered inside (MOD-9).
 
 ## Related
 
@@ -90,3 +107,4 @@ Only when an independent deployment, scaling, ownership, or failure-isolation ne
 - `../review/fitness-functions.md` — automated boundary checks.
 - `../design/contract-design.md` — when boundaries become service contracts.
 - `../design/import-paths.md` — how module references are written and checked (IMP-n).
+- `knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md` §8, §15 G2 — the packaging options MOD-9 chooses between.
