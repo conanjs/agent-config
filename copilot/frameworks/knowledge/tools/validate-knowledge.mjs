@@ -14,8 +14,11 @@
 // Source backlinks from agentic-sdlc), KD-6 (concept ≤ 400 lines, warn), KD-7 (derived-from ↔ synthesized-into);
 // deep-dive DD-1, DD-3, DD-4 (warn); topic-index rules (Docs table ↔ folder, Type/Status copy, index required);
 // shared front-matter, Summary head, References non-empty, footnotes resolve, Verification counts (warn);
-// KB-2 (company / repo names from the Company KB as a deny-list); KB-3 with --urls.
-// LLM-only rules (KD-3, KD-5, KB-1, KB-5, KB-6, DD-2) are not checked here.
+// FM-KEYS (front-matter keys the schema does not define), VS (exact Verification status line, singular/plural,
+// date = last-verified); KB-2 (company / repo names from the Company KB as a deny-list); KB-3 with --urls;
+// KB-7 conversation residue (warn, heuristic); KB-8 duplicated fenced blocks across docs / repeated paragraphs (warn).
+// LLM-only rules (KD-3, KD-5, KD-8, KB-1, KB-5, KB-6, KB-7 in full, DD-2) are not checked here:
+// see {{AGENT_HOME}}/procedures/review-docs.procedure.md.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -104,6 +107,17 @@ const TAIL = ['Takeaways', 'Used by', 'Verification status', 'References', 'Rela
 const STATUS = ['draft', 'verified', 'stale'];
 const V1 = ['knowledge-doc/v1', 'deep-dive/v1', 'topic-index/v1'];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
+// Front-matter keys each schema defines (schemas/*.schema.md "Front-matter" tables). Anything else fails FM-KEYS.
+const KEYS = {
+  'knowledge-doc/v1': ['schema', 'type', 'topic', 'status', 'applies-to', 'last-verified', 'last-updated', 'tags', 'derived-from'],
+  'deep-dive/v1': ['schema', 'topic', 'status', 'applies-to', 'last-updated', 'last-verified', 'synthesized-into', 'tags'],
+  'topic-index/v1': ['schema', 'kind', 'topic', 'last-updated'],
+};
+// KB-7 heuristics: text that only makes sense inside the conversation it was drafted in.
+const RESIDUE = [
+  [/^\*\*(Yes|No)[,.!:]/m, 'paragraph opens with a bare "Yes"/"No" answer; state the question it answers'],
+  [/\b(as (we|I) (discussed|mentioned)|you asked|your (question|request)|as requested|in (my|the) (previous|earlier|last) (answer|message|reply|turn)|earlier in (this|our|the) (chat|conversation)|(this|our) (chat|conversation))\b/i, 'refers to a conversation the reader cannot see'],
+];
 
 function checkSequence(f, got, expected) {
   // expected: [[name, required]]; got must be the required ones in order plus optional ones in their slots, nothing else.
@@ -115,6 +129,11 @@ function checkSequence(f, got, expected) {
   }
   const missing = expected.slice(i).filter((e) => e[1]).map((e) => e[0]);
   if (missing.length) fail('KD-1', `${rel(f)}: missing section(s) ${missing.map((m) => `"## ${m}"`).join(', ')}`);
+}
+
+function checkKeys(f, fm) {
+  const allowed = KEYS[fm.schema] ?? [];
+  for (const k of Object.keys(fm)) if (!allowed.includes(k)) fail('FM-KEYS', `${rel(f)}: front-matter key "${k}" is not defined by ${fm.schema} (allowed: ${allowed.join(', ')})`);
 }
 
 function checkCommonFrontMatter(f, fm, kind) {
@@ -196,6 +215,7 @@ const denyRe = deny.length ? new RegExp(`\\b(${deny.map((d) => d.replace(/[.*+?^
 
 // ---- per-doc checks -----------------------------------------------------------------------------
 const urls = new Map(); // url -> first file
+const fences = new Map(); // normalized fenced block -> [files]
 for (const [f, { fm, text }] of docs) {
   const b = body(text);
   const heads = h2s(b);
@@ -205,6 +225,24 @@ for (const [f, { fm, text }] of docs) {
     if (!urls.has(u)) urls.set(u, f);
   }
   if (!/^# \S/m.test(stripFences(b))) fail('HEAD', `${rel(f)}: no "# Title"`);
+  checkKeys(f, fm);
+  // KB-7 (warn): conversation residue, outside code and quoted material
+  const prose = stripFences(b).split('\n').filter((l) => !/^\s*>/.test(l)).join('\n');
+  for (const [re, why] of RESIDUE) { const m = prose.match(re); if (m) warn('KB-7', `${rel(f)}: "${m[0]}" — ${why}`); }
+  // KB-8 (warn): the same paragraph twice in one doc
+  const seenPara = new Set();
+  for (const para of stripFences(b).split(/\n\s*\n/).map((x) => x.trim().replace(/\s+/g, ' '))) {
+    if (para.length < 120 || /^(\||#|- \[\^)/.test(para)) continue;
+    if (seenPara.has(para)) warn('KB-8', `${rel(f)}: paragraph repeated: "${para.slice(0, 70)}…"`);
+    seenPara.add(para);
+  }
+  // KB-8 (warn): collect fenced blocks of 5+ lines for the cross-doc duplicate check below
+  for (const m of b.matchAll(/^(`{3,})[^\n]*\n([\s\S]*?)^\1\s*$/gm)) {
+    const code = m[2].split('\n').map((l) => l.trimEnd()).filter((l) => l.trim()).join('\n');
+    if (code.split('\n').length < 5) continue;
+    if (!fences.has(code)) fences.set(code, []);
+    fences.get(code).push(rel(f));
+  }
 
   if (fm.schema === 'knowledge-doc/v1') {
     checkCommonFrontMatter(f, fm, 'knowledge-doc');
@@ -219,8 +257,17 @@ for (const [f, { fm, text }] of docs) {
     const claimText = b.replace(vs, '').replace(section(text, 'References') ?? '', '');
     const nOk = (claimText.match(/✅/g) || []).length; const nNo = (claimText.match(/⚠️\s*unverified/g) || []).length;
     const sm = vs.match(/Verified:\s*(\d+)[^·]*·\s*Unverified:\s*(\d+)/);
+    const exact = vs.match(/^- Verified: (\d+) (claims?) \(✅\) · Unverified: (\d+) (claims?) \(⚠️\) · Last verified: (\S+?)\.?\s*$/m);
     if (!sm) fail('VS', `${rel(f)}: Verification status line missing ("- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: date")`);
-    else if (+sm[1] !== nOk || +sm[2] !== nNo) warn('VS', `${rel(f)}: Verification status says ${sm[1]} ✅ / ${sm[2]} ⚠️ but body has ${nOk} / ${nNo}`);
+    else {
+      if (+sm[1] !== nOk || +sm[2] !== nNo) warn('VS', `${rel(f)}: Verification status says ${sm[1]} ✅ / ${sm[2]} ⚠️ but body has ${nOk} / ${nNo}`);
+      if (!exact) fail('VS', `${rel(f)}: Verification status line must read exactly "- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: YYYY-MM-DD"`);
+      else {
+        const noun = (n) => (+n === 1 ? 'claim' : 'claims');
+        if (exact[2] !== noun(exact[1]) || exact[4] !== noun(exact[3])) fail('VS', `${rel(f)}: write "${exact[1]} ${noun(exact[1])}" and "${exact[3]} ${noun(exact[3])}"`);
+        if (fm['last-verified'] && exact[5] !== fm['last-verified']) fail('VS', `${rel(f)}: Verification status says last verified ${exact[5]}, front-matter says ${fm['last-verified']}`);
+      }
+    }
     // KD-4
     const me = rel(f);
     const actual = backlinks.get(me) ?? new Set();
@@ -297,6 +344,9 @@ for (const [f, { fm, text }] of docs) {
     }
   }
 }
+
+// KB-8 (warn): the same fenced block (5+ lines) in more than one place — link to one canonical copy instead
+for (const [code, files] of fences) if (files.length > 1) warn('KB-8', `identical ${code.split('\n').length}-line block in ${files.join(', ')}; keep one copy and link to it`);
 
 // index.md required wherever a v1 doc lives, up to the root
 for (const f of docs.keys()) {

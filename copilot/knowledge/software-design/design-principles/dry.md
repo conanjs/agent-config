@@ -100,7 +100,7 @@ A product has three handlers: create role, update role, and import role. All req
 | foundation rule | DP-6 | Source: |
 
 ## Verification status
-- Verified: 12 claims (✅) · Unverified: 1 claims (⚠️) · Last verified: 2026-10-04
+- Verified: 12 claims (✅) · Unverified: 1 claim (⚠️) · Last verified: 2026-10-04
 
 ## References
 - [Orthogonality and the DRY Principle](https://www.artima.com/articles/orthogonality-and-the-dry-principle) — Bill Venners interview with Andy Hunt and Dave Thomas, 2003. Backs: Problem, How it works, Edge cases, Trade-offs. [^1]

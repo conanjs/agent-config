@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 ---
 
 # Schema: Knowledge Doc (`knowledge-doc/v1`)
@@ -121,6 +121,8 @@ Section names are fixed. Sections marked *(opt)* may be omitted, but **not renam
 | KD-5 | The Mental model has both an analogy and an artifact | — | llm |
 | KD-6 | Concept docs ≤ ~400 lines; split by sub-mechanism if longer. A long, free-form treatment belongs in a `deep-dive/v1` doc instead | — | script (warn) |
 | KD-7 | Every `derived-from` path exists; if it is a `deep-dive/v1` doc, its `synthesized-into` lists this doc. Facts cite the original sources, not the deep dive | links agree both ways | script |
+| KD-8 | Each section does the job the type table gives it, not only carries its name: Problem states a problem, Worked example is one end-to-end run with real values, Verify gives checks with expected results, Takeaways are about this doc's topic. Templates or notes for the reader to fill in are not sections | headings and content agree | llm |
+| KD-9 | The Verification status line reads exactly `- Verified: <n> claim(s) (✅) · Unverified: <n> claim(s) (⚠️) · Last verified: <date>`: singular for 1, and the date equals front-matter `last-verified` | — | script |
 
 ## Example (full `concept` doc)
 
@@ -199,8 +201,8 @@ const b = { y: 2, x: 1 };   // shape S2: different order → different shape
 
 | Check | Tool |
 |---|---|
-| KD-1, KD-2, KD-4, KD-6, KD-7; front-matter enums; URLs resolve (KB-3) | `validate-knowledge.mjs` |
-| KD-3, KD-5, KB-1, KB-5 | LLM review on PRs that touch `knowledge/` |
+| KD-1, KD-2, KD-4, KD-6, KD-7, KD-9; front-matter enums and allowed keys (FM-KEYS); KB-7 and KB-8 heuristics (warn); URLs resolve (KB-3, `--urls`) | `validate-knowledge.mjs`, run by `scripts/check-docs.sh` (pre-commit, Claude Code hook, CI) |
+| KD-3, KD-5, KD-8, KB-1, KB-5, KB-7, KB-8 | LLM review: `{{AGENT_HOME}}/procedures/review-docs.procedure.md`, before committing changes under `knowledge/` |
 
 ## References
 

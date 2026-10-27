@@ -94,7 +94,7 @@ A `POST /shipments/42/cancel` endpoint receives an HTTP request. The adapter par
 | foundation rule | DP-10 | Source: |
 
 ## Verification status
-- Verified: 5 claims (✅) · Unverified: 1 claims (⚠️) · Last verified: 2026-10-04
+- Verified: 5 claims (✅) · Unverified: 1 claim (⚠️) · Last verified: 2026-10-04
 
 ## References
 - [Orthogonality and the DRY Principle](https://www.artima.com/articles/orthogonality-and-the-dry-principle) — Bill Venners interview with Andy Hunt and Dave Thomas, 2003. Backs: How it works. [^1]

@@ -1,6 +1,6 @@
 ---
 schema: framework-index/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 ---
 
 # Knowledge Framework (store B)
@@ -95,6 +95,8 @@ draft ──(sources checked, claims marked)──► verified ──(applies-to
 3. Prefer free, official sources: specs, vendor docs, the author's own site.
 4. One doc, one type. A concept doc that grows a how-to section gets split. If the subject resists splitting, write a deep dive and synthesize it (§4.1).
 5. These rules and the schemas apply to **new docs only**. Existing (legacy) docs are kept as they are and never retrofitted (`schemas/_system.md` §6).
+6. The doc stands alone (no replies to a chat the reader cannot see) and copies nothing another doc already holds: link instead (KB-7, KB-8).
+7. Before committing, follow `{{AGENT_HOME}}/procedures/review-docs.procedure.md`. The validator also runs on its own: after each edit in Claude Code, on `git commit`, and as the required `validate-docs` check on `main` (`README.md` § "Doc guards").
 
 ## 7. Files
 
@@ -104,7 +106,7 @@ draft ──(sources checked, claims marked)──► verified ──(applies-to
 | `schemas/knowledge-doc.schema.md` | Shape of every structured `<slug>.md` |
 | `schemas/deep-dive.schema.md` | Envelope of free-form deep dives, and the synthesis procedure |
 | `schemas/topic-index.schema.md` | Shape of every `index.md` |
-| `tools/validate-knowledge.mjs` | Checks every v1 doc and index (legacy skipped): `node tools/validate-knowledge.mjs [knowledge-root] [--urls]` |
+| `tools/validate-knowledge.mjs` | Checks every v1 doc and index (legacy skipped): `node tools/validate-knowledge.mjs [knowledge-root] [--urls]`. Run automatically by `scripts/check-docs.sh` (pre-commit, Claude Code hook, CI) |
 
 ## References
 

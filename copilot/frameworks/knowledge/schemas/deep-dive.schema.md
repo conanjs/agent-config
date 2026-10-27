@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 ---
 
 # Schema: Deep Dive (`deep-dive/v1`)
@@ -138,7 +138,7 @@ synthesized-into:
 | Check | Tool |
 |---|---|
 | DD-1 envelope; DD-3 two-way links; DD-4 staleness warning; URLs resolve (KB-3) | `validate-knowledge.mjs` |
-| DD-2, DD-5; the synthesis "Done when" | LLM review on PRs that touch `knowledge/` |
+| DD-2, DD-5; the synthesis "Done when" | LLM review: `{{AGENT_HOME}}/procedures/review-docs.procedure.md`, before committing changes under `knowledge/` |
 
 ## References
 

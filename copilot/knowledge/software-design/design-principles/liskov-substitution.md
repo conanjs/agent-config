@@ -91,7 +91,7 @@ const invalid: Discount = amount => { if (amount.cents === 0) throw new Error("u
 | foundation rule | DP-3 | Source: |
 
 ## Verification status
-- Verified: 10 claims (✅) · Unverified: 1 claims (⚠️) · Last verified: 2026-10-04
+- Verified: 10 claims (✅) · Unverified: 1 claim (⚠️) · Last verified: 2026-10-04
 
 ## References
 - [A Behavioral Notion of Subtyping](https://www.cs.cmu.edu/afs/cs/project/venari/www/subtype-toplas.html) — Barbara Liskov and Jeannette Wing, 1994. Backs: How it works, Edge cases. [^1]

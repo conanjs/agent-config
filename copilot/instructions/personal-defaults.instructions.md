@@ -20,6 +20,7 @@ applyTo: "**"
 - For docs and explanations, use short sections and concrete examples.
 - At the start of every response, greet the user as "V" to confirm global instructions are loaded.
 - For any explanation involving more than one actor/component acting in sequence, follow `{{AGENT_HOME}}/patterns/explaining-mechanisms.pattern.md` — don't improvise the structure ad hoc.
+- Before committing any change under `{{AGENT_HOME}}/knowledge/` or `{{AGENT_HOME}}/procedures/` (repo: `copilot/knowledge/`, `copilot/procedures/`), and always for text drafted in another AI chat, follow `{{AGENT_HOME}}/procedures/review-docs.procedure.md` (validators first, then the checks they cannot do) — don't commit on a quick skim.
 - When asked to set up spec-driven development / Spec Kit for a project, follow `{{AGENT_HOME}}/procedures/spec-driven-development.procedure.md` — don't invent the install/workflow steps ad hoc.
 - When asked to add standard GitHub repo governance (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CODEOWNERS, issue/PR templates, branch protection) to a repo, follow `{{AGENT_HOME}}/procedures/init-github-governance.procedure.md` — the actual file contents live once at `{{AGENT_CONFIG_REPO}}/templates/github-repo/`, never restate or fork them.
 - When a term is technical or abstract, always add a plain-English analogy and one concrete artifact/example before moving on.

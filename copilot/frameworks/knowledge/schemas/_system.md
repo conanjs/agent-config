@@ -1,6 +1,6 @@
 ---
 schema: schema-system/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 ---
 
 # Knowledge Framework: Schema System
@@ -17,6 +17,8 @@ schema: knowledge-doc/v1 | deep-dive/v1 | topic-index/v1
 last-updated: YYYY-MM-DD
 ---
 ```
+
+Only the keys listed in each schema's Front-matter table are allowed; any other key (e.g. `revision:`) fails `FM-KEYS` in `validate-knowledge.mjs`. To track something new, add the key to the schema first.
 
 ## 2. Shared sections
 
@@ -62,6 +64,8 @@ The **Verification status** section (knowledge-doc) counts these.
 | KB-4 | `Used by` matches the real backlinks from store A | script |
 | KB-5 | One type per doc | llm |
 | KB-6 | Technical/abstract terms get an analogy + one concrete artifact (global instruction) | llm |
+| KB-7 | **Stands alone.** The doc reads correctly without the conversation it was drafted in: no answer to a question the doc never states, no "as discussed", "you asked", "in my previous answer", no sentence that only makes sense as a reply to someone. Applies with extra care to text drafted in another AI chat and pasted in | script (heuristic warn) + llm |
+| KB-8 | **One canonical copy.** A diagram, code block, table or paragraph that already exists in another doc is linked, not copied; a doc does not repeat its own paragraphs. A short summary next to the link is fine | script (identical 5+-line blocks, repeated paragraphs: warn) + llm |
 
 ## 5. Registry
 
