@@ -3,19 +3,19 @@ schema: stack-reference/v1
 last-updated: 2026-10-28
 stack: typescript-node
 repo: conanjs/agentic-sdlc-reference-typescript-node
-pinned: v3.0.0
-commit: a7cf35cefff608099e7bc6bec84c889e9dd444c1
+pinned: v3.1.0
+commit: aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7
 verified: 2026-10-28
 layout: feature-first
 variants:
-  - { layout: layer-first, branch: layout/layer-first, pinned: v1.3.0, commit: b4d166354736c2de60f96ecac839708ce8b7841e, verified: 2026-10-28 }
+  - { layout: layer-first, branch: layout/layer-first, pinned: v1.4.0, commit: d26655fe30705f42962cecfc7b15ed31be56cab5, verified: 2026-10-28 }
 ---
 
 # Reference: TypeScript on Node.js
 
 ## What it shows
 
-A small Express service with one feature, "revise a document without overwriting a newer change" (`PUT /documents/:id`, optimistic concurrency), built through every layer of one feature module (`src/modules/documents/`), next to a `src/modules/shared/` module: entity, port, use case, adapter, HTTP handler, error mapper, composition root, entry point, unit and integration tests. It exists to be read and copied, not deployed. Every file passes the stack's lint, including the documentation and import-path rules.
+A small Express service for text documents, built through every layer of one feature module (`src/modules/documents/`), next to a `src/modules/shared/` module: create (`POST /documents`, 201 + `Location`), list with a cursor (`GET /documents?cursor=&limit=`), read (`GET /documents/:id`), revise without overwriting a newer change (`PUT /documents/:id`, optimistic concurrency), version history (`GET /documents/:id/versions`) and delete (`DELETE /documents/:id`, 204). It shows entity, ports, use cases, adapters, one handler per route, error mapper, composition root, entry point, unit and integration tests. It exists to be read and copied, not deployed. Every file passes the stack's lint, including the documentation and import-path rules.
 
 The code lives in its own repo, [`conanjs/agentic-sdlc-reference-typescript-node`](https://github.com/conanjs/agentic-sdlc-reference-typescript-node), pinned above by tag and full commit SHA (a tag can move; a SHA cannot). `main` is feature-first, the framework default (MOD-9). The same code with the four layers at the top of `src/` is kept current on branch `layout/layer-first` (tags `v1.x`), pinned under `variants`. This file is the framework's map of it: the Choices table below says which rule each file shows, so a role can find the right file before cloning anything. The repo's own records — `docs/architecture.md`, `.specify/memory/constitution.md`, `docs/glossary.md` — live only in the repo.
 
@@ -32,6 +32,9 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | Import paths | Relative only within one folder; `@/` aliases everywhere else, in `src` and `test` | IMP-1, IMP-2, TSN-16 | `eslint.config.mjs` (`noRelativeOutsideFolder`) |
 | Alias mechanism | tsconfig `paths` + `tsc-alias` in the build (stack Option default) | TSN-15 | `tsconfig.json`, `package.json` `build`, `specs/001-revise-document/research.md` DR-001 |
 | Ports | Declared next to the use cases that consume them | TSN-2 | `src/modules/documents/application/ports/DocumentStore.ts` |
+| Create contract | `201 Created`, `Location: /documents/<id>`, the new document as the body; the id comes from a `DocumentIds` port (UUID adapter in production, sequential in tests) | NAM-7, TSN-2 | `src/modules/documents/application/ports/DocumentIds.ts`, `src/modules/documents/interface/routes/CreateDocumentHandler.ts`, `specs/002-document-lifecycle/research.md` DR-006 |
+| List contract | Cursor pagination: `{ items, nextCursor }`, ascending id, `limit` 1 to 100 (default 20), `nextCursor` `null` on the last page; a bad query is a 400 problem | EXP-7 | `src/modules/documents/application/ListDocuments.ts`, `src/modules/documents/interface/routes/ListDocumentsQuery.ts`, DR-005 |
+| Queries and commands | One use case and one handler per route; queries (`Get…`, `List…`) change nothing | NAM-4, EXP-1 | `src/modules/documents/application/`, `src/CompositionRoot.ts` (route table) |
 | Paradigm | class-modeled@1: entity state in `readonly #fields`, collaborators as `private readonly` parameters | PDM-class-modeled-R1, R7 | `src/modules/documents/domain/Document.ts`, `src/modules/documents/application/ReviseDocument.ts` |
 | Tier B files | Only `src/main.ts` and `src/modules/shared/infrastructure/config.ts` hold free functions | PDM-class-modeled-R7 | `docs/architecture.md` §7, `eslint.config.mjs` (`tierB`) |
 | Port roles | Input port = the use case's public `run()` (no separate interface); gateway port = an explicit interface; no output port (request/response form) | CA-2 | `docs/architecture.md` §4 |
@@ -60,6 +63,9 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | `src/modules/shared/infrastructure/config.ts` | Tier B | zod config, `@throws` |
 | `src/modules/documents/interface/routes/ReviseDocumentBody.ts` | schema | Strict input validation at the boundary |
 | `src/modules/documents/interface/routes/ReviseDocumentHandler.ts` | handler | Parse, call one use case, map the result |
+| `src/modules/documents/application/{CreateDocument,GetDocument,ListDocuments,DeleteDocument,GetDocumentHistory}.ts` | use cases | One per route; plain `DocumentView` out |
+| `src/modules/documents/application/ports/DocumentIds.ts`, `src/modules/documents/infrastructure/UuidDocumentIds.ts` | port, adapter | Where new ids come from |
+| `src/modules/documents/interface/routes/*Handler.ts`, `*Body.ts`, `*Query.ts` | handlers, schemas | One handler per route; strict request schemas |
 | `src/modules/documents/interface/errors/HttpErrorMapper.ts` | mapper | Exhaustive refusal-to-problem table |
 | `src/modules/shared/interface/ProblemDetails.ts` | value | The RFC 9457 body and how it is sent |
 | `src/modules/shared/interface/ErrorMiddleware.ts` | middleware | Thrown errors to `about:blank` problems; logs every 500 |
@@ -76,8 +82,8 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
 
 1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
-2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet a7cf35cefff608099e7bc6bec84c889e9dd444c1` (feature-first, `v3.0.0`), or `… checkout --quiet b4d166354736c2de60f96ecac839708ce8b7841e` for the layer-first variant (`v1.3.0`).
-3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/a7cf35cefff608099e7bc6bec84c889e9dd444c1/<path>`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7` (feature-first, `v3.1.0`), or `… checkout --quiet d26655fe30705f42962cecfc7b15ed31be56cab5` for the layer-first variant (`v1.4.0`).
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7/<path>`.
 
 A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 
@@ -89,8 +95,8 @@ In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, un
 
 | Layout | Copy it when | Tag | Commit |
 |---|---|---|---|
-| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v3.0.0` | `a7cf35cefff608099e7bc6bec84c889e9dd444c1` |
-| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.3.0` | `b4d166354736c2de60f96ecac839708ce8b7841e` |
+| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v3.1.0` | `aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7` |
+| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.4.0` | `d26655fe30705f42962cecfc7b15ed31be56cab5` |
 
 Both variants get every rule fix, one pull request each (`{{AGENT_HOME}}/patterns/maintained-variant.pattern.md`).
 
