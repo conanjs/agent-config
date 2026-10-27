@@ -29,7 +29,7 @@ A use case needs something from outside the core: storage, the clock, an externa
 
 **Scope:** a task that follows this procedure changes only the `allowed-paths` above (relative to the component's path). `package.json` and the lockfile are in scope only to add the one library the **technology** input names (already chosen in the plan). Anything else it seems to need — a new layer, a change in `src/{module}/domain/`, any other dependency — is out of scope: stop and escalate, so the planner can add a task for it.
 
-**Shape to copy** (paths in the stack reference repo at its pinned commit; fetch it as `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/typescript-node/reference.md` "How to fetch" says, or open one file at `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/171c3ba548fd5b00913f8c6a62acdd591f278c91/<path>`). Feature-first, with `module` = `documents`; in the layer-first variant (`a8e776660fe686a716fc1f80550f2671c972cc7b`), drop `documents/`:
+**Shape to copy** (paths in the stack reference repo at its pinned commit; fetch it as `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/typescript-node/reference.md` "How to fetch" says, or open one file at `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/905409d5afa3ddc7eb84e58169b31b09a9925647/<path>`). Feature-first, with `module` = `documents`; in the layer-first variant (`b4d166354736c2de60f96ecac839708ce8b7841e`), drop `documents/`:
 - Port: `src/documents/application/ports/DocumentStore.ts`
 - Adapter: `src/documents/infrastructure/InMemoryDocumentStore.ts`
 - Consumer: `src/documents/application/ReviseDocument.ts`

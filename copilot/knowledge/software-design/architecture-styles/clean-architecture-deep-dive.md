@@ -365,9 +365,9 @@ The handler does not just pass the value through. It decides how each outcome lo
 
 | Outcome of `run()` | Handler line | HTTP answer |
 |---|---|---|
-| `{ ok: true, value: { id: "42", body: "new text", version: 3 } }` | 37: `res.json(result.value)` | `200` with `{"id":"42","body":"new text","version":3}`, the value as-is |
-| `{ ok: false, error: "version-conflict" }` | 33: `res.status(this.errors.statusFor(result.error))` | The status from `HttpErrorMapper`, with `{"error":"version-conflict"}` |
-| (the body failed the zod check; `run()` was never called) | 27 | `400` with `{"error":"invalid-request"}` |
+| `{ ok: true, value: { id: "42", body: "new text", version: 3 } }` | 41: `res.json(result.value)` | `200` with `{"id":"42","body":"new text","version":3}`, the value as-is |
+| `{ ok: false, error: "version-conflict" }` | 37: `res.status(this.errors.statusFor(result.error))` | The status from `HttpErrorMapper`, with `{"error":"version-conflict"}` |
+| (the body failed the zod check; `run()` was never called) | 31 | `400` with `{"error":"invalid-request"}` |
 
 Choosing the status code and the JSON shape is the presenter's job (§6.3); in form B the handler does that job.
 
@@ -451,17 +451,17 @@ export interface ReviseDocumentOutput { readonly id: string; readonly body: stri
 
 1. **Express → handler:** the route table calls `handle(req, res)`.
 2. **Handler** (the "parses the body into a plain request model" part):
-   - line 25: `ReviseDocumentBody.safeParse(req.body)` checks the HTTP body against the zod schema; a bad body answers 400 and stops here (lines 26–29);
-   - line 31: `{ id: req.params.id, ...parsed.data }` builds `{ id: "42", body: "new text", expectedVersion: 2 }`. That object is the **request model** (`ReviseDocumentInput`).
-3. **Handler → use case** (the "calls the use case's input port" part): line 31, `this.reviseDocument.run(...)`.
+   - line 29: `ReviseDocumentBody.safeParse(req.body)` checks the HTTP body against the zod schema; a bad body answers 400 and stops here (lines 26–29);
+   - line 35: `{ id: req.params.id, ...parsed.data }` builds `{ id: "42", body: "new text", expectedVersion: 2 }`. That object is the **request model** (`ReviseDocumentInput`).
+3. **Handler → use case** (the "calls the use case's input port" part): line 35, `this.reviseDocument.run(...)`.
    ══ *crosses green → red; the dependency (handler imports `ReviseDocument`) points inward ✓* ══
-4. **Use case → gateway port:** line 44, `this.documents.find(input.id)`. The use case knows only the `DocumentStore` interface, which sits in its own circle.
+4. **Use case → gateway port:** line 46, `this.documents.find(input.id)`. The use case knows only the `DocumentStore` interface, which sits in its own circle.
    ══ *at run time control goes red → green into `InMemoryDocumentStore.find`; the code dependency stays green → red (`implements DocumentStore`)* ══
-5. **Use case → entity:** line 47, `current.revise(input.body, input.expectedVersion)` applies the business rule.
-6. **Use case → gateway port:** line 52, `this.documents.save(next.value, current.version)`. The adapter checks the version and writes atomically.
+5. **Use case → entity:** line 49, `current.revise(input.body, input.expectedVersion)` applies the business rule.
+6. **Use case → gateway port:** line 54, `this.documents.save(next.value, current.version)`. The adapter checks the version and writes atomically.
 7. **Use case:** lines 55–56 copy `id`, `body` and `version` out of the saved entity into a plain `ReviseDocumentOutput` and return it.
    ══ *crosses red → green by `return`, so no inversion is needed (§6.6); the entity stays inside* ══
-8. **Handler (acting as presenter):** line 37, `res.json(result.value)` sends `{"id":"42","body":"new text","version":3}`. On a refusal, line 33 maps the reason to a status through `HttpErrorMapper`.
+8. **Handler (acting as presenter):** line 41, `res.json(result.value)` sends `{"id":"42","body":"new text","version":3}`. On a refusal, line 37 maps the reason to a status through `HttpErrorMapper`.
 
 ```text
  GREEN (Interface Adapters)          RED (Use Cases)                      GREEN (Interface Adapters)
@@ -758,7 +758,7 @@ Microsoft's .NET architecture guide treats Hexagonal, Ports-and-Adapters, Onion 
 
 ## 15. The stack reference, reviewed against the sources
 
-Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b). Until 2026-10-27 this code lived in-tree at `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`; it moved unchanged (same files and line numbers) to its own repo, pinned by `stacks/typescript-node/reference.md`. v1.1.0 added `@param` notes and rewrote three summaries (CMT-6, CMT-13), so line numbers below are those of v1.1.0; v1.2.0 changed only the adapter's doc comments and lint, so they still hold.
+Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b). Until 2026-10-27 this code lived in-tree at `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`; it moved unchanged (same files and line numbers) to its own repo, pinned by `stacks/typescript-node/reference.md`. v1.1.0 added `@param` notes and rewrote three summaries (CMT-6, CMT-13), so line numbers below are those of v1.1.0; v1.2.0 changed only the adapter's doc comments and lint, so they still hold. Every line number in this doc was re-checked against v1.2.0 on 2026-10-28; some in §6 still carried pre-v1.1.0 numbers and were corrected. From v1.3.0 / v2.1.0 a refusal is an RFC 9457 problem body instead of `{"error": …}` (EXP-8); the links here stay on v1.2.0, so the code quoted matches them.
 
 | Aspect | Verdict | Evidence |
 |---|---|---|

@@ -1,14 +1,14 @@
 ---
 schema: stack-reference/v1
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 stack: typescript-node
 repo: conanjs/agentic-sdlc-reference-typescript-node
-pinned: v2.0.0
-commit: 171c3ba548fd5b00913f8c6a62acdd591f278c91
-verified: 2026-10-27
+pinned: v2.1.0
+commit: 905409d5afa3ddc7eb84e58169b31b09a9925647
+verified: 2026-10-28
 layout: feature-first
 variants:
-  - { layout: layer-first, branch: layout/layer-first, pinned: v1.2.0, commit: a8e776660fe686a716fc1f80550f2671c972cc7b, verified: 2026-10-27 }
+  - { layout: layer-first, branch: layout/layer-first, pinned: v1.3.0, commit: b4d166354736c2de60f96ecac839708ce8b7841e, verified: 2026-10-28 }
 ---
 
 # Reference: TypeScript on Node.js
@@ -37,7 +37,9 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | Port roles | Input port = the use case's public `run()` (no separate interface); gateway port = an explicit interface; no output port (request/response form) | CA-2 | `docs/architecture.md` §4 |
 | Data across boundaries | Plain `<UseCase>Input` in, plain `<UseCase>Output` out; the entity never leaves the use case | CA-4 | `src/documents/application/ReviseDocument.ts` (`ReviseDocumentOutput`) |
 | Expected failures | `Result` union; thrown `Error` only for the unexpected | TSN-4, TSN-5 | `src/shared/domain/Result.ts` |
-| Error to HTTP | One mapper; a `Record` over the error union makes a missing status a compile error | TSN-11, EXP-5 | `src/documents/interface/errors/HttpErrorMapper.ts` |
+| Error to HTTP | One mapper per module; a `Record` over the refusal union makes a missing status a compile error | TSN-11, EXP-5 | `src/documents/interface/errors/HttpErrorMapper.ts` |
+| Error body | RFC 9457 problem, `application/problem+json`: `/problems/<reason>` for named refusals, `about:blank` otherwise; thrown errors through one shared middleware that logs every 500 | EXP-8 | `src/shared/interface/ProblemDetails.ts`, `src/shared/interface/ErrorMiddleware.ts`, `test/integration/documents.int.test.ts` |
+| Status codes | `http-status-codes` named constants, only in `interface/` (stack Option default) | TSN-19 | `eslint.config.mjs` (`http-status-codes` restriction), `specs/001-revise-document/research.md` DR-003 |
 | Doc comments | TSDoc on every export and public member; contract on the port; each adapter method has its own summary starting `{@link Port.member}`, so the editor shows it plus the port's notes; every parameter and return documented; summaries answer the contract questions | CMT-5, CMT-6, CMT-12, CMT-13, TSN-13 | `src/documents/application/ports/DocumentStore.ts`, `src/documents/infrastructure/InMemoryDocumentStore.ts`, `src/documents/application/ReviseDocument.ts` (`run`) |
 | Naming | File name equals the class; suffixes only from the role glossary (`Store`, `Handler`, `Mapper`) | NAM-8, NAM-6 | `docs/glossary.md` |
 | Config | Parsed once, frozen, nothing else reads the environment | TSN-9 | `src/shared/infrastructure/config.ts` |
@@ -58,7 +60,9 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | `src/shared/infrastructure/config.ts` | Tier B | zod config, `@throws` |
 | `src/documents/interface/routes/ReviseDocumentBody.ts` | schema | Strict input validation at the boundary |
 | `src/documents/interface/routes/ReviseDocumentHandler.ts` | handler | Parse, call one use case, map the result |
-| `src/documents/interface/errors/HttpErrorMapper.ts` | mapper | Exhaustive status table; error middleware |
+| `src/documents/interface/errors/HttpErrorMapper.ts` | mapper | Exhaustive refusal-to-problem table |
+| `src/shared/interface/ProblemDetails.ts` | value | The RFC 9457 body and how it is sent |
+| `src/shared/interface/ErrorMiddleware.ts` | middleware | Thrown errors to `about:blank` problems; logs every 500 |
 | `src/CompositionRoot.ts` | composition root | The only importer of adapters; the route table |
 | `src/main.ts` | Tier B entry | Config, logger, listen |
 | `src/**/*.test.ts`, `test/integration/*.int.test.ts` | tests | Unit, concurrency and HTTP tests |
@@ -72,8 +76,8 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
 
 1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
-2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet 171c3ba548fd5b00913f8c6a62acdd591f278c91` (feature-first, `v2.0.0`), or `… checkout --quiet a8e776660fe686a716fc1f80550f2671c972cc7b` for the layer-first variant (`v1.2.0`).
-3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/171c3ba548fd5b00913f8c6a62acdd591f278c91/<path>`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet 905409d5afa3ddc7eb84e58169b31b09a9925647` (feature-first, `v2.1.0`), or `… checkout --quiet b4d166354736c2de60f96ecac839708ce8b7841e` for the layer-first variant (`v1.3.0`).
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/905409d5afa3ddc7eb84e58169b31b09a9925647/<path>`.
 
 A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 
@@ -85,8 +89,8 @@ In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, un
 
 | Layout | Copy it when | Tag | Commit |
 |---|---|---|---|
-| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v2.0.0` | `171c3ba548fd5b00913f8c6a62acdd591f278c91` |
-| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.2.0` | `a8e776660fe686a716fc1f80550f2671c972cc7b` |
+| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v2.1.0` | `905409d5afa3ddc7eb84e58169b31b09a9925647` |
+| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.3.0` | `b4d166354736c2de60f96ecac839708ce8b7841e` |
 
 Both variants get every rule fix, one pull request each (`{{AGENT_HOME}}/patterns/maintained-variant.pattern.md`).
 

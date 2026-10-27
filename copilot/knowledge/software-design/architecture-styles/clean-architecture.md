@@ -96,11 +96,11 @@ Step 5 uses form B (item 7): `Login` returns, and no output port is involved. He
 | Step | Ring | What happens (file:line) | Import direction |
 |---|---|---|---|
 | 1 | Frameworks | Express calls `revise.handle(req, res)` (`CompositionRoot.ts:38`) | Framework glue → controller |
-| 2 | Adapters | `ReviseDocumentHandler` checks the body and calls the input port: `this.reviseDocument.run({ id: req.params.id, ...parsed.data })` (`ReviseDocumentHandler.ts:31`) | Adapter → use case ✓ |
+| 2 | Adapters | `ReviseDocumentHandler` checks the body and calls the input port: `this.reviseDocument.run({ id: req.params.id, ...parsed.data })` (`ReviseDocumentHandler.ts:35`) | Adapter → use case ✓ |
 | 3 | Use cases | `ReviseDocument` loads and saves through the gateway port `DocumentStore` (`ReviseDocument.ts:46,54`) | Use case → its own port ✓ |
 | 4 | Entities | `current.revise(input.body, input.expectedVersion)` applies the rule (`ReviseDocument.ts:49`) | Use case → entity ✓ |
 | 5 | Use cases | Returns the plain output `{ id, body, version }`, not the entity (`ReviseDocument.ts:57–58`) | Form B: no outward name |
-| 6 | Adapters | The handler presents it: `res.json(result.value)` → `{"id":"42","body":"new text","version":3}`; a refusal gets its status from `HttpErrorMapper` (`ReviseDocumentHandler.ts:33,37`) | Adapter → use-case output type ✓ |
+| 6 | Adapters | The handler presents it: `res.json(result.value)` → `{"id":"42","body":"new text","version":3}`; a refusal gets its status from `HttpErrorMapper` (`ReviseDocumentHandler.ts:37,41`) | Adapter → use-case output type ✓ |
 
 Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mistake under item 8, and it is now guarded by a test (`ReviseDocument.test.ts:25`).
 
