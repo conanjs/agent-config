@@ -3,9 +3,10 @@ schema: deep-dive/v1
 topic: software-design/architecture-styles
 status: verified
 applies-to: ["any"]
-last-updated: 2026-10-26
-last-verified: 2026-10-26
-synthesized-into: []
+last-updated: 2026-10-27
+last-verified: 2026-10-27
+synthesized-into:
+  - { path: software-design/architecture-styles/clean-architecture.md, on: 2026-10-27 }
 tags: [clean-architecture, dependency-rule, ports, interactor, presenter, hexagonal, onion, bce, dci, screaming-architecture, package-by-component, component-principles, humble-object]
 ---
 
@@ -20,7 +21,7 @@ tags: [clean-architecture, dependency-rule, ports, interactor, presenter, hexago
 - treating the database, web and frameworks as details.
 
 **Use this when:** you need the whole picture: vocabulary and analogies, where the idea came from, what each circle holds, the official diagram and how a request crosses the boundaries step by step, what each port is, what data may cross, how to package the code, which principles sit underneath, what critics say, and how the stack reference measures up.
-**Depth:** words used; analogies; origin timeline; the goal; the rule; every circle defined; diagrams of the circles, of source dependencies and of the flow of control; the full boundary-crossing flow; input/output/gateway ports, the interactor, driving vs. driven; data across boundaries; Screaming Architecture and the four packaging options (from Simon Brown's own text); "details"; SOLID and the six component principles with a worked instability calculation; the book's mechanism chapters; a comparison with peer styles; criticism; an edge-case matrix; a review of `stacks/typescript-node/reference/`; self-check questions.
+**Depth:** words used; analogies; origin timeline; the goal; the rule; every circle defined; diagrams of the circles, of source dependencies and of the flow of control; the full boundary-crossing flow; input/output/gateway ports, the interactor, driving vs. driven; the request/response form side by side with the output-port form; data across boundaries, with a real before/after mistake, what the authors say, and Martin's own demo code as a counter-example; Screaming Architecture and the four packaging options (from Simon Brown's own text); "details"; SOLID and the six component principles with a worked instability calculation; the book's mechanism chapters; a comparison with peer styles; criticism; an edge-case matrix; a review of `stacks/typescript-node/reference/`; self-check questions.
 
 **Dedicated deep dives** for three of the sources: `hexagonal-architecture-deep-dive.md`, `onion-architecture-deep-dive.md`, `screaming-architecture-deep-dive.md`. This doc keeps its own summary of each and links to the dedicated doc for more.
 
@@ -263,7 +264,134 @@ Full treatment: `hexagonal-architecture-deep-dive.md`.
 
 `ReviseDocument.run()` *returns* a `Result` instead of calling an output port, and the handler does the presenting.
 
+**In short:** `run()` returns a `ReviseDocumentOutput` wrapped in a `Result`, and the handler presents it. A return value instead of an output port is allowed, because a `return` never needs to name the caller. The subsections below show the other side (the output-port form), why a `return` names no one, what "presents" means, and what this choice costs.
+
+```ts
+// src/domain/Result.ts, line 7 — the wrapper
+export type Result<T, E extends string> =
+  { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: E };
+
+// the success value at run time
+{ ok: true, value: { id: "42", body: "new text", version: 3 } }
+```
+
 **Analysis (ours, derived from [^1]):** inversion is needed only where an inner circle must *call* an outer one. A `return` goes back to the caller without naming it, so no output port is required. The cost: the use case cannot push results to several presenters, or push them asynchronously, without changing its signature. It is a legitimate choice, but it should be recorded (§15 G3).
+
+#### The two forms side by side
+
+"A return value instead of an output port" compares two ways for the use case to hand back its result. Martin's figure uses form A. The stack reference uses form B. Form ✗ is what both of them avoid.
+
+**Form ✗: the use case calls the handler directly (forbidden).**
+
+```ts
+// src/application/ReviseDocument.ts
+import { ReviseDocumentHandler } from "@/interface/routes/ReviseDocumentHandler.js"; // ✗ red names green
+
+export class ReviseDocument {
+  public constructor(private readonly documents: DocumentStore, private readonly handler: ReviseDocumentHandler) {}
+  public async run(input: ReviseDocumentInput): Promise<void> {
+    // … find, revise, save …
+    this.handler.show({ id, body, version });   // a call outward, by name
+  }
+}
+```
+
+Martin: "this call must not be direct because that would violate The Dependency Rule" ✅[^1].
+
+**Form A: the use case calls an output port (Martin's figure).**
+
+```ts
+// src/application/ReviseDocumentOutputPort.ts — red: the use case owns this interface
+export interface ReviseDocumentOutputPort {
+  revised(result: ReviseDocumentOutput): void;
+  refused(reason: ReviseDocumentError): void;
+}
+
+// src/application/ReviseDocument.ts
+public async run(input: ReviseDocumentInput, output: ReviseDocumentOutputPort): Promise<void> {
+  // … find, revise, save …
+  output.revised({ id, body, version });      // a call outward, but through its own interface
+}
+
+// src/interface/routes/ReviseDocumentPresenter.ts — green: implements the red interface
+export class ReviseDocumentPresenter implements ReviseDocumentOutputPort {
+  public constructor(private readonly res: Response) {}
+  public revised(r: ReviseDocumentOutput): void { this.res.json(r); }
+  public refused(reason: ReviseDocumentError): void { this.res.status(409).json({ error: reason }); }
+}
+
+// the handler: build a presenter, pass it in, and return nothing
+await this.reviseDocument.run(input, new ReviseDocumentPresenter(res));
+```
+
+"We have the use case call an interface (Shown here as Use Case Output Port) in the inner circle, and have the presenter in the outer circle implement it" ✅[^1].
+
+**Form B: the use case returns its result (the stack reference).**
+
+```ts
+// src/application/ReviseDocument.ts, lines 41–56
+public async run(input: ReviseDocumentInput): Promise<Result<ReviseDocumentOutput, ReviseDocumentError>> {
+  // … find, revise, save …
+  return { ok: true, value: { id, body, version } };   // no call outward at all
+}
+
+// src/interface/routes/ReviseDocumentHandler.ts, lines 31–37 — the handler presents the value
+const result = await this.reviseDocument.run({ id: req.params.id, ...parsed.data });
+if (!result.ok) { res.status(this.errors.statusFor(result.error)).json({ error: result.error }); return; }
+res.json(result.value);
+```
+
+**What the use case file has to name, in each form:**
+
+| Form | Imports or names in `ReviseDocument.ts` | Anything outer (green)? | Allowed? |
+|---|---|---|---|
+| ✗ Direct call | `ReviseDocumentHandler` | **Yes** | ✗ |
+| A Output port | `ReviseDocumentOutputPort` (its own interface) | No | ✓ |
+| B Return | nothing extra; `return` has no target | No | ✓ |
+
+#### Why "a return never needs to name the caller"
+
+To **call** a function, your code must write its name, and that name is a source-code dependency (§4). To **return**, your code writes only `return value`. The language delivers the value to whoever called, and your code never says who that is.
+
+**Analogy:** a phone call vs. answering a question. To phone someone you must know their number. When someone asks you a question face to face, you simply answer; you do not need their name.
+
+**Evidence in the reference.** `ReviseDocument.ts` imports only `DocumentStore` and `Result` (lines 1–2); it has no import from `src/interface/`. Yet its result reaches `ReviseDocumentHandler` at line 31. A CLI controller could call the same `run()` and receive the same value, with no change to `ReviseDocument`.
+
+The output port exists only to solve form ✗: inner code that must *call* outward. Form B never calls outward, so there is nothing to invert.
+
+#### What "the handler presents it" means
+
+The handler does not just pass the value through. It decides how each outcome looks over HTTP:
+
+| Outcome of `run()` | Handler line | HTTP answer |
+|---|---|---|
+| `{ ok: true, value: { id: "42", body: "new text", version: 3 } }` | 37: `res.json(result.value)` | `200` with `{"id":"42","body":"new text","version":3}`, the value as-is |
+| `{ ok: false, error: "version-conflict" }` | 33: `res.status(this.errors.statusFor(result.error))` | The status from `HttpErrorMapper`, with `{"error":"version-conflict"}` |
+| (the body failed the zod check; `run()` was never called) | 27 | `400` with `{"error":"invalid-request"}` |
+
+Choosing the status code and the JSON shape is the presenter's job (§6.3); in form B the handler does that job.
+
+#### The cost of form B, as code
+
+A `return` gives **one value, once, to one caller**. An output port can be called **any number of times, on any number of presenters, at any time**.
+
+| Need | Form A (output port) | Form B (return) |
+|---|---|---|
+| Two presenters (HTTP reply and a WebSocket notice) | `output.revised(r)`, where the composition root passes a presenter that forwards to both | Each caller must forward the value itself, and must remember to |
+| Progress over time (10%, 50%, done) | `output.progress(10); output.progress(50); output.done(s);` | Change the signature, e.g. `run(): AsyncIterable<Progress \| Done>`, and every caller changes too |
+
+That is what "without changing its signature" means: with form B, the signature allows one result, sent once. The reference needs neither, so form B fits. The trigger for switching is recorded in the reference's `docs/architecture.md` §4 (§15 G3).
+
+#### Who backs form B
+
+| Source | What it shows |
+|---|---|
+| Cockburn, *Hexagonal Architecture* | The application's method is `public double discount(double amount)`, and the UI adapter shows the returned value: `text3.setText( "" + discount );` ✅[^3] |
+| Martin's OpenChat (`openchat-unclebob`) | Use cases return values from `exec(...)`; there is no presenter or output port in the code ✅[^25][^28] |
+| Martin's 2012 post | The data is "passed from the controllers to the use cases, and then back from the use cases to the presenters and views". "Back" fits both A and B ✅[^1] |
+| The strict reading | Some writers present form A as *the* Clean way and contrast it with "getting a return value from the interactor" ✅[^27]. The post's diagram and its one worked example do use form A ✅[^1] |
+
+So form B is *common and backed by the authors' own code*, but it is not what the 2012 diagram draws. That is why the choice must be recorded.
 
 ### 6.7 The three ports in the stack reference, exactly
 
@@ -417,6 +545,74 @@ export class ReviseDocumentPresenter implements ReviseDocumentOutputPort {
 | Response model | `{ id, body, version }`: plain data, no methods | use case | `ReviseDocumentOutput` ✓. Added 2026-10-26; before that, `run()` returned the `Document` entity itself (§15 G1) |
 | View model | JSON `{"id":"42","body":"…","version":3}` | presenter / handler | built in `ReviseDocumentHandler` |
 
+**In short (the answers to two common questions):**
+1. *Is returning the entity from a use case good or bad?* It goes against what Martin **wrote**. Returning a plain output model such as `ReviseDocumentOutput` follows it. One honest exception: Martin's own later demo code returns entities (§7.3).
+2. *Does `run()` now return the output directly?* Yes: `ReviseDocumentOutput`, wrapped in a `Result`, and the handler presents it. A return value instead of an output port is allowed, because a `return` never needs to name the caller (§6.6).
+
+### 7.1 Worked mistake: the stack reference used to return the entity
+
+This is a real mistake from the stack reference, kept here as a teaching example. It is gap G1 in §15, fixed on 2026-10-26.
+
+**What changed in the code.** The "before" version was never committed: `src/application/ReviseDocument.ts` has one commit, which already contains the fix. The "before" column is rebuilt from the G1 record.
+
+| | Before (rebuilt from G1) ✗ | Now (`ReviseDocument.ts` lines 41–56) ✓ |
+|---|---|---|
+| Signature | `run(input): Promise<Result<Document, ReviseDocumentError>>` | `run(input): Promise<Result<ReviseDocumentOutput, ReviseDocumentError>>` |
+| Last lines | `return saved;` (the `Document` entity) | `const { id, body, version } = saved.value;`<br>`return { ok: true, value: { id, body, version } };` |
+| What the handler gets | A live `Document` object, with its `revise()` method | A plain object `{ id, body, version }` |
+| Guard test | — | `ReviseDocument.test.ts` line 25: `expect(valueOf(result)).not.toBeInstanceOf(Document);` |
+| Rule text (CA-4) | Covered only the inward direction: "persistence models and transport DTOs never leak inward" | "…and entities never leak outward: a use case returns an output model, not an entity" |
+
+**Why "before" was a mistake.**
+- It breaks the written rule: "We don't want to cheat and pass Entities or Database rows" ✅[^1].
+- The handler was coupled to the entity's shape. A new field on `Document` (say, an internal `lockedBy`) could reach clients without anyone deciding it should (edge case E2).
+- The handler held an object with business behaviour (`revise()`), so outer code *could* call business rules directly, skipping the use case.
+
+**How the fix was checked:** the unit test above, plus `pnpm run check` in the reference (§15).
+
+### 7.2 What the authors say about returning an entity (verified)
+
+| Source | Exact words or code | Verdict on returning the entity |
+|---|---|---|
+| Martin, 2012 post | "Typically the data that crosses the boundaries is simple data structures." ✅[^1] | ✗ An entity is not a simple data structure |
+| Martin, 2012 post | "We don't want to cheat and pass Entities or Database rows." ✅[^1] | ✗ This forbids it directly |
+| Martin, 2012 post | "…it is always in the form that is most convenient for the inner circle." ✅[^1] | ✓ for `ReviseDocumentOutput`: it is declared in the use-case file, so the inner circle owns its shape |
+| Martin, 2012 post | The models are "passed from the controllers to the use cases, and then back from the use cases to the presenters and views." ✅[^1] | Data models go back, not entities |
+| Martin, book ch. 20, section "Request and Response Models" | The section exists ✅[^14]. Its text was not available, so its wording is not quoted here | — |
+| Martin's own later code (OpenChat, branch `openchat-unclebob`) | `public List<Document> exec(String subscriberName)`, where `Document` lives in the `entities` package ✅[^25]. The API class builds the JSON itself: `"text"` from `doc.text`, `"dateTime"` from `doc.dateTime` ✅[^26] | ⚠ Here Martin **does** return entities; the API layer picks which fields go out |
+| Microsoft, Clean Architecture guide | Application Core interfaces work with entities, and "sometimes" with "non-entity types", which are then DTOs ✅[^6] | Concerns the gateway side, not the delivery side (§7.3 nuance) |
+
+### 7.3 The written rule vs. Martin's own demo code
+
+**In one sentence:** in terms of the architecture's principles, as Martin *wrote* them, both the stack reference and this document follow the rule; but Martin's own later demo code returns entities directly.
+
+| | What it says or does | Follows the written rule? |
+|---|---|---|
+| **The written rule** (2012 post) | "We don't want to cheat and pass Entities or Database rows." ✅[^1] | — (this is the rule) |
+| **The stack reference, before 2026-10-26** | `run()` returned `Result<Document, …>`: the entity itself went out to the handler (§15 G1). This old version was never committed; the record is G1 | ✗ |
+| **The stack reference, now** | `run()` returns `Result<ReviseDocumentOutput, …>`: the plain object `{ id, body, version }`. A test asserts the value is not a `Document` (`ReviseDocument.test.ts` line 25) | ✓ |
+| **This document** | Teaches the written rule (§7 above; edge case E2) | ✓ |
+| **Martin's own demo code** (OpenChat, branch `openchat-unclebob`) | The use case is `public List<Document> exec(String subscriberName)`, and `Document` sits in the `entities` package ✅[^25]. The API class then copies the fields into JSON itself: `"text"` from `doc.text`, `"dateTime"` from `doc.dateTime` ✅[^26] | ✗ (it returns entities) |
+
+**How to read the difference (analysis, ours).**
+- The rule is strict; the small demo is relaxed. The demo still does not leak new fields by accident, because its API class picks each JSON field by hand.
+- The price of the relaxed form: every caller must repeat that field picking, and every caller depends on the entity's shape. Change the entity, and every caller may have to change.
+- A reference implementation exists to teach the rule, so it uses the strict form.
+
+**Analogy:** returning the entity is handing the waiter the whole cooking pot. Returning `ReviseDocumentOutput` is handing over a plated dish. The waiter cannot change the recipe through the pot, and if the recipe changes, the plate can still look the same.
+
+**One nuance: entities through the gateway port.** The gateway port `DocumentStore` passes the `Document` entity to and from the storage adapter (`find(id): Promise<Document | undefined>`). Read word for word, "don't pass Entities" could cover that too. The Dependency Rule still holds: the adapter (outer) depends on the entity (inner), which points inward. Martin's OpenChat does the same through its repository ✅[^25]. Microsoft's Clean Architecture guide does too: the Application Core holds "Entities (business model classes that are persisted)" and the interfaces for data access, and Infrastructure implements them as repositories. Only "sometimes" do those interfaces "need to work with non-entity types", which are then DTOs ✅[^6]. So entities crossing a *gateway* boundary is accepted practice. Our reading (analysis, ours): the "don't pass Entities" sentence is applied to the boundary toward the delivery side (controllers, presenters).
+
+### 7.4 Is `ReviseDocumentOutput` correct? A checklist
+
+| Rule (Martin, 2012 ✅[^1]) | `ReviseDocumentOutput` | Pass? |
+|---|---|---|
+| Simple data structure | `{ readonly id: string; readonly body: string; readonly version: number }`, with no methods | ✓ |
+| No dependency that breaks the Dependency Rule | It imports nothing | ✓ |
+| In the form most convenient for the inner circle | Declared in `src/application/ReviseDocument.ts`, next to the use case | ✓ |
+| No entity passed | Guarded by `ReviseDocument.test.ts` line 25 | ✓ |
+| The error is simple data too | `ReviseDocumentError = "not-found" \| "version-conflict" \| "invalid-body"`: plain strings | ✓ |
+
 ---
 
 ## 8. Screaming Architecture and how to package the code
@@ -547,7 +743,7 @@ Microsoft's .NET architecture guide treats Hexagonal, Ports-and-Adapters, Onion 
 | # | Situation | What breaks | Which rule | Fix |
 |---|---|---|---|---|
 | E1 | Entity imports a framework type (`Request`) | The entity can't be tested or reused without the framework | Dependency Rule ✅[^1] | Pass plain data in |
-| E2 | Use case returns the entity to the controller | The outer circle couples to the entity's shape; new fields can leak to clients | Data across boundaries ✅[^1] | Return a response model |
+| E2 | Use case returns the entity to the controller | The outer circle couples to the entity's shape; new fields can leak to clients | Data across boundaries ✅[^1] | Return a response model. Real case: §7.1 |
 | E3 | Gateway returns an ORM row to the use case | The schema leaks into the business rules | "We don't want to pass that row structure inwards" ✅[^1] | The adapter maps row ↔ entity |
 | E4 | Controller calls the repository directly | It skips the use case and any authorization in it (fail-open) | CA-10; the application is the hub ✅[^3] | Go through the input port |
 | E5 | Two adapters in the same circle call each other | The Dependency Rule alone does not catch it (same circle) | CA-10 | Only the composition root names both |
@@ -573,7 +769,7 @@ Target: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`.
 | Entities testable alone | ✓ | `Document.test.ts` has no doubles |
 | Frameworks at the edges | ✓ | `express` only in `interface/` and the root; `zod` only in `interface/` and `infrastructure/config.ts` |
 | Boundaries enforced by tools | ✓ | Lint zones play the role Brown gives the compiler ✅[^23] |
-| **G1: the entity crosses outward (response model missing)** | ✗ → ✓ fixed 2026-10-26 | **Was:** `ReviseDocument.run()` returned `Result<Document, …>`, and the handler destructured the entity. The post forbids passing entities across boundaries ✅[^1]. CA-4 only covered the *inward* direction ("persistence models and transport DTOs never leak inward"), so the rule text had the gap too. **Now:** `run()` returns `Result<ReviseDocumentOutput, …>`; the handler does `res.json(result.value)`; a unit test asserts the value is not a `Document`. CA-4 reads "…and entities never leak outward: a use case returns an output model, not an entity" |
+| **G1: the entity crosses outward (response model missing)** | ✗ → ✓ fixed 2026-10-26 | **Was:** `ReviseDocument.run()` returned `Result<Document, …>`, and the handler destructured the entity. The post forbids passing entities across boundaries ✅[^1]. CA-4 only covered the *inward* direction ("persistence models and transport DTOs never leak inward"), so the rule text had the gap too. **Now:** `run()` returns `Result<ReviseDocumentOutput, …>`; the handler does `res.json(result.value)`; a unit test asserts the value is not a `Document`. CA-4 reads "…and entities never leak outward: a use case returns an output model, not an entity". Worked as a teaching example in §7.1 |
 | **G2: top level does not scream** | ~ | `src/domain/ application/ …` is layer-first, which is fine for one feature. At scale it goes against Screaming Architecture ✅[^2], Fowler ✅[^9] and Brown ✅[^23]. The reference does not say when to switch to feature-first |
 | G3: no output port / presenter | ~ → ✓ recorded 2026-10-26 | The request/response variant (§6.6). `docs/architecture.md` §4 now lists the port roles, the no-output-port choice, and when to extract explicit ports |
 | G4: the handler names Express types | ✓ under CA-6 | Under the strict circle reading, framework types belong in the outer circle; the foundation deliberately allows them in adapters (CA-6) |
@@ -603,15 +799,28 @@ Target: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`.
 ## Verification status
 - Every factual claim carries ✅ and a footnote. Rows or lines marked "teaching analogy, ours" or "analysis, ours" are reasoning built on cited facts.
 - The book's body text was not available. Book-specific statements are limited to its table of contents ([^5], [^14]) and to Brown's own published version of chapter 34 ([^23]).
-- Last verified: 2026-10-25.
+- Last verified: 2026-10-27.
+
+**How the claims in §6.6 and §7 were checked:**
+
+| Claim | How it was checked |
+|---|---|
+| Martin forbids passing entities across boundaries | ✅ Read the 2012 post text [^1] |
+| The output port exists to avoid a direct call outward | ✅ Read the 2012 post text [^1] |
+| Martin's OpenChat returns entities and has no presenter | ✅ Read the OpenChat source [^25][^26] |
+| Cockburn's driving port returns a value | ✅ Read Cockburn's article [^3] |
+| Entities through gateway ports are accepted practice | ✅ Microsoft's guide [^6] and OpenChat [^25] |
+| The old reference code returned `Document` | Taken from the §15 G1 record; that version is not in git |
+| The exact text of the book's ch. 20 | Not checked: the text was not available. Only the section title is used [^14] |
+| The several-presenters and progress costs of form B | Analysis, ours: follows from how `return` works |
 
 ## References
-- [^1]: [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012 (text and figure). Backs: §0, §2–§7, §14.
+- [^1]: [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012 (text and figure). Backs: §0, §2–§7 (incl. §6.6 side-by-side forms, §7.1), §14.
 - [^2]: [Screaming Architecture](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) — Robert C. Martin, 2011. Backs: A4, §2, §8, §9.
-- [^3]: [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: §0, A1, A2, §2, §5 mapping note, §6.4, §6.5, §11, E4.
+- [^3]: [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: §0, A1, A2, §2, §5 mapping note, §6.4, §6.5, §6.6 "Who backs form B", §11, E4.
 - [^4]: [The Onion Architecture, part 1](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/) — Jeffrey Palermo, 2008. Backs: A6, §2, §12, §13.
 - [^5]: [Clean Architecture (publisher page)](https://www.pearson.com/en-us/subject-catalog/p/clean-architecture-a-craftsmans-guide-to-software-structure-and-design/P200000009528/9780134494166) — Robert C. Martin, Pearson, 2017. Backs: §2, §9, §10.
-- [^6]: [Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) — Microsoft, living. Backs: §11, §12.
+- [^6]: [Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) — Microsoft, living. Backs: §7.1 (gateway nuance), §11, §12.
 - [^7]: [Clean Micro-service Architecture](https://blog.cleancoder.com/uncle-bob/2014/10/01/CleanMicroserviceArchitecture.html) — Robert C. Martin, 2014. Backs: §2, §9, §11, E10.
 - [^8]: [A Little Architecture](https://blog.cleancoder.com/uncle-bob/2016/01/04/ALittleArchitecture.html) — Robert C. Martin, 2016. Backs: A7, §2, §9.
 - [^9]: [Presentation Domain Data Layering](https://martinfowler.com/bliki/PresentationDomainDataLayering.html) — Martin Fowler, 2015. Backs: §8, §13, G2.
@@ -630,6 +839,10 @@ Target: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`.
 - [^22]: [Clean Architecture, ch. 34 "The Missing Chapter"](https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/ch34.xhtml) — O'Reilly (subscription; blocks automated fetching). Listed for readers with access; facts here come from [^23].
 - [^23]: [Modular monolith and "package by component"](https://simonbrown.je/modular-monolith) — Simon Brown, originally 2016 (the version published as chapter 34). Backs: §2, §8, §13, §15, E11.
 - [^24]: [Type Compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility.html) — TypeScript Handbook, living. Backs: §6.7 (compatibility is structural, so a class's public shape works as an interface).
+- [^25]: [OpenChat `GetSubscribedDocuments.java`, branch `openchat-unclebob`](https://github.com/sandromancuso/cleancoders_openchat/blob/openchat-unclebob/src/main/java/org/openchat/usecases/GetSubscribedDocuments.java) — Cleancoders OpenChat repository; `Document` is in [`org/openchat/entities`](https://github.com/sandromancuso/cleancoders_openchat/tree/openchat-unclebob/src/main/java/org/openchat/entities). Backs: §6.6 "Who backs form B", §7.1.
+- [^26]: [OpenChat `GetSubscribedDocumentsAPI.java`, branch `openchat-unclebob`](https://github.com/sandromancuso/cleancoders_openchat/blob/openchat-unclebob/src/main/java/org/openchat/api/GetSubscribedDocumentsAPI.java) — the API class that turns the returned entities into JSON. Backs: §7.1.
+- [^27]: [Implementing Clean Architecture – Of controllers and presenters](http://www.plainionist.net/Implementing-Clean-Architecture-Controller-Presenter/) — Plainionist, 2018 (updated 2023). Backs: §6.6 "Who backs form B" (the strict reading).
+- [^28]: [techexcellenceio community discussion #3](https://github.com/techexcellenceio/community/discussions/3) — community discussion that identifies the `openchat-unclebob` branch as Uncle Bob's version, using "use case handlers WITHOUT presenters". Backs: §6.6 "Who backs form B".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules (§14, §15).
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/` — the code reviewed in §15.
 

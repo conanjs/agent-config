@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: subtopic
 topic: software-design/architecture-styles
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 ---
 
 # Architecture styles
@@ -13,8 +13,8 @@ How the code inside one deployable is arranged so that business rules stay indep
 | Doc | Type | Summary | Status |
 |---|---|---|---|
 | [hexagonal-architecture.md](hexagonal-architecture.md) | concept | Ports, driving and driven adapters; the application as the hub, so adapters never call each other. | verified |
-| [clean-architecture.md](clean-architecture.md) | concept | Concentric rings, the inward dependency rule, crossing boundaries by inversion, and what a presenter is. | verified |
-| [clean-architecture-deep-dive.md](clean-architecture-deep-dive.md) | deep-dive | The whole story: analogies, circles, the official diagram, input/output/gateway ports, driving vs. driven, data across boundaries, principles, critics, and a review of the stack reference. Not yet synthesized. | verified |
+| [clean-architecture.md](clean-architecture.md) | concept | Concentric rings, the inward dependency rule, the input/output/gateway ports, return vs. output port, what data may cross, and what a presenter is. Distilled from the deep dive. | verified |
+| [clean-architecture-deep-dive.md](clean-architecture-deep-dive.md) | deep-dive | The whole story: analogies, circles, the official diagram, input/output/gateway ports, driving vs. driven, the request/response form, data across boundaries with a real before/after mistake and Martin's own demo code, principles, critics, and a review of the stack reference. Synthesized into `clean-architecture.md`. | verified |
 | [hexagonal-architecture-deep-dive.md](hexagonal-architecture-deep-dive.md) | deep-dive | Cockburn's ports and adapters: driving vs. driven with his own code, the configurator, staged examples, known uses, costs. | verified |
 | [onion-architecture-deep-dive.md](onion-architecture-deep-dive.md) | deep-dive | Palermo's four tenets, why traditional layering ages, his CodeCampServer example, the 2013 retrospective. | verified |
 | [screaming-architecture-deep-dive.md](screaming-architecture-deep-dive.md) | deep-dive | Folders that show the business, not the framework: packaging options and when to switch to feature-first. | verified |
