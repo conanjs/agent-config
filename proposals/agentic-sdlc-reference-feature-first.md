@@ -1,6 +1,6 @@
 # Proposal: A Feature-First, Fuller Stack Reference — Without Losing the Layer-First Example
 
-**Status:** Draft 2026-10-27, for the owner (V) to decide. Nothing here is implemented. It builds on `proposals/agentic-sdlc-reference-repos-and-procedures.md` (the reference now lives in `conanjs/agentic-sdlc-reference-typescript-node`).
+**Status:** Partly approved 2026-10-27 by the owner (V): A1, A2 and L1–L3, H2, F1 approved as recommended; H1, F2 and M1 (new, §A5) open for discussion (§E). Done so far: reference v1.1.0 merged and pinned (`0f89909`); branch `layout/layer-first` created from it; MOD-9 added to `foundations/design/module-boundaries.md`, closing G2; the technique written up as `copilot/patterns/maintained-variant.pattern.md`. Not started: v2.0.0 (waits for M1). It builds on `proposals/agentic-sdlc-reference-repos-and-procedures.md` (the reference now lives in `conanjs/agentic-sdlc-reference-typescript-node`).
 
 **How to read:**
 - Part A: how the code is organized as it grows, and how the current four-folder example stays available.
@@ -38,7 +38,7 @@ src/
 │   │   └── ports/                 DocumentStore.ts
 │   ├── infrastructure/            InMemoryDocumentStore.ts
 │   ├── interface/http/            DocumentRoutes.ts, handlers, request schemas
-│   └── index.ts                   ← the module's public API: the only file other modules may import
+│   └── index.ts                   ← the module's public API (mechanism open: see §A5, decision M1)
 ├── comments/                      ← second module; reaches documents only through documents/index.ts
 │   └── …same four folders…
 ├── shared/                        ← no feature code; every module may use it, it uses no module
@@ -54,7 +54,7 @@ src/
 | Rule | Example that fails |
 |---|---|
 | Inside a module, the existing layer rule holds: `domain` ← `application` ← `infrastructure` / `interface` | `documents/domain/Document.ts` imports `documents/application/...` |
-| A module imports another module only through its `index.ts` | `comments/application/AddComment.ts` imports `@/documents/domain/Document.js` |
+| A module imports another module only through its public surface (§A5 decides how it is declared) | `comments/application/AddComment.ts` imports `@/documents/domain/Document.js` |
 | No cycles between modules | `documents` → `comments` → `documents` |
 | `shared/` imports no module | `shared/interface/http/HttpErrorMapper.ts` imports `@/documents/...` |
 | The composition root may import every module's adapters | — (allowed) |
@@ -95,6 +95,23 @@ Replacing it would leave no example of the layout that small projects should sti
 - **`add-port-and-adapter`:** gains an input `module` (feature-first) and `allowed-paths` written as `src/{module}/application/**` etc. The validator substitutes `{module}`; for a layer-first repo the module is empty, and paths fall back to `src/application/**`.
 - **The stack lint snippet** (`idioms.md`) gains the module-boundary zones from A2, tested in the reference like the other snippets.
 
+### A5. A module's public surface: a barrel `index.ts` or not (decision M1)
+
+The owner dislikes `index.ts` and asked for a comparison first. A **barrel** is a file that only re-exports other files, for example `export { ReviseDocument } from "./application/ReviseDocument.js";`. Other modules then import `@/documents/index.js`, never a file inside the module. Analogy: a shop counter. Customers may take only what is on the counter, and the counter is a separate piece of furniture that someone must keep stocked.
+
+| Option | How the public surface is declared | Example import in `comments` | Gains | Costs |
+|---|---|---|---|---|
+| A. Barrel `index.ts` | One re-export file per module; lint allows other modules to import only that file | `import { GetDocument } from "@/documents/index.js"` | One obvious list of what is public; internals can move without touching consumers | Importing one name loads the whole module graph, which slows type checking, tests and dev servers. Hagemeister measured this, and Atlassian cut CI build time by about 75% by removing barrels from Jira's frontend. Barrels also create cycles easily (`import-x/no-cycle` noise), make IDE auto-import pick the barrel or the file inconsistently, and add a file that has no primary type (NAM-8) and must be kept in sync by hand |
+| B. **Designated files, enforced by lint (recommended)** | Public = the module's use-case classes and their `Input`/`Output` types in `application/` (MOD-5's "public use case"), listed in `docs/architecture.md` §4. Lint zones forbid everything else | `import { GetDocument } from "@/documents/application/GetDocument.js"` | No extra file; each import names the real file; no graph-loading cost; follows IMP and NAM-8 as they are | The surface is a folder convention plus lint, not one file; moving a use case changes the consumers' import paths |
+| C. Consumer-owned port | `comments` declares the port it needs (`DocumentLookup`); an adapter wired by the composition root calls `documents`' use case. Modules never import each other | `comments` imports nothing from `documents` | Lowest coupling; easiest later split into a service | One port, one adapter and one test per cross-module need: heavy for a reference |
+| D. One package per module | pnpm workspace; each module's `package.json` `exports` lists its public files; Node refuses other paths | `import { GetDocument } from "@ref/documents"` | Enforced by the runtime, not only by lint | Workspace, build and versioning work per module; overkill inside one service |
+
+**Lint for B** (to be tested in v2.0.0, like every snippet): with `import-x/no-restricted-paths`, one zone forbids `./src/documents` from `./src/comments` with `except: ["./application"]`, and a second zone forbids `./src/documents/application/ports`. Zones are checked independently, so the second still blocks ports.
+
+**Recommendation: B**, with C when a consumer needs only a narrow capability, or when the module is a candidate for a later split. MOD-3's "public entry point" is then the use case itself. If B is chosen, the A2 tree has no `index.ts`.
+
+**Sources:** [Marvin Hagemeister, "Speeding up the JavaScript ecosystem – The barrel file debacle"](https://marvinh.dev/blog/speeding-up-javascript-ecosystem-part-7/); [Atlassian, "How We Achieved 75% Faster Builds by Removing Barrel Files"](https://www.atlassian.com/blog/atlassian-engineering/faster-builds-when-removing-barrel-files) (2025-06-26); [Node.js, package `exports`](https://nodejs.org/docs/latest-v24.x/api/packages.html#exports).
+
 ---
 
 ## Part B — Standard HTTP status codes
@@ -126,6 +143,35 @@ The rule is enforced by lint: `no-restricted-imports` for `http-status` everywhe
 
 **Also:** error bodies become **RFC 9457 Problem Details** (`application/problem+json`, with `type`, `title`, `status`, `detail`), which the existing knowledge doc `web-apis/http-error-mapping.md` already recommends. `title` comes from `status[code]`. RFC 9457 obsoletes RFC 7807.
 
+### B3. H1 revisited: why not the most downloaded library?
+
+The owner asked why the recommendation was not `http-status-codes`, the most downloaded. Registry data, re-read on 2026-10-27:
+- `http-status-codes` 2.3.0: about 9.95M downloads/week; last published 2023-09-20.
+- `http-status` 2.1.0: about 1.27M downloads/week.
+- Both figures are from the npm downloads API, week 2026-06-25 to 2026-07-01.
+
+**The first recommendation leaned on two weak reasons.**
+- "ESM-native": true, but the spike showed `http-status-codes` imports fine in this ESM + NodeNext project.
+- "Last published 2023": also true, but the constants mirror the IANA status-code registry. That registry rarely changes, so a quiet package is not a sign of neglect, as it would be for a parser or a framework. This is our reasoning, not a sourced fact.
+
+**What favours `http-status-codes`:**
+- About 8× more installs.
+- Its `StatusCodes.CONFLICT` / `getReasonPhrase()` API is the form most developers, and the models agents run on, have seen most. That means fewer invented APIs in generated code.
+
+**What favours `http-status`:**
+- Native ESM, with an `exports` map.
+- Reason phrases by number (`status[409]`).
+- `status.extra` for codes outside the IANA registry used by common servers (per its README).
+
+| Choice | Pick when |
+|---|---|
+| **`http-status-codes`** (revised recommendation) | Default: widest familiarity; works in this project as tested |
+| `http-status` | The project needs codes outside the IANA registry (`status.extra`), or a strict ESM-only toolchain rejects packages without an `exports` map |
+| Hand-written constants | A tiny service using a handful of codes that wants zero dependencies |
+| `node:http` `STATUS_CODES` | Only reason phrases are needed, never named constants |
+
+All four become one row of the stack's Options table (`stacks/typescript-node/idioms.md`). The row is added in v2.1.0, together with the tested lint configuration that keeps the library in the interface ring (B2), so that each option has a tested config, as the schema requires.
+
 ---
 
 ## Part C — A fuller, more realistic app
@@ -143,6 +189,24 @@ Every addition shows a rule that the current code cannot. Each is planned as a `
 | Persistence (later phase) | Same routes, a `SqliteDocumentStore` behind `DocumentStore` via `node:sqlite` | A second adapter for one port, with one shared contract test (procedure step 8). `node:sqlite` is "1.2 – Release candidate" in Node 24, so this waits until it is stable or uses a library |
 
 Out of scope: authentication and authorization (a whole topic: its own proposal), deployment.
+
+### C2. F2 revisited: in-memory documents, SQLite for another entity?
+
+The owner suggested keeping `documents` in memory as the example and adding a SQLite adapter for another entity, such as comments. Analysis:
+
+| Question | In-memory documents + SQLite comments | SQLite as a second adapter of `DocumentStore` (and later `CommentStore`) |
+|---|---|---|
+| Does it prove the port is a real abstraction? | No. Each port has one adapter, so nothing shows that the port is not shaped by its only adapter | Yes. One contract test suite runs against both adapters (procedure step 8), which is the classic hexagonal test |
+| Is the data consistent? | No. After a restart, comments survive and their documents vanish, leaving orphan comments; the "comment needs an existing document" check passes when written and is broken after restart | Yes, when both modules use the same configured store |
+| Is it realistic? | Mixed persistence for related data is a known production smell | `STORE=memory\|sqlite` in config; memory for unit tests and demos, SQLite for a run that keeps data |
+| What does it teach about MOD-6 (one owner per table)? | Something, because each module owns its storage | The same, as long as each module has its own tables |
+
+**Recommendation:**
+- Do not split persistence by entity.
+- Keep in-memory as the default adapter of every store: tests and the demo stay fast and dependency-free.
+- In a later phase, add `SqliteDocumentStore` behind the same `DocumentStore` port, selected by config, with the shared contract test. Then do the same for comments.
+
+**Driver:** `node:sqlite` is "1.2 – Release candidate" in Node 24; `better-sqlite3` is the mature alternative, but it is a native addon. Decide when the phase starts.
 
 ---
 
@@ -164,15 +228,19 @@ Each step is one PR in the reference repo plus one pin bump here, and is checked
 
 ## E. Decisions needed
 
-| # | Question | Recommended |
-|---|---|---|
-| L1 | Switch the reference to feature-first? | Yes, as v2.0.0, a pure move first |
-| L2 | How to keep the layer-first example? | B: maintained branch `layout/layer-first`, tags `v1.x` |
-| L3 | Threshold rule | Layer-first ≤ 3 features in one bounded context; feature-first beyond; recorded as a decision |
-| H1 | Status-code source | `http-status` 2.x, interface ring only, lint-enforced |
-| H2 | Error body | RFC 9457 Problem Details |
-| F1 | Feature scope | Part C table; auth out of scope |
-| F2 | Persistence | In-memory now; SQLite adapter later |
+Answers from the owner, 2026-10-27. "Lands in" is the permanent home of each decision once implemented (`proposals/README.md`).
+
+| # | Question | Recommended | Owner's answer | Lands in |
+|---|---|---|---|---|
+| A1, A2 | The problem, and the feature-first layout | As written | "Yes" | MOD-9 (done); reference v2.0.0 |
+| L1 | Switch the reference to feature-first? | Yes, as v2.0.0, a pure move first | "ok" | `stacks/typescript-node/reference.md` (pins both layouts) |
+| L2 | How to keep the layer-first example? | B: maintained branch `layout/layer-first`, tags `v1.x` | "ok for option B" | `copilot/patterns/maintained-variant.pattern.md` (done); `reference.md` |
+| L3 | Threshold rule | Layer-first ≤ 3 features in one bounded context; feature-first beyond; recorded as a decision | "ok" | MOD-9 (done) |
+| M1 | How a module declares its public surface (new, §A5) | B: designated use-case files, enforced by lint; no barrel | Open: owner asked for the comparison first | MOD-3 text; TSN lint snippet; `docs/architecture.md` §4 of the reference |
+| H1 | Status-code source | Revised: `http-status-codes` as default, three alternatives (§B3) | Open: owner asked why not the most downloaded | `idioms.md` Options row (v2.1.0) |
+| H2 | Error body | RFC 9457 Problem Details | "ok" | `idioms.md` TSN rule + `knowledge/web-apis/http-error-mapping.md` |
+| F1 | Feature scope | Part C table; auth out of scope | "ok" | Reference `specs/` tasks |
+| F2 | Persistence | Revised: in-memory default for every store; SQLite later as a second adapter of the same port (§C2) | Open: owner proposed SQLite for another entity; discuss | `reference.md` Choices row |
 
 ## References
 
@@ -198,3 +266,5 @@ Each step is one PR in the reference repo plus one pin bump here, and is checked
 
 - `proposals/agentic-sdlc-reference-repos-and-procedures.md` — the reference repo move and procedures (D11, D12).
 - `copilot/patterns/revise-without-erasing.pattern.md` — why the layer-first example is kept, not replaced.
+- `copilot/patterns/maintained-variant.pattern.md` — the technique chosen in L2.
+- `proposals/README.md` — where each decision lands once implemented.
