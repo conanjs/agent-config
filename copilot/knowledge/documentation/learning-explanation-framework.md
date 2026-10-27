@@ -3,16 +3,13 @@ schema: knowledge-doc/v1
 type: how-to
 topic: documentation
 status: draft
-revision: 1
 applies-to: ["Technical learning and explanation design"]
-last-verified: 2026-10-26
-last-updated: 2026-10-26
+last-verified: 2026-10-27
+last-updated: 2026-10-27
 tags: [documentation, learning, explanations]
 ---
 
 # Learning Explanation Framework — A Practical How-to Guide
-
-**Revision:** v1 · 2026-10-26
 
 ## Summary
 
@@ -40,7 +37,8 @@ This is a reusable authoring and learning method. It does not automatically over
 2. Select the useful checklist items and gather supporting evidence.
 3. Use one of the quoted prompts as a drafting artifact, adapting it to the task.
 4. Check the worked example for the relationship between definitions, diagrams, failure cases, and recall.
-5. Verify the explanation, then record what you can explain independently and what to revisit.
+5. Verify the explanation (see **Verify**).
+6. Record what you can explain independently and what to revisit, using the learning-notes template below.
 
 ### Explanation structure and scale
 
@@ -107,7 +105,7 @@ Core takeaway
 6. **Truthful about uncertainty:** Mark emerging terminology and context-dependent definitions.
 7. **Revisable:** Keep definitions, examples, open questions, and references easy to update.
 8. **Consistent:** Diagrams, prose, and code must agree about dependencies, counters, outcomes, and stopping rules.
-9. **Evidence-aware:** Mark official facts, teaching simplifications, proposed designs, and uncertainty separately. A tracking parameter in a URL is not evidence that the reference is fabricated.
+9. **Evidence-aware:** Mark official facts, teaching simplifications, proposed designs, and uncertainty separately. Judge a reference by opening it and checking that it says what you cite; surface features of its URL (such as tracking parameters) prove nothing either way.
 10. **Testable:** State whether code was executed, what was checked, and which behaviors are only simulated.
 
 ### Copy-and-use prompts
@@ -161,6 +159,8 @@ Keep diagrams, prose, and code consistent. End with a useful next learning step.
 
 ### Worked example: Graph Engineering
 
+This example shows the checklist applied to one topic, section by section. The canonical explanation of Graph Engineering, with the full bounded-execution diagrams and a runnable simulation, is [graph-engineering-study-guide.md](../ai-agents/graph-engineering-study-guide.md). When a fact about Graph Engineering changes, change it there first, then check this example.
+
 #### Definition and purpose
 
 In the **AI agent/workflow orchestration** context, *Graph Engineering* can describe the practice of designing and operating interconnected tasks, agents, tools, and decisions as a graph.
@@ -207,24 +207,7 @@ flowchart TD
 
 This simplified view assumes the contract, join, repair limit, and escalation rules shown below. It illustrates responsibilities and feedback; use the bounded view to define execution.
 
-**Bounded execution view**
-
-```mermaid
-flowchart TD
-    A[Agree requirements and contracts] --> F[Frontend with API mocks]
-    A --> B[Backend and database implementation]
-    F --> J[Join required outputs and integrate]
-    B --> J
-    J --> V[Run tests and acceptance checks]
-    V --> P{Checks pass?}
-    P -->|Yes| D[Deliver reviewed result]
-    P -->|No| C{Cause understood?}
-    C -->|Spec or design ambiguity| H[Pause for human clarification]
-    C -->|Implementation defect| R{Repair budget remains?}
-    R -->|No| H
-    R -->|Yes| X[Count repair and run owner repair]
-    X --> J
-```
+**Bounded execution view: contracts, join and repair budget.** The study guide's "Detailed execution" diagram adds what the overview leaves out: agree contracts first, run the frontend against API mocks, join only when every required output exists, classify a failure (implementation defect → owner repair within a shared budget; spec or design ambiguity → pause for a person). Full diagram: [graph-engineering-study-guide.md → Software development workflow](../ai-agents/graph-engineering-study-guide.md#software-development-workflow).
 
 The frontend uses agreed API mocks while backend/database implementation proceeds. The join waits for both required outputs. Repairs go to the responsible owner; specification or design ambiguity pauses the run for clarification. A later restart uses a reviewed plan and an explicit new budget.
 
@@ -244,20 +227,9 @@ flowchart TD
     F --> B
 ```
 
-This simplified view assumes the contract, join, repair limit, and escalation rules shown below. It illustrates responsibilities and feedback; use the bounded view to define execution.
+This minimal view shows only the feedback idea. It has no repair limit, so as drawn it could loop forever; the bounded view below adds the counter and the escalation.
 
-**Bounded execution view**
-
-```mermaid
-flowchart TD
-    A[Implement change] --> T[Run tests]
-    T --> P{Tests pass?}
-    P -->|Yes| D[Return tested result]
-    P -->|No| B{Repairs used below limit?}
-    B -->|No| H[Stop and escalate]
-    B -->|Yes| R[Increment count and repair affected code]
-    R --> T
-```
+**Bounded execution view: repair counter.** Same loop, with a counter: when tests fail, check whether repairs used are below the limit; if yes, increment the count and repair, then test again; if no, stop and escalate. Full diagram: [graph-engineering-study-guide.md → Branching and feedback](../ai-agents/graph-engineering-study-guide.md#branching-and-feedback) ("Explicit repair-count view").
 
 **Pass:** Follow the success edge and deliver.  
 **Fail:** Follow the correction edge and run tests again.  
@@ -334,23 +306,24 @@ Walkthrough: **Analyst** supplies the contract; **workers** write the owned outp
 
 ✅ [LangGraph](https://docs.langchain.com/oss/python/langgraph/overview) is a stateful orchestration runtime; this worked example uses it as an implementation reference rather than claiming one standardized definition of Graph Engineering.
 
-## Verify
+**Worked-example takeaway:** Put coordination rules into an explicit execution structure when the work is too complex or important to leave entirely to a single agent's implicit choices.
 
-Use the checklist to check definition, purpose, example, mechanism, boundaries, evidence, and takeaway. Compare each diagram’s branches with the prose and any code. For a runnable example, execute it and record the runtime, observed output, and limits; for a paper exercise, label it as manual.
+### Learning-notes template (step 6)
 
-**Worked check:** With zero repairs used and a two-repair budget, outcomes `fail, pass` finish after two attempts with one repair; `fail, fail, fail` escalate after three attempts with two repairs. If the prose says two total attempts instead, correct the inconsistency. Ask the learner to explain why resetting the counter prevents reliable termination.
+Copy this into your own notes; it is a personal record, not part of the explanation.
 
-### Personal learning notes
+**Example note:** "I can explain why two repairs permit three attempts. I still need to learn how checkpoint recovery avoids repeating external actions."
 
-**Example note:** “I can explain why two repairs permit three attempts. I still need to learn how checkpoint recovery avoids repeating external actions.”
+| Field | Your entry |
+| --- | --- |
+| What I can explain without looking (what I understand now) | … |
+| My own example, and where the analogy fails | … |
+| What still confuses me (one uncertainty to investigate) | … |
+| Topics to revisit | … |
+| Review log: date · gap found · next action | … |
+| Last reviewed | YYYY-MM-DD |
 
-**What I can explain without looking:** …
-
-**My own example and where the analogy fails:** …
-
-**One uncertainty to investigate:** …
-
-**Recall questions and answers:**
+**Recall questions and answers (sample):**
 
 1. Does a graph require multiple agents? **No; ordinary functions and decisions are enough.**
 2. Can a parallel marker replace dependency checks? **No; prerequisites, shared resources, and output ownership still matter.**
@@ -358,27 +331,20 @@ Use the checklist to check definition, purpose, example, mechanism, boundaries, 
 
 **Suggested review:** Try explaining the concept without notes tomorrow, then again in a week. Revisit earlier if a real implementation exposes a gap; re-check product details before using commands from an older document.
 
-**Personal review log:** Date: … · Gap found: … · Next action: …
+## Verify
 
-### Additional review fields
+Use the checklist to check definition, purpose, example, mechanism, boundaries, evidence, and takeaway. Compare each diagram’s branches with the prose and any code. For a runnable example, execute it and record the runtime, observed output, and limits; for a paper exercise, label it as manual.
 
-**What I understand now:**
+**Worked check:** With zero repairs used and a two-repair budget, outcomes `fail, pass` finish after two attempts with one repair; `fail, fail, fail` escalate after three attempts with two repairs. If the prose says two total attempts instead, correct the inconsistency. Ask the learner to explain why resetting the counter prevents reliable termination.
 
-- 
-
-**What still confuses me:**
-
-- 
-
-**My own example:**
-
-- 
-
-**Topics to revisit:**
-
-- 
-
-**Last reviewed:** YYYY-MM-DD
+| Check | How | Expected result |
+| --- | --- | --- |
+| Checklist coverage | Tick each chosen checklist item against the draft | Every chosen item has a section; unchosen items are omitted on purpose |
+| Diagram ↔ prose ↔ code | Compare branches, counters and stopping rules in each | All three agree (e.g. two repairs = at most three attempts) |
+| Runnable example | Save the study guide's simulation as `graph_demo.py`, run `python3 graph_demo.py` | `done 1 implement -> test -> done`, then `done 2 …`, then `escalate 3 …` |
+| Manual exercise | Work the route table above on paper | Answers match the table's Answer column |
+| References | Open each link used as evidence | Each one says what the doc cites it for |
+| Recall | Learner explains the concept without notes | They can state the definition, one example and one boundary |
 
 ## Troubleshooting
 
@@ -397,7 +363,7 @@ Use the checklist to check definition, purpose, example, mechanism, boundaries, 
 - Treat diagrams, manual exercises, and runnable code as different evidence artifacts.
 - Use recall to find gaps, then verify the relevant technical behavior against primary sources.
 
-> **Final takeaway:** Put coordination rules into an explicit execution structure when the work is too complex or important to leave entirely to a single agent's implicit choices.
+> **Final takeaway:** Scale the explanation to the reader's goal, pair every abstraction with a concrete artifact, keep diagrams, prose and code consistent, and verify before you assert.
 
 ## Used by
 
@@ -405,7 +371,7 @@ Use the checklist to check definition, purpose, example, mechanism, boundaries, 
 
 ## Verification status
 
-- Verified: 1 claims · Unverified: 0 claims · Last verified: 2026-10-26
+- Verified: 1 claim (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
 
 The marked implementation claim was checked against the primary source. The explanation sequence, checklist, prompts, analogies, and review schedule are practical recommendations, not empirically established guarantees of learning. The Graph Engineering scenarios are illustrative; the manual route cases were checked arithmetically. Links used as technical evidence were opened; supplementary reading is not claimed as primary evidence.
 
@@ -416,7 +382,7 @@ The marked implementation claim was checked against the primary source. The expl
 - [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview) — LangChain, living. Backs: stateful workflow and agent runtime example.
 - [Graph database concepts](https://neo4j.com/docs/getting-started/graph-database/) — Neo4j, living. Backs: the data-centered use of graphs.
 - [Mermaid flowchart syntax](https://mermaid.js.org/syntax/flowchart.html) — Mermaid, living. Backs: diagram authoring syntax.
-- [Graph Engineering tutorial](https://www.datacamp.com/tutorial/graph-engineering-guide) — DataCamp, living. Optional terminology/tutorial reading.
+- [What is Graph Engineering? A Hands-On Guide to Multi-Agent Orchestration With LangGraph](https://www.datacamp.com/tutorial/graph-engineering-guide) — Josep Ferrer, DataCamp, 2026. Optional terminology/tutorial reading.
 - `../ai-agents/graph-engineering-study-guide.md` — dedicated concept guide and executable routing simulation.
 - `../ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md` — dedicated comparison of workflow, specification, toolkit, and lifecycle concerns.
 - `../../patterns/explaining-mechanisms.pattern.md` — actor ownership, artifacts, diagrams, and step-by-step mechanism explanations.

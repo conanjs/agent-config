@@ -3,26 +3,22 @@ schema: knowledge-doc/v1
 type: concept
 topic: ai-agents
 status: draft
-revision: 1
 applies-to: ["Concept comparison; product documentation checked 2026-10-26"]
-last-verified: 2026-10-26
-last-updated: 2026-10-26
+last-verified: 2026-10-27
+last-updated: 2026-10-27
 tags: [ai-agents, orchestration, study-guide]
 ---
 
 # Graph Engineering, SDD, AWS AI-DLC, and GitHub Spec Kit — A Concept Comparison
 
-**Revision:** v1 · 2026-10-26
-
 ## Summary
 
 **TL;DR:** SDD describes required behavior and its verification; graph orchestration describes how work executes and recovers. Spec Kit supports repeatable processes, while AWS AI-DLC describes a broader human–AI delivery lifecycle. These concerns can be combined without requiring one fixed stack.
-
 **Use this when:** distinguishing these four concerns or deciding whether graph orchestration adds value to a specification-driven workflow.
 
 ## Problem
 
-> **Core answer:** Graph Engineering is primarily an **architecture and orchestration approach**, not inherently a Spec-Driven Development (SDD) framework. It can be integrated with SDD, GitHub Spec Kit, or AWS AI-DLC because they address different concerns.
+> **The question this doc answers:** is Graph Engineering a Spec-Driven Development (SDD) framework? **Core answer:** No. Graph Engineering is primarily an **architecture and orchestration approach**, not inherently a Spec-Driven Development (SDD) framework. It can be integrated with SDD, GitHub Spec Kit, or AWS AI-DLC because they address different concerns.
 
 Confusing a specification discipline, a toolkit, a lifecycle methodology, and an execution architecture leads to unnecessary tooling or missing coordination rules.
 
@@ -33,9 +29,7 @@ Confusing a specification discipline, a toolkit, a lifecycle methodology, and an
 - **AWS AI-Driven Development Lifecycle (AI-DLC):** A broader methodology for organizing human–AI collaboration across software delivery stages, including inception, construction, and operations. It is **not merely another name for SDD**.
 - **Graph Engineering:** Designing explicit nodes, dependencies, routing decisions, transitions, retries, and execution paths among tasks, tools, people, and/or AI agents. **Question:** *What runs, in what order, under which conditions, and what happens when something fails?*
 
-**Essential difference:**
-
-> **SDD governs requirements and their fulfillment. Graph Engineering governs execution and coordination.**
+> **Essential difference:** **SDD governs requirements and their fulfillment. Graph Engineering governs execution and coordination.**
 
 These two concerns may overlap, but neither inherently contains the other. “Graph Engineering” is not a universally standardized label; in some contexts it also refers to knowledge-graph engineering. Here, it means graph-based workflow/agent orchestration.
 
@@ -159,9 +153,7 @@ The graph defines:
 
 A graph does **not** require multiple AI agents. A simple function-and-validation workflow is already a legitimate graph-based design.
 
-✅ Spec Kit’s [quickstart](https://github.github.com/spec-kit/quickstart.html) and [command reference](https://github.github.com/spec-kit/reference/agentic-sdd.html) document the feature workflow, convergence behavior, and integration-dependent invocation.
-
-✅ AWS describes the phases and human oversight in its [AI-DLC methodology introduction](https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/).
+✅ Spec Kit’s [quickstart](https://github.github.com/spec-kit/quickstart.html) and [command reference](https://github.github.com/spec-kit/reference/agentic-sdd.html) document the feature workflow, convergence behavior, and integration-dependent invocation. ✅ AWS describes the phases and human oversight in its [AI-DLC methodology introduction](https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/).
 
 ## Worked example
 
@@ -300,7 +292,7 @@ The separation of responsibility is precise:
 
 ## Edge cases
 
-**No, not by definition.** They are complementary, orthogonal concerns.
+**Is Graph Engineering an SDD framework? No, not by definition.** They are complementary, orthogonal concerns. The three cases below show each one alone and both together; the table after them lists failure cases.
 
 #### Case A: SDD without Graph Engineering
 
@@ -329,8 +321,16 @@ A graph can orchestrate the **SDD stages themselves** as well as the implementat
 | A repair repeats without progress | Stop at the budget and escalate | A feedback edge needs a termination rule |
 | People disagree about quantity-zero behavior | Clarify the specification before further repairs | The ambiguity is in the target behavior |
 
-
 ## Trade-offs
+
+| Option | Gains | Costs |
+|---|---|---|
+| SDD only (specs, plan, tasks, one agent or person) | Clear target and acceptance evidence; little machinery | Coordination, parallel work and retries stay implicit |
+| Graph orchestration only | Explicit routing, retries, joins and audit trail | No agreed definition of "done"; tests may pass against the wrong target |
+| SDD + graph orchestration | Specs set the target; the graph runs and recovers the work | Most architecture, state and maintenance to own |
+| AI-DLC as the outer lifecycle | Team roles, review points and phases across delivery | A methodology to adopt, not a tool; still needs concrete specs and execution rules |
+
+**Where to start, by scenario:**
 
 | Scenario | Recommended starting point |
 |---|---|
@@ -375,7 +375,7 @@ Graph Engineering→ HOW do executable steps coordinate and transition?
 
 ## Verification status
 
-- Verified: 2 claims · Unverified: 0 claims · Last verified: 2026-10-26
+- Verified: 2 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
 
 The two marked claim groups were checked against current primary documentation. Architecture comparisons are explanatory analysis; integration diagrams, task adapters, shopping-cart rules, failure policies, and scenario recommendations are illustrative designs. No adapter or vendor integration was executed. Product behavior can change; use the installed release’s documentation before invoking commands.
 
@@ -389,7 +389,7 @@ The two marked claim groups were checked against current primary documentation. 
 - [Adopt AI in software development practices](https://aws.amazon.com/isv/resources/adopt-ai-in-software-development-practices-with-aws/) — AWS, living. Supplementary lifecycle reading.
 - [Collaborative AI-DLC methodology notes](https://github.com/aws-samples/sample-collaborative-ai-dlc/blob/main/docs/getting-started/methodology.md) — AWS Samples, living. Supplementary sample implementation; not the normative definition of every AI-DLC process.
 - [Spec Kit repository](https://github.com/github/spec-kit) — GitHub, living. Project implementation and release history.
-- [Graph Engineering tutorial](https://www.datacamp.com/tutorial/graph-engineering-guide) — DataCamp, living. Supplementary terminology reading.
+- [What is Graph Engineering? A Hands-On Guide to Multi-Agent Orchestration With LangGraph](https://www.datacamp.com/tutorial/graph-engineering-guide) — Josep Ferrer, DataCamp, 2026. Supplementary terminology reading.
 - `graph-engineering-study-guide.md` — definitions, routing examples, and a runnable simulation.
 - `../documentation/learning-explanation-framework.md` — explanation checklist and reusable prompts.
 

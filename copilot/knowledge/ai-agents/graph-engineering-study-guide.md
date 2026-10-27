@@ -3,26 +3,24 @@ schema: knowledge-doc/v1
 type: concept
 topic: ai-agents
 status: draft
-revision: 1
 applies-to: ["AI workflow and task orchestration; Python 3 simulation"]
-last-verified: 2026-10-26
-last-updated: 2026-10-26
+last-verified: 2026-10-27
+last-updated: 2026-10-27
 tags: [ai-agents, orchestration, study-guide]
 ---
 
 # Graph Engineering — An Introductory Study Guide
 
-**Revision:** v1 · 2026-10-26
-
 ## Summary
 
 **TL;DR:** Graph Engineering means deliberately designing how work, decisions, information, and control move through a system represented as a graph. In the AI-agent usage discussed here, it refers to orchestrating agents, tools, and tasks as explicit nodes and transitions.
-
 **Use this when:** learning agent/workflow graphs, choosing whether explicit orchestration helps, or explaining how graph coordination differs from knowledge graphs.
 
 ## Problem
 
-In the context of AI systems, **Graph Engineering** is the practice of designing and controlling how tasks, tools, people, and optionally AI agents work together using a graph-based architecture.
+When one agent improvises a whole multi-step job, the coordination lives only inside its reasoning. Then nobody can see or test it: two workers may edit the same files, a failing test may be retried forever, work may be declared done before integration runs, and afterwards nobody can say which step decided what. Graph Engineering makes that coordination explicit.
+
+**Definition.** In the context of AI systems, **Graph Engineering** is the practice of designing and controlling how tasks, tools, people, and optionally AI agents work together using a graph-based architecture.
 
 A capable single agent can be enough. When coordination needs explicit control, you design:
 
@@ -100,7 +98,6 @@ flowchart LR
 This diagram shows the successful route. Here, **Review → Publish** means review has approved publication. If review requests changes, return to summarization within a revision budget; if the budget is exhausted or approval is withheld, pause without publishing. The simple diagram omits those branches; it does not authorize automatic publication.
 
 **Knowledge graph:**
-
 ```mermaid
 flowchart LR
     P[Person] -->|works for| C[Company]
@@ -109,7 +106,6 @@ flowchart LR
 ```
 
 **Memory aid:**
-
 - **Knowledge Graph = What the system knows.**
 - **Agent Graph = How the system works.**
 
@@ -124,7 +120,6 @@ A **directed graph** gives each edge a direction. A **DAG** (directed acyclic gr
 ### Software development workflow
 
 **Seven roles in this illustrative workflow:**
-
 - **Orchestrator** — its job: select the next task, via routing rules.
 - **Requirements analyst** — its job: define behavior and contracts, via the agreed specification.
 - **Frontend worker** — its job: build the user interface, via frontend files and API mocks.
@@ -216,14 +211,12 @@ flowchart TD
 #### Walk through both paths
 
 **Path A — tests pass:**
-
 1. Coding agent implements the change.
 2. Test runner executes checks.
 3. Tests pass.
 4. Workflow follows the **Yes** edge and delivers the result.
 
 **Path B — tests fail:**
-
 1. Coding agent implements the change.
 2. Test runner returns errors.
 3. Workflow follows the **No** edge.
@@ -234,13 +227,7 @@ flowchart TD
 
 ## Worked example
 
-### Learning roadmap
-
-1. **Graph fundamentals:** nodes, edges, directed graphs, cycles, DAGs.
-2. **State and control flow:** shared state, transitions, conditions, retries.
-3. **Orchestration:** sequential work, parallel work, fan-out/fan-in, routing.
-4. **Practical implementation:** build a simple graph workflow with LangGraph or a comparable framework.
-5. **Production reliability:** checkpointing, bounded retries, observability, evaluation, human-in-the-loop review.
+One end-to-end run with real values: the starter workflow below, then a runnable simulation of it, traced step by step. The learning roadmap that follows says where to go next.
 
 #### Suggested starter project
 
@@ -304,11 +291,28 @@ done 2 implement -> test -> implement -> test -> done
 escalate 3 implement -> test -> implement -> test -> implement -> test -> escalate
 ```
 
+**Trace of `run(pass_on=2, max_repairs=2)`** (the second output line):
+
+| Step | Node run | State after it | Returned edge |
+|---|---|---|---|
+| 1 | `implement` | attempts 1, repairs 0 | `test` |
+| 2 | `test` | attempt 1 < `pass_on` 2: fail; repairs 0 < 2, so repairs becomes 1 | `implement` |
+| 3 | `implement` | attempts 2, repairs 1 | `test` |
+| 4 | `test` | attempt 2 ≥ 2: pass | `done` |
+
 `nodes` holds executable work; returned names select edges; `state` carries progress; the driver executes the chosen node. `max_repairs=2` means **two repairs after the initial attempt**, not two total attempts.
 
 **Experiment:** Predict the result of `run(pass_on=2, max_repairs=0)` before running it. Answer: escalation after one failed attempt. With `pass_on=1`, even a zero-repair budget succeeds immediately. Production code also needs exception handling, per-call timeouts, persistence, and side-effect controls.
 
 Next, implement equivalent nodes and conditional edges with LangGraph, then add checkpointing. Only introduce parallel workers after defining contracts, branch ownership, and join behavior.
+
+#### Next: learning roadmap
+
+1. **Graph fundamentals:** nodes, edges, directed graphs, cycles, DAGs.
+2. **State and control flow:** shared state, transitions, conditions, retries.
+3. **Orchestration:** sequential work, parallel work, fan-out/fan-in, routing.
+4. **Practical implementation:** build a simple graph workflow with LangGraph or a comparable framework.
+5. **Production reliability:** checkpointing, bounded retries, observability, evaluation, human-in-the-loop review.
 
 ## Edge cases
 
@@ -332,7 +336,6 @@ These are engineering design checks, not guarantees supplied by drawing a graph.
 ## Trade-offs
 
 **It helps when:**
-
 - A task has distinct steps with clear dependencies.
 - Specialized tools or agents must cooperate.
 - You need conditional routing or human approval.
@@ -340,7 +343,6 @@ These are engineering design checks, not guarantees supplied by drawing a graph.
 - Some work can be parallelized and later merged.
 
 **It may be unnecessary when:**
-
 - A single prompt or function handles the task reliably.
 - Additional orchestration would add more complexity than value.
 - The workflow is so fluid that an explicit graph would be overly restrictive.
@@ -375,7 +377,7 @@ This makes complex AI systems more **inspectable, testable, and controllable**. 
 
 ## Verification status
 
-- Verified: 3 claims · Unverified: 0 claims · Last verified: 2026-10-26
+- Verified: 3 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
 
 The three marked claim groups were checked against primary sources. The named terminology is context-specific. Diagrams, design controls, invoice scenario, and Python simulation are illustrative engineering material, not vendor guarantees. The Python block was executed and its documented output and zero-repair cases checked; Mermaid blocks were checked as source, not visually rendered. Framework-specific deployment, checkpoint recovery, concurrency semantics, and performance require a dedicated investigation. The diagrams use Mermaid code blocks. Markdown tools with Mermaid support render them as flowcharts; otherwise the text remains readable.
 
@@ -386,7 +388,7 @@ The three marked claim groups were checked against primary sources. The named te
 - [Building effective agents](https://www.anthropic.com/research/building-effective-agents) — Anthropic, 2024. Backs: workflow/agent architectural distinction.
 - [Graph database concepts](https://neo4j.com/docs/getting-started/graph-database/) — Neo4j, living. Backs: graph databases model entities and relationships.
 - [GraphRAG](https://microsoft.github.io/graphrag/) — Microsoft, living. Backs: graph-based indexing and retrieval, distinct from agent execution.
-- [Graph Engineering: A Hands-On Guide](https://www.datacamp.com/tutorial/graph-engineering-guide) — DataCamp, living. Supplementary terminology/tutorial reading; not the primary evidence for runtime behavior.
+- [What is Graph Engineering? A Hands-On Guide to Multi-Agent Orchestration With LangGraph](https://www.datacamp.com/tutorial/graph-engineering-guide) — Josep Ferrer, DataCamp, 2026. Supplementary terminology/tutorial reading; not the primary evidence for runtime behavior.
 - `graph-engineering-vs-sdd-ai-dlc-spec-kit.md` — companion concept comparison and integration example.
 - `../documentation/learning-explanation-framework.md` — reusable method for studying and explaining technical concepts.
 
