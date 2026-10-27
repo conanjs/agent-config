@@ -394,10 +394,21 @@ if (!exists(architecturePath)) {
     layers = parseYamlListBlock(layerYaml, 'layers') ?? [];
     if (!layers.length) fail('ARCH', 'docs/architecture.md §4: layers list is empty or unparsable');
     const names = new Set(layers.map((l) => l.name).filter(Boolean));
+    // Feature-first (MOD-9): an optional modules list; layer paths are then relative to each module.
+    const modules = parseYamlListBlock(layerYaml, 'modules') ?? [];
+    const mnames = new Set(modules.map((m) => m.name).filter(Boolean));
+    const at = (...parts) => path.join(projectRoot, ...parts.flatMap((p) => String(p).replace(/\/$/, '').split('/')).filter(Boolean));
+    for (const m of modules) {
+      const label = `docs/architecture.md §4 module ${m.name || '<unnamed>'}`;
+      for (const k of ['name', 'path', 'may-depend-on', 'public']) if (!(k in m)) fail('ARCH', `${label}: missing ${k}`);
+      if (m.path && !exists(at(m.path))) fail('ARCH', `${label}: path ${m.path} does not exist`);
+      for (const dep of Array.isArray(m['may-depend-on']) ? m['may-depend-on'] : []) if (!mnames.has(dep)) fail('ARCH', `${label}: may-depend-on target ${dep} is not a module`);
+    }
     for (const l of layers) {
       const label = `docs/architecture.md §4 layer ${l.name || '<unnamed>'}`;
       for (const k of ['name', 'path', 'may-depend-on']) if (!(k in l)) fail('ARCH', `${label}: missing ${k}`);
-      if (l.path && !exists(path.join(projectRoot, ...String(l.path).replace(/\/$/, '').split('/')))) fail('ARCH', `${label}: path ${l.path} does not exist`);
+      if (l.path && !modules.length && !exists(at(l.path))) fail('ARCH', `${label}: path ${l.path} does not exist`);
+      for (const m of modules) if (l.path && m.path && !exists(at(m.path, l.path))) fail('ARCH', `${label}: path ${m.path}${l.path} does not exist (every module has every layer; an empty one keeps a .gitkeep)`);
       const deps = Array.isArray(l['may-depend-on']) ? l['may-depend-on'] : [];
       for (const dep of deps) if (!names.has(dep)) fail('ARCH', `${label}: may-depend-on target ${dep} is not a layer`);
       if (l.paradigm && !paradigms.has(l.paradigm)) fail('ARCH', `${label}: paradigm ${l.paradigm} is not defined`);

@@ -41,6 +41,8 @@ components:
 ```yaml
 layers:
   - { name: <id>, path: <dir>/, may-depend-on: [<layer names>], paradigm: <id>@<major>, alias: <prefix> }   # paradigm and alias optional
+modules:                                                                                                    # feature-first only (MOD-9)
+  - { name: <id>, path: <dir>/, may-depend-on: [<module names>], public: [<globs relative to the module>], alias: <prefix> }
 ```
 
 ## 5. Data
@@ -73,7 +75,7 @@ layers:
   - `framework` must be listed in that stack's front-matter.
   - `paradigm` is `<id>@<major>`, and that paradigm's `supports` must include the stack.
   - `decisions` is required when `stack` or `paradigm` is set.
-- **§4:** `may-depend-on` names only layers from the same list. The stack turns it into FF-1 boundary rules. An optional `alias: <prefix>` on a layer or module is its import alias (`foundations/design/import-paths.md`, IMP-7); the stack turns it into runtime and type-check alias config.
+- **§4:** `may-depend-on` names only layers from the same list. A feature-first repo (MOD-9, the default) also lists `modules`: each module's `may-depend-on` names other modules, `public` lists the files other modules may import (MOD-3, IMP-5), and layer `path`s are then relative to each module, which must contain every layer folder (an empty one keeps a `.gitkeep`). An opted-in layer-first repo has no `modules` list and its layer paths are relative to the repo root. The stack turns it into FF-1 boundary rules. An optional `alias: <prefix>` on a layer or module is its import alias (`foundations/design/import-paths.md`, IMP-7); the stack turns it into runtime and type-check alias config.
 - **§7 (optional):** when a component's paradigm is tiered (`paradigms/class-modeled.md`), a bullet `Tier B files:` lists the globs where free functions are allowed, one reason each. It is the allow-list the stack's lint config mirrors (PDM-class-modeled-R7).
 - **§6:** every external service the code calls has a row. Every row of kind other than `none` has a `Doc` that complies with `integration/v1`.
 - **§8** links to records and never restates them.

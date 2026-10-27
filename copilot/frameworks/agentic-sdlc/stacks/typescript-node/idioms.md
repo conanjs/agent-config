@@ -118,7 +118,7 @@ function handle(req: Request, log = rootLogger) {
 | TSN-14 | TODO and FIXME carry an owner or task id | Every marker looks like `TODO(PROJ-123): ...` (CMT-10) | A bare `// TODO fix later` | script | — |
 | TSN-15 | Aliases use the repo's chosen mechanism (Options below): tsconfig `paths` with an `@/` prefix plus a build-time rewrite (default), or `package.json` `imports` with a `#` prefix. Never `paths` without the rewrite | The same import specifier resolves under the type checker, the dev runner, the test runner, the lint resolver and `node dist/…` (IMP-4, IMP-7) | `paths` is set, the type checker passes, and the built output fails to load with module-not-found | script | `knowledge/js-runtime/subpath-imports.md` |
 | TSN-16 | Relative imports name only same-folder files; everything else uses an alias, in `src` and `test` alike; no cycles | No relative specifier starts with `../` or contains a folder after `./`; the import graph is acyclic (IMP-1, IMP-2, IMP-6) | `../errors.js`, `./http/createApp.js` from a root file, `../support/fixtures.js` in a test | lint | — |
-| TSN-17 | Each layer imports other layers only through their alias entry point | Layer aliases come from `docs/architecture.md` §4; only the composition root imports adapters (IMP-2, IMP-3, PDM-class-modeled-R9) | A use case imports `@/infrastructure/pg-user-repo` | lint | — |
+| TSN-17 | Each layer imports other layers only through their alias entry point; in a feature-first repo (MOD-9) the layer rule holds inside every module, a module imports another only through its public files (MOD-3), and `shared/` imports no module | Layer aliases come from `docs/architecture.md` §4; only the composition root imports adapters (IMP-2, IMP-3, PDM-class-modeled-R9) | A use case imports `@/infrastructure/pg-user-repo` | lint | — |
 | TSN-18 | No barrel files (IMP-5): no file under `src/` re-exports (`export * from …`, `export { X } from …`). Import the file that declares the symbol; a module's public surface is the list of files in `docs/architecture.md` §4 (MOD-3), checked by lint zones. A published library's entry point, named in `package.json` `exports`, is the only exception | Lint reports nothing for the `noReExports` selectors | `src/documents/index.ts` containing `export * from "./application/ReviseDocument.js"` | lint | `knowledge/js-runtime/barrel-files.md` |
 
 ## Options
@@ -179,7 +179,7 @@ require-if: package.json imports
 | TSN-15 | Smoke script: build, then import one aliased module from `dist/` with plain `node`, and once from `src/` under the dev runner. `tsc --noEmit` alone cannot catch this failure; config per option in "Import alias and lint configuration" below |
 | IMP-1, IMP-2 | TSN-16 configuration: relative paths only within the folder, aliases everywhere else |
 | TSN-16 | ESLint `no-restricted-imports` with the `noRelativeOutsideFolder` pattern from the snippet below, on `src/**` and `test/**`, repeated in every later block that sets `no-restricted-imports` (see the flat-config note below); `import-x/no-cycle`. Exceptions (root tool config, pre-build scripts) only by file name, mirroring `docs/architecture.md` §4 |
-| TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `@/application/*`, `@/infrastructure/*`, `@/interface/*`); adapters allowed only in the composition root block |
+| TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `@/application/*`, `@/infrastructure/*`, `@/interface/*`); adapters allowed only in the composition root block. Feature-first (MOD-9): `import-x/no-restricted-paths` with layer zones per module and module zones, snippet "Module-boundary lint configuration" below |
 | TSN-18 | ESLint `no-restricted-syntax` selectors `ExportAllDeclaration` and `ExportNamedDeclaration[source]` (the `noReExports` list in the snippet below), added to **every** block that sets `no-restricted-syntax`, including a block for the Tier B files, because a later block's options replace earlier ones |
 | CS-2 (unit size) | ESLint `complexity` and `max-lines-per-function`, or `llm (fallback)` if not configured |
 | FF-1 (layer deps) | ESLint `no-restricted-imports`/boundaries rules generated from `docs/architecture.md` §4 |
@@ -297,6 +297,33 @@ Node requires every `imports` key to start with `#`, "to ensure they are disambi
 | A | tsx without `--conditions=source`, no `dist/` | `ERR_MODULE_NOT_FOUND` |
 | A | `node --conditions=source` (built-in type stripping) | Fails whenever relative specifiers say `.js`: Node requires the real `.ts` extension and ignores tsconfig. Use tsx unless the repo writes `.ts` specifiers |
 | A | import-x resolver without `conditionNames` | `#…` resolves to `dist/`, so `import-x/no-restricted-paths` zones on `src/` never match: FF-1 **fails open** |
+| Both | A glob zone without a trailing `/**` (`target: "./src/*/domain"`) | import-x matches a glob against the full file path, so a bare folder glob matches no file: the zone **fails open**. A plain path (`"./src/domain"`) matches everything under it; a glob needs `"./src/*/domain/**"`. Found 2026-10-27 in the reference (eslint-plugin-import-x 4.17) when a seeded `domain → application` import passed |
+
+### Module-boundary lint configuration (feature-first, MOD-3, MOD-9)
+
+Verified 2026-10-27 in the stack reference v2.0.0 (eslint-plugin-import-x 4.17): seeded imports of another module's `domain/` and `application/ports/`, of the composition root from a module, of a module from `shared/`, and `domain → application` and `application → infrastructure` inside a module were each reported; an import of another module's public use case passed.
+
+```js
+// eslint.config.mjs (excerpt): layers inside every module, then module-to-module rules.
+import { readdirSync } from "node:fs";
+const modules = readdirSync("src", { withFileTypes: true })
+  .filter((d) => d.isDirectory() && d.name !== "shared").map((d) => d.name);
+const layerZones = [   // globs end in /** (see the pitfall table above)
+  { target: "./src/*/domain/**", from: ["./src/*/application/**", "./src/*/infrastructure/**", "./src/*/interface/**"] },
+  { target: "./src/*/application/**", from: ["./src/*/infrastructure/**", "./src/*/interface/**"] },
+  { target: "./src/*/infrastructure/**", from: ["./src/*/interface/**"] },
+  { target: "./src/*/interface/**", from: ["./src/*/infrastructure/**"] },
+  { target: ["./src/!(CompositionRoot|main).ts", "./src/*/**"], from: ["./src/CompositionRoot.ts", "./src/main.ts"] },
+];
+const moduleZones = [
+  ...modules.flatMap((target) => modules.filter((from) => from !== target).flatMap((from) => [
+    { target: `./src/${target}`, from: `./src/${from}`, except: ["./application"], message: `${target} may import only ${from}/application (MOD-3)` },
+    { target: `./src/${target}`, from: `./src/${from}/application/ports`, message: `Ports of ${from} are not public (MOD-3)` },
+  ])),
+  ...modules.map((from) => ({ target: "./src/shared", from: `./src/${from}`, message: "shared/ imports no feature module (MOD-4)" })),
+];
+// rules: { "import-x/no-restricted-paths": ["error", { zones: [...layerZones, ...moduleZones] }] }
+```
 
 ### Documentation lint configuration
 
