@@ -24,6 +24,7 @@ All paths are relative to the reference repo's root, at the pinned commit.
 |---|---|---|---|
 | Layers | `domain`, `application`, `infrastructure`, `interface` under `src/`; composition root outside them | CA rules, FF-1 | `docs/architecture.md` §4 |
 | Layer direction | Resolved-path zones, so aliases cannot bypass them | FF-1, TSN-17 | `eslint.config.mjs` (`layerZones`) |
+| Re-exports | None: every import names the declaring file; no `index.ts` barrels | IMP-5, TSN-18 | `eslint.config.mjs` (`noReExports`) |
 | Import paths | Relative only within one folder; `@/` aliases everywhere else, in `src` and `test` | IMP-1, IMP-2, TSN-16 | `eslint.config.mjs` (`noRelativeOutsideFolder`) |
 | Alias mechanism | tsconfig `paths` + `tsc-alias` in the build (stack Option default) | TSN-15 | `tsconfig.json`, `package.json` `build`, `specs/001-revise-document/research.md` DR-001 |
 | Ports | Declared next to the use cases that consume them | TSN-2 | `src/application/ports/DocumentStore.ts` |
@@ -33,7 +34,7 @@ All paths are relative to the reference repo's root, at the pinned commit.
 | Data across boundaries | Plain `<UseCase>Input` in, plain `<UseCase>Output` out; the entity never leaves the use case | CA-4 | `src/application/ReviseDocument.ts` (`ReviseDocumentOutput`) |
 | Expected failures | `Result` union; thrown `Error` only for the unexpected | TSN-4, TSN-5 | `src/domain/Result.ts` |
 | Error to HTTP | One mapper; a `Record` over the error union makes a missing status a compile error | TSN-11, EXP-5 | `src/interface/errors/HttpErrorMapper.ts` |
-| Doc comments | TSDoc on every export and public member; contract on the port, `{@inheritDoc}` on the adapter; every parameter and return documented; summaries answer the contract questions | CMT-5, CMT-6, CMT-12, CMT-13, TSN-13 | `src/application/ports/DocumentStore.ts`, `src/infrastructure/InMemoryDocumentStore.ts`, `src/application/ReviseDocument.ts` (`run`) |
+| Doc comments | TSDoc on every export and public member; contract on the port; each adapter method has its own summary starting `{@link Port.member}`, so the editor shows it plus the port's notes; every parameter and return documented; summaries answer the contract questions | CMT-5, CMT-6, CMT-12, CMT-13, TSN-13 | `src/application/ports/DocumentStore.ts`, `src/infrastructure/InMemoryDocumentStore.ts`, `src/application/ReviseDocument.ts` (`run`) |
 | Naming | File name equals the class; suffixes only from the role glossary (`Store`, `Handler`, `Mapper`) | NAM-8, NAM-6 | `docs/glossary.md` |
 | Config | Parsed once, frozen, nothing else reads the environment | TSN-9 | `src/infrastructure/config.ts` |
 | Logging | One pino logger made in `main.ts` and injected; `no-console` | TSN-10 | `src/main.ts`, `src/CompositionRoot.ts` |
@@ -49,7 +50,7 @@ All paths are relative to the reference repo's root, at the pinned commit.
 | `src/domain/Document.ts` | entity | Private constructor, static `create`, `#fields`, invariant in `revise` |
 | `src/application/ports/DocumentStore.ts` | port | The contract, written once, with `@remarks` and `@returns` |
 | `src/application/ReviseDocument.ts` | use case | Constructor injection; a why-comment on the one non-obvious line |
-| `src/infrastructure/InMemoryDocumentStore.ts` | adapter | `{@inheritDoc}`; implementation note as a body comment |
+| `src/infrastructure/InMemoryDocumentStore.ts` | adapter | Own summary linking the port member (CMT-12); implementation note as a body comment |
 | `src/infrastructure/config.ts` | Tier B | zod config, `@throws` |
 | `src/interface/routes/ReviseDocumentBody.ts` | schema | Strict input validation at the boundary |
 | `src/interface/routes/ReviseDocumentHandler.ts` | handler | Parse, call one use case, map the result |
@@ -58,7 +59,7 @@ All paths are relative to the reference repo's root, at the pinned commit.
 | `src/main.ts` | Tier B entry | Config, logger, listen |
 | `src/**/*.test.ts`, `test/integration/*.int.test.ts` | tests | Unit, concurrency and HTTP tests |
 | `eslint.config.mjs` | lint | Every lint rule of the stack, with the flat-config pitfalls handled |
-| `eslint/specific-summary.mjs` | lint plugin | The CMT-13 floor: a summary must add words beyond the member and class names; copy it into each repo |
+| `eslint/local-docs.mjs` | lint plugin | `specific-summary` (CMT-13 floor) and `implementation-summary` (CMT-12); copy it into each repo |
 | `docs/`, `.specify/`, `specs/` | records | Architecture, glossary, constitution, decision records, task plan, as any project has |
 | `.github/workflows/check.yml` | CI | `pnpm run check`, then this framework's `validate-project.mjs` at a pinned framework commit |
 
@@ -79,7 +80,7 @@ In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, un
 ## Using it in a repo
 
 1. Copy the configs (`package.json` scripts, `tsconfig*.json`, `vitest*.config.ts`, `eslint.config.mjs`, `.prettierrc.json`) and adjust names.
-2. Keep the four layer folders and the composition root; put the repo's own features in them.
+2. Start feature-first (MOD-9, the default): put the four layer folders inside one folder per feature area, `src/<feature>/{domain,application,infrastructure,interface}/`, with the composition root at `src/`. The pinned code is the layer-first variant until v2.0.0, so read its `src/<layer>/` as `src/<feature>/<layer>/`. Keep the four layers at the top only when the owner opts in to layer-first with a decision record.
 3. Record the repo's own decisions (alias Option, paradigm, Tier B files) in its `specs/<feature>/research.md` and `docs/architecture.md`; do not copy this reference's records.
 4. Anything done differently goes in the constitution's "style deviations" table.
 

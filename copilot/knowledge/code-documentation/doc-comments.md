@@ -4,8 +4,8 @@ type: reference
 topic: code-documentation
 status: verified
 applies-to: ["C#", "TypeScript (TSDoc)", "JavaScript (JSDoc)", "Python", "Go", "Rust"]
-last-verified: 2026-10-25
-last-updated: 2026-10-25
+last-verified: 2026-10-27
+last-updated: 2026-10-27
 tags: [doc-comments, tsdoc, jsdoc, xml-documentation, csharp, linting]
 ---
 
@@ -57,6 +57,7 @@ Doc comments on public declarations (types, functions, methods, properties, inte
 - In the C# compiler, `<param>` names and `cref` targets are checked against the code. ✅[^1] TSDoc tools do not check names against the signature.
 - `{@inheritDoc}` copies the summary, `@remarks`, `@param`, `@typeParam` and `@returns`; the same comment may not add its own summary or `@remarks`, but may add other tags such as `@throws` or `@example`. ✅[^11] `tsdoc/syntax` reports a violation as `tsdoc-inheritdoc-incompatible-tag` (tested 2026-10-25).
 - The TypeScript language service (editor hover) does not resolve the inline `{@inheritDoc X}` form and shows it as literal text. It does follow the JSDoc block tag `@inheritDoc`, and inherits automatically when a member has no comment. Tested 2026-10-25 on TypeScript 6.0.3.
+- The same language service also inherits an interface member's `@param`, `@returns` and `@remarks` when the implementing method has its **own summary but no block tag**; one block tag (`@see`, `@throws`) stops that. So an implementation can carry its own summary, link the contract with `{@link Port.member}`, and still show the contract's notes on hover. Tested 2026-10-27 on TypeScript 6.0.3 through `getQuickInfoAtPosition`, the call editors make. The framework uses this form (CMT-12, TSN-13).
 
 ## Takeaways
 - Require a doc comment on every public declaration, enforced by lint, in every stack. [rule-candidate]
@@ -66,7 +67,7 @@ Doc comments on public declarations (types, functions, methods, properties, inte
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 28 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
+- Verified: 28 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
 
 ## References
 - [Recommended XML documentation tags](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags) — Microsoft, living. Backs: C# column, recommendations, inheritdoc. [^1]

@@ -1,6 +1,6 @@
 # Proposal: A Feature-First, Fuller Stack Reference — Without Losing the Layer-First Example
 
-**Status:** Partly approved 2026-10-27 by the owner (V): A1, A2 and L1–L3, H2, F1 approved as recommended; H1, F2 and M1 (new, §A5) open for discussion (§E). Done so far: reference v1.1.0 merged and pinned (`0f89909`); branch `layout/layer-first` created from it; MOD-9 added to `foundations/design/module-boundaries.md`, closing G2; the technique written up as `copilot/patterns/maintained-variant.pattern.md`. Not started: v2.0.0 (waits for M1). It builds on `proposals/agentic-sdlc-reference-repos-and-procedures.md` (the reference now lives in `conanjs/agentic-sdlc-reference-typescript-node`).
+**Status:** Approved 2026-10-27 by the owner (V), except H1, which is still open (§E). Answers that differ from the draft: L3 makes feature-first the default and layer-first an opt-in; M1 bans barrel files everywhere in application code (IMP-5, TSN-18); F2 takes the revised plan (§C2). Done so far: reference v1.1.0 merged and pinned (`0f89909`); branch `layout/layer-first` created and CI-checked on push (reference PRs #2, #3); MOD-9 (feature-first default) closing G2; IMP-5 and MOD-3 rewritten for M1; CMT-12 implementation summaries; `copilot/patterns/maintained-variant.pattern.md`. Not started: v2.0.0.
 
 **How to read:**
 - Part A: how the code is organized as it grows, and how the current four-folder example stays available.
@@ -38,8 +38,7 @@ src/
 │   │   └── ports/                 DocumentStore.ts
 │   ├── infrastructure/            InMemoryDocumentStore.ts
 │   ├── interface/http/            DocumentRoutes.ts, handlers, request schemas
-│   └── index.ts                   ← the module's public API (mechanism open: see §A5, decision M1)
-├── comments/                      ← second module; reaches documents only through documents/index.ts
+├── comments/                      ← second module; imports only documents' public use-case files (§A5)
 │   └── …same four folders…
 ├── shared/                        ← no feature code; every module may use it, it uses no module
 │   ├── domain/                    Result.ts
@@ -59,7 +58,7 @@ src/
 | `shared/` imports no module | `shared/interface/http/HttpErrorMapper.ts` imports `@/documents/...` |
 | The composition root may import every module's adapters | — (allowed) |
 
-**When to use which layout** (a new packaging rule in `foundations/design/module-boundaries.md`, closing G2): layer-first for one to three features in one bounded context; feature-first from the fourth feature or the second bounded context, recorded as a decision record when switching.
+**When to use which layout** (`foundations/design/module-boundaries.md` MOD-9, closing G2): feature-first is the default for every new repo, even with one feature. Layer-first is an explicit opt-in for one bounded context with at most three feature areas, recorded as a decision, and switches to feature-first at the fourth area or the second bounded context. *(Owner's change, 2026-10-27: "recommend any application should always start with feature-first … The three cited rules for layer-first are still applied if the user explicitly chooses to opt-in".)*
 
 ### A3. Keeping the layer-first example: options
 
@@ -183,7 +182,7 @@ Every addition shows a rule that the current code cannot. Each is planned as a `
 | Documents, full lifecycle | `POST /documents` → 201 + `Location`; `GET /documents/:id`; `GET /documents?cursor=&limit=` (cursor pagination); `PUT /documents/:id` (exists); `DELETE /documents/:id` → 204 | Several use cases per module; pagination contract; one handler per use case |
 | Version history | `GET /documents/:id/versions` | A read model from the same store; a second port method |
 | HTTP-native optimistic concurrency | `ETag` on reads; `If-Match` on `PUT`/`DELETE` → 412 when stale, 428 when missing | The HTTP form of the existing `expectedVersion` rule (RFC 9110 conditional requests; RFC 6585 for 428) |
-| Comments (second module) | `POST /documents/:id/comments`, `GET /documents/:id/comments` | Cross-module access only through `documents/index.ts`; the module-boundary lint |
+| Comments (second module) | `POST /documents/:id/comments`, `GET /documents/:id/comments` | Cross-module access only through `documents`' public use-case files (§A5); the module-boundary lint |
 | Operational | `GET /healthz`; request-id middleware; structured request logs | Cross-cutting code in `shared/`; logging rules (TSN-10) |
 | Errors | Problem Details everywhere | Part B in practice |
 | Persistence (later phase) | Same routes, a `SqliteDocumentStore` behind `DocumentStore` via `node:sqlite` | A second adapter for one port, with one shared contract test (procedure step 8). `node:sqlite` is "1.2 – Release candidate" in Node 24, so this waits until it is stable or uses a library |
@@ -235,12 +234,12 @@ Answers from the owner, 2026-10-27. "Lands in" is the permanent home of each dec
 | A1, A2 | The problem, and the feature-first layout | As written | "Yes" | MOD-9 (done); reference v2.0.0 |
 | L1 | Switch the reference to feature-first? | Yes, as v2.0.0, a pure move first | "ok" | `stacks/typescript-node/reference.md` (pins both layouts) |
 | L2 | How to keep the layer-first example? | B: maintained branch `layout/layer-first`, tags `v1.x` | "ok for option B" | `copilot/patterns/maintained-variant.pattern.md` (done); `reference.md` |
-| L3 | Threshold rule | Layer-first ≤ 3 features in one bounded context; feature-first beyond; recorded as a decision | "ok" | MOD-9 (done) |
-| M1 | How a module declares its public surface (new, §A5) | B: designated use-case files, enforced by lint; no barrel | Open: owner asked for the comparison first | MOD-3 text; TSN lint snippet; `docs/architecture.md` §4 of the reference |
+| L3 | Threshold rule | Layer-first ≤ 3 features in one bounded context; feature-first beyond; recorded as a decision | Changed: feature-first is the default for every repo; layer-first only by explicit opt-in, under the ≤ 3 rule | MOD-9 (done) |
+| M1 | How a module declares its public surface (§A5) | B: designated use-case files, enforced by lint; no barrel | "Use the recommendation", and record a rule against barrels with the evidence | IMP-5 and MOD-3 (done); TSN-18 + `noReExports` lint (done, reference PR pending); module zones in v2.0.0 |
 | H1 | Status-code source | Revised: `http-status-codes` as default, three alternatives (§B3) | Open: owner asked why not the most downloaded | `idioms.md` Options row (v2.1.0) |
 | H2 | Error body | RFC 9457 Problem Details | "ok" | `idioms.md` TSN rule + `knowledge/web-apis/http-error-mapping.md` |
 | F1 | Feature scope | Part C table; auth out of scope | "ok" | Reference `specs/` tasks |
-| F2 | Persistence | Revised: in-memory default for every store; SQLite later as a second adapter of the same port (§C2) | Open: owner proposed SQLite for another entity; discuss | `reference.md` Choices row |
+| F2 | Persistence | Revised: in-memory default for every store; SQLite later as a second adapter of the same port (§C2) | "ok, agree with that recommendation" | `reference.md` Choices row (when the SQLite phase lands) |
 
 ## References
 

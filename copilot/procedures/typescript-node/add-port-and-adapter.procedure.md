@@ -47,7 +47,7 @@ A use case needs something from outside the core: storage, the clock, an externa
    - TSDoc on the interface and on every member: summary, `@param`, `@returns`, and `@remarks` for guarantees every adapter must keep (atomicity, ordering). This is the only place the contract is written (CMT-5, CMT-12, TSN-13).
 
 4. **Write the adapter** in `src/infrastructure/<Adapter>.ts`, `implements <Port>`.
-   - Each member's doc comment is `{@inheritDoc <Port>.<member>}`, plus only `@throws`, `@example` or `@deprecated` for what this adapter adds. No summary or `@remarks` beside it (TSN-13).
+   - Each member's doc comment is the adapter's own summary, starting `{@link <Port>.<member>}` and saying what this adapter adds: where the data lives, durability, how far atomicity holds, cost, extra failures. Put an extra failure in the sentence, with no block tags, so the editor still shows the port's `@param`/`@returns`. Do not use `{@inheritDoc}`: the editor shows it as raw text (CMT-12, TSN-13; lint `local-docs/implementation-summary`).
    - Implementation notes (why a lock, why no `await` between two lines) go in a comment inside the method body (CMT-1).
    - Third-party libraries for this technology are imported here and nowhere else (CA rules; FF-1).
    - Secrets the adapter holds are `readonly #field` (class-modeled State row).

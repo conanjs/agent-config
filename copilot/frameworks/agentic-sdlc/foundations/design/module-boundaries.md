@@ -15,13 +15,13 @@ How the architecture role defines modules and layers inside one repo, checks dep
 |---|---|---|---|---|---|
 | MOD-1 | Modules by domain, layers inside. Top-level structure follows business capability (package by feature), not technical role (`controllers/`, `services/` at the root). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-2 | Dependency direction is declared and acyclic. Every module-to-module dependency appears in the documented DAG; anything else is a violation. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
-| MOD-3 | Depend only on public surfaces. A module imports another's public entry point, never its internals. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
+| MOD-3 | Depend only on public surfaces. A module's public surface is its use cases and their input and output types, plus any domain events it publishes. It is listed in `docs/architecture.md` §4, or declared by the language's visibility. Other modules import those files directly, never internals, and never through a re-export file (IMP-5). | Every cross-module import targets a file on the listed surface | `comments` imports `@/documents/domain/Document.js`, or `@/documents/index.js` | llm | — |
 | MOD-4 | Shared code is earned. A `shared`/`common` module holds only stable, domain-neutral utilities; business rules never go there. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-5 | Cross-module communication is explicit: a direct call to a public use case, or a domain event. No reaching into another module's persistence. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-6 | One owner per table/collection. Only the owning module reads/writes its storage directly. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-7 | The composition root wires modules; modules don't instantiate each other's adapters (`idiom.di`). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-8 | Simplifications are recorded. Collapsing a layer or skipping a module boundary is stated in `docs/architecture.md` with the reason. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
-| MOD-9 | Choose the top-level packaging by size, and record the switch. **Layer-first** (`domain/`, `application/`, `infrastructure/`, `interface/` at the top of `src/`) while the repo serves one bounded context with at most three feature areas: the repo is then one module, layered inside, which satisfies MOD-1. **Feature-first** (one folder per feature area, the same layers inside each, plus `shared/` under MOD-4) from the fourth feature area or the second bounded context. The switch is a decision record in `docs/architecture.md`, done as a pure move with no behaviour change. | `docs/architecture.md` names the layout and the feature-area count, and the tree matches it | Five feature areas whose files are spread across four top-level layer folders; or a one-feature service split into `documents/` and `shared/` with nothing else | llm | — |
+| MOD-9 | **Feature-first is the default packaging** for every new repo: one folder per feature area at the top of `src/`, the same layers inside each, plus `shared/` (MOD-4) once something is actually shared. Even a repo with one feature starts as `src/<feature>/{domain,application,infrastructure,interface}/`, because most applications grow and moving later costs more than one folder level now. **Layer-first** (`domain/`, `application/`, `infrastructure/`, `interface/` at the top of `src/`) is allowed only when the owner opts in explicitly, the repo serves one bounded context, and it has at most three feature areas. The opt-in is a decision record in `docs/architecture.md`. When an opted-in repo reaches its fourth feature area or second bounded context, it switches to feature-first as a recorded pure move with no behaviour change. | `docs/architecture.md` names the layout; a layer-first repo has an opt-in record and at most three feature areas; the tree matches the record | A new repo starts layer-first with no opt-in record; an opted-in layer-first repo with five feature areas spread over four layer folders | llm | — |
 
 ## Interpreting
 
@@ -64,18 +64,23 @@ Merge when two modules always change together, call each other in both direction
 
 Only when an independent deployment, scaling, ownership, or failure-isolation need exists **and** the module already has a clean public surface and owned data. Module first, service later — escalate to system-architecture.
 
-**Packaging: layer-first or feature-first (MOD-9)**
+**Packaging: feature-first by default, layer-first by opt-in (MOD-9)**
 
 A *feature area* is a group of use cases around one aggregate or business capability, with its own vocabulary: for example `documents` (create, get, list, revise, delete, history) or `comments`. A use case is not a feature area; ten use cases on documents are still one.
 
-| Repo | Layout | Top of `src/` | Why |
+| Repo | Layout | Top of `src/` | When |
 |---|---|---|---|
-| One bounded context, 1–3 feature areas | Layer-first | `domain/ application/ infrastructure/ interface/` + composition root | Every layer is small; the layers themselves teach the rule. The repo is one module (MOD-1 holds at repo level) |
-| 4+ feature areas, or a second bounded context | Feature-first | `documents/ comments/ … shared/` + composition root; each module has the four layers | A change to one feature touches one folder; module boundaries (MOD-3, MOD-5) can be enforced per folder |
+| Any new repo | **Feature-first (default)** | `documents/ comments/ … shared/` + composition root; each module has the four layers | Always, unless the owner opts in to layer-first. A one-feature repo is `src/documents/{domain,application,infrastructure,interface}/` plus the composition root, and no `shared/` until two modules need the same thing (MOD-4) |
+| One bounded context, 1–3 feature areas, owner opted in | Layer-first (opt-in) | `domain/ application/ infrastructure/ interface/` + composition root | The owner chose it and recorded why, for example a short-lived tool or a teaching example. The repo is one module, so MOD-1 holds at repo level |
+| Opted-in repo reaching its 4th feature area or 2nd bounded context | Switch to feature-first | As the default row | Recorded pure move |
 
-Analogy: a small shop keeps all tools on four shelves sorted by kind; a workshop with ten benches gives each bench its own shelves plus one shared shelf.
+**Why feature-first by default.** Most applications grow, and the top level should show what the system does, not which framework layer a file sits in (Martin, Fowler, Brown; see References). Starting feature-first costs one folder level in a one-feature repo. Switching later costs a move of every file, a change to every import, and new lint zones, done while features are being added. Layer-first is still a valid, simpler shape for a repo that will stay small, so it remains as a deliberate choice, not an accident of starting small.
 
-**Switching:** write the decision record, then move files without changing behaviour (all tests pass unchanged), then add the module-boundary checks (MOD-3, FF-1). The stack reference shows both layouts: `stacks/<stack>/reference.md`.
+Analogy: a small shop could keep all tools on four shelves sorted by kind. A shop that expects to grow gives the first workbench its own shelves from day one, so adding a second bench never means re-sorting every shelf.
+
+**Opting in to layer-first:** the decision record states the owner, the reason, the expected maximum of feature areas, and the trigger for switching. Concrete, where `D-007` is the repo's seventh decision record: "D-007 Layer-first: owner V, 2026-10-27; internal tool with one feature area (documents); switch to feature-first at the 4th area".
+
+**Switching:** write the decision record, then move files without changing behaviour (all tests pass unchanged), then add the module-boundary checks (MOD-3, FF-1). The stack reference shows both layouts: `stacks/<stack>/reference.md` (feature-first on `main`, layer-first on a maintained branch).
 
 **Application note:** stack profiles define concrete commands and idioms; this foundation defines stack-agnostic intent.
 
@@ -84,7 +89,8 @@ Analogy: a small shop keeps all tools on four shelves sorted by kind; a workshop
 | Rule A | Rule B | Default resolution |
 |---|---|---|
 | Simplicity | Explicit boundaries | Add boundaries only where change rate, ownership or risk justifies them. |
-| MOD-1 modules by domain | A one-feature repo | MOD-9: below the threshold the whole repo is one module, so layer folders at the top satisfy MOD-1. Technical-role folders that cut across features (`controllers/`, `services/`) still do not. |
+| MOD-1 modules by domain | An opted-in layer-first repo | MOD-9: an opted-in layer-first repo is one module, so layer folders at the top satisfy MOD-1. Technical-role folders that cut across features (`controllers/`, `services/`) still do not. |
+| MOD-9 feature-first by default | YAGNI for a one-feature repo | The default costs one folder level; a later switch costs a repo-wide move. A repo that will truly stay small opts in to layer-first with a record. |
 
 ## References
 
@@ -108,3 +114,4 @@ Analogy: a small shop keeps all tools on four shelves sorted by kind; a workshop
 - `../design/contract-design.md` — when boundaries become service contracts.
 - `../design/import-paths.md` — how module references are written and checked (IMP-n).
 - `knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md` §8, §15 G2 — the packaging options MOD-9 chooses between.
+- `copilot/patterns/maintained-variant.pattern.md` — how the stack reference keeps both layouts current.

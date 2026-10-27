@@ -12,7 +12,7 @@ related-patterns: [revise-without-erasing, layered-guards]
 
 ## The pattern
 
-1. **First write the rule that says when each shape applies.** Without it, two shapes are just two opinions. Example: MOD-9 says layer-first for one bounded context with at most three feature areas, feature-first beyond.
+1. **First write the rule that says when each shape applies.** Without it, two shapes are just two opinions. Example: MOD-9 makes feature-first the default and layer-first an explicit opt-in for one bounded context with at most three feature areas.
 2. **Keep the old shape as a maintained branch, not a frozen tag.** A frozen copy is like a check that nobody runs: it stays correct only until the rules change, and nothing tells anyone when it stops being correct.
 3. **Put every variant under the same automatic checks.** CI triggers name the variant branch, and a rule change lands as one pull request per variant. If a variant cannot be checked, it is not maintained; say so and freeze it on purpose.
 4. **Give each variant its own version series and pin.** For example, `v1.x` tags come from the variant branch and `v2.x` from `main`. Each pointer names the variant, its tag and its full commit.
@@ -30,7 +30,7 @@ The first gap appeared within the hour. The new `layout/layer-first` branch was 
 
 The CI trigger of `conanjs/agentic-sdlc-reference-typescript-node`, `.github/workflows/check.yml`, in each version:
 
-| v1.1.0 (variant branch just created) | [PR #2](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/pull/2) into `main` / [PR #3](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/pull/3) into `layout/layer-first` (CI passing; merge pending owner approval) |
+| v1.1.0 (variant branch just created) | [PR #2](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/pull/2) into `main` / [PR #3](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/pull/3) into `layout/layer-first` (both merged 2026-10-27) |
 |---|---|
 | `on:`<br>`  push:`<br>`    branches: [main]`<br>`  pull_request:` | `on:`<br>`  push:`<br>`    branches: [main, "layout/**"]`<br>`  pull_request:` |
 | A merge into `layout/layer-first` runs no checks | Every push to either variant runs `pnpm run check`, `pnpm audit` and the framework validator |
@@ -48,7 +48,7 @@ The same fix went in as two pull requests, one per variant (rule 3). The pointer
 ## References
 
 **Local artifacts:**
-- `copilot/frameworks/agentic-sdlc/foundations/design/module-boundaries.md` (MOD-9): the rule that decides between the two layouts.
+- `copilot/frameworks/agentic-sdlc/foundations/design/module-boundaries.md` (MOD-9): the rule that decides between the two layouts (feature-first by default, layer-first by opt-in).
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`: the pointer that pins each variant.
 - `proposals/agentic-sdlc-reference-feature-first.md` §A3: the four options compared, and the choice.
 

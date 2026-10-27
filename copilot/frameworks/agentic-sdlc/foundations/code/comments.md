@@ -24,7 +24,7 @@ When code gets a comment, what that comment says, and which comments are mandato
 | CMT-9 | No commented-out code. History lives in version control. | The repo contains no disabled code blocks inside comments | A 20-line block commented out "just in case" | llm | — |
 | CMT-10 | TODO and FIXME carry an owner or task id: `TODO(<owner-or-task-id>): <what>`. | Every marker matches the format and its task is open | A bare `// TODO fix later` | script | — |
 | CMT-11 | Comments are changed with the code they describe. A comment that contradicts the code is a defect. | Changed lines and their nearby comments agree after the change | A step comment says "validate" after the validation moved elsewhere | llm | — |
-| CMT-12 | A contract is written once, on the declaration that owns it: the port, interface or base type. An implementation references it with the format's inherit-doc form. It adds only parts the reference does not copy, such as extra errors or an example; implementation detail (storage, performance) goes in a why-comment in the body (CMT-1). Formats that copy the summary and remarks reject a second one next to the reference (TS: TSN-13). | No implementation repeats a contract its port already states, and every port member has one | Two adapters each say "returns null when the document does not exist" while the port says nothing | lint + llm | — |
+| CMT-12 | A contract is written once, on the declaration that owns it: the port, interface or base type. An implementation's doc comment has a summary of its own: it links the contract it fulfils and states only what this implementation adds that a caller or operator must know, such as where the data lives, durability, how far atomicity holds, cost, or extra failures. It never repeats the contract's summary, parameter or return notes. The stack names the form that keeps those notes visible in the editor (TS: TSN-13). How the implementation works stays in a body comment (CMT-1). | No implementation repeats a contract its port already states, every port member has one, and every implementation's summary links its contract and adds one fact the port does not | Two adapters each say "returns null when the document does not exist" while the port says nothing; an adapter documented only as `{@inheritDoc DocumentStore.find}`, which the editor shows as raw text, so the adapter has no visible summary | lint + llm | — |
 | CMT-13 | A summary is specific: it states what the member does in terms the names around it do not already give. It answers the contract questions in `naming.md` ("The contract questions"): the effect, the condition it depends on, where the change lands, and what happens otherwise. Mechanism stays out (CMT-1, body comment). If no specific summary can be written, the unit's design is suspect, not the wording (NAM-13). | The summary passes the swap test: it would be false for a different member with the same name and signature, such as a last-write-wins `run()` | `/** Applies one revision. */` on `ReviseDocument.run`; `/** Handles the request. */`; `/** Processes the order. */` | llm (fallback); stacks add a lint floor where one exists (TypeScript: TSN-13) | — |
 
 ## Interpreting
@@ -37,7 +37,7 @@ CS-13 asks for comments that explain why. CS-15 asks for documented public surfa
 |---|---|---|
 | Exported type, function, method, accessor, interface member | Required (CMT-5) | Contract, errors, side effects, units |
 | Port or interface member | Required (CMT-5, CMT-12) | The contract, once, for every implementation |
-| Member implementing a port or interface | Inherit-doc reference (CMT-12) | Only parts the reference does not copy, such as extra errors; implementation detail goes in the body |
+| Member implementing a port or interface | Own summary linking the contract (CMT-12) | What this implementation adds: where data lives, durability, scope of atomicity, cost, extra failures. Parameter and return notes are inherited, not repeated; how it works goes in the body |
 | Orchestration body | Required (CMT-3) | One short line per step; why when order matters (CMT-4) |
 | Small internal helper | None, unless a why exists | A constraint or trade-off the name cannot show |
 | Every function, by default | Not required | — |
@@ -55,7 +55,7 @@ Every stack's format carries the same parts, in this order. The stack profile na
 | Return note | Always for a non-void function or method; not for properties and getters (CMT-6) | Empty, null or not-found cases |
 | Errors | Always, for each expected failure | Which error, and when |
 | Example | Optional | One call and its result |
-| Inherit-doc | On implementations (CMT-12) | A reference to the port member that owns the contract |
+| Contract link | On implementations (CMT-12) | A link to the port member that owns the contract, inside the implementation's own summary |
 
 **Step comments**
 
@@ -129,6 +129,19 @@ Two checks, cheapest first:
 1. **Lint floor (stacks that have it; TS: TSN-13).** Remove stop words and every word of the member, class and interface names from the summary. Fewer than three words left fails. This catches verb-plus-object summaries, nothing more.
 2. **Review (RUB-10).** The swap test above, plus: does the summary answer the questions a caller must know before calling? A long summary can still be vague, so lint never replaces this.
 
+**Implementation summaries (CMT-12)**
+
+An adapter used to point at its port with the format's inherit-doc form and nothing else. Measured on 2026-10-27 in the stack reference, hovering `InMemoryDocumentStore.find` in the editor (TypeScript 6.0.3 language service):
+
+| Adapter comment | Summary on hover | `@param` / `@returns` on hover |
+|---|---|---|
+| `/** {@inheritDoc DocumentStore.find} */` | `{@inheritDoc DocumentStore.find}` as raw text: no real summary | The port's, inherited |
+| none | The port's summary | The port's, inherited |
+| `/** {@link DocumentStore.find} against this process's memory: resolves at once and never rejects, so a caller here never sees a storage failure. */` | The adapter's own sentence, with a link to the contract | The port's, inherited |
+| The same sentence plus `@throws RangeError …` | The adapter's own sentence | **None**: one block tag on the adapter stops the inheritance |
+
+So the adapter keeps a summary of its own that a reader can act on, the contract's notes still appear once, and nothing is copied. An extra failure goes in the summary sentence ("…; rejects with `SqliteError` when the file stays locked past the busy timeout"), not in a block tag. A summary with nothing to add beyond the port ("Finds a document") fails CMT-13; say where it looks and what that means for the caller.
+
 **TODO format.** `TODO(RBAC-142): remove after the v2 token migration`. A task id or an owner handle is enough. A marker whose task is closed is stale and counts as a CMT-11 finding.
 
 **Generated and vendored code.** Rules do not apply to generated files; the generator's output is not reviewed for comments.
@@ -137,7 +150,7 @@ Two checks, cheapest first:
 
 | Part | Checked by | Where it is configured |
 |---|---|---|
-| Doc comment present on every public declaration (CMT-5), valid format, not a pure paraphrase (CMT-6), inherit-doc on implementations (CMT-12), summary longer than its surrounding names (CMT-13 floor) | Lint, required in every stack profile | Stack idioms (TS: TSN-13; Python, Go and Rust: their Enforcement tables) |
+| Doc comment present on every public declaration (CMT-5), valid format, not a pure paraphrase (CMT-6), own summary linking the contract on implementations (CMT-12), summary longer than its surrounding names (CMT-13 floor) | Lint, required in every stack profile | Stack idioms (TS: TSN-13; Python, Go and Rust: their Enforcement tables) |
 | TODO and FIXME format (CMT-10) | Script over source | Stack idioms (TS: TSN-14) |
 | Why-not-what, step comments, headers, deviations, commented-out code, stale comments, specific summaries beyond the lint floor (CMT-1 to CMT-4, CMT-7 to CMT-9, CMT-11, CMT-13) | `llm` review | `../review/review-rubrics.md` RUB-10; the engineering role's ENG-R11 |
 
@@ -162,6 +175,7 @@ Two checks, cheapest first:
 - Robert C. Martin, *Clean Code* (2008), ch. 4 "Comments" — good comments versus noise and commented-out code.
 - [Google TypeScript Style Guide, "Comments and documentation"](https://google.github.io/styleguide/tsguide.html) — documentation comments versus implementation comments; avoid comments that restate the parameter name and type.
 - [TSDoc](https://tsdoc.org/) — the doc-comment standard for TypeScript.
+- [TSDoc, `{@inheritDoc}`](https://tsdoc.org/pages/tags/inheritdoc/) — copies summary, `@remarks`, `@param`, `@typeParam`, `@returns`, and forbids a summary beside it: why an implementation cannot have both (CMT-12).
 - [Recommended XML documentation tags (C#)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags) — "document all publicly visible types and their public members"; `<inheritdoc>` keeps implementations in sync with interfaces (CMT-5, CMT-12).
 - [Compiler warning CS1591](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs1591) — missing XML comment for a publicly visible type or member: the enforcement bar CMT-5 copies.
 - [Go Doc Comments, "Funcs"](https://go.dev/doc/comment) — a function's doc comment "should explain what the function returns or, for functions called for side effects, what it does", and not the algorithm (CMT-13).
