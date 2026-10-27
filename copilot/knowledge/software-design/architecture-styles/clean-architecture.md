@@ -6,7 +6,7 @@ status: verified
 applies-to: ["any"]
 derived-from: [software-design/architecture-styles/clean-architecture-deep-dive.md]
 last-verified: 2026-10-27
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 tags: [clean-architecture, dependency-rule, interface-adapters, presenter, input-port, output-port, request-response, architecture]
 ---
 
@@ -124,12 +124,15 @@ Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mista
 | Collapsed rings for a small component | Less ceremony | The collapse must be recorded so reviewers do not see it as drift |
 | Request/response (return, no output port) | No presenter object per request; simple control flow | One result, once, to one caller; differs from Martin's figure, so record it |
 | Input port as the class's public method (no interface) | One less type | The controller cannot get a hand-written fake |
+| Layers inside feature modules (`src/modules/<feature>/<layer>/`, the framework default, MOD-9) | Code grouped by what it does from day one; a module boundary to enforce | Two extra folder levels for a one-feature app |
+| Layers at the top of `src/` (opt-in layer-first) | The rings are the first thing a reader sees; simplest for one small feature | Every feature is spread across four folders as features grow (deep dive §8, G2) |
 
 ## Takeaways
 - Check every import against the inward direction; inner code never names outer code. [rule-candidate]
 - Put presenters and controllers in the adapter ring and keep them free of business decisions. [rule-candidate]
 - A use case hands back a plain output model, never the entity, whether it returns it or calls an output port.
 - Choosing return over an output port is legitimate; record the choice and when to switch.
+- Group by feature first and put the rings inside each module; keep rings at the top only as a recorded choice for a small app.
 
 ## Used by
 - _Not cited by any rule yet._
@@ -147,7 +150,7 @@ Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mista
 - [GUI Architectures](https://martinfowler.com/eaaDev/uiArchs.html) — Martin Fowler, 2006. Backs: the Model-View-Presenter meaning of "presenter".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules this doc explains.
 - `copilot/frameworks/agentic-sdlc/foundations/code/naming.md` — the `Presenter` role suffix.
-- [`src/` of the stack reference at v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`. The same code in the default feature-first layout (MOD-9): [@ v2.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/171c3ba548fd5b00913f8c6a62acdd591f278c91) (`src/documents/`, `src/shared/`).
+- [`src/` of the stack reference at v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`. The same code in the default feature-first layout (MOD-9): [@ v3.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a7cf35cefff608099e7bc6bec84c889e9dd444c1) (`src/modules/documents/`, `src/modules/shared/`).
 - `copilot/knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md` — the deep dive this doc was distilled from (§6.3, §6.6, §6.7, §7).
 
 ## Related

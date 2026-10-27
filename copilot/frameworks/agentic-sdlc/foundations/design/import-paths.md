@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 rule-prefix: IMP
 subject: design
 ---

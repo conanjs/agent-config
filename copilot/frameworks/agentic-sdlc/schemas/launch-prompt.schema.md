@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 ---
 
 # Schema: Launch Prompt (`launch-prompt/v1`)

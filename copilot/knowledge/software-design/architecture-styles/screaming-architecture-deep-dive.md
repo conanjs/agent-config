@@ -3,7 +3,7 @@ schema: deep-dive/v1
 topic: software-design/architecture-styles
 status: verified
 applies-to: ["any"]
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 last-verified: 2026-10-25
 synthesized-into: []
 tags: [screaming-architecture, use-cases, packaging, package-by-feature, vertical-slice, folder-structure]
@@ -110,11 +110,11 @@ src/
 
 **Was (to v1.x):** `src/domain/ application/ infrastructure/ interface/` is **layer-first** (it shows ports and adapters). With one feature (`ReviseDocument`) this is fine (S1). The reference did not say when to switch.
 
-**Now (2026-10-27):** the framework rule MOD-9 (`foundations/design/module-boundaries.md`) makes feature-first the default: `src/<feature>/<layer>/` plus `src/shared/<layer>/`, with layer-first only as a recorded opt-in for one bounded context with at most three feature areas. The reference's `main` (v2.0.0) is `src/documents/` and `src/shared/`, so its top level names the feature. The layer-first form is kept on branch `layout/layer-first` (v1.x) and its `docs/architecture.md` records the choice (DR-002).
+**Now (2026-10-27):** the framework rule MOD-9 (`foundations/design/module-boundaries.md`) makes feature-first the default: `src/modules/<feature>/<layer>/` plus `src/modules/shared/<layer>/`, with layer-first only as a recorded opt-in for one bounded context with at most three feature areas. The reference's `main` is `src/modules/documents/` and `src/modules/shared/` (v2.0.0 had the modules directly under `src/`; v3.0.0 moved them into `src/modules/`, DR-004), so the first grouping is the feature, and the `modules/` folder leaves room for jobs, CLI entry points and migrations beside it. The layer-first form is kept on branch `layout/layer-first` (v1.x) and its `docs/architecture.md` records the choice (DR-002).
 
 ## 8. Check yourself
 1. Open a repo: what should its top-level folders tell you? *(What the system does.)*
-2. Where would `PublishDocument` go in the combined layout? *(`src/documents/application/`.)*
+2. Where would `PublishDocument` go in the combined layout? *(`src/documents/application/`; with the framework's `modules/` folder, MOD-9, `src/modules/documents/application/`.)*
 3. Why is "the web is a delivery mechanism" a screaming argument? *(The web belongs in an outer folder, not in the top-level shape.)*
 
 ## References
@@ -125,7 +125,7 @@ src/
 - [^5]: [Presentation Domain Data Layering](https://martinfowler.com/bliki/PresentationDomainDataLayering.html) — Martin Fowler, 2015. Backs: §5, S1.
 - [^6]: [Vertical Slice Architecture](https://www.jimmybogard.com/vertical-slice-architecture/) — Jimmy Bogard, 2018. Backs: §5, S4.
 - [^7]: [Modular monolith and "package by component"](https://simonbrown.je/modular-monolith) — Simon Brown, originally 2016 (the version published as *Clean Architecture* ch. 34). Backs: §5.
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — §7 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`). The same code in the default feature-first layout (MOD-9): [@ v2.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/171c3ba548fd5b00913f8c6a62acdd591f278c91) (`src/documents/`, `src/shared/`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — §7 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`). The same code in the default feature-first layout (MOD-9): [@ v3.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a7cf35cefff608099e7bc6bec84c889e9dd444c1) (`src/modules/documents/`, `src/modules/shared/`).
 
 ## Related
 - `software-design/architecture-styles/clean-architecture-deep-dive.md`

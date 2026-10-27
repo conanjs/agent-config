@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["ES modules and CommonJS", "TypeScript", "Python packages", "any JS tool that follows imports (bundlers, test runners, type checkers)"]
 last-verified: 2026-10-27
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 tags: [barrel-files, index-ts, re-export, module-graph, build-performance, module-boundaries]
 ---
 
@@ -24,16 +24,16 @@ Barrels look tidy: one short import line, and internals can move without touchin
 
 **Artifact:**
 ```ts
-// src/documents/index.ts: a barrel
+// src/modules/documents/index.ts: a barrel
 export * from "./application/ReviseDocument.js";
 export * from "./application/GetDocument.js";
 export * from "./infrastructure/InMemoryDocumentStore.js";
 
 // consumer: needs one class, loads all three files and everything they import
-import { GetDocument } from "@/documents/index.js";
+import { GetDocument } from "@/modules/documents/index.js";
 
 // without a barrel: loads only GetDocument.ts and what it imports
-import { GetDocument } from "@/documents/application/GetDocument.js";
+import { GetDocument } from "@/modules/documents/application/GetDocument.js";
 ```
 
 ## How it works
@@ -47,9 +47,9 @@ The stack reference (`conanjs/agentic-sdlc-reference-typescript-node`) has a `co
 
 | Step | With a barrel | Without (framework choice) |
 |---|---|---|
-| Import in `comments` | `@/documents/index.js` | `@/documents/application/GetDocument.js` |
-| What `documents` declares public | Whatever `index.ts` happens to re-export | The list in `docs/architecture.md` §4: `documents/application/*.ts`, excluding `ports/` (MOD-3) |
-| What stops `comments` from importing `documents/domain/Document.ts` | Nothing, unless a second rule exists | A lint zone on resolved paths |
+| Import in `comments` | `@/modules/documents/index.js` | `@/modules/documents/application/GetDocument.js` |
+| What `documents` declares public | Whatever `index.ts` happens to re-export | The list in `docs/architecture.md` §4: `application/*.ts`, excluding `ports/` (MOD-3) |
+| What stops `comments` from importing `modules/documents/domain/Document.ts` | Nothing, unless a second rule exists | A lint zone on resolved paths |
 | Loaded when the test runs | Every file `index.ts` lists | `GetDocument.ts` and its own imports |
 | Lint check on `src/` | `index.ts` is allowed | `noReExports`: `ExportAllDeclaration`, `ExportNamedDeclaration[source]` fail (TSN-18) |
 

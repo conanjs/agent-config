@@ -1,6 +1,6 @@
 ---
 schema: stack/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-28
 id: python
 detect-by: [pyproject.toml, uv.lock]
 frameworks: []

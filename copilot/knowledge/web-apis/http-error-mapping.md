@@ -5,7 +5,7 @@ topic: web-apis
 status: verified
 applies-to: ["HTTP APIs", "REST-like services", "TypeScript interface layers"]
 last-verified: 2026-10-27
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 tags: [http, errors, problem-details, api]
 ---
 
@@ -103,7 +103,7 @@ An unexpected database exception is logged internally and mapped to a generic 50
 - [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes) — IETF, 2022. Backs: How it works, Worked example, Edge cases. [^2]
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-11 and TSN-19.
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/frameworks/express.md` — EXP-8, problem bodies for every error response.
-- Stack reference `conanjs/agentic-sdlc-reference-typescript-node` v2.1.0, `src/shared/interface/ProblemDetails.ts` — a tested implementation.
+- Stack reference `conanjs/agentic-sdlc-reference-typescript-node` v3.0.0, `src/modules/shared/interface/ProblemDetails.ts` — a tested implementation.
 
 ## Related
 - `operations/structured-logging.md` — log internal error details safely.

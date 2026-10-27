@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-28
 ---
 
 # Schema: Stack Paradigm Overlay (`stack-paradigm/v1`)

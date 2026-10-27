@@ -1,6 +1,6 @@
 ---
 schema: stack/v2
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 id: typescript-node
 detect-by: [package.json, pnpm-lock.yaml, tsconfig.json]
 frameworks: [express]

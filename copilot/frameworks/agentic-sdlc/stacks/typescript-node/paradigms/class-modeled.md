@@ -1,6 +1,6 @@
 ---
 schema: stack-paradigm/v1
-last-updated: 2026-10-25
+last-updated: 2026-10-28
 stack: typescript-node
 paradigm: class-modeled@1
 ---

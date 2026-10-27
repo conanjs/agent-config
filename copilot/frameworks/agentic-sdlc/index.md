@@ -1,6 +1,6 @@
 ---
 schema: framework-index/v1
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 framework-version: 2.0.0
 status: active
 ---

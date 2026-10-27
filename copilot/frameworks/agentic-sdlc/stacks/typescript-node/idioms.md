@@ -1,6 +1,6 @@
 ---
 schema: stack-idioms/v1
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 stack: typescript-node
 rule-prefix: TSN
 ---

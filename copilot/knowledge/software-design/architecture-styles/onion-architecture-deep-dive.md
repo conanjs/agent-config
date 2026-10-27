@@ -3,7 +3,7 @@ schema: deep-dive/v1
 topic: software-design/architecture-styles
 status: verified
 applies-to: ["any"]
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 last-verified: 2026-10-25
 synthesized-into: []
 tags: [onion, palermo, domain-model, repository-interface, dependency-inversion, layering]
@@ -128,7 +128,7 @@ The core depends on interfaces, so the implementations must arrive from outside:
 - [^5]: [Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) — Microsoft, living. Backs: §1.
 - [^6]: [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: §8.
 - [^7]: [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012 (text and figure). Backs: §8.
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — mapped in §10 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`). The same code in the default feature-first layout (MOD-9): [@ v2.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/171c3ba548fd5b00913f8c6a62acdd591f278c91) (`src/documents/`, `src/shared/`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — mapped in §10 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`). The same code in the default feature-first layout (MOD-9): [@ v3.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a7cf35cefff608099e7bc6bec84c889e9dd444c1) (`src/modules/documents/`, `src/modules/shared/`).
 
 ## Related
 - `software-design/architecture-styles/clean-architecture-deep-dive.md`

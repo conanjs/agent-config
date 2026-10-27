@@ -3,10 +3,10 @@ schema: deep-dive/v1
 topic: software-design/architecture-styles
 status: verified
 applies-to: ["any"]
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 last-verified: 2026-10-27
 synthesized-into:
-  - { path: software-design/architecture-styles/clean-architecture.md, on: 2026-10-27 }
+  - { path: software-design/architecture-styles/clean-architecture.md, on: 2026-10-28 }
 tags: [clean-architecture, dependency-rule, ports, interactor, presenter, hexagonal, onion, bce, dci, screaming-architecture, package-by-component, component-principles, humble-object]
 ---
 
@@ -634,7 +634,7 @@ This is a real mistake from the stack reference, kept here as a teaching example
 
 **Fowler agrees.** Presentation/domain/data layering is fine inside a module. But for a larger system, "you should split your top level into domain oriented modules", each layered inside ✅[^9].
 
-**Rule of thumb (analysis, ours):** put layers *inside* features once the app has more than a handful of features: `src/documents/{domain,application,infrastructure,interface}/`.
+**Rule of thumb (analysis, ours):** put layers *inside* features once the app has more than a handful of features: `src/documents/{domain,application,infrastructure,interface}/`. The framework later went further (MOD-9, 2026-10-27/28): layers inside features from the first feature, with modules under `src/modules/` (`src/modules/documents/{domain,…}/`), and layer-first only as a recorded opt-in.
 
 Full treatment: `screaming-architecture-deep-dive.md`.
 
@@ -770,7 +770,7 @@ Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github
 | Frameworks at the edges | ✓ | `express` only in `interface/` and the root; `zod` only in `interface/` and `infrastructure/config.ts` |
 | Boundaries enforced by tools | ✓ | Lint zones play the role Brown gives the compiler ✅[^23] |
 | **G1: the entity crosses outward (response model missing)** | ✗ → ✓ fixed 2026-10-26 | **Was:** `ReviseDocument.run()` returned `Result<Document, …>`, and the handler destructured the entity. The post forbids passing entities across boundaries ✅[^1]. CA-4 only covered the *inward* direction ("persistence models and transport DTOs never leak inward"), so the rule text had the gap too. **Now:** `run()` returns `Result<ReviseDocumentOutput, …>`; the handler does `res.json(result.value)`; a unit test asserts the value is not a `Document`. CA-4 reads "…and entities never leak outward: a use case returns an output model, not an entity". Worked as a teaching example in §7.1 |
-| **G2: top level does not scream** | ~ → ✓ rule adopted 2026-10-27 | **Was:** `src/domain/ application/ …` is layer-first, which is fine for one feature. At scale it goes against Screaming Architecture ✅[^2], Fowler ✅[^9] and Brown ✅[^23]. The reference did not say when to switch to feature-first. **Now:** MOD-9 in `foundations/design/module-boundaries.md` makes feature-first (modules at the top, the same layers inside each) the default for every new repo, so the top level screams from day one. Layer-first is an explicit, recorded opt-in for one bounded context with at most three feature areas, switching to feature-first at the fourth area or the second bounded context. The reference keeps layer-first on branch `layout/layer-first` (v1.x); a feature-first `main` (v2.0.0) follows (`proposals/agentic-sdlc-reference-feature-first.md`) |
+| **G2: top level does not scream** | ~ → ✓ rule adopted 2026-10-27 | **Was:** `src/domain/ application/ …` is layer-first, which is fine for one feature. At scale it goes against Screaming Architecture ✅[^2], Fowler ✅[^9] and Brown ✅[^23]. The reference did not say when to switch to feature-first. **Now:** MOD-9 in `foundations/design/module-boundaries.md` makes feature-first (modules first, under `src/modules/`, the same layers inside each) the default for every new repo, so the code is grouped by what it does from day one. Layer-first is an explicit, recorded opt-in for one bounded context with at most three feature areas, switching to feature-first at the fourth area or the second bounded context. The reference keeps layer-first on branch `layout/layer-first` (v1.x); a feature-first `main` (v2.0.0) follows (`proposals/agentic-sdlc-reference-feature-first.md`) |
 | G3: no output port / presenter | ~ → ✓ recorded 2026-10-26 | The request/response variant (§6.6). `docs/architecture.md` §4 now lists the port roles, the no-output-port choice, and when to extract explicit ports |
 | G4: the handler names Express types | ✓ under CA-6 | Under the strict circle reading, framework types belong in the outer circle; the foundation deliberately allows them in adapters (CA-6) |
 
@@ -844,7 +844,7 @@ Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github
 - [^27]: [Implementing Clean Architecture – Of controllers and presenters](http://www.plainionist.net/Implementing-Clean-Architecture-Controller-Presenter/) — Plainionist, 2018 (updated 2023). Backs: §6.6 "Who backs form B" (the strict reading).
 - [^28]: [techexcellenceio community discussion #3](https://github.com/techexcellenceio/community/discussions/3) — community discussion that identifies the `openchat-unclebob` branch as Uncle Bob's version, using "use case handlers WITHOUT presenters". Backs: §6.6 "Who backs form B".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules (§14, §15).
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`). The same code in the default feature-first layout (MOD-9): [@ v2.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/171c3ba548fd5b00913f8c6a62acdd591f278c91) (`src/documents/`, `src/shared/`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`). The same code in the default feature-first layout (MOD-9): [@ v3.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a7cf35cefff608099e7bc6bec84c889e9dd444c1) (`src/modules/documents/`, `src/modules/shared/`).
 
 ## Related
 - `software-design/architecture-styles/hexagonal-architecture-deep-dive.md`
