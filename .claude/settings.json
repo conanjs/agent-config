@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/claude-doc-hook.sh",
+            "timeout": 120,
+            "statusMessage": "Validating docs"
+          }
+        ]
+      }
+    ]
+  }
+}

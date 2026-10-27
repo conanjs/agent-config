@@ -12,6 +12,7 @@ A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, Git
 | Write or check a global knowledge doc (schemas, deep dives, validator) | [`copilot/frameworks/knowledge/index.md`](copilot/frameworks/knowledge/index.md) |
 | Work inside a specific company's KB (e.g. OTS) | [`copilot/companies/ots/index.md`](copilot/companies/ots/index.md) |
 | Bootstrap Spec-Driven Development (Spec Kit) in a project | [`copilot/procedures/spec-driven-development.procedure.md`](copilot/procedures/spec-driven-development.procedure.md) |
+| Review a knowledge doc or procedure before committing (validators + the checks they can't do) | [`copilot/procedures/review-docs.procedure.md`](copilot/procedures/review-docs.procedure.md); enable the automatic checks with `git config core.hooksPath .githooks` (see `SETUP.md` step 9) |
 | Add standard GitHub repo governance to a repo | [`copilot/procedures/init-github-governance.procedure.md`](copilot/procedures/init-github-governance.procedure.md) |
 | Install/update the eight Windows apps after a restart | Select `/agent windows-software`, then send `run`; see [`copilot/agents/windows-software.agent.md`](copilot/agents/windows-software.agent.md). Installers stay in Downloads; nvm, Notepad++, Git, and WinRAR go under `D:\win11 software`. |
 | Look up a path/preference variable (`{{AGENT_HOME}}` etc.) | [`global-variables.md`](global-variables.md) |
@@ -79,6 +80,19 @@ agent-config/
 ```
 
 **A naming note, since this moved twice during design:** `knowledge/`, `companies/`, and `frameworks/company-kb/` aren't actually Copilot-specific — no tool reads them automatically, they only work because an instructions file tells an agent to go read a path there. They briefly lived at the repo's top level for that reason. They're under `copilot/` because the user wants to be able to say "global Copilot knowledge" in conversation and have that phrase map directly onto both the folder name and the concept (see `personal-defaults.instructions.md`'s term-recognition rules). Functionally this changes nothing — the deployed destination has always been `~/.copilot/knowledge` (and now `~/.copilot/frameworks/company-kb`) either way, since `mapping.yaml`'s `source` (repo-internal) and `target` (disk destination) are independent of each other.
+
+## Doc guards
+
+Four layers keep knowledge docs, procedures and the agentic-sdlc framework from drifting or degrading. The technique is written up as `copilot/patterns/layered-guards.pattern.md`.
+
+| Layer | Catches | Runs | Files |
+|---|---|---|---|
+| 1. Wiring | any validator failure | Claude Code after every edit here (`.claude/settings.json`); git pre-commit (enable once per clone: `git config core.hooksPath .githooks`); CI on every push/PR, **required to merge into `main`** (branch protection check `validate-docs`) | `scripts/check-docs.sh`, `scripts/claude-doc-hook.sh`, `.githooks/pre-commit`, `.github/workflows/validate-docs.yml` |
+| 2. Mechanical checks | shape: unknown front-matter keys, malformed Verification status, copied blocks, repeated paragraphs, chat leftovers (warn) | inside the validators | `copilot/frameworks/knowledge/tools/validate-knowledge.mjs`, `copilot/frameworks/agentic-sdlc/tools/validate.mjs` |
+| 3. Judgment review | meaning: doc stands alone, sections do their job, claims sourced, tool facts current, nothing erased | before committing, by procedure (required by `personal-defaults.instructions.md`; `review-docs` skill) | `copilot/procedures/review-docs.procedure.md`, `skills/review-docs/SKILL.md` |
+| 4. Freshness | staleness: procedures record the version of each outside tool they describe; warns when unverified, > 90 days old, or behind upstream | validator on every run; upstream check weekly in CI | `copilot/procedures/procedure.schema.md`, `copilot/procedures/tools/validate-procedures.mjs` |
+
+Run everything locally: `scripts/check-docs.sh` (finds Node.js ≥ 18 itself). Rules: `copilot/frameworks/knowledge/schemas/_system.md` (KB-1 … KB-8), `knowledge-doc.schema.md` (KD-1 … KD-9), `procedure.schema.md` (PR-1 … PR-6).
 
 ## Path & preference variables
 
