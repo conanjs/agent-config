@@ -502,7 +502,7 @@ for (const [id, rec] of allDecisionRecords) {
 // Front-matter of a stack procedure: stack, inputs (inline list) and allowed-paths (block list of globs).
 function procedureMeta(file) {
   const m = read(file).match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  const meta = { stack: undefined, inputs: [], allowed: [] };
+  const meta = { stack: undefined, inputs: [], optional: new Set(), allowed: [] };
   if (!m) return meta;
   let key = null;
   for (const line of m[1].split(/\r?\n/)) {
@@ -511,7 +511,12 @@ function procedureMeta(file) {
       key = kv[1];
       const v = kv[2].trim();
       if (key === 'stack') meta.stack = v;
-      if (key === 'inputs') meta.inputs = v.replace(/^\[|\]$/g, '').split(',').map((x) => x.trim()).filter(Boolean);
+      if (key === 'inputs') {
+        // A trailing ? marks an optional input, e.g. module? (empty for a layer-first repo).
+        const raw = v.replace(/^\[|\]$/g, '').split(',').map((x) => x.trim()).filter(Boolean);
+        meta.inputs = raw.map((x) => x.replace(/\?$/, ''));
+        for (const x of raw) if (x.endsWith('?')) meta.optional.add(x.slice(0, -1));
+      }
       continue;
     }
     const item = line.match(/^\s+-\s+(.+?)\s*$/);
@@ -598,9 +603,9 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
           if (comp?.stack && comp.stack !== pm[1]) fail('TASK', `${label}:${i + 2}: procedure ${proc} is for stack ${pm[1]}, but the task path's component ${comp.name} is ${comp.stack}`);
           if (!comp) fail('TASK', `${label}:${i + 1}: task with a procedure needs a path in (…) inside a component of architecture §3`);
           const given = new Map((inputsLine?.[1] ?? '').split(';').map((kv) => kv.split('=')).filter((a) => a.length >= 2).map(([k, ...v]) => [k.trim(), v.join('=').trim()]));
-          for (const inp of meta.inputs) if (!given.get(inp)) fail('TASK', `${label}:${i + 3}: procedure ${proc} needs input ${inp} (inputs: ${inp}=<value>; …)`);
+          for (const inp of meta.inputs) if (!meta.optional.has(inp) && !given.get(inp)) fail('TASK', `${label}:${i + 3}: procedure ${proc} needs input ${inp} (inputs: ${inp}=<value>; …)`);
           for (const k of given.keys()) if (!meta.inputs.includes(k)) fail('TASK', `${label}:${i + 3}: input ${k} is not declared by procedure ${proc}`);
-          taskProcedures.set(id, { label, line: i + 1, procedure: proc, meta, component: comp });
+          taskProcedures.set(id, { label, line: i + 1, procedure: proc, meta, component: comp, given });
         }
       } else taskProcedures.set(id, { label, line: i + 1, procedure: 'none' });
       if (inputsLine && (!proc || proc === 'none')) fail('TASK', `${label}:${i + 3}: inputs: given but the task has no procedure`);
@@ -626,10 +631,13 @@ if (taskArg) {
     try { changed = [...new Set([...git('diff', '--relative', '--name-only', baseArg), ...git('ls-files', '--others', '--exclude-standard')])]; }
     catch (e) { fail('SCOPE', `--task ${taskArg}: git failed (${String(e.message).split('\n')[0]})`); }
     const compDir = normDir(t.component.path);
-    const allowed = t.meta.allowed.map(globToRegExp);
+    // {input} placeholders take the task's input value; an empty optional input collapses its path segment.
+    const fill = (g) => g.replace(/\{([^}]+)\}/g, (_, k) => t.given.get(k) ?? '').replace(/\/{2,}/g, '/').replace(/^\//, '');
+    const globs = t.meta.allowed.map(fill);
+    const allowed = globs.map(globToRegExp);
     for (const f of changed) {
       const inComp = compDir === '' ? f : f.startsWith(`${compDir}/`) ? f.slice(compDir.length + 1) : null;
-      if (inComp === null || !allowed.some((re) => re.test(inComp))) fail('SCOPE', `${taskArg} (${t.procedure}): ${f} is outside the procedure's allowed-paths (${t.meta.allowed.join(', ')})`);
+      if (inComp === null || !allowed.some((re) => re.test(inComp))) fail('SCOPE', `${taskArg} (${t.procedure}): ${f} is outside the procedure's allowed-paths (${globs.join(', ')})`);
     }
     if (!failures.some((x) => x.startsWith('SCOPE'))) warnings.push(`SCOPE  ${taskArg}: ${changed.length} changed file(s), all inside ${t.procedure} allowed-paths`);
   }

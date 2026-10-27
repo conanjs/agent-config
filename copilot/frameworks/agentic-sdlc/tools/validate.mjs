@@ -303,6 +303,19 @@ for (const stack of stackIds) {
     }
     if (rfm.commit && !rtext.replace(/^---[\s\S]*?\n---/, '').includes(String(rfm.commit))) fail('REF', `${label}: How to fetch must check out the pinned commit ${rfm.commit}`);
     if (rfm.repo && rfm.pinned) refPins.push([stack, rfm.repo, rfm.pinned]);
+    // variants: other maintained layouts, one flow mapping per line (stack-reference/v1, 1.2.0).
+    const vblock = (rtext.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '').match(/^variants:\s*\r?\n((?:[ \t]+- \{.*\}[ \t]*\r?\n?)+)/m);
+    const variants = vblock ? vblock[1].split(/\r?\n/).filter((l) => l.trim().startsWith('- {')) : [];
+    if (variants.length && !['feature-first', 'layer-first'].includes(rfm.layout)) fail('REF', `${label}: layout (feature-first or layer-first) is required when variants are listed`);
+    if (variants.length && !rhs.includes('Which layout')) fail('REF', `${label}: section "## Which layout" missing (required with variants)`);
+    for (const v of variants) {
+      const vl = flowField(v, 'layout') ?? '<unnamed>';
+      for (const k of ['layout', 'branch', 'pinned', 'commit', 'verified']) if (!flowField(v, k)) fail('REF', `${label}: variant ${vl} lacks ${k}`);
+      const vc = flowField(v, 'commit') ?? '';
+      if (!/^[0-9a-f]{40}$/.test(vc)) fail('REF', `${label}: variant ${vl} commit must be a full 40-character SHA`);
+      else if (!rtext.replace(/^---[\s\S]*?\n---/, '').includes(vc)) fail('REF', `${label}: How to fetch must also check out variant ${vl}'s commit ${vc}`);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(flowField(v, 'verified') ?? '')) fail('REF', `${label}: variant ${vl} verified must be a YYYY-MM-DD date`);
+    }
   }
 
   // idioms.md

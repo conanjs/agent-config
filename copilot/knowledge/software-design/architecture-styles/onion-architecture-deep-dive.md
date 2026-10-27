@@ -128,7 +128,7 @@ The core depends on interfaces, so the implementations must arrive from outside:
 - [^5]: [Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) — Microsoft, living. Backs: §1.
 - [^6]: [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: §8.
 - [^7]: [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012 (text and figure). Backs: §8.
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e) — mapped in §10 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — mapped in §10 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
 
 ## Related
 - `software-design/architecture-styles/clean-architecture-deep-dive.md`

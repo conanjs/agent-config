@@ -3,8 +3,8 @@ schema: stack-reference/v1
 last-updated: 2026-10-27
 stack: typescript-node
 repo: conanjs/agentic-sdlc-reference-typescript-node
-pinned: v1.1.0
-commit: 0f899099b469a63262fd113f2b0a88414c08f30e
+pinned: v1.2.0
+commit: a8e776660fe686a716fc1f80550f2671c972cc7b
 verified: 2026-10-27
 ---
 
@@ -68,8 +68,8 @@ All paths are relative to the reference repo's root, at the pinned commit.
 Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
 
 1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
-2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet 0f899099b469a63262fd113f2b0a88414c08f30e`.
-3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/0f899099b469a63262fd113f2b0a88414c08f30e/<path>`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet a8e776660fe686a716fc1f80550f2671c972cc7b`.
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/a8e776660fe686a716fc1f80550f2671c972cc7b/<path>`.
 
 A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 

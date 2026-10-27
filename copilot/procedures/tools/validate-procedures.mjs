@@ -99,11 +99,14 @@ for (const f of files) {
   if (folder) {
     if (fm.stack !== folder) fail('PR-7', `${rel(f)}: stack must be "${folder}" (its folder)`);
     const inputs = fm.inputs; const allowed = fm['allowed-paths'];
-    if (!Array.isArray(inputs) || inputs.some((x) => typeof x !== 'string' || !/^[a-z][a-z0-9-]*$/.test(x))) fail('PR-7', `${rel(f)}: inputs must be a list of kebab-case names ([] if none)`);
+    if (!Array.isArray(inputs) || inputs.some((x) => typeof x !== 'string' || !/^[a-z][a-z0-9-]*\??$/.test(x))) fail('PR-7', `${rel(f)}: inputs must be a list of kebab-case names, a trailing ? for optional ([] if none)`);
     if (!Array.isArray(allowed) || !allowed.length || allowed.some((x) => typeof x !== 'string' || x.startsWith('/') || x.includes('..'))) fail('PR-7', `${rel(f)}: allowed-paths must be a non-empty list of repo-relative globs`);
     const idx = path.join(path.dirname(f), 'index.md');
     if (!fs.existsSync(idx) || !read(idx).includes(`](${path.basename(f)})`)) fail('PR-7', `${rel(f)}: not listed in ${folder}/index.md (the planner's catalog)`);
-    for (const inp of Array.isArray(inputs) ? inputs : []) if (!new RegExp(`\\*\\*${inp}\\*\\*`).test(text)) fail('PR-7', `${rel(f)}: input "${inp}" is not described under **Inputs needed:** as **${inp}**`);
+    const names = (Array.isArray(inputs) ? inputs : []).map((x) => String(x).replace(/\?$/, ''));
+    for (const inp of names) if (!new RegExp(`\\*\\*${inp}\\*\\*`).test(text)) fail('PR-7', `${rel(f)}: input "${inp}" is not described under **Inputs needed:** as **${inp}**`);
+    // An allowed-paths glob may name an input as {name}; validate-project.mjs --task fills it from the task line.
+    for (const g of Array.isArray(allowed) ? allowed : []) for (const [, ph] of String(g).matchAll(/\{([^}]+)\}/g)) if (!names.includes(ph)) fail('PR-7', `${rel(f)}: allowed-paths ${g} uses {${ph}}, which is not a declared input`);
   } else if (fm.stack || fm.inputs || fm['allowed-paths']) fail('PR-7', `${rel(f)}: stack, inputs and allowed-paths belong only to procedures under procedures/<stack>/`);
   // PR-3
   const body = stripFences(text.replace(/^---\n[\s\S]*?\n---\n/, ''));

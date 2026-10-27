@@ -3,10 +3,11 @@ schema: procedure/v1
 last-updated: 2026-10-27
 depends-on: []
 stack: typescript-node
-inputs: [capability, technology, use-case]
+inputs: [capability, technology, use-case, module?]
 allowed-paths:
-  - src/application/**
-  - src/infrastructure/**
+  - src/{module}/application/**
+  - src/{module}/infrastructure/**
+  - src/shared/infrastructure/config.ts
   - src/CompositionRoot.ts
   - test/**
   - docs/architecture.md
@@ -23,11 +24,12 @@ A use case needs something from outside the core: storage, the clock, an externa
 **Inputs needed:**
 - **capability** (required): what the use case needs, in domain words, e.g. "store documents", "tell the time".
 - **technology** (required): what the adapter uses, e.g. "SQLite", "in-memory", "system clock".
-- **use-case** (required): the class in `src/application/` that will consume the port.
+- **use-case** (required): the class in `src/{module}/application/` that will consume the port.
+- **module** (optional): the feature module the port belongs to, the folder under `src/` (e.g. `documents`). Feature-first is the default layout (MOD-9). Leave it out only in a repo that opted in to layer-first; `{module}` in the paths below then disappears (`src/application/`).
 
-**Scope:** a task that follows this procedure changes only the `allowed-paths` above (relative to the component's path). `package.json` and the lockfile are in scope only to add the one library the **technology** input names (already chosen in the plan). Anything else it seems to need — a new layer, a change in `src/domain/`, any other dependency — is out of scope: stop and escalate, so the planner can add a task for it.
+**Scope:** a task that follows this procedure changes only the `allowed-paths` above (relative to the component's path). `package.json` and the lockfile are in scope only to add the one library the **technology** input names (already chosen in the plan). Anything else it seems to need — a new layer, a change in `src/{module}/domain/`, any other dependency — is out of scope: stop and escalate, so the planner can add a task for it.
 
-**Shape to copy** (paths in the stack reference repo at its pinned commit; fetch it as `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/typescript-node/reference.md` "How to fetch" says, or open one file at `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/0f899099b469a63262fd113f2b0a88414c08f30e/<path>`):
+**Shape to copy** (paths in the stack reference repo at its pinned commit; fetch it as `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/typescript-node/reference.md` "How to fetch" says, or open one file at `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/a8e776660fe686a716fc1f80550f2671c972cc7b/<path>`):
 - Port: `src/application/ports/DocumentStore.ts`
 - Adapter: `src/infrastructure/InMemoryDocumentStore.ts`
 - Consumer: `src/application/ReviseDocument.ts`
@@ -42,11 +44,11 @@ A use case needs something from outside the core: storage, the clock, an externa
    - Adapter: technology plus port name (`SqliteDocumentStore`). File name equals the class (NAM-8).
    - Add any new domain term to `docs/glossary.md` in the same change (NAM-2).
 
-3. **Write the port** in `src/application/ports/<Port>.ts`, next to the use cases that consume it (TSN-2).
+3. **Write the port** in `src/{module}/application/ports/<Port>.ts`, next to the use cases that consume it (TSN-2).
    - Expected failures are `Result` values in the signature, not thrown (TSN-4).
    - TSDoc on the interface and on every member: summary, `@param`, `@returns`, and `@remarks` for guarantees every adapter must keep (atomicity, ordering). This is the only place the contract is written (CMT-5, CMT-12, TSN-13).
 
-4. **Write the adapter** in `src/infrastructure/<Adapter>.ts`, `implements <Port>`.
+4. **Write the adapter** in `src/{module}/infrastructure/<Adapter>.ts`, `implements <Port>`.
    - Each member's doc comment is the adapter's own summary, starting `{@link <Port>.<member>}` and saying what this adapter adds: where the data lives, durability, how far atomicity holds, cost, extra failures. Put an extra failure in the sentence, with no block tags, so the editor still shows the port's `@param`/`@returns`. Do not use `{@inheritDoc}`: the editor shows it as raw text (CMT-12, TSN-13; lint `local-docs/implementation-summary`).
    - Implementation notes (why a lock, why no `await` between two lines) go in a comment inside the method body (CMT-1).
    - Third-party libraries for this technology are imported here and nowhere else (CA rules; FF-1).
@@ -54,7 +56,7 @@ A use case needs something from outside the core: storage, the clock, an externa
 
 5. **Inject the port into the use case** as a `private readonly` constructor parameter typed as the port, never the adapter (TSN-6, class-modeled State row).
 
-6. **Wire it in the composition root only.** Construct the adapter in `src/CompositionRoot.ts` and pass it to the use case (PDM-class-modeled-R9). If the adapter needs config, add the setting to `src/infrastructure/config.ts` (TSN-9).
+6. **Wire it in the composition root only.** Construct the adapter in `src/CompositionRoot.ts` and pass it to the use case (PDM-class-modeled-R9). If the adapter needs config, add the setting to `src/shared/infrastructure/config.ts` (`src/infrastructure/config.ts` in an opted-in layer-first repo) (TSN-9).
 
 7. **Imports.** Same-folder files with `./`; everything else through the repo's alias (IMP-1, IMP-2, TSN-15, TSN-16).
 

@@ -758,7 +758,7 @@ Microsoft's .NET architecture guide treats Hexagonal, Ports-and-Adapters, Onion 
 
 ## 15. The stack reference, reviewed against the sources
 
-Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e). Until 2026-10-27 this code lived in-tree at `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`; it moved unchanged (same files and line numbers) to its own repo, pinned by `stacks/typescript-node/reference.md`. v1.1.0 added `@param` notes and rewrote three summaries (CMT-6, CMT-13), so line numbers below are those of v1.1.0.
+Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b). Until 2026-10-27 this code lived in-tree at `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/`; it moved unchanged (same files and line numbers) to its own repo, pinned by `stacks/typescript-node/reference.md`. v1.1.0 added `@param` notes and rewrote three summaries (CMT-6, CMT-13), so line numbers below are those of v1.1.0; v1.2.0 changed only the adapter's doc comments and lint, so they still hold.
 
 | Aspect | Verdict | Evidence |
 |---|---|---|
@@ -844,7 +844,7 @@ Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github
 - [^27]: [Implementing Clean Architecture – Of controllers and presenters](http://www.plainionist.net/Implementing-Clean-Architecture-Controller-Presenter/) — Plainionist, 2018 (updated 2023). Backs: §6.6 "Who backs form B" (the strict reading).
 - [^28]: [techexcellenceio community discussion #3](https://github.com/techexcellenceio/community/discussions/3) — community discussion that identifies the `openchat-unclebob` branch as Uncle Bob's version, using "use case handlers WITHOUT presenters". Backs: §6.6 "Who backs form B".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules (§14, §15).
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.1.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/0f899099b469a63262fd113f2b0a88414c08f30e) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
 
 ## Related
 - `software-design/architecture-styles/hexagonal-architecture-deep-dive.md`

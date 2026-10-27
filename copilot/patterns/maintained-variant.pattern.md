@@ -35,7 +35,7 @@ The CI trigger of `conanjs/agentic-sdlc-reference-typescript-node`, `.github/wor
 | `on:`<br>`  push:`<br>`    branches: [main]`<br>`  pull_request:` | `on:`<br>`  push:`<br>`    branches: [main, "layout/**"]`<br>`  pull_request:` |
 | A merge into `layout/layer-first` runs no checks | Every push to either variant runs `pnpm run check`, `pnpm audit` and the framework validator |
 
-The same fix went in as two pull requests, one per variant (rule 3). The pointer file, `stacks/typescript-node/reference.md`, pins `v1.1.0` at commit `0f899099b469a63262fd113f2b0a88414c08f30e`. From v2.0.0 it lists both variants (`proposals/agentic-sdlc-reference-feature-first.md` §A4).
+The same fix went in as two pull requests, one per variant (rule 3). At the time, the pointer file, `stacks/typescript-node/reference.md`, pinned `v1.1.0` at commit `0f899099b469a63262fd113f2b0a88414c08f30e`. From v2.0.0 it lists both variants (`proposals/agentic-sdlc-reference-feature-first.md` §A4).
 
 ## Checklist
 

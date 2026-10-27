@@ -24,7 +24,7 @@ Spec Kit owns the task line's start (`- [ ] T020 [P] [US2] <description>`). The 
 | `touches:` | yes for `[llm]` | `none`, or `integration:<svc>` where `<svc>` is a row in architecture §6 | the planner checks the task against §6 |
 | `refs:` | yes for `[llm]` | `none`, or paths taken from the matching stack's Reference topics table | the planner checks the task against the "Attach when" column |
 | `procedure:` | yes for `[llm]` when the component's stack has a procedure catalog (`{{AGENT_HOME}}/procedures/<stack>/index.md`); otherwise optional | `none`, or `<stack>/<slug>` naming `{{AGENT_HOME}}/procedures/<stack>/<slug>.procedure.md` for the task path's stack | the planner checks the task against the catalog's "Use when" column |
-| `inputs:` | yes when the procedure's front-matter lists `inputs` | one `name=value` per declared input, separated by `;` | the planner, from the spec and plan |
+| `inputs:` | yes when the procedure's front-matter lists `inputs` | one `name=value` per declared input, separated by `;`; an optional input (declared `name?`) may be left out, for example `module` in a layer-first repo | the planner, from the spec and plan |
 | `hot-path:` | no | `yes` · `no` | the plan (performance-sensitive work) |
 
 ## Rules

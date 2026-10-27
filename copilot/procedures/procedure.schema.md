@@ -36,8 +36,8 @@ Stack procedures (files under `procedures/<stack>/`) also declare their **bounde
 | Key | Required | Meaning |
 |---|---|---|
 | `stack` | yes, under `procedures/<stack>/` only | The stack id; equals the folder name |
-| `inputs` | yes, under `procedures/<stack>/` only | Kebab-case names of the values the task line must supply (`inputs: name=value; …`); `[]` if none. Each is described in **Inputs needed:** as `**<name>**` |
-| `allowed-paths` | yes, under `procedures/<stack>/` only | Globs (`*`, `**`), relative to the component's path in `docs/architecture.md` §3, of every file a task following this procedure may change. `validate-project.mjs --task` fails a task that changed anything else |
+| `inputs` | yes, under `procedures/<stack>/` only | Kebab-case names of the values the task line must supply (`inputs: name=value; …`); `[]` if none. A trailing `?` marks an optional input (`module?`), which the task line may omit. Each is described in **Inputs needed:** as `**<name>**` |
+| `allowed-paths` | yes, under `procedures/<stack>/` only | Globs (`*`, `**`), relative to the component's path in `docs/architecture.md` §3, of every file a task following this procedure may change. A glob may name an input as `{name}` (`src/{module}/application/**`); `validate-project.mjs --task` fills it from the task line, and an empty optional input drops its path segment (`src/application/**`). It fails a task that changed anything else |
 
 No other keys are allowed.
 
