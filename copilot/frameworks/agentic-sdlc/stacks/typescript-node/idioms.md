@@ -120,6 +120,7 @@ function handle(req: Request, log = rootLogger) {
 | TSN-16 | Relative imports name only same-folder files; everything else uses an alias, in `src` and `test` alike; no cycles | No relative specifier starts with `../` or contains a folder after `./`; the import graph is acyclic (IMP-1, IMP-2, IMP-6) | `../errors.js`, `./http/createApp.js` from a root file, `../support/fixtures.js` in a test | lint | — |
 | TSN-17 | Each layer imports other layers only through their alias entry point; in a feature-first repo (MOD-9) the layer rule holds inside every module, a module imports another only through its public files (MOD-3), and `shared/` imports no module | Layer aliases come from `docs/architecture.md` §4; only the composition root imports adapters (IMP-2, IMP-3, PDM-class-modeled-R9) | A use case imports `@/infrastructure/pg-user-repo` | lint | — |
 | TSN-18 | No barrel files (IMP-5): no file under `src/` re-exports (`export * from …`, `export { X } from …`). Import the file that declares the symbol; a module's public surface is the list of files in `docs/architecture.md` §4 (MOD-3), checked by lint zones. A published library's entry point, named in `package.json` `exports`, is the only exception | Lint reports nothing for the `noReExports` selectors | `src/documents/index.ts` containing `export * from "./application/ReviseDocument.js"` | lint | `knowledge/js-runtime/barrel-files.md` |
+| TSN-19 | HTTP status codes come from the repo's chosen source (Options: "HTTP status-code source") as named constants, never bare numbers, and only in the interface ring (`src/**/interface/**`). Domain and application return `Result` errors; each module's mapper turns them into statuses (TSN-11, EXP-8) | Lint reports nothing for the `http-status-codes` restriction outside `interface/` | `return { status: 409 }` in a use case; `res.status(404)` with a bare number | lint | `knowledge/web-apis/http-error-mapping.md` |
 
 ## Options
 
@@ -128,6 +129,7 @@ Per-repo choices this stack offers. The tech-stack role proposes the default at 
 | Choice | Default | Alternative | Choose the alternative when |
 |---|---|---|---|
 | Alias mechanism (TSN-15) | **tsconfig `paths`**, prefix `@/`, build rewritten by `tsc-alias` (or a bundler that reads `paths`) | **`package.json` `imports`**, prefix `#` or `#/` | No build-time rewrite wanted, or code runs without a build step (Node type stripping, published library sources) |
+| HTTP status-code source (TSN-19) | **`http-status-codes`** (`StatusCodes.CONFLICT`, `getReasonPhrase(409)`): the most installed (about 9.95M downloads/week against 1.27M for `http-status`, npm, week of 2026-06-25), and the form most developers and models know | `http-status` (`status.CONFLICT`, `status[409]`); hand-written constants; `node:http` `STATUS_CODES` | `http-status`: the API needs codes outside the IANA registry (`status.extra`) or a toolchain that rejects packages without an `exports` map. Hand-written: a tiny service with a few codes and zero dependencies. `STATUS_CODES`: only reason phrases are needed |
 
 ## Runtime & performance
 
@@ -181,6 +183,7 @@ require-if: package.json imports
 | TSN-16 | ESLint `no-restricted-imports` with the `noRelativeOutsideFolder` pattern from the snippet below, on `src/**` and `test/**`, repeated in every later block that sets `no-restricted-imports` (see the flat-config note below); `import-x/no-cycle`. Exceptions (root tool config, pre-build scripts) only by file name, mirroring `docs/architecture.md` §4 |
 | TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `@/application/*`, `@/infrastructure/*`, `@/interface/*`); adapters allowed only in the composition root block. Feature-first (MOD-9): `import-x/no-restricted-paths` with layer zones per module and module zones, snippet "Module-boundary lint configuration" below |
 | TSN-18 | ESLint `no-restricted-syntax` selectors `ExportAllDeclaration` and `ExportNamedDeclaration[source]` (the `noReExports` list in the snippet below), added to **every** block that sets `no-restricted-syntax`, including a block for the Tier B files, because a later block's options replace earlier ones |
+| TSN-19 | ESLint `no-restricted-imports` `paths: [{ name: "http-status-codes" }]` in a block for `src/**/*.ts` that ignores `src/*/interface/**` and tests, repeating `patterns: [noRelativeOutsideFolder]` because a later block's options replace earlier ones. Snippet: "Status-code lint configuration" below |
 | CS-2 (unit size) | ESLint `complexity` and `max-lines-per-function`, or `llm (fallback)` if not configured |
 | FF-1 (layer deps) | ESLint `no-restricted-imports`/boundaries rules generated from `docs/architecture.md` §4 |
 | FF-2 (cycles) | `import-x/no-cycle` (TSN-16) or a graph script |
@@ -325,6 +328,24 @@ const moduleZones = [
 // rules: { "import-x/no-restricted-paths": ["error", { zones: [...layerZones, ...moduleZones] }] }
 ```
 
+### Status-code lint configuration (TSN-19)
+
+Verified 2026-10-27 in the stack reference v2.1.0 (ESLint 10, `http-status-codes` 2.3.0 under NodeNext ESM: `import { StatusCodes, getReasonPhrase } from "http-status-codes"` typechecks and runs). A seeded import in `documents/application/` was reported, and a seeded `../` import in the same file still was, so the repeated pattern works.
+
+```js
+// eslint.config.mjs (excerpt), after the block that sets noRelativeOutsideFolder for src and test
+{
+  files: ["src/**/*.ts"],
+  ignores: ["src/*/interface/**", "src/**/*.test.ts"],
+  rules: {
+    "no-restricted-imports": ["error", {
+      patterns: [noRelativeOutsideFolder],
+      paths: [{ name: "http-status-codes", message: "Status codes belong to the interface ring; return a Result error (TSN-19)" }],
+    }],
+  },
+},
+```
+
 ### Documentation lint configuration
 
 Verified 2026-10-25 on a copy of `rbac-demo` with ESLint 10, eslint-plugin-jsdoc 65.4 and eslint-plugin-tsdoc 0.5. It found every undocumented port member, exported constant and public method (232 in that repo), plus 3 TSDoc syntax errors.
@@ -455,6 +476,8 @@ The earlier note here called the first row a "known gap, accepted"; the current 
 - https://github.com/nestjs/nest-cli/blob/master/lib/compiler/hooks/tsconfig-paths.hook.ts — the Nest CLI rewrites aliases at build time
 - https://tsdoc.org/pages/tags/inheritdoc/ — what `{@inheritDoc}` copies; no summary or `@remarks` beside it
 - https://typedoc.org/documents/Tags.__inheritDoc_.html — TypeDoc accepts inline and block forms
+- https://www.npmjs.com/package/http-status-codes — the default status-code source (TSN-19 Option)
+- https://www.npmjs.com/package/http-status — the alternative with `status.extra` (TSN-19 Option)
 - https://marvinh.dev/blog/speeding-up-javascript-ecosystem-part-7/ — barrels make tools load large module graphs (TSN-18)
 - https://www.atlassian.com/blog/atlassian-engineering/faster-builds-when-removing-barrel-files — about 75% fewer CI build minutes after removing barrels (TSN-18)
 
