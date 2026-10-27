@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 rule-prefix: CMT
 subject: code
 ---
@@ -18,7 +18,7 @@ When code gets a comment, what that comment says, and which comments are mandato
 | CMT-3 | Orchestration code carries step comments: one short comment per step, numbered when the order is fixed. Orchestration code is a process entry point, a composition root, a use-case or application-service method that sequences 3+ collaborator calls, a middleware chain, or a job body. | A reader sees the flow from the comments alone, without tracing every call | `main()` builds, wires, starts and listens with no marker of which step is which | llm | — |
 | CMT-4 | A step whose order or placement is non-obvious states why. | The reason is written where a future edit would break it | Config load moved after logger creation with no note that the logger needs it | llm | — |
 | CMT-5 | Every exported type and every public member (function, method, constructor, accessor, interface member, exported constant) has a doc comment in the stack's standard doc-comment format, checked by lint. Its summary states the contract: what is promised, what can fail, side effects, and units or ranges the type cannot express. This is the same bar as C#'s compiler warning for a missing XML comment on a publicly visible member. | Lint reports no undocumented public declaration, and each summary names at least one fact the signature does not | An exported use case with no note that it throws on a missing role; a port method with no contract | lint | — |
-| CMT-6 | Doc comments add information. Parameter and return notes appear only when they say more than the name and type. | No doc comment is a paraphrase of the symbol name | `/** @param roleId The role id. */` | llm (fallback) | — |
+| CMT-6 | Doc comments add information. Every parameter and every non-void return is documented (C# parity: StyleCop SA1611, SA1615): as a tag where the stack's format has one (TSDoc `@param`/`@returns`, C# `<param>`/`<returns>`, Python `Args:`/`Returns:`), in the summary prose where it has none (Go, Rust). Each note says more than the name and type: range, unit, format, ownership, the empty or not-found case. A property or getter is described by its summary alone. An implementation that only inherits the contract (CMT-12) inherits its notes. Stacks enforce presence by lint where a rule exists (TypeScript: TSN-13) | Every parameter and non-void return is documented, and no note is a paraphrase of the symbol name | `/** @param roleId The role id. */`; a public method with no note for one of its parameters | llm (fallback) | — |
 | CMT-7 | A file or class header exists only when the purpose is not obvious from its name; it links the decision record or owner where one exists. | Every header answers a question the file name does not | A header repeating `role-repository.ts` as "Role repository" | llm | — |
 | CMT-8 | Deviations carry a reason and a record: paradigm escape hatches, lint or type suppressions, and workarounds name the rule or decision id (and an issue or task id for a workaround). | Each deviation comment names what is bypassed and why, with an id | A suppression with no reason, or a free function with no hatch note | llm | — |
 | CMT-9 | No commented-out code. History lives in version control. | The repo contains no disabled code blocks inside comments | A 20-line block commented out "just in case" | llm | — |
@@ -50,8 +50,8 @@ Every stack's format carries the same parts, in this order. The stack profile na
 |---|---|---|
 | Summary sentence | Always | The contract in one sentence: what is promised, beyond the name |
 | Remarks | When needed | Longer explanation, design reason, decision-record id |
-| Parameter notes | Only when they add meaning (CMT-6) | Range, unit, format, ownership |
-| Return note | Only when it adds meaning | Empty, null or not-found cases |
+| Parameter notes | Always, one per parameter, each adding meaning (CMT-6) | Range, unit, format, ownership |
+| Return note | Always for a non-void function or method; not for properties and getters (CMT-6) | Empty, null or not-found cases |
 | Errors | Always, for each expected failure | Which error, and when |
 | Example | Optional | One call and its result |
 | Inherit-doc | On implementations (CMT-12) | A reference to the port member that owns the contract |

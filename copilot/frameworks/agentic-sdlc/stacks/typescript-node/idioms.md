@@ -114,7 +114,7 @@ function handle(req: Request, log = rootLogger) {
 | TSN-4 | Return discriminated Results for expected domain failures | Callers narrow on `ok` and handle every expected case | A validation conflict is thrown as a generic Error | typecheck | — |
 | TSN-5 | Throw only Error instances for unexpected failures | Thrown values have stack, name and optional `cause` | Code throws a string or plain object | lint | — |
 | TSN-6 | Inject use-case dependencies through constructors | A use case can be constructed with fake ports in tests | A use case imports a singleton client | llm | — |
-| TSN-13 | Every exported declaration and public member carries a TSDoc comment (`/** … */`), the TypeScript equivalent of C# XML doc comments: summary sentence, then `@remarks`, `@param name - …`, `@returns`, `@throws`, `@example` as needed. Implementations of a port use `{@inheritDoc Port.member}`, followed only by tags it does not copy (`@throws`, `@example`, `@deprecated`); implementation notes go in a why-comment in the body | Lint reports nothing for `tsdoc/syntax`, `jsdoc/require-jsdoc` and `jsdoc/informative-docs` (CMT-5, CMT-6, CMT-12) | A port method with no contract; `@param roleId The role id`; a bare `@inheritDoc`; a summary or `@remarks` next to `{@inheritDoc}` | lint | — |
+| TSN-13 | Every exported declaration and public member carries a TSDoc comment (`/** … */`), the TypeScript equivalent of C# XML doc comments: summary sentence, then `@remarks`, `@param name - …`, `@returns`, `@throws`, `@example` as needed. Implementations of a port use `{@inheritDoc Port.member}`, followed only by tags it does not copy (`@throws`, `@example`, `@deprecated`); implementation notes go in a why-comment in the body | Lint reports nothing for `tsdoc/syntax`, `jsdoc/require-jsdoc`, `jsdoc/informative-docs`, `jsdoc/require-param`, `jsdoc/check-param-names` and `jsdoc/require-returns` (CMT-5, CMT-6, CMT-12) | A port method with no contract; a public method missing `@param` for one parameter; `@param roleId The role id`; a bare `@inheritDoc`; a summary or `@remarks` next to `{@inheritDoc}` | lint | — |
 | TSN-14 | TODO and FIXME carry an owner or task id | Every marker looks like `TODO(PROJ-123): ...` (CMT-10) | A bare `// TODO fix later` | script | — |
 | TSN-15 | Aliases use the repo's chosen mechanism (Options below): tsconfig `paths` with an `@/` prefix plus a build-time rewrite (default), or `package.json` `imports` with a `#` prefix. Never `paths` without the rewrite | The same import specifier resolves under the type checker, the dev runner, the test runner, the lint resolver and `node dist/…` (IMP-4, IMP-7) | `paths` is set, the type checker passes, and the built output fails to load with module-not-found | script | `knowledge/js-runtime/subpath-imports.md` |
 | TSN-16 | Relative imports name only same-folder files; everything else uses an alias, in `src` and `test` alike; no cycles | No relative specifier starts with `../` or contains a folder after `./`; the import graph is acyclic (IMP-1, IMP-2, IMP-6) | `../errors.js`, `./http/createApp.js` from a root file, `../support/fixtures.js` in a test | lint | — |
@@ -149,6 +149,8 @@ require:
   - tsdoc/syntax
   - jsdoc/require-jsdoc
   - jsdoc/informative-docs
+  - jsdoc/require-param
+  - jsdoc/require-returns
   - noRelativeOutsideFolder
   - import-x/no-cycle
   - import-x/extensions
@@ -168,7 +170,7 @@ require-if: package.json imports
 | TSN-5 | ESLint `no-throw-literal` / `@typescript-eslint/only-throw-error` |
 | TSN-7 | `@typescript-eslint/no-floating-promises` |
 | TSN-10 | ESLint `no-console` scoped to `src/**` |
-| TSN-13 | `eslint-plugin-tsdoc` (`tsdoc/syntax`) plus `eslint-plugin-jsdoc` in `typescript` mode: `jsdoc/require-jsdoc` (`publicOnly`, classes, methods, functions, getters, and the TS contexts in the snippet below) and `jsdoc/informative-docs`. `require-param` and `require-returns` stay off, so tags appear only when they add meaning. Snippet: "Documentation lint configuration" below |
+| TSN-13 | `eslint-plugin-tsdoc` (`tsdoc/syntax`) plus `eslint-plugin-jsdoc` in `typescript` mode: `jsdoc/require-jsdoc` (`publicOnly`, classes, methods, functions, getters, and the TS contexts in the snippet below) and `jsdoc/informative-docs`, plus `jsdoc/require-param`, `require-param-description`, `check-param-names`, `require-returns` and `require-returns-description` (CMT-6: every parameter and non-void return documented, C# parity with StyleCop SA1611/SA1615). Getters are exempt from `require-returns` (the summary describes the value), and so is a comment that is only `{@inheritDoc Port.member}`, through a `comment` selector, because the inherited contract carries the notes (CMT-12). Snippet: "Documentation lint configuration" below |
 | TSN-14 | CI script: fail on `grep -rnP '\b(TODO\|FIXME)\b(?!\([A-Za-z0-9_-]+\))' src` (ESLint `no-warning-comments` cannot allow a valid format, so use it only for `xxx` and `hack`) |
 | TSN-15 | Smoke script: build, then import one aliased module from `dist/` with plain `node`, and once from `src/` under the dev runner. `tsc --noEmit` alone cannot catch this failure; config per option in "Import alias and lint configuration" below |
 | IMP-1, IMP-2 | TSN-16 configuration: relative paths only within the folder, aliases everywhere else |
@@ -313,9 +315,22 @@ import tsdoc from "eslint-plugin-tsdoc";
                  "TSPropertySignature", "ExportNamedDeclaration > VariableDeclaration"],
     }],
     "jsdoc/informative-docs": "error",
+    // CMT-6: every parameter and non-void return documented; an {@inheritDoc}-only comment inherits them (CMT-12).
+    "jsdoc/require-param": ["error", { checkDestructured: false, contexts: notInheriting }],
+    "jsdoc/require-param-description": "error",
+    "jsdoc/check-param-names": "error",
+    "jsdoc/require-returns": ["error", { forceReturnsWithAsync: true, checkGetters: false, contexts: notInheriting }],
+    "jsdoc/require-returns-description": "error",
   },
 },
+// defined above the config array:
+const notInheriting = ["ArrowFunctionExpression", "FunctionDeclaration", "FunctionExpression"].map((context) => ({
+  context,
+  comment: 'JsdocBlock:not(:has(JsdocInlineTag[tag="inheritDoc"]))',
+}));
 ```
+
+The `require-param` / `require-returns` additions were verified on 2026-10-27 in the stack reference (eslint-plugin-jsdoc 65.4): with the rules on, 12 gaps were reported; the `comment` selector removed exactly the 5 on `{@inheritDoc}`-only adapters; a removed `@param` and a misnamed `@param` were each reported.
 
 | C# XML doc | TSDoc | Note |
 |---|---|---|
