@@ -31,7 +31,30 @@ Each `depends-on` entry:
 | `source` | yes | URL of the authoritative doc the steps were checked against |
 | `repo` | no | `owner/name` on GitHub; lets `--upstream` compare `verified-against` with the latest release |
 
+Stack procedures (files under `procedures/<stack>/`) also declare their **bounded scope**, so the Orchestrator can assign them to a task (`task-line.schema.md`, `procedure:`):
+
+| Key | Required | Meaning |
+|---|---|---|
+| `stack` | yes, under `procedures/<stack>/` only | The stack id; equals the folder name |
+| `inputs` | yes, under `procedures/<stack>/` only | Kebab-case names of the values the task line must supply (`inputs: name=value; …`); `[]` if none. Each is described in **Inputs needed:** as `**<name>**` |
+| `allowed-paths` | yes, under `procedures/<stack>/` only | Globs (`*`, `**`), relative to the component's path in `docs/architecture.md` §3, of every file a task following this procedure may change. `validate-project.mjs --task` fails a task that changed anything else |
+
 No other keys are allowed.
+
+```yaml
+---
+schema: procedure/v1
+last-updated: 2026-10-27
+depends-on: []
+stack: typescript-node
+inputs: [capability, technology, use-case]
+allowed-paths:
+  - src/application/**
+  - src/infrastructure/**
+  - src/CompositionRoot.ts
+  - test/**
+---
+```
 
 ```yaml
 ---
@@ -70,13 +93,14 @@ depends-on:
 | PR-3 | Title `# Procedure: …`; sections Steps → References → Related, Related last; References lists external sources when `depends-on` is not empty | script |
 | PR-4 | Freshness: a dependency that is `unverified`, or a `last-verified` older than 90 days, is flagged for re-verification | script (warn) |
 | PR-5 | Upstream drift: the latest GitHub release of a `repo` differs from `verified-against` | script (warn, `--upstream`, weekly in CI) |
+| PR-7 | A procedure under `procedures/<stack>/` declares `stack` (= folder), `inputs` (each described under **Inputs needed:**) and a non-empty `allowed-paths` of repo-relative globs, and is listed in that folder's `index.md` catalog with a "Use when" | script |
 | PR-6 | Re-verifying means opening each `source` (and the tool's changelog since `verified-against`), fixing every step that changed, then updating `verified-against` and `last-verified` together. Never bump the version or date without the check | llm (`review-docs.procedure.md`) |
 
 ## Checks
 
 | Check | Tool |
 |---|---|
-| PR-1 … PR-4 | `node copilot/procedures/tools/validate-procedures.mjs` (also run by `scripts/check-docs.sh`: pre-commit, Claude Code hook, CI) |
+| PR-1 … PR-4, PR-7 | `node copilot/procedures/tools/validate-procedures.mjs` (also run by `scripts/check-docs.sh`: pre-commit, Claude Code hook, CI) |
 | PR-5 | `… validate-procedures.mjs --upstream` (weekly CI job; set `GITHUB_TOKEN` locally to avoid rate limits) |
 | PR-6 | `procedures/review-docs.procedure.md` |
 

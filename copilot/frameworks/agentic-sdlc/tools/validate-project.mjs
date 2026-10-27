@@ -2,8 +2,13 @@
 // Validates Agentic SDLC v2 Store-D project files against the script-checkable
 // rows in schemas/{repo-architecture,integration,constitution,task-line,blueprint,decision-record}.schema.md.
 //
-// Usage: node tools/validate-project.mjs <project-root> [--framework <agentic-sdlc root>]
+// Usage: node tools/validate-project.mjs <project-root> [--framework <agentic-sdlc root>] [--procedures <root>]
+//                                        [--task <Tnnn> [--base <git ref>]]
 //   <project-root> is required. --framework defaults to the realpath parent of this script's folder.
+//   --procedures defaults to <framework>/../../procedures (repo: copilot/procedures; installed: ~/.copilot/procedures).
+//   --task runs the procedure scope check for one task: every file changed since --base (default HEAD, i.e. the
+//   uncommitted work), plus untracked files, must match the task's procedure allowed-paths. Run it at P6 before
+//   review and before the task is marked done.
 //
 // Checks implemented:
 // - repo-architecture/v2: front-matter, 10 ordered sections, §3/§4 fenced YAML shape,
@@ -12,7 +17,9 @@
 // - integration/v1: front-matter, required sections, service row in architecture §6,
 //   basic secret-pattern scan.
 // - constitution-sdlc/v1: framework headings, default paradigm exists or none, integer budgets.
-// - task-line/v1: task role/executor suffixes, llm continuation fields, integration and refs existence.
+// - task-line/v1: task role/executor suffixes, llm continuation fields, integration and refs existence,
+//   procedure: (exists, matches the task path's stack, declared inputs given; warn when a catalog exists but
+//   the task states none), and with --task the procedure scope check (changed files within allowed-paths).
 // - blueprint/v2: front-matter, required sections, max 3 open questions, tree-node citations.
 // - decision-record/v2: record ids/fields, non-empty rejected alternatives, unique ids,
 //   supersede targets, tree-node/role references.
@@ -21,10 +28,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const rawArgs = process.argv.slice(2);
 const frameworkFlag = rawArgs.indexOf('--framework');
 const frameworkArg = frameworkFlag >= 0 ? rawArgs.splice(frameworkFlag, 2)[1] : undefined;
+const takeFlag = (n) => { const i = rawArgs.indexOf(n); return i >= 0 ? rawArgs.splice(i, 2)[1] : undefined; };
+const proceduresArg = takeFlag('--procedures');
+const taskArg = takeFlag('--task');
+const baseArg = takeFlag('--base') ?? 'HEAD';
 if (!rawArgs[0]) {
   console.error('Usage: node tools/validate-project.mjs <project-root> [--framework <agentic-sdlc root>]');
   process.exit(1);
@@ -32,6 +44,7 @@ if (!rawArgs[0]) {
 const projectRoot = fs.realpathSync(path.resolve(rawArgs[0]));
 const frameworkRoot = fs.realpathSync(path.resolve(frameworkArg ?? path.join(path.dirname(fileURLToPath(import.meta.url)), '..')));
 const agentHome = process.env.AGENT_HOME || path.join(process.env.USERPROFILE || process.env.HOME || '', '.copilot');
+const proceduresRoot = path.resolve(proceduresArg ?? path.join(frameworkRoot, '..', '..', 'procedures'));
 
 const failures = [];
 const warnings = [];
@@ -485,6 +498,49 @@ for (const [id, rec] of allDecisionRecords) {
   if (decided && decided !== 'human' && !roleIds.has(decided)) fail('DR', `${label}: Decided by ${decided} is not a role id or human`);
 }
 
+// Procedures (task-line procedure:) ------------------------------------------
+// Front-matter of a stack procedure: stack, inputs (inline list) and allowed-paths (block list of globs).
+function procedureMeta(file) {
+  const m = read(file).match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const meta = { stack: undefined, inputs: [], allowed: [] };
+  if (!m) return meta;
+  let key = null;
+  for (const line of m[1].split(/\r?\n/)) {
+    const kv = line.match(/^([\w-]+):\s*(.*)$/);
+    if (kv) {
+      key = kv[1];
+      const v = kv[2].trim();
+      if (key === 'stack') meta.stack = v;
+      if (key === 'inputs') meta.inputs = v.replace(/^\[|\]$/g, '').split(',').map((x) => x.trim()).filter(Boolean);
+      continue;
+    }
+    const item = line.match(/^\s+-\s+(.+?)\s*$/);
+    if (item && key === 'allowed-paths') meta.allowed.push(item[1].replace(/^['"](.*)['"]$/, '$1'));
+  }
+  return meta;
+}
+function globToRegExp(glob) {
+  let re = '';
+  for (let i = 0; i < glob.length; i++) {
+    const c = glob[i];
+    if (c === '*' && glob[i + 1] === '*') { re += glob[i + 2] === '/' ? '(?:.*/)?' : '.*'; i += glob[i + 2] === '/' ? 2 : 1; }
+    else if (c === '*') re += '[^/]*';
+    else re += c.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+  }
+  return new RegExp(`^${re}$`);
+}
+const normDir = (p) => { const d = String(p || '').replace(/^\.\/?/, '').replace(/\/$/, ''); return d === '.' ? '' : d; };
+function componentFor(taskPath) {
+  const t = normDir(taskPath);
+  let best = null;
+  for (const c of components) {
+    const d = normDir(c.path);
+    if ((d === '' || t === d || t.startsWith(`${d}/`)) && (!best || d.length > normDir(best.path).length)) best = c;
+  }
+  return best;
+}
+const taskProcedures = new Map(); // Tnnn -> { label, line, procedure, meta, component }
+
 // Tasks ---------------------------------------------------------------------
 function resolveRef(ref) {
   const r = stripTicks(ref);
@@ -507,7 +563,7 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
     if (!exec) fail('TASK', `${label}:${i + 1}: missing executor tag [llm] or [script]`);
     const next = lines[i + 1] ?? '';
     if (exec === 'llm') {
-      const cont = /^\s+touches:\s*(.*?)\s+·\s+refs:\s*(.*?)(?:\s+·\s+hot-path:\s*(yes|no))?\s*$/.exec(next);
+      const cont = /^\s+touches:\s*(.*?)\s+·\s+refs:\s*(.*?)(?:\s+·\s+procedure:\s*(\S+))?(?:\s+·\s+hot-path:\s*(yes|no))?\s*$/.exec(next);
       if (!cont) { fail('TASK', `${label}:${i + 1}: [llm] task missing continuation line with touches/refs`); continue; }
       const touches = cont[1].split(',').map((s) => s.trim()).filter(Boolean);
       const refs = cont[2].split(',').map((s) => s.trim()).filter(Boolean);
@@ -522,8 +578,32 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
         const rp = resolveRef(r);
         if (rp && !exists(rp)) fail('TASK', `${label}:${i + 2}: refs path ${r} does not exist`);
       }
-      const hot = cont[3];
+      const hot = cont[4];
       if (hot && !['yes', 'no'].includes(hot)) fail('TASK', `${label}:${i + 2}: hot-path must be yes or no`);
+      // procedure: (task-line.schema.md) — a bounded scope chosen at P5
+      const id = line.match(/^- \[[ xX]\]\s+(T\d+)/)[1];
+      const taskPath = line.match(/\(([^()]+)\)\s*(?:\[|$)/)?.[1]?.trim();
+      const comp = taskPath ? componentFor(taskPath) : null;
+      const proc = cont[3];
+      const inputsLine = /^\s+inputs:\s*(.*)$/.exec(lines[i + 2] ?? '');
+      if (!proc) {
+        if (comp?.stack && exists(path.join(proceduresRoot, comp.stack, 'index.md'))) warn('TASK', `${label}:${i + 2}: stack ${comp.stack} has a procedure catalog; state procedure: none or procedure: ${comp.stack}/<slug>`);
+      } else if (proc !== 'none') {
+        const pm = proc.match(/^([a-z0-9-]+)\/([a-z0-9-]+)$/);
+        const file = pm ? path.join(proceduresRoot, pm[1], `${pm[2]}.procedure.md`) : null;
+        if (!pm) fail('TASK', `${label}:${i + 2}: procedure must be none or <stack>/<slug>, got ${proc}`);
+        else if (!exists(file)) fail('TASK', `${label}:${i + 2}: procedure ${proc} not found at ${file}`);
+        else {
+          const meta = procedureMeta(file);
+          if (comp?.stack && comp.stack !== pm[1]) fail('TASK', `${label}:${i + 2}: procedure ${proc} is for stack ${pm[1]}, but the task path's component ${comp.name} is ${comp.stack}`);
+          if (!comp) fail('TASK', `${label}:${i + 1}: task with a procedure needs a path in (…) inside a component of architecture §3`);
+          const given = new Map((inputsLine?.[1] ?? '').split(';').map((kv) => kv.split('=')).filter((a) => a.length >= 2).map(([k, ...v]) => [k.trim(), v.join('=').trim()]));
+          for (const inp of meta.inputs) if (!given.get(inp)) fail('TASK', `${label}:${i + 3}: procedure ${proc} needs input ${inp} (inputs: ${inp}=<value>; …)`);
+          for (const k of given.keys()) if (!meta.inputs.includes(k)) fail('TASK', `${label}:${i + 3}: input ${k} is not declared by procedure ${proc}`);
+          taskProcedures.set(id, { label, line: i + 1, procedure: proc, meta, component: comp });
+        }
+      } else taskProcedures.set(id, { label, line: i + 1, procedure: 'none' });
+      if (inputsLine && (!proc || proc === 'none')) fail('TASK', `${label}:${i + 3}: inputs: given but the task has no procedure`);
     }
   }
   checkTreeCitations(label, text);
@@ -534,6 +614,26 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
 }
 
 for (const id of archDecisionRefs) if (!decisionExists(id)) fail('ARCH', `decision ${id} referenced by architecture does not exist`);
+
+// Procedure scope check (--task) ----------------------------------------------
+if (taskArg) {
+  const t = taskProcedures.get(taskArg);
+  if (!t) fail('SCOPE', `--task ${taskArg}: no such [llm] task with a procedure: field in specs/*/tasks.md`);
+  else if (t.procedure === 'none') warnings.push(`SCOPE  ${taskArg}: procedure: none, so there is no scope to check`);
+  else {
+    const git = (...a) => execFileSync('git', ['-C', projectRoot, ...a], { encoding: 'utf8' }).split('\n').filter(Boolean);
+    let changed = [];
+    try { changed = [...new Set([...git('diff', '--relative', '--name-only', baseArg), ...git('ls-files', '--others', '--exclude-standard')])]; }
+    catch (e) { fail('SCOPE', `--task ${taskArg}: git failed (${String(e.message).split('\n')[0]})`); }
+    const compDir = normDir(t.component.path);
+    const allowed = t.meta.allowed.map(globToRegExp);
+    for (const f of changed) {
+      const inComp = compDir === '' ? f : f.startsWith(`${compDir}/`) ? f.slice(compDir.length + 1) : null;
+      if (inComp === null || !allowed.some((re) => re.test(inComp))) fail('SCOPE', `${taskArg} (${t.procedure}): ${f} is outside the procedure's allowed-paths (${t.meta.allowed.join(', ')})`);
+    }
+    if (!failures.some((x) => x.startsWith('SCOPE'))) warnings.push(`SCOPE  ${taskArg}: ${changed.length} changed file(s), all inside ${t.procedure} allowed-paths`);
+  }
+}
 
 if (failures.length) {
   console.log(`FAIL (${failures.length})`);

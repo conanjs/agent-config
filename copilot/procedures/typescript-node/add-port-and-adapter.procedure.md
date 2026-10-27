@@ -2,6 +2,18 @@
 schema: procedure/v1
 last-updated: 2026-10-27
 depends-on: []
+stack: typescript-node
+inputs: [capability, technology, use-case]
+allowed-paths:
+  - src/application/**
+  - src/infrastructure/**
+  - src/CompositionRoot.ts
+  - test/**
+  - docs/architecture.md
+  - docs/glossary.md
+  - docs/integrations/**
+  - package.json
+  - pnpm-lock.yaml
 ---
 
 # Procedure: Add a Port and Adapter (typescript-node)
@@ -11,7 +23,9 @@ A use case needs something from outside the core: storage, the clock, an externa
 **Inputs needed:**
 - **capability** (required): what the use case needs, in domain words, e.g. "store documents", "tell the time".
 - **technology** (required): what the adapter uses, e.g. "SQLite", "in-memory", "system clock".
-- **use case** (required): the class in `src/application/` that will consume the port.
+- **use-case** (required): the class in `src/application/` that will consume the port.
+
+**Scope:** a task that follows this procedure changes only the `allowed-paths` above (relative to the component's path). `package.json` and the lockfile are in scope only to add the one library the **technology** input names (already chosen in the plan). Anything else it seems to need — a new layer, a change in `src/domain/`, any other dependency — is out of scope: stop and escalate, so the planner can add a task for it.
 
 **Shape to copy** (all paths under `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/typescript-node/reference/`):
 - Port: `src/application/ports/DocumentStore.ts`

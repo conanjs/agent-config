@@ -1,6 +1,6 @@
 ---
 schema: stack/v2
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 id: typescript-node
 detect-by: [package.json, pnpm-lock.yaml, tsconfig.json]
 frameworks: [express]
@@ -19,6 +19,8 @@ paradigms: [class-modeled, functional-pipeline]
 **Paradigm overlays:**
 - `paradigms/class-modeled.md`
 - `paradigms/functional-pipeline.md`
+
+**Procedures:** `{{AGENT_HOME}}/procedures/typescript-node/index.md` — bounded code tasks the planner assigns with a task line's `procedure:` (D11).
 
 ## Slots
 | Slot | Value |

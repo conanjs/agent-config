@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 ---
 
 # Schema: Role Message (`message/v2`)
@@ -28,6 +28,8 @@ payload:
     - { rule: <rule id>, enforced_by: lint | typecheck | test | script | llm,
         result: pass | fail | n/a, severity: blocker | major | minor | nit,
         location: <path:line>, detail: <one line> }
+  procedure_steps:                                              # execute with state.procedure only
+    - { step: <n>, result: done | n/a, note: <one line: what was done, or why n/a> }
   references_used: [<knowledge paths actually read>]
   unlisted_needs: [<knowledge or integration the task needed but the plan didn't list>]
   reason: spec-or-plan-wrong | fixable | blocked                # review-fail / veto only
@@ -40,6 +42,7 @@ payload:
 - A finding on a rule marked `lint`, `typecheck` or `test` cites the tool output. The reviewer doesn't re-judge it.
 - `execute` replies list every tier-1 check in `checks`. A reply with any `fail` is not sent: the agent fixes the code first, within budget, or replies `type: question` with `reason: blocked`.
 - `unlisted_needs` non-empty → the Orchestrator adds it to the next gate as a planning gap. This is the feedback channel for D7 (the planner missed a `touches:` or `refs:`).
+- With `state.procedure`, `procedure_steps` has one entry per numbered step of the procedure, in order. A step that cannot be done is not marked `n/a` to get past it: the reply is `type: question` with `reason: blocked`. `artifacts` must lie inside the procedure's `allowed-paths`.
 - `veto` is reserved for `security`.
 - `open_questions` are only for what a human must answer.
 

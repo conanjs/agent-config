@@ -1,6 +1,6 @@
 ---
 schema: conventions/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 ---
 # Agentic SDLC — Conventions
 
@@ -33,9 +33,9 @@ roles:
 ## 3. Loading model
 1. ① Preset: the role file's `## Preset knowledge` table. It contains only `foundations/` paths and has no budget cap.
 2. ② Profiles: stack, framework, paradigm, and future dimensions resolved from docs/architecture.md component/layer entries.
-3. ③ State: project and task facts in the launch prompt: constitution, architecture, spec, plan, research, tasks, integrations, references, review target, and retry feedback.
+3. ③ State: project and task facts in the launch prompt: constitution, architecture, spec, plan, research, tasks, integrations, references, procedure, review target, and retry feedback.
 4. Precedence on form: State > Paradigm > Stack > Preset. Precedence on intent: Preset wins. If both cannot be satisfied, escalate.
-5. The Orchestrator copies `touches:` and `refs:` from task lines; it does not guess integrations or reference docs.
+5. The Orchestrator copies `touches:`, `refs:` and `procedure:` (with `inputs:`) from task lines; it does not guess integrations, reference docs or procedures. A procedure is chosen once, by the planner at P5 against the stack's procedure catalog, approved at G4, and checked at P6 with `validate-project.mjs --task` (D11).
 
 ## 4. Profile-dimension registry
 ```yaml
@@ -141,7 +141,7 @@ Framework validator (`tools/validate.mjs`) checks:
 - V6: files outside stack profiles do not name stack-specific tools;
 - wrappers and skills match role presets when present.
 
-Per-repo validator (`tools/validate-project.mjs`, planned) checks repo architecture, task-line suffixes, integration docs, decision records, profile ids, references, and cross-repo system links. It already fails a project whose `paradigm: <id>@<major>` pin (architecture §3/§4 or constitution default) has no matching paradigm file. It also fails a project whose lint config lacks a string from its stack's `lint-baseline` block (stack idioms, Enforcement). That is how documentation and import-path rules reach every repo instead of depending on who writes the code.
+Per-repo validator (`tools/validate-project.mjs`) checks repo architecture, task-line suffixes (including `procedure:` and `inputs:`), integration docs, decision records, profile ids, references, and cross-repo system links. It already fails a project whose `paradigm: <id>@<major>` pin (architecture §3/§4 or constitution default) has no matching paradigm file. It also fails a project whose lint config lacks a string from its stack's `lint-baseline` block (stack idioms, Enforcement). That is how documentation and import-path rules reach every repo instead of depending on who writes the code.
 
 ## 13. Versioning
 Two numbers, two jobs (`knowledge/versioning/semantic-versioning.md`):

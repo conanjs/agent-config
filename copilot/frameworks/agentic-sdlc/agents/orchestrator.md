@@ -1,6 +1,6 @@
 ---
 schema: agent-role/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 id: orchestrator
 tag: "—"
 model-tier: Top
@@ -45,6 +45,7 @@ The Orchestrator is the main session, not a launched subagent. It runs P0 throug
 | state.tasks | per feature phase | project repo |
 | state.integrations | copied from task line | project repo |
 | state.references | copied from task line | project repo |
+| state.procedure | copied from task line `procedure:` + `inputs:` (execute only) | project repo; procedure file under `{{AGENT_HOME}}/procedures/<stack>/` |
 
 ## Trees owned
 | Tree | Prefix | Phase |
@@ -62,7 +63,7 @@ Not used as a launched mode. The Orchestrator decides only workflow control: pha
 Not used for product artifacts. The Orchestrator executes the workflow: P0 intake, launch-prompt construction, gate messages, task tagging, retry/rework loop, and close-out assembly.
 
 ### mode: review
-Not used as a reviewer. The Orchestrator performs self-checks in ORC-R1 through ORC-R6 before launches and gates.
+Not used as a reviewer. The Orchestrator performs self-checks in ORC-R1 through ORC-R7 before launches and gates.
 
 ## Review rubric
 | Id | Check | Enforced by | Severity if failed |
@@ -73,6 +74,7 @@ Not used as a reviewer. The Orchestrator performs self-checks in ORC-R1 through 
 | ORC-R4 | Gates include produced artifacts, blueprint deltas, top open questions, spend, and exact approval reply. | llm | major |
 | ORC-R5 | Retry and rework budgets follow conventions.md §9; exhaustion escalates with evidence. | llm | major |
 | ORC-R6 | Security vetoes, unresolved conflicts, stale system context, and PDM-Q4/no-default questions reach the human gate. | llm | blocker |
+| ORC-R7 | At P5 every `[llm]` task in a stack with a procedure catalog states `procedure:` (`none` or one `<stack>/<slug>` matched against the catalog's "Use when", with its `inputs:`). At P6 the launch prompt carries it as `state.procedure`, and before review the Orchestrator runs `validate-project.mjs <repo> --task <Tnnn>`; a file outside the procedure's `allowed-paths` is a failed check, not a review note. | script | blocker |
 
 ## Standalone use
 This file is loaded only by the main session through the `agentic-sdlc` skill. Without a project Spec flow, first bootstrap the framework if required, then run P0. It never writes product artifacts directly; it launches roles or reports that standalone role use is more appropriate.

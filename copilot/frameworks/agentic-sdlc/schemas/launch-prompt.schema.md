@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 ---
 
 # Schema: Launch Prompt (`launch-prompt/v1`)
@@ -30,6 +30,9 @@ state:
   tasks: specs/<feature>/tasks.md
   integrations: [docs/integrations/<svc>.md]      # copied from the task line's touches: (D7)
   references: [{{AGENT_HOME}}/knowledge/<topic>/<doc>.md]   # copied from the task line's refs: (D7)
+  procedure:                                      # copied from the task line's procedure: and inputs: (execute only)
+    path: {{AGENT_HOME}}/procedures/<stack>/<slug>.procedure.md
+    inputs: { <name>: <value> }
   trees: [trees/<name>.tree.md]                   # decide mode only
   review_target: [<paths under review>]           # review mode only
 context:                                          # retries only
@@ -47,7 +50,8 @@ output: schemas/message.schema.md
   3. Find the longest matching layer `path` in §4.
   4. For each dimension, use the layer value if set, otherwise the component value.
   5. Leave out a dimension that has no value.
-- `state.integrations` and `state.references` are **copied** from the task line (`task-line.schema.md`). The Orchestrator never invents them.
+- `state.integrations`, `state.references` and `state.procedure` are **copied** from the task line (`task-line.schema.md`). The Orchestrator never invents them, and never picks a procedure at launch time: the planner chose it at P5 and the human approved it at G4.
+- **With `state.procedure`, the role follows that procedure's Steps in order, changes nothing outside its `allowed-paths`, and reports each step's result in the message.** If a step cannot be done as written, the role stops and escalates instead of improvising.
 - An absent optional state key is left out, not given an empty value. `integrations: []` and `references: []` are allowed, and mean the planner checked and found none.
 - **Standalone use:** `phase: standalone`. `profiles` are resolved in this order: the request, then `docs/architecture.md`, then manifest detection, then asking the user. Spec-dependent checks are reported as N/A.
 - Never include secrets or file contents. Paths only.
@@ -72,8 +76,19 @@ state:
 output: schemas/message.schema.md
 ```
 
+With a procedure (task T031 in `task-line.schema.md`):
+
+```yaml
+state:
+  # … as above …
+  procedure:
+    path: {{AGENT_HOME}}/procedures/typescript-node/add-port-and-adapter.procedure.md
+    inputs: { capability: tell the time, technology: system clock, use-case: ExpireSessions }
+```
+
 ## Checks
 
 | Check | Tool |
 |---|---|
 | Required keys per mode; every path exists; `profiles` ids exist | Orchestrator self-check before launch |
+| The role stayed inside the procedure's `allowed-paths` | `validate-project.mjs <repo> --task <Tnnn>`, run by the Orchestrator before review |

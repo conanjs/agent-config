@@ -1,6 +1,6 @@
 ---
 schema: framework-index/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-27
 framework-version: 2.0.0
 status: active
 ---
@@ -52,6 +52,7 @@ If a statement can fail a review, it is a Rule. If it explains a concept general
 | B Global knowledge | {{AGENT_HOME}}/knowledge/<topic>/ | References | ③ state when cited |
 | C Company KB | {{AGENT_HOME}}/companies/<company>/ | Company facts and optional system maps | ③ state through repo links |
 | D Project repo | docs/, .specify/, specs/ | Repo facts and mission artifacts | ③ state |
+| Stack procedures | {{AGENT_HOME}}/procedures/<stack>/ | Bounded, step-by-step code tasks for one stack (inputs, steps, `allowed-paths`) | ③ state, when a task line names one (`procedure:`) |
 | Runtime | chat | Launch prompts and role messages | not committed |
 
 A rules file may cite B as `Source:`. A repo fact may point to C through `company-kb:`. The framework never hardcodes company facts.
@@ -96,15 +97,18 @@ Example flow for one engineering task:
 | Step | Actor | Action | Data |
 |---|---|---|---|
 | 1 | Orchestrator | Finds component/layer for the task path | docs/architecture.md |
-| 2 | Orchestrator | Copies `touches:` and `refs:` from task line | tasks.md |
+| 2 | Orchestrator | Copies `touches:`, `refs:` and `procedure:` (+ `inputs:`) from task line | tasks.md |
 | 3 | Orchestrator | Builds `launch-prompt/v1` | runtime |
 | 4 | Role | Loads preset, profiles, and state | A1, A2, D |
 | 5 | Role | Follows listed integrations/references only | B, C, D |
-| 6 | Role | Produces artifact and runs profile checks | repo |
+| 6 | Role | Produces artifact and runs profile checks; with a procedure, follows its steps and reports each one | repo |
+| 6b | Orchestrator | With a procedure, runs `validate-project.mjs <repo> --task <Tnnn>`: every changed file must be inside the procedure's `allowed-paths` | repo |
 | 7 | Reviewer | Checks only remaining `llm` rules | message/v2 |
 | 8 | Orchestrator | Marks task, retries, or escalates | tasks.md/gate |
 
 Worked example: a task touching an external integration lists `touches: integration:hr-directory`; the launch prompt includes `state.integrations: [docs/integrations/hr-directory.md]`. The role follows that doc to any company and reference facts.
+
+Worked example with a procedure: at P5 the planner matches "Add Clock port and SystemClock adapter" against `procedures/typescript-node/index.md` ("A use case needs a new capability from outside the core") and writes `procedure: typescript-node/add-port-and-adapter` with `inputs: capability=tell the time; technology=system clock; use-case=ExpireSessions`. The launch prompt carries `state.procedure`; the role follows the ten steps and changes only `src/application/**`, `src/infrastructure/**`, `src/CompositionRoot.ts`, `test/**` and the listed docs. A change to `src/domain/` fails the scope check.
 
 ## 9. Enforcement
 | Tier | Checker | When |
@@ -145,7 +149,8 @@ Open design item: at P7, the framework should collect lessons from repeated revi
 | D | docs/architecture.md | repo-architecture/v2 |
 | D | docs/integrations/<svc>.md | integration/v1 |
 | D | .specify/memory/constitution.md framework sections | constitution-sdlc/v1 |
-| D | specs/<feature>/tasks.md suffix | task-line/v1 |
+| D | specs/<feature>/tasks.md suffix (`touches:`, `refs:`, `procedure:`, `inputs:`) | task-line/v1 |
+| — | `{{AGENT_HOME}}/procedures/<stack>/<slug>.procedure.md` + `index.md` catalog | procedure/v1 (`{{AGENT_HOME}}/procedures/procedure.schema.md`; checked by `procedures/tools/validate-procedures.mjs`) |
 | D | specs/<feature>/blueprint.md | blueprint/v2 |
 | D | specs/<feature>/research.md records | decision-record/v2 |
 
@@ -157,6 +162,7 @@ Open design item: at P7, the framework should collect lessons from repeated revi
 5. Add a profile dimension: add one conventions.md §4 row, folder, tree, skill pattern, and architecture field support.
 6. Add a knowledge doc: write the Store B doc under its schema and cite it from rules or task `refs:`.
 7. Add an integration: create docs/integrations/<svc>.md, add architecture §6 row, and list `touches:` on tasks.
+8. Add a stack procedure: write `{{AGENT_HOME}}/procedures/<stack>/<slug>.procedure.md` (`procedure/v1` with `stack`, `inputs`, `allowed-paths`), add a "Use when" row to that folder's `index.md`, and point to it from `stacks/<stack>/index.md`. The planner can then assign it with `procedure:`.
 
 ## 14. Glossary
 | Term | Meaning |
@@ -178,7 +184,7 @@ Open design item: at P7, the framework should collect lessons from repeated revi
 ## 15. Status & decisions
 Version 2.0.0 is live and active. Phase 1 migration completed 2026-10-04 for the live framework files in this scope.
 
-Decisions: D1 stack naming; D2 paradigm as its own dimension; D3 paradigm inferred or asked at G0 and locked at G3; D4 design approved before migration; D5 routing via Preset plus profiles plus state; D6 no Preset cap; D7 `touches:` and `refs:` copied from task lines; D8 system context in Company KB; D9 legacy knowledge docs are not retrofitted; D10 deep dives synthesize into structured knowledge docs.
+Decisions: D1 stack naming; D2 paradigm as its own dimension; D3 paradigm inferred or asked at G0 and locked at G3; D4 design approved before migration; D5 routing via Preset plus profiles plus state; D6 no Preset cap; D7 `touches:` and `refs:` copied from task lines; D8 system context in Company KB; D9 legacy knowledge docs are not retrofitted; D10 deep dives synthesize into structured knowledge docs; D11 (2026-10-27) stack procedures are bounded task scopes assigned on task lines (`procedure:`) and checked by `validate-project.mjs --task` (`{{AGENT_CONFIG_REPO}}/proposals/agentic-sdlc-reference-repos-and-procedures.md` Part B).
 
 Completed 2026-10-04 after phase 1: `validate-project.mjs`; the knowledge framework deployed with `validate-knowledge.mjs`; 23 verified knowledge docs seeded (OOP, DDD, functional modeling, JS runtime, concurrency, error handling, operations, web APIs), so every paradigm and stack runtime rule has a `Source`; rbac-demo piloted on the v2 store D schemas (paradigm `functional-pipeline@1`, kept under PDM-Q1); OTS Company KB `system/` created.
 

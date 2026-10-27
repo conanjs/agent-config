@@ -8,7 +8,8 @@
 //                    differs from `verified-against` (network; uses GITHUB_TOKEN when set)
 //
 // Checks: PR-1 front-matter (schema, keys, dates); PR-2 depends-on entries; PR-3 required sections and order;
-// PR-4 freshness (warn): unverified dependencies, last-verified older than --max-age; PR-5 upstream drift (warn).
+// PR-4 freshness (warn): unverified dependencies, last-verified older than --max-age; PR-5 upstream drift (warn);
+// PR-7 stack procedures (in procedures/<stack>/): stack = folder, inputs and allowed-paths declared, listed in index.md.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,7 +29,7 @@ const read = (p) => fs.readFileSync(p, 'utf8').replace(/^﻿/, '').replace(/\r\n
 const rel = (p) => path.relative(pRoot, p).split(path.sep).join('/');
 const today = new Date().toISOString().slice(0, 10);
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
-const KEYS = ['schema', 'last-updated', 'last-verified', 'depends-on'];
+const KEYS = ['schema', 'last-updated', 'last-verified', 'depends-on', 'stack', 'inputs', 'allowed-paths'];
 const DEP_KEYS = ['tool', 'verified-against', 'source', 'repo'];
 
 // ---- tiny YAML front-matter parser (scalars, [inline], block lists of maps) — same subset as validate-knowledge.mjs
@@ -48,6 +49,8 @@ function frontMatter(text) {
     if (top) { key = top[1]; fm[key] = top[2] === '' ? [] : scalar(top[2]); continue; }
     const item = line.match(/^\s*-\s+([\w-]+):\s*(.*)$/);
     if (item && key) { if (!Array.isArray(fm[key])) fm[key] = []; fm[key].push({ [item[1]]: scalar(item[2]) }); continue; }
+    const plain = line.match(/^\s*-\s+(.*)$/);
+    if (plain && key) { if (!Array.isArray(fm[key])) fm[key] = []; fm[key].push(scalar(plain[1])); continue; }
     const cont = line.match(/^\s+([\w-]+):\s*(.*)$/);
     if (cont && key && Array.isArray(fm[key]) && typeof fm[key].at(-1) === 'object') fm[key].at(-1)[cont[1]] = scalar(cont[2]);
   }
@@ -91,6 +94,17 @@ for (const f of files) {
   if (anyVerified && !fm['last-verified']) fail('PR-2', `${rel(f)}: a dependency has verified-against set, so last-verified is required`);
   // PR-4
   if (anyVerified && DATE.test(fm['last-verified'] ?? '') && daysSince(fm['last-verified']) > maxAge) warn('PR-4', `${rel(f)}: last verified ${fm['last-verified']} (${daysSince(fm['last-verified'])} days ago, > ${maxAge}); re-check every depends-on source`);
+  // PR-7: a procedure under procedures/<stack>/ is a bounded task scope the planner can assign (task-line procedure:)
+  const folder = path.relative(pRoot, path.dirname(f)).split(path.sep).join('/');
+  if (folder) {
+    if (fm.stack !== folder) fail('PR-7', `${rel(f)}: stack must be "${folder}" (its folder)`);
+    const inputs = fm.inputs; const allowed = fm['allowed-paths'];
+    if (!Array.isArray(inputs) || inputs.some((x) => typeof x !== 'string' || !/^[a-z][a-z0-9-]*$/.test(x))) fail('PR-7', `${rel(f)}: inputs must be a list of kebab-case names ([] if none)`);
+    if (!Array.isArray(allowed) || !allowed.length || allowed.some((x) => typeof x !== 'string' || x.startsWith('/') || x.includes('..'))) fail('PR-7', `${rel(f)}: allowed-paths must be a non-empty list of repo-relative globs`);
+    const idx = path.join(path.dirname(f), 'index.md');
+    if (!fs.existsSync(idx) || !read(idx).includes(`](${path.basename(f)})`)) fail('PR-7', `${rel(f)}: not listed in ${folder}/index.md (the planner's catalog)`);
+    for (const inp of Array.isArray(inputs) ? inputs : []) if (!new RegExp(`\\*\\*${inp}\\*\\*`).test(text)) fail('PR-7', `${rel(f)}: input "${inp}" is not described under **Inputs needed:** as **${inp}**`);
+  } else if (fm.stack || fm.inputs || fm['allowed-paths']) fail('PR-7', `${rel(f)}: stack, inputs and allowed-paths belong only to procedures under procedures/<stack>/`);
   // PR-3
   const body = stripFences(text.replace(/^---\n[\s\S]*?\n---\n/, ''));
   if (!/^# Procedure: \S/m.test(body)) fail('PR-3', `${rel(f)}: title must be "# Procedure: <name>"`);

@@ -1,6 +1,6 @@
 ---
 schema: agent-role/v2
-last-updated: 2026-10-25
+last-updated: 2026-10-27
 id: engineering
 tag: "[Eng]"
 model-tier: Mid
@@ -50,6 +50,7 @@ Owns how code is written inside the boundaries `architecture` sets: standards, i
 | state.integrations | when task line lists touches | launch prompt |
 | project glossary | yes for code tasks; read before writing code, extend it when a new domain term appears (NAM-2) | docs/glossary.md |
 | state.references | when task line lists refs | launch prompt |
+| state.procedure | when task line names a procedure | launch prompt; follow its Steps in order, stay inside its `allowed-paths`, report `procedure_steps` (`schemas/message.schema.md`) |
 | context.feedback | retries only | launch prompt |
 
 ## Trees owned
@@ -65,10 +66,10 @@ At P1, preview paradigm needs for touched components. Walk PDM-Q1 through PDM-Q4
 At P2, return constitution clauses for coding standards, error handling, task checks, and paradigm governance. At P4, walk PDM-Q1 through PDM-Q4 per affected component or layer, write a `PDM-<component>` decision record, and list any architecture updates needed before G3 locks the choice.
 
 ### mode: execute
-Implement one `[Eng] [llm]` task. Read the task, acceptance criteria, plan, decision records, profiles, and retry feedback. Produce code and task-owned tests inside the assigned boundary; then run the profile checks named by the launch packet before replying. Done when checks pass, task acceptance criteria are covered, no dead/debug leftovers remain, and artifacts list every changed path.
+Implement one `[Eng] [llm]` task. Read the task, acceptance criteria, plan, decision records, profiles, and retry feedback. When the launch prompt has `state.procedure`, the procedure *is* the assigned boundary: follow its Steps in order with the given inputs, change only its `allowed-paths`, and stop with `type: question`, `reason: blocked` when a step cannot be done as written. Produce code and task-owned tests inside the assigned boundary; then run the profile checks named by the launch packet before replying. Done when checks pass, task acceptance criteria are covered, no dead/debug leftovers remain, and artifacts list every changed path.
 
 ### mode: review
-Review implementation output against ENG-R1 through ENG-R13. Confirm tier-1 results for checks enforced by tools, and directly judge only `llm` checks. Fast-path fixes must restore the cited behaviour without changing other behaviour.
+Review implementation output against ENG-R1 through ENG-R14. Confirm tier-1 results for checks enforced by tools, and directly judge only `llm` checks. Fast-path fixes must restore the cited behaviour without changing other behaviour.
 
 ## Review rubric
 | Id | Check | Enforced by | Severity if failed |
@@ -86,6 +87,7 @@ Review implementation output against ENG-R1 through ENG-R13. Confirm tier-1 resu
 | ENG-R11 | Comments follow `foundations/code/comments.md`: why not what, step comments in orchestration code, doc comments on public API, no commented-out code, TODOs with an owner. Cite the CMT id. | llm | minor |
 | ENG-R12 | Names follow `foundations/code/naming.md` and the project `docs/glossary.md`; new domain terms are added to the glossary. Cite the NAM id. | llm | minor |
 | ENG-R13 | References between files follow `foundations/design/import-paths.md`: aliases or public entry points across boundaries, no deep `../`, no cycles. Cite the IMP id. | llm | major |
+| ENG-R14 | With `state.procedure`: every step was followed in order and reported in `procedure_steps`, and every changed path is inside the procedure's `allowed-paths` (`validate-project.mjs --task`). A step that could not be done was escalated, not skipped. | script | blocker |
 
 ## Standalone use
 When invoked directly, load this role and its Preset first. Resolve profiles from the request, then docs/architecture.md, then detected manifests; if still unknown, state what cannot be checked. Paradigm remains empty unless the request or repo declares it. With no Spec flow, report spec-dependent checks as `n/a`; do not write decision records, task files, or architecture records.

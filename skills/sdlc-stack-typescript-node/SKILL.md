@@ -8,7 +8,7 @@ Read and apply, in this order:
 2. `~/.copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md`
 3. `~/.copilot/frameworks/agentic-sdlc/stacks/typescript-node/frameworks/<fw>.md` for each framework named in the task's `profiles.framework` (e.g. `express`)
 4. `~/.copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference/index.md` (working code showing every choice; copy its shape)
-5. For a recurring task, `~/.copilot/procedures/typescript-node/index.md`, then follow the matching procedure step by step
+5. If the launch prompt has `state.procedure`, follow that procedure step by step, change only its `allowed-paths`, and report each step (`procedure_steps`). Without one (standalone use), check `~/.copilot/procedures/typescript-node/index.md`; if a row's "Use when" matches the request, follow that procedure the same way
 
 (On Windows `~/.copilot` is `%USERPROFILE%\.copilot`.)
 The role's preset foundations say WHAT good code must do; this stack profile says HOW in this language. A paradigm skill, if named, adds the modeling style.
