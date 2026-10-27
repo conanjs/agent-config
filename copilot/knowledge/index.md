@@ -1,7 +1,7 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-10-04
+last-updated: 2026-10-26
 ---
 
 # Global knowledge
@@ -23,12 +23,12 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [operations/](operations/index.md) | Runtime operation concerns in code: config at startup, structured logging | topic index |
 | [web-apis/](web-apis/index.md) | HTTP API design: mapping errors to status codes and problem details | topic index |
 | [windows/](windows/index.md) | Windows specifics: creating symlinks needs admin, Developer Mode or the symlink user right regardless of shell or PowerShell version | 1 |
-| [ai-agents/](ai-agents/) | *legacy* — loop engineering for AI agents | 3 |
+| [ai-agents/](ai-agents/index.md) | Graph Engineering study guide, comparison with SDD / AI-DLC / Spec Kit, and existing loop-engineering guides | 2 concepts + 3 legacy |
 | [analytics/](analytics/) | *legacy* — GTM → GA4 → BigQuery → Looker Studio pipeline | 5 |
 | [blink/](blink/) | *legacy* — rollout notes | 1 |
 | [datadog/](datadog/) | *legacy* — error-rate SLOs | 1 |
 | [dead-code/](dead-code/) | *legacy* — dead-code detection rules | 1 |
-| [documentation/](documentation/) | *legacy* — doc template and format guides (markdown, HTML, PDF, Excel) | 7 |
+| [documentation/](documentation/index.md) | Learning Explanation Framework, team doc conventions, and format guides (Markdown, HTML, Word, PDF, Excel) | 1 how-to + 7 legacy |
 | [gcp/](gcp/) | *legacy* — GKE and GCP notes | 2 |
 | [git/](git/) | *legacy* — multi-account SSH, shallow clones with SonarQube | 2 |
 | [github-copilot/](github-copilot/) | *legacy* — Copilot CLI internals and setup | 2 |
