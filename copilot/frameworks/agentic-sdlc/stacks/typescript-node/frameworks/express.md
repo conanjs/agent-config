@@ -14,10 +14,10 @@ versions: [4, 5]
 | Framework piece | Layer | Location |
 |---|---|---|
 | Express app bootstrap | composition root | `src/CompositionRoot.ts` builds the app, installs middleware and mounts every module's routes; `src/main.ts` starts the server. |
-| Router modules | interface | `src/<module>/interface/routes/` (feature-first, MOD-9; `src/interface/routes/` in an opted-in layer-first repo), one router per resource or bounded HTTP surface. |
-| Route handlers | interface | `src/<module>/interface/routes/`; handlers adapt HTTP to one application use case. |
-| Middleware | interface | `src/shared/interface/` for cross-cutting middleware used by every module: auth, correlation id, rate limiting, observability, the error middleware. |
-| Error mapper | interface | `src/<module>/interface/errors/` maps that module's `Result` errors to problems; `src/shared/interface/` holds the problem type and the error middleware for thrown failures. |
+| Router modules | interface | `src/modules/<module>/interface/routes/` (feature-first, MOD-9; `src/interface/routes/` in an opted-in layer-first repo), one router per resource or bounded HTTP surface. |
+| Route handlers | interface | `src/modules/<module>/interface/routes/`; handlers adapt HTTP to one application use case. |
+| Middleware | interface | `src/modules/shared/interface/` for cross-cutting middleware used by every module: auth, correlation id, rate limiting, observability, the error middleware. Why there: it serves every module and belongs to none, and `shared` imports no feature module (MOD-4), so modules depend on it and never the reverse. |
+| Error mapper | interface | `src/modules/<module>/interface/errors/` maps that module's `Result` errors to problems, because only that module knows its refusal reasons; `src/modules/shared/interface/` holds the problem type and the error middleware for thrown failures, because every module sends the same body shape and a thrown error belongs to no module. Status codes appear only here, in the interface ring (TSN-19). |
 
 ## Rules
 
@@ -36,8 +36,8 @@ versions: [4, 5]
 
 | Rule | Tool config |
 |---|---|
-| EXP-1 | `llm (fallback)`: review handler body shape; optional ESLint restricted imports blocks repositories from `src/interface/routes/**`. |
-| EXP-2 | `no-restricted-imports` in `src/interface/routes/**` for infrastructure adapters and DB clients. |
+| EXP-1 | `llm (fallback)`: review handler body shape; optional ESLint restricted imports blocks repositories from `src/modules/*/interface/routes/**`. |
+| EXP-2 | `no-restricted-imports` in `src/modules/*/interface/routes/**` for infrastructure adapters and DB clients. |
 | EXP-5 | `llm (fallback)`: verify each handler uses the shared mapper. |
 | EXP-6 | TypeScript `no-floating-promises`; Express 4 projects use a shared `asyncHandler` wrapper. |
 | EXP-7 | `llm (fallback)`: verify validation schemas run before use-case calls. |

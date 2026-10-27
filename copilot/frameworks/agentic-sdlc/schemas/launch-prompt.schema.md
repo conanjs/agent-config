@@ -63,7 +63,7 @@ schema: launch-prompt/v1
 mode: execute
 role: engineering
 phase: P6
-task: "T021 [US4] Add SyncUsersFromHr use case (src/application/users/) [Eng] [llm] · touches: integration:apigee-hr · refs: none · hot-path: no"
+task: "T021 [US4] Add SyncUsersFromHr use case (src/modules/users/application/) [Eng] [llm] · touches: integration:apigee-hr · refs: none · hot-path: no"
 profiles: { stack: typescript-node, framework: express, paradigm: class-modeled@1 }
 state:
   constitution: .specify/memory/constitution.md

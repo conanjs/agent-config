@@ -70,9 +70,9 @@ async function syncUser(raw: { id: string; email: string }, repo: { exists(id: s
 
 | Rule | Tool config | Scope (paths) |
 |---|---|---|
-| PDM-functional-pipeline-R1 | TypeScript `readonly` types plus `tsconfig` `strict`, `noUncheckedIndexedAccess`, and `exactOptionalPropertyTypes`; `llm (fallback): full immutability needs review when no readonly lint plugin is configured` | `src/domain/**`, `src/application/**` |
-| PDM-functional-pipeline-R2 | ESLint `no-restricted-imports` or boundary rules blocking core imports from infrastructure, interface, runtime I/O modules, and adapter packages | `src/domain/**`, `src/application/**` |
-| PDM-functional-pipeline-R5 | ESLint `no-restricted-imports` or boundary rules requiring adapters and handlers to stay outside the core paths | `src/domain/**`, `src/application/**` |
+| PDM-functional-pipeline-R1 | TypeScript `readonly` types plus `tsconfig` `strict`, `noUncheckedIndexedAccess`, and `exactOptionalPropertyTypes`; `llm (fallback): full immutability needs review when no readonly lint plugin is configured` | `src/modules/*/domain/**`, `src/modules/*/application/**` |
+| PDM-functional-pipeline-R2 | ESLint `no-restricted-imports` or boundary rules blocking core imports from infrastructure, interface, runtime I/O modules, and adapter packages | `src/modules/*/domain/**`, `src/modules/*/application/**` |
+| PDM-functional-pipeline-R5 | ESLint `no-restricted-imports` or boundary rules requiring adapters and handlers to stay outside the core paths | `src/modules/*/domain/**`, `src/modules/*/application/**` |
 
 ## References
 

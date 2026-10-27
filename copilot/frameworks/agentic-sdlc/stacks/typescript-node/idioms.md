@@ -11,7 +11,7 @@ Long form of the `idiom.*` slots in [index.md](index.md). Each idiom shows how s
 
 ## idiom.errors
 
-Expected domain failures (not found, validation, conflict) are values, returned as a discriminated `Result`. Unexpected failures (I/O, bugs) are thrown as typed `Error` subclasses that keep the original error in `cause`. Never throw strings or plain objects. One mapper in `src/interface/` turns errors into HTTP/CLI responses.
+Expected domain failures (not found, validation, conflict) are values, returned as a discriminated `Result`. Unexpected failures (I/O, bugs) are thrown as typed `Error` subclasses that keep the original error in `cause`. Never throw strings or plain objects. One mapper per module, in its interface ring (`src/modules/<module>/interface/errors/`), turns that module's errors into HTTP or CLI responses; thrown errors go through one shared error middleware in `src/modules/shared/interface/`.
 
 ```ts
 export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
@@ -119,8 +119,8 @@ function handle(req: Request, log = rootLogger) {
 | TSN-15 | Aliases use the repo's chosen mechanism (Options below): tsconfig `paths` with an `@/` prefix plus a build-time rewrite (default), or `package.json` `imports` with a `#` prefix. Never `paths` without the rewrite | The same import specifier resolves under the type checker, the dev runner, the test runner, the lint resolver and `node dist/…` (IMP-4, IMP-7) | `paths` is set, the type checker passes, and the built output fails to load with module-not-found | script | `knowledge/js-runtime/subpath-imports.md` |
 | TSN-16 | Relative imports name only same-folder files; everything else uses an alias, in `src` and `test` alike; no cycles | No relative specifier starts with `../` or contains a folder after `./`; the import graph is acyclic (IMP-1, IMP-2, IMP-6) | `../errors.js`, `./http/createApp.js` from a root file, `../support/fixtures.js` in a test | lint | — |
 | TSN-17 | Each layer imports other layers only through their alias entry point; in a feature-first repo (MOD-9) the layer rule holds inside every module, a module imports another only through its public files (MOD-3), and `shared/` imports no module | Layer aliases come from `docs/architecture.md` §4; only the composition root imports adapters (IMP-2, IMP-3, PDM-class-modeled-R9) | A use case imports `@/infrastructure/pg-user-repo` | lint | — |
-| TSN-18 | No barrel files (IMP-5): no file under `src/` re-exports (`export * from …`, `export { X } from …`). Import the file that declares the symbol; a module's public surface is the list of files in `docs/architecture.md` §4 (MOD-3), checked by lint zones. A published library's entry point, named in `package.json` `exports`, is the only exception | Lint reports nothing for the `noReExports` selectors | `src/documents/index.ts` containing `export * from "./application/ReviseDocument.js"` | lint | `knowledge/js-runtime/barrel-files.md` |
-| TSN-19 | HTTP status codes come from the repo's chosen source (Options: "HTTP status-code source") as named constants, never bare numbers, and only in the interface ring (`src/**/interface/**`). Domain and application return `Result` errors; each module's mapper turns them into statuses (TSN-11, EXP-8) | Lint reports nothing for the `http-status-codes` restriction outside `interface/` | `return { status: 409 }` in a use case; `res.status(404)` with a bare number | lint | `knowledge/web-apis/http-error-mapping.md` |
+| TSN-18 | No barrel files (IMP-5): no file under `src/` re-exports (`export * from …`, `export { X } from …`). Import the file that declares the symbol; a module's public surface is the list of files in `docs/architecture.md` §4 (MOD-3), checked by lint zones. A published library's entry point, named in `package.json` `exports`, is the only exception | Lint reports nothing for the `noReExports` selectors | `src/modules/documents/index.ts` containing `export * from "./application/ReviseDocument.js"` | lint | `knowledge/js-runtime/barrel-files.md` |
+| TSN-19 | HTTP status codes come from the repo's chosen source (Options: "HTTP status-code source") as named constants, never bare numbers, and only in the interface ring (`src/**/interface/**`). Domain and application return `Result` errors; each module's mapper turns them into statuses (TSN-11, EXP-8). Why: a status code is an HTTP delivery detail. A use case states a refusal as a `Result` reason, so the same use case serves a CLI, a queue consumer or another module, each choosing its own exit code, retry or status; and the HTTP mapping stays in one place per module | Lint reports nothing for the `http-status-codes` restriction outside `interface/` | `return { status: 409 }` in a use case; `res.status(404)` with a bare number | lint | `knowledge/web-apis/http-error-mapping.md` |
 
 ## Options
 
@@ -183,7 +183,7 @@ require-if: package.json imports
 | TSN-16 | ESLint `no-restricted-imports` with the `noRelativeOutsideFolder` pattern from the snippet below, on `src/**` and `test/**`, repeated in every later block that sets `no-restricted-imports` (see the flat-config note below); `import-x/no-cycle`. Exceptions (root tool config, pre-build scripts) only by file name, mirroring `docs/architecture.md` §4 |
 | TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `@/application/*`, `@/infrastructure/*`, `@/interface/*`); adapters allowed only in the composition root block. Feature-first (MOD-9): `import-x/no-restricted-paths` with layer zones per module and module zones, snippet "Module-boundary lint configuration" below |
 | TSN-18 | ESLint `no-restricted-syntax` selectors `ExportAllDeclaration` and `ExportNamedDeclaration[source]` (the `noReExports` list in the snippet below), added to **every** block that sets `no-restricted-syntax`, including a block for the Tier B files, because a later block's options replace earlier ones |
-| TSN-19 | ESLint `no-restricted-imports` `paths: [{ name: "http-status-codes" }]` in a block for `src/**/*.ts` that ignores `src/*/interface/**` and tests, repeating `patterns: [noRelativeOutsideFolder]` because a later block's options replace earlier ones. Snippet: "Status-code lint configuration" below |
+| TSN-19 | ESLint `no-restricted-imports` `paths: [{ name: "http-status-codes" }]` in a block for `src/**/*.ts` that ignores `src/modules/*/interface/**` (`src/interface/**` in an opted-in layer-first repo) and tests, repeating `patterns: [noRelativeOutsideFolder]` because a later block's options replace earlier ones. Snippet: "Status-code lint configuration" below |
 | CS-2 (unit size) | ESLint `complexity` and `max-lines-per-function`, or `llm (fallback)` if not configured |
 | FF-1 (layer deps) | ESLint `no-restricted-imports`/boundaries rules generated from `docs/architecture.md` §4 |
 | FF-2 (cycles) | `import-x/no-cycle` (TSN-16) or a graph script |
@@ -255,6 +255,8 @@ settings: { "import-x/resolver-next": [createTypeScriptImportResolver({ project:
   "imports": {
     "#domain/*": { "source": "./src/domain/*.ts", "default": "./dist/domain/*.js" },
     "#application/*": { "source": "./src/application/*.ts", "default": "./dist/application/*.js" }
+    // Feature-first (MOD-9): one entry for the modules folder instead, e.g. "#modules/*" → "./src/modules/*.ts" / "./dist/modules/*.js".
+    // Not separately tested: the verified run above used the layer folders.
   },
   "scripts": {
     // Every tsx entry needs the condition, including `node --import tsx …` and child processes that tests spawn.
@@ -300,30 +302,30 @@ Node requires every `imports` key to start with `#`, "to ensure they are disambi
 | A | tsx without `--conditions=source`, no `dist/` | `ERR_MODULE_NOT_FOUND` |
 | A | `node --conditions=source` (built-in type stripping) | Fails whenever relative specifiers say `.js`: Node requires the real `.ts` extension and ignores tsconfig. Use tsx unless the repo writes `.ts` specifiers |
 | A | import-x resolver without `conditionNames` | `#…` resolves to `dist/`, so `import-x/no-restricted-paths` zones on `src/` never match: FF-1 **fails open** |
-| Both | A glob zone without a trailing `/**` (`target: "./src/*/domain"`) | import-x matches a glob against the full file path, so a bare folder glob matches no file: the zone **fails open**. A plain path (`"./src/domain"`) matches everything under it; a glob needs `"./src/*/domain/**"`. Found 2026-10-27 in the reference (eslint-plugin-import-x 4.17) when a seeded `domain → application` import passed |
+| Both | A glob zone without a trailing `/**` (`target: "./src/modules/*/domain"`) | import-x matches a glob against the full file path, so a bare folder glob matches no file: the zone **fails open**. A plain path (`"./src/domain"`) matches everything under it; a glob needs `"./src/modules/*/domain/**"`. Found 2026-10-27 in the reference (eslint-plugin-import-x 4.17) when a seeded `domain → application` import passed |
 
 ### Module-boundary lint configuration (feature-first, MOD-3, MOD-9)
 
-Verified 2026-10-27 in the stack reference v2.0.0 (eslint-plugin-import-x 4.17): seeded imports of another module's `domain/` and `application/ports/`, of the composition root from a module, of a module from `shared/`, and `domain → application` and `application → infrastructure` inside a module were each reported; an import of another module's public use case passed.
+Verified 2026-10-27 in the stack reference v2.0.0 and again on 2026-10-28 in v3.0.0, with modules under `src/modules/` (eslint-plugin-import-x 4.17): seeded imports of another module's `domain/` and `application/ports/`, of the composition root from a module, of a module from `shared/`, and `domain → application` and `application → infrastructure` inside a module were each reported; an import of another module's public use case passed.
 
 ```js
 // eslint.config.mjs (excerpt): layers inside every module, then module-to-module rules.
 import { readdirSync } from "node:fs";
-const modules = readdirSync("src", { withFileTypes: true })
+const modules = readdirSync("src/modules", { withFileTypes: true })
   .filter((d) => d.isDirectory() && d.name !== "shared").map((d) => d.name);
 const layerZones = [   // globs end in /** (see the pitfall table above)
-  { target: "./src/*/domain/**", from: ["./src/*/application/**", "./src/*/infrastructure/**", "./src/*/interface/**"] },
-  { target: "./src/*/application/**", from: ["./src/*/infrastructure/**", "./src/*/interface/**"] },
-  { target: "./src/*/infrastructure/**", from: ["./src/*/interface/**"] },
-  { target: "./src/*/interface/**", from: ["./src/*/infrastructure/**"] },
-  { target: ["./src/!(CompositionRoot|main).ts", "./src/*/**"], from: ["./src/CompositionRoot.ts", "./src/main.ts"] },
+  { target: "./src/modules/*/domain/**", from: ["./src/modules/*/application/**", "./src/modules/*/infrastructure/**", "./src/modules/*/interface/**"] },
+  { target: "./src/modules/*/application/**", from: ["./src/modules/*/infrastructure/**", "./src/modules/*/interface/**"] },
+  { target: "./src/modules/*/infrastructure/**", from: ["./src/modules/*/interface/**"] },
+  { target: "./src/modules/*/interface/**", from: ["./src/modules/*/infrastructure/**"] },
+  { target: ["./src/!(CompositionRoot|main).ts", "./src/modules/*/**"], from: ["./src/CompositionRoot.ts", "./src/main.ts"] },
 ];
 const moduleZones = [
   ...modules.flatMap((target) => modules.filter((from) => from !== target).flatMap((from) => [
-    { target: `./src/${target}`, from: `./src/${from}`, except: ["./application"], message: `${target} may import only ${from}/application (MOD-3)` },
-    { target: `./src/${target}`, from: `./src/${from}/application/ports`, message: `Ports of ${from} are not public (MOD-3)` },
+    { target: `./src/modules/${target}`, from: `./src/modules/${from}`, except: ["./application"], message: `${target} may import only ${from}/application (MOD-3)` },
+    { target: `./src/modules/${target}`, from: `./src/modules/${from}/application/ports`, message: `Ports of ${from} are not public (MOD-3)` },
   ])),
-  ...modules.map((from) => ({ target: "./src/shared", from: `./src/${from}`, message: "shared/ imports no feature module (MOD-4)" })),
+  ...modules.map((from) => ({ target: "./src/modules/shared", from: `./src/modules/${from}`, message: "shared/ imports no feature module (MOD-4)" })),
 ];
 // rules: { "import-x/no-restricted-paths": ["error", { zones: [...layerZones, ...moduleZones] }] }
 ```
@@ -336,7 +338,7 @@ Verified 2026-10-27 in the stack reference v2.1.0 (ESLint 10, `http-status-codes
 // eslint.config.mjs (excerpt), after the block that sets noRelativeOutsideFolder for src and test
 {
   files: ["src/**/*.ts"],
-  ignores: ["src/*/interface/**", "src/**/*.test.ts"],
+  ignores: ["src/modules/*/interface/**", "src/**/*.test.ts"],
   rules: {
     "no-restricted-imports": ["error", {
       patterns: [noRelativeOutsideFolder],

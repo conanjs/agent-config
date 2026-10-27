@@ -54,7 +54,7 @@ Shows **how one paradigm looks in one language**, and **how its rules are enforc
 
 - **Shape mapping** has one row per shape section of the paradigm file.
 - **Enforcement** has a row for every paradigm rule marked `lint`, `typecheck` or `test`. If the rule can't be mapped in this stack, the row says `llm (fallback): <reason>`.
-- Scope paths are generic globs (`src/domain/**`). Projects whose layout differs override them in their own lint config, never here.
+- Scope paths are generic globs for the default feature-first layout (`src/modules/*/domain/**`, MOD-9). Projects whose layout differs, such as an opted-in layer-first repo (`src/domain/**`), override them in their own lint config, never here.
 - Tool names are allowed here, because this file sits inside `stacks/` (V6).
 
 ## Example

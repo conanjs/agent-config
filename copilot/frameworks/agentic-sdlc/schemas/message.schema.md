@@ -58,8 +58,8 @@ payload:
   summary: Role exposes mutable permissions; use case bypasses the aggregate.
   confidence: high
   findings:
-    - { rule: PDM-class-modeled-R1, enforced_by: lint, result: fail, severity: major, location: src/domain/role.ts:4, detail: "cmd.lint: explicit-member-accessibility" }
-    - { rule: DDD-8, enforced_by: llm, result: fail, severity: major, location: src/application/roles/grant.ts:12, detail: "pushes into role.permissions directly" }
+    - { rule: PDM-class-modeled-R1, enforced_by: lint, result: fail, severity: major, location: src/modules/roles/domain/Role.ts:4, detail: "cmd.lint: explicit-member-accessibility" }
+    - { rule: DDD-8, enforced_by: llm, result: fail, severity: major, location: src/modules/roles/application/GrantPermission.ts:12, detail: "pushes into role.permissions directly" }
   reason: fixable
   open_questions: []
 ```

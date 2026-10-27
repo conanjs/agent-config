@@ -37,7 +37,7 @@ Stack procedures (files under `procedures/<stack>/`) also declare their **bounde
 |---|---|---|
 | `stack` | yes, under `procedures/<stack>/` only | The stack id; equals the folder name |
 | `inputs` | yes, under `procedures/<stack>/` only | Kebab-case names of the values the task line must supply (`inputs: name=value; …`); `[]` if none. A trailing `?` marks an optional input (`module?`), which the task line may omit. Each is described in **Inputs needed:** as `**<name>**` |
-| `allowed-paths` | yes, under `procedures/<stack>/` only | Globs (`*`, `**`), relative to the component's path in `docs/architecture.md` §3, of every file a task following this procedure may change. A glob may name an input as `{name}` (`src/{module}/application/**`); `validate-project.mjs --task` fills it from the task line, and an empty optional input drops its path segment (`src/application/**`). It fails a task that changed anything else |
+| `allowed-paths` | yes, under `procedures/<stack>/` only | Globs (`*`, `**`), relative to the component's path in `docs/architecture.md` §3, of every file a task following this procedure may change. A glob may name an input as `{name}` (`src/{module-path}/application/**`, with `module-path=modules/documents`); `validate-project.mjs --task` fills it from the task line, and an empty optional input drops its path segment (`src/application/**`). It fails a task that changed anything else |
 
 No other keys are allowed.
 
@@ -47,10 +47,10 @@ schema: procedure/v1
 last-updated: 2026-10-27
 depends-on: []
 stack: typescript-node
-inputs: [capability, technology, use-case]
+inputs: [capability, technology, use-case, module-path?]
 allowed-paths:
-  - src/application/**
-  - src/infrastructure/**
+  - src/{module-path}/application/**
+  - src/{module-path}/infrastructure/**
   - src/CompositionRoot.ts
   - test/**
 ---

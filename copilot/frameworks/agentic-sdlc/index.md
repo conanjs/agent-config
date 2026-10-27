@@ -109,7 +109,7 @@ Example flow for one engineering task:
 
 Worked example: a task touching an external integration lists `touches: integration:hr-directory`; the launch prompt includes `state.integrations: [docs/integrations/hr-directory.md]`. The role follows that doc to any company and reference facts.
 
-Worked example with a procedure: at P5 the planner matches "Add Clock port and SystemClock adapter" against `procedures/typescript-node/index.md` ("A use case needs a new capability from outside the core") and writes `procedure: typescript-node/add-port-and-adapter` with `inputs: capability=tell the time; technology=system clock; use-case=ExpireSessions`. The launch prompt carries `state.procedure`; the role follows the ten steps and changes only `src/application/**`, `src/infrastructure/**`, `src/CompositionRoot.ts`, `test/**` and the listed docs. A change to `src/domain/` fails the scope check.
+Worked example with a procedure: at P5 the planner matches "Add Clock port and SystemClock adapter" against `procedures/typescript-node/index.md` ("A use case needs a new capability from outside the core") and writes `procedure: typescript-node/add-port-and-adapter` with `inputs: capability=tell the time; technology=system clock; use-case=ExpireSessions; module-path=modules/sessions`. The launch prompt carries `state.procedure`; the role follows the ten steps and changes only `src/modules/sessions/application/**`, `src/modules/sessions/infrastructure/**`, `src/CompositionRoot.ts`, `test/**` and the listed docs. A change to `src/modules/sessions/domain/` fails the scope check.
 
 ## 9. Enforcement
 | Tier | Checker | When |

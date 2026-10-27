@@ -24,7 +24,7 @@ Spec Kit owns the task line's start (`- [ ] T020 [P] [US2] <description>`). The 
 | `touches:` | yes for `[llm]` | `none`, or `integration:<svc>` where `<svc>` is a row in architecture §6 | the planner checks the task against §6 |
 | `refs:` | yes for `[llm]` | `none`, or paths taken from the matching stack's Reference topics table | the planner checks the task against the "Attach when" column |
 | `procedure:` | yes for `[llm]` when the component's stack has a procedure catalog (`{{AGENT_HOME}}/procedures/<stack>/index.md`); otherwise optional | `none`, or `<stack>/<slug>` naming `{{AGENT_HOME}}/procedures/<stack>/<slug>.procedure.md` for the task path's stack | the planner checks the task against the catalog's "Use when" column |
-| `inputs:` | yes when the procedure's front-matter lists `inputs` | one `name=value` per declared input, separated by `;`; an optional input (declared `name?`) may be left out, for example `module` in a layer-first repo | the planner, from the spec and plan |
+| `inputs:` | yes when the procedure's front-matter lists `inputs` | one `name=value` per declared input, separated by `;`; an optional input (declared `name?`) may be left out, for example `module-path` in a layer-first repo | the planner, from the spec and plan |
 | `hot-path:` | no | `yes` · `no` | the plan (performance-sensitive work) |
 
 ## Rules
@@ -39,13 +39,13 @@ Spec Kit owns the task line's start (`- [ ] T020 [P] [US2] <description>`). The 
 ## Example
 
 ```markdown
-- [ ] T021 [US4] Add SyncUsersFromHr use case (src/application/users/)  [Eng] [llm]
+- [ ] T021 [US4] Add SyncUsersFromHr use case (src/modules/users/application/)  [Eng] [llm]
       touches: integration:apigee-hr  ·  refs: none  ·  hot-path: no
-- [ ] T022 [US4] Batch-upsert 50k users per run (src/infrastructure/userRepo.ts)  [Eng] [llm]
+- [ ] T022 [US4] Batch-upsert 50k users per run (src/modules/users/infrastructure/UserRepo.ts)  [Eng] [llm]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/js-runtime/v8-hidden-classes.md  ·  hot-path: yes
-- [ ] T031 [US2] Add Clock port and SystemClock adapter (src/application/ports/)  [Eng] [llm]
+- [ ] T031 [US2] Add Clock port and SystemClock adapter (src/modules/sessions/application/ports/)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: typescript-node/add-port-and-adapter  ·  hot-path: no
-      inputs: capability=tell the time; technology=system clock; use-case=ExpireSessions
+      inputs: capability=tell the time; technology=system clock; use-case=ExpireSessions; module-path=modules/sessions
 ```
 
 ## Checks

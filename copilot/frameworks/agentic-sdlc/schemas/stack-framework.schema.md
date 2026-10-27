@@ -51,8 +51,8 @@ Rules for using one application framework (Express, Gin, FastAPI…) **inside** 
 ## Placement
 | Framework piece | Layer | Location |
 |---|---|---|
-| Router / route handlers | interface | src/interface/routes/ (one router per resource, mounted in main.ts) |
-| Middleware | interface | src/interface/middleware/ (authn, authz, rate limit only) |
+| Router / route handlers | interface | src/modules/<module>/interface/routes/ (one router per resource, mounted in main.ts) |
+| Middleware | interface | src/modules/shared/interface/ (authn, authz, rate limit only) |
 
 ## Rules
 | Id | Rule | Holds when | Typical violation | Enforced by | Source |
