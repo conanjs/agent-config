@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["Node ≥ 14.6 / 12.19", "TypeScript ≥ 4.7 (node16/nodenext/bundler resolution)"]
 last-verified: 2026-10-25
-last-updated: 2026-10-25
+last-updated: 2026-10-28
 tags: [subpath-imports, package-json, imports, aliases, module-resolution]
 ---
 
@@ -73,6 +73,7 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 | Another package imports `#core/…` from yours | Not resolved | `imports` is private to the declaring package ✅[^1] |
 | Only tsconfig `paths` is set | Type-check passes, runtime fails | `paths` does not affect emit ✅[^2] |
 | `#` in an import versus `#field` in a class | Unrelated | One is a module specifier, the other a private class field |
+| One `#/*` key for a whole `src/` tree (`"#/*": { "source": "./src/*.ts", "default": "./dist/*.js" }`) | Works with tsc (`customConditions: ["source"]`), tsx `--conditions=source`, Vitest `ssr.resolve.conditions` and the built `dist/`; tested 2026-10-28 on Node 24.22 in a copy of the typescript-node stack reference | Keys may start with `#/` from Node 24.14; the `source`/`default` conditions pick `.ts` in development and `.js` after the build |
 
 ## Takeaways
 - Use an alias every tool resolves: `package.json` `imports`, or tsconfig `paths` with a build-time rewrite. Never rely on `paths` alone. [rule-candidate]

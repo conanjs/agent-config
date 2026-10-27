@@ -255,8 +255,6 @@ settings: { "import-x/resolver-next": [createTypeScriptImportResolver({ project:
   "imports": {
     "#domain/*": { "source": "./src/domain/*.ts", "default": "./dist/domain/*.js" },
     "#application/*": { "source": "./src/application/*.ts", "default": "./dist/application/*.js" }
-    // Feature-first (MOD-9): one entry for the modules folder instead, e.g. "#modules/*" → "./src/modules/*.ts" / "./dist/modules/*.js".
-    // Not separately tested: the verified run above used the layer folders.
   },
   "scripts": {
     // Every tsx entry needs the condition, including `node --import tsx …` and child processes that tests spawn.
@@ -266,6 +264,20 @@ settings: { "import-x/resolver-next": [createTypeScriptImportResolver({ project:
 // tsconfig.json: "moduleResolution": "nodenext", "rootDir": "./src", "outDir": "./dist", "customConditions": ["source"]
 // Specifiers carry no extension: `#domain/role` (the pattern adds `.ts` or `.js`).
 ```
+
+The snippet above maps layer folders (an opted-in layer-first repo). For the default feature-first layout, one key covers all of `src/`, plus one for test helpers:
+
+```jsonc
+// package.json (feature-first, MOD-9). "#/" keys need Node ≥ 24.14.
+"imports": {
+  "#/*": { "source": "./src/*.ts", "default": "./dist/*.js" },
+  "#test/*": "./test/*.ts"
+}
+// imports read: "#/modules/documents/application/ReviseDocument", "#/CompositionRoot", "#test/support/results"
+// build is plain `tsc -p tsconfig.build.json` (no tsc-alias); dist keeps "#/…" and Node resolves it through "default".
+```
+
+Verified 2026-10-28 on a throwaway copy of the stack reference v3.0.0 (Node 24.22, TypeScript 6.0, tsx 4.23, Vitest 5, ESLint 10, eslint-plugin-import-x 4.17), converted to this option: `tsconfig` `paths` removed and `customConditions: ["source"]` added, Vitest `ssr.resolve.conditions` as below, the import-x node resolver with `conditionNames` as below, and every `@/….js` import rewritten to `#/…`. Format, lint, typecheck, 7 unit and 5 integration tests, the build and the `dist/` smoke import all passed. The module-boundary zones still reported a seeded `#/modules/documents/domain/Document` import from another module and a seeded `domain → application` import. `tsx --conditions=source src/main.ts` served a request (404 problem body); without the condition and with no `dist/`, tsx failed with `ERR_MODULE_NOT_FOUND`, as the pitfall table says.
 
 ```ts
 // vitest.config.ts: since Vite 6, node-environment tests resolve through `ssr.resolve`,
