@@ -1,6 +1,6 @@
 ---
 name: spec-driven-development
-description: Bootstrap GitHub Spec Kit in a project (new or existing) and run its spec -> plan -> tasks -> implement workflow.
+description: Bootstrap GitHub Spec Kit in a project (new or existing) and run its spec -> plan -> tasks -> implement -> converge workflow.
 argument-hint: "agent=<claude|copilot|codex> [new=<project-name>|existing]"
 agent: 'agent'
 ---
