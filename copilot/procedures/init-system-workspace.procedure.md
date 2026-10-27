@@ -1,3 +1,12 @@
+---
+schema: procedure/v1
+last-updated: 2026-10-27
+depends-on:
+  - tool: git clone
+    verified-against: unverified
+    source: https://git-scm.com/docs/git-clone
+---
+
 # Procedure: Initialize a System Workspace (multi-repo)
 
 Tool-agnostic procedure for a multi-repo system under the Agentic SDLC framework: create (or adopt) the system docs in the company's **Company KB** (`{{AGENT_HOME}}/companies/<co>/system/`, decision D8 — there is no separate system repo), and clone every repo of the system into the standard local layout. Written once here; tool wrappers only point here.

@@ -1,3 +1,18 @@
+---
+schema: procedure/v1
+last-updated: 2026-10-27
+last-verified: 2026-10-27
+depends-on:
+  - tool: GitHub Spec Kit (specify CLI)
+    verified-against: v1.2.3
+    source: https://github.github.com/spec-kit/quickstart.html
+    repo: github/spec-kit
+  - tool: uv
+    verified-against: unverified
+    source: https://docs.astral.sh/uv/getting-started/installation/
+    repo: astral-sh/uv
+---
+
 # Procedure: Bootstrap Spec-Driven Development (Spec Kit)
 
 Tool-agnostic procedure for adopting [GitHub Spec Kit](https://github.com/github/spec-kit) in a project — the spec → plan → tasks → implement → converge workflow, run through whichever agent (Claude Code, Copilot, Codex) is active in that project.

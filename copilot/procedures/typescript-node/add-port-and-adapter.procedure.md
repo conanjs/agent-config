@@ -1,3 +1,9 @@
+---
+schema: procedure/v1
+last-updated: 2026-10-27
+depends-on: []
+---
+
 # Procedure: Add a Port and Adapter (typescript-node)
 
 A use case needs something from outside the core: storage, the clock, an external API, password hashing. This procedure adds the port (the interface the use case depends on) and one adapter (the class that implements it with a real technology), wired the way the stack reference does it. Analogy: the port is the wall socket shape; the adapter is the plug for one particular appliance.

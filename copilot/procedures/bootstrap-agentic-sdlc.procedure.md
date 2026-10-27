@@ -1,3 +1,9 @@
+---
+schema: procedure/v1
+last-updated: 2026-10-27
+depends-on: []
+---
+
 # Procedure: Bootstrap the Agentic SDLC Framework in a Project
 
 Tool-agnostic procedure for adopting the Agentic SDLC framework (`{{AGENT_HOME}}/frameworks/agentic-sdlc/`) in one project repo. The framework layers onto GitHub Spec Kit, so Spec Kit setup comes first. Written once here; tool wrappers (Copilot prompt, the `agentic-sdlc` skill) only point here.
