@@ -844,7 +844,7 @@ Target: [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github
 - [^27]: [Implementing Clean Architecture – Of controllers and presenters](http://www.plainionist.net/Implementing-Clean-Architecture-Controller-Presenter/) — Plainionist, 2018 (updated 2023). Backs: §6.6 "Who backs form B" (the strict reading).
 - [^28]: [techexcellenceio community discussion #3](https://github.com/techexcellenceio/community/discussions/3) — community discussion that identifies the `openchat-unclebob` branch as Uncle Bob's version, using "use case handlers WITHOUT presenters". Backs: §6.6 "Who backs form B".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules (§14, §15).
-- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`).
+- [conanjs/agentic-sdlc-reference-typescript-node @ v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b) — the code reviewed in §15 (the stack reference, pinned by `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`). The same code in the default feature-first layout (MOD-9): [@ v2.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/171c3ba548fd5b00913f8c6a62acdd591f278c91) (`src/documents/`, `src/shared/`).
 
 ## Related
 - `software-design/architecture-styles/hexagonal-architecture-deep-dive.md`

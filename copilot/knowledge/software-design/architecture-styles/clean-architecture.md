@@ -147,7 +147,7 @@ Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mista
 - [GUI Architectures](https://martinfowler.com/eaaDev/uiArchs.html) — Martin Fowler, 2006. Backs: the Model-View-Presenter meaning of "presenter".
 - `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules this doc explains.
 - `copilot/frameworks/agentic-sdlc/foundations/code/naming.md` — the `Presenter` role suffix.
-- [`src/` of the stack reference at v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`.
+- [`src/` of the stack reference at v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`. The same code in the default feature-first layout (MOD-9): [@ v2.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/171c3ba548fd5b00913f8c6a62acdd591f278c91) (`src/documents/`, `src/shared/`).
 - `copilot/knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md` — the deep dive this doc was distilled from (§6.3, §6.6, §6.7, §7).
 
 ## Related
