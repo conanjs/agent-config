@@ -324,7 +324,7 @@ Node requires every `imports` key to start with `#`, "to ensure they are disambi
 
 ### Module-boundary lint configuration (feature-first, MOD-3, MOD-9)
 
-Verified 2026-10-27 in the stack reference v2.0.0 and again on 2026-10-28 in v3.0.0, with modules under `src/modules/` (eslint-plugin-import-x 4.17): seeded imports of another module's `domain/` and `application/ports/`, of the composition root from a module, of a module from `shared/`, and `domain → application` and `application → infrastructure` inside a module were each reported; an import of another module's public use case passed.
+Verified 2026-10-27 in the stack reference v2.0.0 and again on 2026-10-28 in v3.0.0, with modules under `src/modules/` (eslint-plugin-import-x 4.17): seeded imports of another module's `domain/` and `application/ports/`, of the composition root from a module, of a module from `shared/`, and `domain → application` and `application → infrastructure` inside a module were each reported; an import of another module's public use case passed. With one module this never tested direction: the first version of this snippet let any module import any other module's `application/`, so with a second module, `documents` could have imported `comments`. The `mayDependOn` map closes that: tested 2026-10-28 on the stack reference's v4.1.0 branch (PR #14) with `comments -> documents`, where `documents` importing `comments` was reported, and `comments` importing `documents`' `domain/`, `application/ports/` and `interface/` was reported, while its public `DocumentView` passed.
 
 ```js
 // eslint.config.mjs (excerpt): layers inside every module, then module-to-module rules.
@@ -338,11 +338,17 @@ const layerZones = [   // globs end in /** (see the pitfall table above)
   { target: "./src/modules/*/interface/**", from: ["./src/modules/*/infrastructure/**"] },
   { target: ["./src/!(CompositionRoot|main).ts", "./src/modules/*/**"], from: ["./src/CompositionRoot.ts", "./src/main.ts"] },
 ];
+// The may-depend-on edges of docs/architecture.md §4; an unlisted module may use none.
+const mayDependOn = { comments: ["documents"] };
 const moduleZones = [
-  ...modules.flatMap((target) => modules.filter((from) => from !== target).flatMap((from) => [
-    { target: `./src/modules/${target}`, from: `./src/modules/${from}`, except: ["./application"], message: `${target} may import only ${from}/application (MOD-3)` },
-    { target: `./src/modules/${target}`, from: `./src/modules/${from}/application/ports`, message: `Ports of ${from} are not public (MOD-3)` },
-  ])),
+  ...modules.flatMap((target) => modules.filter((from) => from !== target).flatMap((from) =>
+    (mayDependOn[target] ?? []).includes(from)
+      ? [
+          { target: `./src/modules/${target}`, from: `./src/modules/${from}`, except: ["./application"], message: `${target} may import only ${from}/application (MOD-3)` },
+          { target: `./src/modules/${target}`, from: `./src/modules/${from}/application/ports`, message: `Ports of ${from} are not public (MOD-3)` },
+        ]
+      : [{ target: `./src/modules/${target}`, from: `./src/modules/${from}`, message: `${target} may not depend on ${from} (MOD-3)` }],
+  )),
   ...modules.map((from) => ({ target: "./src/modules/shared", from: `./src/modules/${from}`, message: "shared/ imports no feature module (MOD-4)" })),
 ];
 // rules: { "import-x/no-restricted-paths": ["error", { zones: [...layerZones, ...moduleZones] }] }
