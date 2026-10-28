@@ -161,6 +161,8 @@ require:
   - local-docs/implementation-summary
   - noReExports
   - noRelativeOutsideFolder
+  - noEnums
+  - noRawStatusCodes
   - import-x/no-cycle
   - import-x/extensions
   - @typescript-eslint/no-extraneous-class
@@ -186,8 +188,8 @@ require-if: package.json imports
 | TSN-16 | ESLint `no-restricted-imports` with the `noRelativeOutsideFolder` pattern from the snippet below, on `src/**` and `test/**`, repeated in every later block that sets `no-restricted-imports` (see the flat-config note below); `import-x/no-cycle`. Exceptions (root tool config, pre-build scripts) only by file name, mirroring `docs/architecture.md` §4 |
 | TSN-17 | ESLint `no-restricted-imports` `patterns` per layer, generated from `docs/architecture.md` §4 (for example `domain` forbids `@/application/*`, `@/infrastructure/*`, `@/interface/*`); adapters allowed only in the composition root block. Feature-first (MOD-9): `import-x/no-restricted-paths` with layer zones per module and module zones, snippet "Module-boundary lint configuration" below |
 | TSN-18 | ESLint `no-restricted-syntax` selectors `ExportAllDeclaration` and `ExportNamedDeclaration[source]` (the `noReExports` list in the snippet below), added to **every** block that sets `no-restricted-syntax`, including a block for the Tier B files, because a later block's options replace earlier ones |
-| TSN-19 | ESLint `no-restricted-imports` `paths: [{ name: "http-status-codes" }]` in a block for `src/**/*.ts` that ignores `src/modules/*/interface/**` (`src/interface/**` in an opted-in layer-first repo) and tests, repeating `patterns: [noRelativeOutsideFolder]` because a later block's options replace earlier ones. Bare numbers: a `noRawStatusCodes` list of `no-restricted-syntax` selectors, in every block that sets that rule, reports a 100–599 literal passed to `res.status`/`res.sendStatus` or compared (`===`, `<`, `>=` …) with anything named `*status`; tests are exempt, because the contract test writes wire values on purpose. Tested 2026-10-28 on the stack reference v4.0.0: it found `status >= 500` in `ErrorMiddleware`, reported four planted forms, and ignored `status / 100` and numbers outside the range. `StatusCodes` is an `enum` inside the library (TSN-20 bans declaring enums, not using a dependency's), and `@typescript-eslint/no-unsafe-enum-comparison` rejects comparing it with a `number`, so a threshold is a constant typed `number` (`static readonly #FIRST_SERVER_ERROR: number = StatusCodes.INTERNAL_SERVER_ERROR`). Snippet: "Status-code lint configuration" below |
-| TSN-20 | ESLint `no-restricted-syntax` selector `TSEnumDeclaration` (a `noEnums` list), added to every block that sets `no-restricted-syntax`, like TSN-18. Not `erasableSyntaxOnly`: that flag also bans constructor parameter properties, which TSN-6 and the class-modeled paradigm use (23 errors on reference v3.1.0, tested 2026-10-28). The stack reference adopts the selector in v4.0.0 (layer-first v1.5.0), where seeded enums in six kinds of file were all reported (2026-10-28); `noEnums` joins the lint baseline when that release is pinned. Raw-string uses of an owned code are found in review, not by lint |
+| TSN-19 | ESLint `no-restricted-imports` `paths: [{ name: "http-status-codes" }]` in a block for `src/**/*.ts` that ignores `src/modules/*/interface/**` (`src/interface/**` in an opted-in layer-first repo) and tests, repeating `patterns: [noRelativeOutsideFolder]` because a later block's options replace earlier ones. Bare numbers: a `noRawStatusCodes` list of `no-restricted-syntax` selectors, in every block that sets that rule, reports a 100–599 literal passed to `res.status`/`res.sendStatus` or compared (`===`, `<`, `>=` …) with anything named `*status`; tests are exempt, because the contract test writes wire values on purpose. Tested 2026-10-28 on the stack reference v4.0.0: it found `status >= 500` in `ErrorMiddleware`, reported four planted forms, and ignored `status / 100` and numbers outside the range. `StatusCodes` is an `enum` inside the library (TSN-20 bans declaring enums, not using a dependency's), and `@typescript-eslint/no-unsafe-enum-comparison` rejects comparing it with a `number`, so a threshold is a constant typed `number` (`static readonly #FIRST_SERVER_ERROR: number = StatusCodes.INTERNAL_SERVER_ERROR`). `noRawStatusCodes` is in the lint baseline. Snippet: "Status-code lint configuration" below |
+| TSN-20 | ESLint `no-restricted-syntax` selector `TSEnumDeclaration` (a `noEnums` list), added to every block that sets `no-restricted-syntax`, like TSN-18. Not `erasableSyntaxOnly`: that flag also bans constructor parameter properties, which TSN-6 and the class-modeled paradigm use (23 errors on reference v3.1.0, tested 2026-10-28). The stack reference has the selector since v4.0.0 (layer-first v1.5.0), where seeded enums in six kinds of file were all reported (2026-10-28); `noEnums` is in the lint baseline. Raw-string uses of an owned code are found in review, not by lint |
 | CS-2 (unit size) | ESLint `complexity` and `max-lines-per-function`, or `llm (fallback)` if not configured |
 | FF-1 (layer deps) | ESLint `no-restricted-imports`/boundaries rules generated from `docs/architecture.md` §4 |
 | FF-2 (cycles) | `import-x/no-cycle` (TSN-16) or a graph script |
@@ -362,6 +364,28 @@ Verified 2026-10-27 in the stack reference v2.1.0 (ESLint 10, `http-status-codes
     }],
   },
 },
+```
+
+Bare numbers and enums: verified 2026-10-28 in the stack reference v4.0.0 (ESLint 10, typescript-eslint 8.72). `noRawStatusCodes` reported `res.status(404)`, `res.sendStatus(204)`, `err.status === 400` and `500 < status`, ignored `status / 100` and `status !== 2`, and found the one real case (`status >= 500`). `noEnums` reported planted enums in six kinds of file. Both lists go in **every** block that sets `no-restricted-syntax`, because a later block's options replace earlier ones; tests get a block with `noEnums` only, since the contract test writes status numbers on purpose.
+
+```js
+// TSN-20: no TypeScript enum.
+const noEnums = [
+  { selector: "TSEnumDeclaration", message: "No enum: use an as-const object or a literal union (TSN-20)" },
+];
+
+// TSN-19: a status code is a named constant, never a bare number, where it is set or compared.
+const statusLiteral = "Literal[value>=100][value<=599]";
+const comparison = "BinaryExpression[operator=/^([=!]==?|[<>]=?)$/]";
+const noRawStatusCodes = [
+  `CallExpression[callee.property.name=/^(status|sendStatus)$/] > ${statusLiteral}`,
+  `${comparison}:matches([left.name=/status$/i], [left.property.name=/status$/i]) > ${statusLiteral}.right`,
+  `${comparison}:matches([right.name=/status$/i], [right.property.name=/status$/i]) > ${statusLiteral}.left`,
+].map((selector) => ({ selector, message: "Use a StatusCodes constant, not a bare status number (TSN-19)" }));
+
+// e.g. { files: ["src/**/*.ts"], ignores: [...tierB, "src/**/*.test.ts"],
+//        rules: { "no-restricted-syntax": ["error", ...noFreeFunctions, ...noReExports, ...noEnums, ...noRawStatusCodes] } }
+// and  { files: ["src/**/*.test.ts", "test/**/*.ts"], rules: { "no-restricted-syntax": ["error", ...noEnums] } }
 ```
 
 ### Documentation lint configuration

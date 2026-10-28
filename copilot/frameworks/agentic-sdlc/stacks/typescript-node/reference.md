@@ -3,12 +3,12 @@ schema: stack-reference/v1
 last-updated: 2026-10-28
 stack: typescript-node
 repo: conanjs/agentic-sdlc-reference-typescript-node
-pinned: v3.1.0
-commit: aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7
+pinned: v4.0.0
+commit: ce689e533f4163d2f991c4cbfad9470f5d8fdae6
 verified: 2026-10-28
 layout: feature-first
 variants:
-  - { layout: layer-first, branch: layout/layer-first, pinned: v1.4.0, commit: d26655fe30705f42962cecfc7b15ed31be56cab5, verified: 2026-10-28 }
+  - { layout: layer-first, branch: layout/layer-first, pinned: v1.5.0, commit: 0269dae5009fa0452aaa7b2a34d7e55c3a3a036f, verified: 2026-10-28 }
 ---
 
 # Reference: TypeScript on Node.js
@@ -25,25 +25,26 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 
 | Concern | Choice | Rule | Where |
 |---|---|---|---|
-| Packaging | Feature-first, modules under `src/modules/`: `src/modules/documents/` and `src/modules/shared/`, each with `domain`, `application`, `infrastructure`, `interface` (empty ones keep `.gitkeep`); composition root outside them | MOD-9, CA rules | `docs/architecture.md` §4 (`modules`), `specs/001-revise-document/research.md` DR-002, DR-004 |
-| Module boundaries | Another module may import only `documents/application/*.ts` (not `ports/`); `shared/` imports no module; module list read from `src/modules/` | MOD-3, MOD-4, TSN-17 | `eslint.config.mjs` (`moduleZones`) |
+| Packaging | Feature-first, modules under `src/modules/`: `src/modules/documents/` and `src/modules/shared/`, each with `domain`, `application`, `infrastructure`, `interface` (empty ones keep `.gitkeep`); composition root outside them. Inside a layer, one folder per use case (`application/revise-document/`, `interface/routes/revise-document/`) and one per aggregate in `domain/` (`domain/document/`); files shared by several use cases stay at the layer root | MOD-9, MOD-10, CA rules | `docs/architecture.md` §4 (`modules`), `specs/001-revise-document/research.md` DR-002, DR-004 |
+| Module boundaries | Another module may import only `documents/application/**` outside `ports/`; `shared/` imports no module; module list read from `src/modules/` | MOD-3, MOD-4, TSN-17 | `eslint.config.mjs` (`moduleZones`) |
 | Layer direction | Resolved-path zones inside every module, so aliases cannot bypass them; glob zones end in `/**` | FF-1, TSN-17 | `eslint.config.mjs` (`layerZones`) |
 | Re-exports | None: every import names the declaring file; no `index.ts` barrels | IMP-5, TSN-18 | `eslint.config.mjs` (`noReExports`) |
 | Import paths | Relative only within one folder; `@/` aliases everywhere else, in `src` and `test` | IMP-1, IMP-2, TSN-16 | `eslint.config.mjs` (`noRelativeOutsideFolder`) |
 | Alias mechanism | tsconfig `paths` + `tsc-alias` in the build (stack Option default) | TSN-15 | `tsconfig.json`, `package.json` `build`, `specs/001-revise-document/research.md` DR-001 |
 | Ports | Declared next to the use cases that consume them | TSN-2 | `src/modules/documents/application/ports/DocumentStore.ts` |
-| Create contract | `201 Created`, `Location: /documents/<id>`, the new document as the body; the id comes from a `DocumentIds` port (UUID adapter in production, sequential in tests) | NAM-7, TSN-2 | `src/modules/documents/application/ports/DocumentIds.ts`, `src/modules/documents/interface/routes/CreateDocumentHandler.ts`, `specs/002-document-lifecycle/research.md` DR-006 |
-| List contract | Cursor pagination: `{ items, nextCursor }`, ascending id, `limit` 1 to 100 (default 20), `nextCursor` `null` on the last page; a bad query is a 400 problem | EXP-7 | `src/modules/documents/application/ListDocuments.ts`, `src/modules/documents/interface/routes/ListDocumentsQuery.ts`, DR-005 |
+| Create contract | `201 Created`, `Location: /documents/<id>`, the new document as the body; the id comes from a `DocumentIds` port (UUID adapter in production, sequential in tests) | NAM-7, TSN-2 | `src/modules/documents/application/ports/DocumentIds.ts`, `src/modules/documents/interface/routes/create-document/CreateDocumentHandler.ts`, `specs/002-document-lifecycle/research.md` DR-006 |
+| List contract | Cursor pagination: `{ items, nextCursor }`, ascending id, `limit` 1 to 100 (default 20), `nextCursor` `null` on the last page; a bad query is a 400 problem | EXP-7 | `src/modules/documents/application/list-documents/ListDocuments.ts`, `src/modules/documents/interface/routes/list-documents/ListDocumentsQuery.ts`, DR-005 |
 | Queries and commands | One use case and one handler per route; queries (`Get…`, `List…`) change nothing | NAM-4, EXP-1 | `src/modules/documents/application/`, `src/CompositionRoot.ts` (route table) |
-| Paradigm | class-modeled@1: entity state in `readonly #fields`, collaborators as `private readonly` parameters | PDM-class-modeled-R1, R7 | `src/modules/documents/domain/Document.ts`, `src/modules/documents/application/ReviseDocument.ts` |
+| Paradigm | class-modeled@1: entity state in `readonly #fields`, collaborators as `private readonly` parameters | PDM-class-modeled-R1, R7 | `src/modules/documents/domain/document/Document.ts`, `src/modules/documents/application/revise-document/ReviseDocument.ts` |
 | Tier B files | Only `src/main.ts` and `src/modules/shared/infrastructure/config.ts` hold free functions | PDM-class-modeled-R7 | `docs/architecture.md` §7, `eslint.config.mjs` (`tierB`) |
 | Port roles | Input port = the use case's public `run()` (no separate interface); gateway port = an explicit interface; no output port (request/response form) | CA-2 | `docs/architecture.md` §4 |
-| Data across boundaries | Plain `<UseCase>Input` in, plain `<UseCase>Output` out; the entity never leaves the use case | CA-4 | `src/modules/documents/application/ReviseDocument.ts` (`ReviseDocumentOutput`) |
+| Data across boundaries | Plain `<UseCase>Input` in, plain `<UseCase>Output` out; the entity never leaves the use case | CA-4 | `src/modules/documents/application/revise-document/ReviseDocument.ts` (`ReviseDocumentOutput`) |
 | Expected failures | `Result` union; thrown `Error` only for the unexpected | TSN-4, TSN-5 | `src/modules/shared/domain/Result.ts` |
+| Error codes | `as const` objects with a same-name derived type, each value written once in the layer that owns it (`DocumentError`, `LookupError`, `DocumentsRefusal` spreading both); keys in code and unit tests, literal values only in the contract test; no `enum` (`noEnums`) | TSN-20 | `src/modules/documents/domain/document/DocumentError.ts`, `src/modules/documents/application/LookupError.ts`, `src/modules/documents/interface/errors/HttpErrorMapper.ts`, `eslint.config.mjs` (`noEnums`) |
 | Error to HTTP | One mapper per module; a `Record` over the refusal union makes a missing status a compile error | TSN-11, EXP-5 | `src/modules/documents/interface/errors/HttpErrorMapper.ts` |
-| Error body | RFC 9457 problem, `application/problem+json`: `/problems/<reason>` for named refusals, `about:blank` otherwise; thrown errors through one shared middleware that logs every 500 | EXP-8 | `src/modules/shared/interface/ProblemDetails.ts`, `src/modules/shared/interface/ErrorMiddleware.ts`, `test/integration/documents.int.test.ts` |
-| Status codes | `http-status-codes` named constants, only in `interface/` (stack Option default) | TSN-19 | `eslint.config.mjs` (`http-status-codes` restriction), `specs/001-revise-document/research.md` DR-003 |
-| Doc comments | TSDoc on every export and public member; contract on the port; each adapter method has its own summary starting `{@link Port.member}`, so the editor shows it plus the port's notes; every parameter and return documented; summaries answer the contract questions | CMT-5, CMT-6, CMT-12, CMT-13, TSN-13 | `src/modules/documents/application/ports/DocumentStore.ts`, `src/modules/documents/infrastructure/InMemoryDocumentStore.ts`, `src/modules/documents/application/ReviseDocument.ts` (`run`) |
+| Error body | RFC 9457 problem, `application/problem+json`: `/problems/<reason>` for named refusals, `about:blank` otherwise; thrown errors through one shared middleware that logs every 500 | EXP-8 | `src/modules/shared/interface/ProblemDetails.ts`, `src/modules/shared/interface/ErrorMiddleware.ts`, `test/integration/documents.int.test.ts`, `docs/problem-types.md` (every type with its title and status, RFC 9457 §4) |
+| Status codes | `http-status-codes` named constants, only in `interface/` (stack Option default); never a bare number where a status is set or compared | TSN-19 | `eslint.config.mjs` (`http-status-codes` restriction, `noRawStatusCodes`), `specs/001-revise-document/research.md` DR-003 |
+| Doc comments | TSDoc on every export and public member; contract on the port; each adapter method has its own summary starting `{@link Port.member}`, so the editor shows it plus the port's notes; every parameter and return documented; summaries answer the contract questions; every `{@link}` resolves, checked by asking the language service as an editor does | CMT-5, CMT-6, CMT-12, CMT-13, TSN-13 | `src/modules/documents/application/ports/DocumentStore.ts`, `src/modules/documents/infrastructure/InMemoryDocumentStore.ts`, `src/modules/documents/application/revise-document/ReviseDocument.ts` (`run`), `scripts/check-doc-links.mjs` |
 | Naming | File name equals the class; suffixes only from the role glossary (`Store`, `Handler`, `Mapper`) | NAM-8, NAM-6 | `docs/glossary.md` |
 | Config | Parsed once, frozen, nothing else reads the environment | TSN-9 | `src/modules/shared/infrastructure/config.ts` |
 | Logging | One pino logger made in `main.ts` and injected; `no-console` | TSN-10 | `src/main.ts`, `src/CompositionRoot.ts` |
@@ -56,16 +57,17 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | Path | Role | Shows |
 |---|---|---|
 | `src/modules/shared/domain/Result.ts` | type | Expected-failure union |
-| `src/modules/documents/domain/Document.ts` | entity | Private constructor, static `create`, `#fields`, invariant in `revise` |
+| `src/modules/documents/domain/document/Document.ts` | entity | Private constructor, static `create`, `#fields`, invariant in `revise` |
 | `src/modules/documents/application/ports/DocumentStore.ts` | port | The contract, written once, with `@remarks` and `@returns` |
-| `src/modules/documents/application/ReviseDocument.ts` | use case | Constructor injection; a why-comment on the one non-obvious line |
+| `src/modules/documents/domain/document/DocumentError.ts`, `src/modules/documents/application/LookupError.ts` | error codes | Each code declared once, in the layer that owns it (TSN-20) |
+| `src/modules/documents/application/revise-document/ReviseDocument.ts` | use case | Constructor injection; a why-comment on the one non-obvious line |
 | `src/modules/documents/infrastructure/InMemoryDocumentStore.ts` | adapter | Own summary linking the port member (CMT-12); implementation note as a body comment |
 | `src/modules/shared/infrastructure/config.ts` | Tier B | zod config, `@throws` |
-| `src/modules/documents/interface/routes/ReviseDocumentBody.ts` | schema | Strict input validation at the boundary |
-| `src/modules/documents/interface/routes/ReviseDocumentHandler.ts` | handler | Parse, call one use case, map the result |
-| `src/modules/documents/application/{CreateDocument,GetDocument,ListDocuments,DeleteDocument,GetDocumentHistory}.ts` | use cases | One per route; plain `DocumentView` out |
+| `src/modules/documents/interface/routes/revise-document/ReviseDocumentBody.ts` | schema | Strict input validation at the boundary |
+| `src/modules/documents/interface/routes/revise-document/ReviseDocumentHandler.ts` | handler | Parse, call one use case, map the result |
+| `src/modules/documents/application/<use-case>/` (`create-document/`, `get-document/`, `list-documents/`, `delete-document/`, `get-document-history/`) | use cases | One folder per use case with its test (MOD-10); one per route; plain `DocumentView` out |
 | `src/modules/documents/application/ports/DocumentIds.ts`, `src/modules/documents/infrastructure/UuidDocumentIds.ts` | port, adapter | Where new ids come from |
-| `src/modules/documents/interface/routes/*Handler.ts`, `*Body.ts`, `*Query.ts` | handlers, schemas | One handler per route; strict request schemas |
+| `src/modules/documents/interface/routes/<use-case>/*Handler.ts`, `*Body.ts`, `*Query.ts` | handlers, schemas | One handler per route; strict request schemas |
 | `src/modules/documents/interface/errors/HttpErrorMapper.ts` | mapper | Exhaustive refusal-to-problem table |
 | `src/modules/shared/interface/ProblemDetails.ts` | value | The RFC 9457 body and how it is sent |
 | `src/modules/shared/interface/ErrorMiddleware.ts` | middleware | Thrown errors to `about:blank` problems; logs every 500 |
@@ -73,6 +75,7 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | `src/main.ts` | Tier B entry | Config, logger, listen |
 | `src/**/*.test.ts`, `test/integration/*.int.test.ts` | tests | Unit, concurrency and HTTP tests |
 | `eslint.config.mjs` | lint | Every lint rule of the stack, with the flat-config pitfalls handled |
+| `scripts/check-doc-links.mjs` | link check | Fails `pnpm run check` on any `{@link}` an editor could not follow (TSN-13) |
 | `eslint/local-docs.mjs` | lint plugin | `specific-summary` (CMT-13 floor) and `implementation-summary` (CMT-12); copy it into each repo |
 | `docs/`, `.specify/`, `specs/` | records | Architecture, glossary, constitution, decision records, task plan, as any project has |
 | `.github/workflows/check.yml` | CI | `pnpm run check`, then this framework's `validate-project.mjs` at a pinned framework commit |
@@ -82,21 +85,21 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
 
 1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
-2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7` (feature-first, `v3.1.0`), or `… checkout --quiet d26655fe30705f42962cecfc7b15ed31be56cab5` for the layer-first variant (`v1.4.0`).
-3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7/<path>`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet ce689e533f4163d2f991c4cbfad9470f5d8fdae6` (feature-first, `v4.0.0`), or `… checkout --quiet 0269dae5009fa0452aaa7b2a34d7e55c3a3a036f` for the layer-first variant (`v1.5.0`).
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/ce689e533f4163d2f991c4cbfad9470f5d8fdae6/<path>`.
 
 A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 
 ## How to check
 
-In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, unit and integration tests, build, smoke import of `dist/`). Then `node {{AGENT_HOME}}/frameworks/agentic-sdlc/tools/validate-project.mjs .`. The repo's CI runs both on every push, the second at a pinned framework commit. A failure means the reference no longer matches the stack's rules; fix the reference or the rule, as a pair of pull requests (below).
+In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, doc links, unit and integration tests, build, smoke import of `dist/`). Then `node {{AGENT_HOME}}/frameworks/agentic-sdlc/tools/validate-project.mjs .`. The repo's CI runs both on every push, the second at a pinned framework commit. A failure means the reference no longer matches the stack's rules; fix the reference or the rule, as a pair of pull requests (below).
 
 ## Which layout
 
 | Layout | Copy it when | Tag | Commit |
 |---|---|---|---|
-| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v3.1.0` | `aac9ab88cf89639aed05050d3a32ef1ce3ddb8d7` |
-| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.4.0` | `d26655fe30705f42962cecfc7b15ed31be56cab5` |
+| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v4.0.0` | `ce689e533f4163d2f991c4cbfad9470f5d8fdae6` |
+| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.5.0` | `0269dae5009fa0452aaa7b2a34d7e55c3a3a036f` |
 
 Both variants get every rule fix, one pull request each (`{{AGENT_HOME}}/patterns/maintained-variant.pattern.md`).
 
