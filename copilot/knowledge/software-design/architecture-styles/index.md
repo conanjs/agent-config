@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: subtopic
 topic: software-design/architecture-styles
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 ---
 
 # Architecture styles
@@ -19,6 +19,8 @@ How the code inside one deployable is arranged so that business rules stay indep
 | [onion-architecture-deep-dive.md](onion-architecture-deep-dive.md) | deep-dive | Palermo's four tenets, why traditional layering ages, his CodeCampServer example, the 2013 retrospective. | verified |
 | [screaming-architecture-deep-dive.md](screaming-architecture-deep-dive.md) | deep-dive | Folders that show the business, not the framework: packaging options and when to switch to feature-first. | verified |
 | [combining-styles.md](combining-styles.md) | concept | What DDD, layered, onion, hexagonal and clean each contribute, and which one a given import rule comes from. | verified |
+| [vertical-slice-architecture.md](vertical-slice-architecture.md) | concept | One folder per request across all layers; the slice rule (no slice imports another) that replaces the layer rule, and the tested `eslint-plugin-boundaries` configuration. | verified |
+| [use-case-folders.md](use-case-folders.md) | concept | Folders inside a module: one per use case in each layer (default) and one per aggregate in `domain/`, full vertical slices, or commands/queries; the placement rule (deepest folder containing all users) and where it needs a second rule. | verified |
 
 ## References
 - `copilot/frameworks/knowledge/schemas/topic-index.schema.md` — defines the topic index shape.

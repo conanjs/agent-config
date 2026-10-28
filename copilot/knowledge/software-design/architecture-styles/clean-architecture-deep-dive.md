@@ -611,7 +611,7 @@ This is a real mistake from the stack reference, kept here as a teaching example
 | No dependency that breaks the Dependency Rule | It imports nothing | ✓ |
 | In the form most convenient for the inner circle | Declared in `src/application/ReviseDocument.ts`, next to the use case | ✓ |
 | No entity passed | Guarded by `ReviseDocument.test.ts` line 25 | ✓ |
-| The error is simple data too | `ReviseDocumentError = "not-found" \| "version-conflict" \| "invalid-body"`: plain strings | ✓ |
+| The error is simple data too | `ReviseDocumentError = "not-found" \| "version-conflict" \| "invalid-body"`: plain strings. From reference v4.0.0 the same values are declared once as `as const` objects (`ReviseDocumentError = LookupError \| DocumentError`); they are still plain strings at runtime | ✓ |
 
 ---
 

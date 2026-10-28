@@ -60,7 +60,7 @@ When the business rules import the web framework or the database driver, every c
    export class ReviseDocument implements ReviseDocumentInputPort { /* the interactor */ }
 
    // the controller depends on the port, so a test can hand it a fake:
-   const fake: ReviseDocumentInputPort = { run: async () => ({ ok: false, error: "not-found" }) };
+   const fake: ReviseDocumentInputPort = { run: async () => ({ ok: false, error: LookupError.NotFound }) };
    ```
 
    A port does not need its own `interface` keyword. In the stack reference the input port is simply the public `run()` method of `ReviseDocument`; the class's public shape plays the role. Write the interface once a second implementation must stand in for the use case, such as a test fake or a logging wrapper.

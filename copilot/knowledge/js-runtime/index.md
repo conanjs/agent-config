@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: js-runtime
-last-updated: 2026-10-27
+last-updated: 2026-10-28
 ---
 
 # JavaScript runtime internals
@@ -17,6 +17,7 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [subpath-imports.md](subpath-imports.md) | concept | `package.json` `imports`: why internal aliases start with `#`, versus `paths`, self-reference and relative paths | verified |
 | [private-fields.md](private-fields.md) | concept | `#x` versus TypeScript `private`: runtime privacy, serialization leaks, measured performance | verified |
 | [barrel-files.md](barrel-files.md) | concept | Re-export files (`index.ts`): measured load cost, cycles, and the alternative of importing the declaring file | verified |
+| [enums-and-literal-unions.md](enums-and-literal-unions.md) | concept | `enum` vs `as const` object, `as const` array and literal union: erasability, measured emit, what a rename breaks, and which to pick (an object for codes the project owns and repeats) | verified |
 | [abort-signal.md](abort-signal.md) | concept | AbortController and AbortSignal as a cancellation contract across fetch and own APIs | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 
