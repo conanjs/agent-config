@@ -77,6 +77,7 @@ An unexpected database exception is logged internally and mapped to a generic 50
 | Domain conflict | Return 409 with a conflict problem body | 409 indicates the request conflicts with current target resource state ✅[^2] |
 | Authentication missing | Return 401 and include the authentication challenge required by HTTP semantics ✅[^2] | 401 is tied to authentication credentials and challenge semantics ✅[^2] |
 | Authorization denied | Return 403 without saying which hidden resource or policy failed | 403 indicates the server understood the request but refuses to fulfill it ✅[^2] |
+| No route matches the path or method | Express answers with its own HTML 404 page, not a problem, unless a catch-all handler after the routes sends one | Tested 2026-10-28 on Express 5.3 (stack reference): `GET /nope` and `PATCH /documents/d1` returned `text/html`; a final `NotFoundHandler` now sends an `about:blank` 404 problem. Strictly, a known path with an unsupported method is a 405 that must carry an `Allow` header (RFC 9110 §15.5.6) ✅[^2] |
 | Unexpected exception | Return 500 with a generic problem body | 5xx indicates the server is aware it erred or cannot perform the request ✅[^2] |
 
 ## Trade-offs
@@ -114,7 +115,7 @@ Whichever form, list every type with its title and status in one document (the s
 | stack framework | EXP-8 | Source: |
 
 ## Verification status
-- Verified: 31 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
+- Verified: 32 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
 ## References
 - [RFC 9457: Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457.html) — IETF, 2023. Backs: Summary, Problem, How it works, Trade-offs. [^1]
