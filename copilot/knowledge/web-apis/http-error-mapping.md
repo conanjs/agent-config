@@ -4,7 +4,7 @@ type: concept
 topic: web-apis
 status: verified
 applies-to: ["HTTP APIs", "REST-like services", "TypeScript interface layers"]
-last-verified: 2026-10-27
+last-verified: 2026-10-28
 last-updated: 2026-10-28
 tags: [http, errors, problem-details, api]
 ---
@@ -41,9 +41,13 @@ The mapper owns the table from `AppError.kind` to status code, problem type, tit
    - The five standard members are `type` and `instance` (URI references), `status` (number), `title` and `detail` (strings) ✅[^1]
    - `type` `about:blank` means the problem has no meaning beyond its status code, and its `title` should then be the status code's recommended reason phrase ✅[^1]
    - A relative `type` is resolved against the document's base URI; RFC 9457 recommends absolute URIs where possible ✅[^1]
+   - Relative URIs can confuse clients, so a relative `type` should carry its full path (`/types/123`, or `/problems/not-found` in the stack reference) ✅[^1]
+   - A `type` URI may be non-resolvable, such as a `tag:` URI. An `http`/`https` one should lead to human-readable documentation for the problem type, but clients should not fetch it automatically ✅[^1]
+   - Defining a new problem type means documenting its type URI, its title and the status it is used with (§4). An API mints its own types; the IANA "HTTP Problem Types" registry is only for common, widely used types, and application-specific ones cannot be registered ✅[^1]
+   - Moving to a different `type` URI later gives the problem a new identity, which breaks clients that match on the old one; RFC 9457 encourages resolvable URIs from the start for this reason ✅[^1]
    - The body's `status` is advisory, but a generator must send the same code as the actual HTTP status ✅[^1]
    - Problem types may add extension members, and clients must ignore extensions they do not recognize ✅[^1]
-5. RFC 9110 groups status codes by first digit: 4xx indicates client error and 5xx indicates server error ✅[^2]
+5. RFC 9110 groups status codes by first digit: 4xx indicates client error and 5xx indicates server error ✅[^2]. A client must understand the class of any status code and treat an unknown one as the `x00` code of its class (§15) ✅[^2]
 6. A mapper receives typed domain/application errors and returns an HTTP status, headers, and a public problem body.
 7. The mapper can log the original error through structured logging while sending only safe fields to the client.
 8. Handlers call the mapper instead of embedding protocol choices beside business logic.
@@ -83,10 +87,22 @@ An unexpected database exception is logged internally and mapped to a generic 50
 | Handler-local mapping | Quick for prototypes | Diverges across endpoints over time |
 | Exposing raw messages | Fast debugging for clients | Leaks internals and couples clients to implementation details |
 
+**Choosing the `type` URI** (each is valid RFC 9457; the choice is the API's):
+
+| Form | Example | Gains | Costs |
+|---|---|---|---|
+| Relative, full path | `/problems/version-conflict` | Short; no host in the code; the stack reference's choice | Resolved against the API's base URI, which RFC 9457 warns can confuse ✅[^1]; leads to documentation only if the API serves a page at that path |
+| Absolute documentation URL | `https://docs.example.com/problems/version-conflict` | Recommended form ✅[^1]; a developer can open it | The host becomes part of the identity; moving the docs changes every `type` |
+| `tag:` URI | `tag:example.com,2026:version-conflict` | Stable, owned, needs no server ✅[^1] | Not resolvable; documentation must be found another way |
+| `about:blank` | `about:blank` | No problem type to define; the status says it all ✅[^1] | Clients cannot tell two refusals with the same status apart |
+
+Whichever form, list every type with its title and status in one document (the stack reference: `docs/problem-types.md`), and choose before clients depend on it: a later change is a breaking change.
+
 ## Takeaways
 - Keep HTTP status and problem-body mapping in the interface layer. [rule-candidate]
 - Use a small mapping table for known domain/application errors. [rule-candidate]
 - Log internal causes, but send clients only stable and safe problem details. [rule-candidate]
+- Document every problem type (URI, title, status) in one place, and treat a change of `type` as a breaking API change. [rule-candidate]
 
 ## Used by
 | Where | Id / path | How |
@@ -96,7 +112,7 @@ An unexpected database exception is logged internally and mapped to a generic 50
 | stack framework | EXP-8 | Source: |
 
 ## Verification status
-- Verified: 22 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
+- Verified: 31 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
 ## References
 - [RFC 9457: Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457.html) — IETF, 2023. Backs: Summary, Problem, How it works, Trade-offs. [^1]

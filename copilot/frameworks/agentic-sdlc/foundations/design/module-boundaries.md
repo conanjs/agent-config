@@ -71,7 +71,7 @@ A *feature area* is a group of use cases around one aggregate or business capabi
 
 | Repo | Layout | Top of `src/` | When |
 |---|---|---|---|
-| Any new repo | **Feature-first (default)** | `modules/` (holding `documents/ comments/ … shared/`) + composition root + entry point; each module has the four layers | Always, unless the owner opts in to layer-first. A one-feature repo is `src/modules/documents/{domain,application,infrastructure,interface}/`, `src/modules/shared/{domain,application,infrastructure,interface}/` and the composition root. `shared/` exists from day one, even empty (a `.gitkeep` holds an empty folder in git), so nobody has to decide later where cross-cutting code goes; MOD-4 decides what may enter it |
+| Any new repo | **Feature-first (default)** | `modules/` (holding `documents/ comments/ … shared/`) + composition root + entry point; each module has the four layers | Always, unless the owner opts in to layer-first. A one-feature repo is `src/modules/documents/{domain,application,infrastructure,interface}/`, `src/modules/shared/{domain,application,infrastructure,interface}/` and the composition root. `shared/` exists from day one, even empty (a `.gitkeep` holds an empty folder in git, which tracks only files), so nobody has to decide later where cross-cutting code goes; MOD-4 decides what may enter it. Delete a folder's `.gitkeep` in the commit that adds its first real file |
 | One bounded context, 1–3 feature areas, owner opted in | Layer-first (opt-in) | `domain/ application/ infrastructure/ interface/` + composition root | The owner chose it and recorded why, for example a short-lived tool or a teaching example. The repo is one module, so MOD-1 holds at repo level |
 | Opted-in repo reaching its 4th feature area or 2nd bounded context | Switch to feature-first | As the default row | Recorded pure move |
 
@@ -126,6 +126,7 @@ Option C and D are explained with full trees, costs and sources in `knowledge/so
 - Robert C. Martin, *Clean Architecture* (2017) — component principles (ADP, SDP, SAP).
 - Simon Brown, "Modular Monoliths" and the C4 model (c4model.com).
 - [Robert C. Martin, "Screaming Architecture"](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) (2011) — the top level should show the use cases, not the framework (MOD-9).
+- [Git FAQ (archived wiki), "Can I add empty directories?"](https://archive.kernel.org/oldwiki/git.wiki.kernel.org/index.php/GitFaq.html) — the index lists only files, so an empty folder needs a placeholder file (MOD-9's `.gitkeep`).
 - [Martin Fowler, "PresentationDomainDataLayering"](https://martinfowler.com/bliki/PresentationDomainDataLayering.html) (2015) — for a larger system, split the top level into domain-oriented modules, each layered inside (MOD-9).
 
 ## Related
