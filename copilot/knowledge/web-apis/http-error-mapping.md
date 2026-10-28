@@ -96,6 +96,8 @@ An unexpected database exception is logged internally and mapped to a generic 50
 | `tag:` URI | `tag:example.com,2026:version-conflict` | Stable, owned, needs no server ✅[^1] | Not resolvable; documentation must be found another way |
 | `about:blank` | `about:blank` | No problem type to define; the status says it all ✅[^1] | Clients cannot tell two refusals with the same status apart |
 
+What resolving a relative `type` does, tested 2026-10-28 with Node 24's WHATWG `URL` (the resolution RFC 3986 §5 defines): `/problems/version-conflict` received from `https://api.example.com/documents/d1` becomes `https://api.example.com/problems/version-conflict`; from `https://staging.example.com/…` it becomes a different URI on the staging host; and behind a gateway prefix (`https://gw.example.com/docs-api/v1/documents/d1`) it becomes `https://gw.example.com/problems/version-conflict`, outside the API's own path. So a client that resolves the URI, as RFC 9457 asks, sees one problem type as several identities, one per host. An absolute `type` must therefore be a fixed constant, not built from the request's host or an environment variable, or it has the same flaw.
+
 Whichever form, list every type with its title and status in one document (the stack reference: `docs/problem-types.md`), and choose before clients depend on it: a later change is a breaking change.
 
 ## Takeaways
