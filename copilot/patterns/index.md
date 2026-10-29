@@ -13,6 +13,7 @@ This repo follows a deliberate structural philosophy: every recurring shape gets
 | Compare Every Version | [`compare-every-version.pattern.md`](compare-every-version.pattern.md) | Showing how something changed across two or more versions: one column per version, exact excerpts in every cell, a verdict with a reason |
 | Layered Guards | [`layered-guards.pattern.md`](layered-guards.pattern.md) | The same kinds of mistake keep reaching a kind of artifact, and you want them caught every time: sort mistakes into shape / meaning / staleness, give each its own guard, and wire the checks into hook, commit and required CI |
 | Maintained Variant | [`maintained-variant.pattern.md`](maintained-variant.pattern.md) | An example, template or reference that docs point to must change shape, and the old shape is still right for some readers: keep it as a CI-checked branch with its own pin, not a frozen tag |
+| Pin Before You Change | [`pin-before-you-change.pattern.md`](pin-before-you-change.pattern.md) | Something already works but has no tests or written requirements, and you are about to change it or bring it under a standard: pin today's behavior as scenarios, list what looks wrong, prove every check is caught, then change it under a new spec |
 | Artifact Types | [`artifact-types.pattern.md`](artifact-types.pattern.md) | Adding anything new an agent will read or run, and deciding if it is an instruction, skill, prompt, agent, procedure, framework, knowledge or pattern |
 
 This catalog is meant to grow — add a row + a new `patterns/<name>.pattern.md` file when a second recurring shape shows up, rather than folding it into an existing pattern's file or leaving it undocumented. This folder now deploys to `{{AGENT_HOME}}/patterns/` (see `mapping.yaml`), so these patterns are available from any project, not only while working inside `agent-config` itself — worth checking here before designing a one-off reusable mechanism anywhere, not just here.
@@ -20,7 +21,7 @@ This catalog is meant to grow — add a row + a new `patterns/<name>.pattern.md`
 ## References
 
 **Local artifacts:**
-- `shared-procedure-thin-wrapper.pattern.md`, `backup-before-overwrite.pattern.md`, `explaining-mechanisms.pattern.md`, `artifact-types.pattern.md`, `revise-without-erasing.pattern.md`, `compare-every-version.pattern.md`, `layered-guards.pattern.md`, `maintained-variant.pattern.md` — the eight patterns documented so far.
+- `shared-procedure-thin-wrapper.pattern.md`, `backup-before-overwrite.pattern.md`, `explaining-mechanisms.pattern.md`, `artifact-types.pattern.md`, `revise-without-erasing.pattern.md`, `compare-every-version.pattern.md`, `layered-guards.pattern.md`, `maintained-variant.pattern.md`, `pin-before-you-change.pattern.md` — the nine patterns documented so far.
 - `pattern.schema.md` — `pattern/v1`, the shape of new pattern files (origin, concrete examples, version comparisons). The first four patterns predate it and are legacy.
 - `copilot/frameworks/company-kb/index.md` — a worked example of "one folder, one concise overview file, typed subfolders for accumulating content" — itself following this same don't-repeat-yourself philosophy, just not yet promoted to its own named pattern here.
 
