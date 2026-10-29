@@ -257,6 +257,28 @@ Feature: Atlas
           docs/index.md
       """
 
+  Scenario: --explain finds a file of another repo by its path in that repo's folder
+    Given the file "elsewhere/x.md" contains:
+      """
+      # X
+      """
+    And in "copilot/atlas/atlas.yaml", `\nareas:` becomes `\n  - { id: other, root: elsewhere, ref: —, url: —, title: "Other", summary: "Another repo" }\nareas:`
+    And in "copilot/atlas/atlas.yaml", `\nkinds:` becomes `\n  - { id: other-root, repo: other, parent: root, title: "Other files", summary: "Everything in other" }\nkinds:`
+    And in "copilot/atlas/atlas.yaml", `\nedges:` becomes `\n  - { id: other-file, area: other-root, home: "**", title: "Other files", summary: "Any file", schema: —, index: —, checked-by: —, tests: —, deploy: — }\nedges:`
+    When the tool runs with "--explain {root}/elsewhere/x.md"
+    Then it exits with 0 and prints:
+      """
+      x.md
+        place:        Other › Other files › Other files
+        kind:         other-file — Any file
+        schema:       —
+        index:        —
+        checked by:   —
+        scenarios:    —
+        installed to: —
+        linked from: —
+      """
+
   Scenario: --explain on a file that is not on the map says so
     Given the file "notes/todo.txt" contains:
       """

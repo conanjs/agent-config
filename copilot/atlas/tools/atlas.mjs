@@ -265,10 +265,13 @@ if (!fails.length) for (const [p, text] of pages) {
 
 // ---- --explain ----------------------------------------------------------------------------------------
 if (explain) {
-  const target = posix(path.relative(home, path.resolve(explain)));
-  const hit = [...placed].flatMap(([repoId, byKind]) => [...byKind].filter(([, fs_]) => fs_.includes(target) || fs_.includes(explain)).map(([kid]) => [repoId, kid]))[0];
+  // The path is read relative to the folder of each present repo that contains it, innermost first.
+  const abs = path.resolve(explain);
+  const owners = [...present].filter(([, r]) => !path.relative(path.resolve(r.root), abs).startsWith('..')).sort(([, a], [, b]) => b.root.length - a.root.length);
+  const target = owners.length ? posix(path.relative(owners[0][1].root, abs)) : posix(path.relative(home, abs));
+  const hit = owners.flatMap(([repoId]) => [...placed.get(repoId)].filter(([, fs_]) => fs_.includes(posix(path.relative(present.get(repoId).root, abs)))).map(([kid]) => [repoId, kid]))[0];
   if (!hit) { console.log(`${target}: not on the map (no present repo has it)`); process.exit(1); }
-  const [repoId, kid] = hit; const k = kindById.get(kid); const file = placed.get(repoId).get(kid).includes(target) ? target : explain;
+  const [repoId, kid] = hit; const k = kindById.get(kid); const file = posix(path.relative(present.get(repoId).root, abs));
   const up = chain(k.area).map((id) => areaById.get(id).title).reverse();
   console.log(`${file}`);
   console.log(`  place:        ${[repoById.get(repoId).title, ...up, k.title].join(' › ')}`);

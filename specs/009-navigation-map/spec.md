@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-29
 
-**Status**: Implemented 2026-10-29; the feature-first reference pages are generated once the v4.2.0 tag exists
+**Status**: Implemented 2026-10-29
 
 **Input**: V: "later I will also need a coordinator/controller/orchestrator to know the navigation table, what to do, and so on for hierarchical trees, branches, chains for every thing, so they can link and know. One person onboarding this cannot know everything."
 
