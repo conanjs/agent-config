@@ -54,6 +54,7 @@ Notes: `cmd.audit` needs the `cargo-audit` subcommand installed (`cargo install 
 | `foundations/delivery/testing-strategy.md` | Unit tests in-module with fake trait impls; integration tests in `tests/` exercise the public API and real adapters |
 | `foundations/delivery/release-pipeline.md` | CI template below; `--locked` everywhere; release binaries from `cmd.build` |
 | `foundations/delivery/threat-modeling.md` | `cmd.audit` against the RustSec database; validate input at `interface/`; review every `unsafe` block and new dependency |
+| `foundations/design/module-boundaries.md` (MOD-11) | W2: each feature has a wiring module (a `<feature>` crate or `wiring.rs`) with a constructor that takes its adapters as trait objects or generics and returns the feature's router; the binary crate creates the adapters. `Cargo.toml` keeps adapter crates out of the wiring crate's dependencies, so the compiler enforces it |
 
 ## Reference topics
 | Topic | Attach when | Path |

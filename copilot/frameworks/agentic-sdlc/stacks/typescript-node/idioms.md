@@ -322,9 +322,9 @@ Node requires every `imports` key to start with `#`, "to ensure they are disambi
 | A | import-x resolver without `conditionNames` | `#…` resolves to `dist/`, so `import-x/no-restricted-paths` zones on `src/` never match: FF-1 **fails open** |
 | Both | A glob zone without a trailing `/**` (`target: "./src/modules/*/domain"`) | import-x matches a glob against the full file path, so a bare folder glob matches no file: the zone **fails open**. A plain path (`"./src/domain"`) matches everything under it; a glob needs `"./src/modules/*/domain/**"`. Found 2026-10-27 in the reference (eslint-plugin-import-x 4.17) when a seeded `domain → application` import passed |
 
-### Module-boundary lint configuration (feature-first, MOD-3, MOD-9)
+### Module-boundary lint configuration (feature-first, MOD-3, MOD-9, MOD-11)
 
-Verified 2026-10-27 in the stack reference v2.0.0 and again on 2026-10-28 in v3.0.0, with modules under `src/modules/` (eslint-plugin-import-x 4.17): seeded imports of another module's `domain/` and `application/ports/`, of the composition root from a module, of a module from `shared/`, and `domain → application` and `application → infrastructure` inside a module were each reported; an import of another module's public use case passed. With one module this never tested direction: the first version of this snippet let any module import any other module's `application/`, so with a second module, `documents` could have imported `comments`. The `mayDependOn` map closes that: tested 2026-10-28 on the stack reference's v4.1.0 branch (PR #14) with `comments -> documents`, where `documents` importing `comments` was reported, and `comments` importing `documents`' `domain/`, `application/ports/` and `interface/` was reported, while its public `DocumentView` passed.
+Verified 2026-10-27 in the stack reference v2.0.0 and again on 2026-10-28 in v3.0.0, with modules under `src/modules/` (eslint-plugin-import-x 4.17): seeded imports of another module's `domain/` and `application/ports/`, of the composition root from a module, of a module from `shared/`, and `domain → application` and `application → infrastructure` inside a module were each reported; an import of another module's public use case passed. With one module this never tested direction: the first version of this snippet let any module import any other module's `application/`, so with a second module, `documents` could have imported `comments`. The `mayDependOn` map closes that: tested 2026-10-28 on the stack reference's v4.1.0 branch (PR #14) with `comments -> documents`, where `documents` importing `comments` was reported, and `comments` importing `documents`' `domain/`, `application/ports/` and `interface/` was reported, while its public `DocumentView` passed. The two module-composer zones (MOD-11, W2) were tested 2026-10-29 for the stack reference's v4.2.0: a composer importing its module's adapter or the shared `UuidIdSource`, a use case and a router importing their composer, and `CommentsModule` importing `DocumentsModule` were each reported.
 
 ```js
 // eslint.config.mjs (excerpt): layers inside every module, then module-to-module rules.
@@ -337,6 +337,9 @@ const layerZones = [   // globs end in /** (see the pitfall table above)
   { target: "./src/modules/*/infrastructure/**", from: ["./src/modules/*/interface/**"] },
   { target: "./src/modules/*/interface/**", from: ["./src/modules/*/infrastructure/**"] },
   { target: ["./src/!(CompositionRoot|main).ts", "./src/modules/*/**"], from: ["./src/CompositionRoot.ts", "./src/main.ts"] },
+  // MOD-11 (W2): a module composer at the module root gets its adapters from the composition root, and no layer imports it.
+  { target: "./src/modules/*/*Module.ts", from: "./src/modules/*/infrastructure/**", message: "A module composer receives adapters from the composition root (MOD-11)" },
+  { target: "./src/modules/*/@(domain|application|infrastructure|interface)/**", from: "./src/modules/*/*Module.ts", message: "Only the composition root imports a module composer (MOD-11)" },
 ];
 // The may-depend-on edges of docs/architecture.md §4; an unlisted module may use none.
 const mayDependOn = { comments: ["documents"] };

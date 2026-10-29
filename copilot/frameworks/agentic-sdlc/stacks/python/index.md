@@ -54,6 +54,7 @@ Notes: register the marker with `[tool.pytest.ini_options] markers = ["integrati
 | `foundations/delivery/testing-strategy.md` | Fast unit tests with fakes in `tests/unit/`; real adapters in `tests/integration/` selected by marker |
 | `foundations/delivery/release-pipeline.md` | CI template below; `--locked` install; sdist + wheel in `dist/` from `cmd.build` |
 | `foundations/delivery/threat-modeling.md` | `cmd.audit` against the exact locked versions; validate input at `interface/`; secrets only via environment, never logged |
+| `foundations/design/module-boundaries.md` (MOD-11) | W2: a `module.py` at each module package root with a class built from its adapters that exposes the module's router; the entry point creates the adapters and the module objects. Banned-import rules (ruff `flake8-tidy-imports`, or an import-linter contract) keep `module.py` from importing `infrastructure` and the layers from importing `module.py` |
 
 ## Reference topics
 | Topic | Attach when | Path |

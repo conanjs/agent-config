@@ -54,6 +54,7 @@ Notes: `cmd.format` prints nothing; when it fails run `gofmt -l .` to list the o
 | `foundations/delivery/testing-strategy.md` | Table-driven unit tests with fakes; integration tests behind the `integration` build tag via `cmd.test_integration` |
 | `foundations/delivery/release-pipeline.md` | CI template below; static binaries from `cmd/`; `go.sum` checked by `go mod verify` |
 | `foundations/delivery/threat-modeling.md` | `cmd.audit` reports only vulnerabilities reachable from your code; validate input in `transport/`; `context` deadlines on every outbound call |
+| `foundations/design/module-boundaries.md` (MOD-11) | W2: a `module.go` in each `internal/modules/<module>/` package with `func New(deps Deps) *Module` building the module's use cases and handlers; `cmd/<app>/main.go` creates the adapters and calls each `New`. A `depguard` rule keeps the module package from importing its `infra` package, and the layer packages from importing the module package |
 
 ## Reference topics
 | Topic | Attach when | Path |
