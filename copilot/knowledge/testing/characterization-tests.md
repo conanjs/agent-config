@@ -64,6 +64,7 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | A step with no definition | The run must fail, not skip: Cucumber's default `strict` mode does this |
 | The same step text used as a precondition and as an assertion | Word them differently ("`… already links to …`" vs "`… is a symlink to …`"): Cucumber ignores the Given/When/Then keyword when it matches a step, so two definitions with one text are ambiguous. ✅ [^3] Tested on 13.3.0: 30 scenarios reported "ambiguous". ✅ |
 | Tests that run git, started from a git hook | Start every test process without the outer command's `GIT_*` variables. Git exports `GIT_DIR`, `GIT_WORK_TREE` and others to hooks so that their git commands find the repository, and a hook that works in another repository should clear them (git's documented way: `unset $(git rev-parse --local-env-vars)`). ✅ [^7] Observed in agent-config: under `git commit -a`, a scenario's `git add` in its fixture repo wrote into the outer commit's index (`GIT_INDEX_FILE`), until the test environment dropped `GIT_*`. ✅ |
+| A fixture under a git-ignored name (`dist/`, `build/`, `.env`) | Write that file from the scenario instead of keeping it as a fixture, or check `git check-ignore -v <fixture path>` before committing. Seen in the typescript-node reference repo on 2026-10-29: `scripts/test/fixtures/smoke/dist/` passed locally but was never committed (`.gitignore: dist/`), so CI failed. ✅ |
 | Temp folders on macOS | Resolve the temp folder's real path before using it as `{root}`: `os.tmpdir()` is under `/var`, a symlink to `/private/var`, so a tool that prints real paths shows `/private{root}`. Tested on macOS 26 with Node 24.22.1. ✅ |
 
 ## Trade-offs
@@ -86,7 +87,7 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | foundation rule | TST-14 | Source: |
 
 ## Verification status
-- Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
+- Verified: 17 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
 ## References
 - [Empirical Characterization Testing](https://blog.ploeh.dk/2025/11/03/empirical-characterization-testing/) — Mark Seemann, 2025-11-03; cites Michael Feathers, *Working Effectively with Legacy Code* (2004), ch. 13. Backs: How it works 1–2. [^1]
