@@ -18,6 +18,7 @@ roles:
   - { id: qa, tag: "[QA]", tier: Mid, owns: "Testing bar, test depth, test tasks, consistency analysis", file: agents/qa.md }
   - { id: security, tag: "[Sec]", tier: Top, owns: "Risk tier, threat model, security review, veto on fail-open", file: agents/security.md }
   - { id: devops, tag: "[DevOps]", tier: Mid, owns: "CI/CD, environments, deployment topology, release, rollback, PR", file: agents/devops.md }
+  - { id: coordinator, tag: "[Coord]", tier: Mid, owns: "The atlas: where every file is, what checks it, where a request starts", file: agents/coordinator.md }
 ```
 
 ## 2. Runtime model
@@ -48,7 +49,7 @@ profile_dimensions:
 ## 5. Workflow
 | Phase | Runs when | Owner(s) | Spec Kit command | Output | Gate |
 |---|---|---|---|---|---|
-| P0 Intake | Every session | Orchestrator, with security/devops for fast-path checks | — | Mission type, profile-detection report, validation notes | — |
+| P0 Intake | Every session | Orchestrator, with security/devops for fast-path checks; the coordinator when the starting point is unclear (NAV) | — | Mission type, profile-detection report, validation notes | — |
 | P1 Blueprint | New project, feature, or cross-repo mission | Relevant roles in propose mode | — | blueprint.md | G0 direction |
 | P2 Constitution | New project or amendment | architecture, engineering, qa, security | constitution command | constitution sections | G1 principles |
 | P3 Specify | Every feature or behaviour-changing fix | product-spec | specify/clarify commands | spec.md | G2 spec |

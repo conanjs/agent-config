@@ -4,7 +4,7 @@
 f="$(jq -r '.tool_input.file_path // .tool_response.filePath // empty' 2>/dev/null)"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 case "$f" in
-  */copilot/knowledge/*|*/copilot/procedures/*|*/copilot/frameworks/knowledge/*|*/copilot/frameworks/agentic-sdlc/*|*/copilot/frameworks/agent-foundry/*|"$root"/tests/*) ;;
+  */copilot/knowledge/*|*/copilot/procedures/*|*/copilot/frameworks/knowledge/*|*/copilot/frameworks/agentic-sdlc/*|*/copilot/frameworks/agent-foundry/*|*/copilot/atlas/*|"$root"/tests/*) ;;
   *) exit 0 ;;
 esac
 out="$("$(dirname "$0")/check-docs.sh" 2>&1)"; rc=$?

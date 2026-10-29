@@ -1,10 +1,10 @@
 # Feature Specification: A navigation map and coordinator for agent-config
 
-**Feature Branch**: (not started)
+**Feature Branch**: `feat/mod-11-and-coordinator`
 
 **Created**: 2026-10-29
 
-**Status**: Clarified 2026-10-29 — option B, a new coordinator role, and a map of everything (Clarifications); ready for `/speckit-plan`
+**Status**: Implemented 2026-10-29; the feature-first reference pages are generated once the v4.2.0 tag exists
 
 **Input**: V: "later I will also need a coordinator/controller/orchestrator to know the navigation table, what to do, and so on for hierarchical trees, branches, chains for every thing, so they can link and know. One person onboarding this cannot know everything."
 

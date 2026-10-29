@@ -6,6 +6,7 @@ A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, Git
 
 | If you want to... | Go to |
 |---|---|
+| Find anything: where a file is, what checks it, what links to it, where a task starts | [`copilot/atlas/index.md`](copilot/atlas/index.md) (the map of every file), or ask the `sdlc-coordinator` agent; one file: `node copilot/atlas/tools/atlas.mjs --explain <path>` |
 | Set this repo up on a new machine | [`SETUP.md`](SETUP.md) |
 | Reuse a design technique before improvising a one-off | [`copilot/patterns/index.md`](copilot/patterns/index.md) |
 | Understand or extend the Company KB Framework | [`copilot/frameworks/company-kb/index.md`](copilot/frameworks/company-kb/index.md) |

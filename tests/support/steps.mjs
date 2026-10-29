@@ -203,3 +203,13 @@ Then('the file {string} contains exactly:', function (p, doc) {
 function isLink(p) {
   try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; }
 }
+
+Then('the file {string} has the line {string}', function (p, line) {
+  const lines = fs.readFileSync(this.at(p), 'utf8').split('\n');
+  assert.ok(lines.includes(line), `${p} has no line "${line}"`);
+});
+
+Then('the file {string} has no line containing {string}', function (p, text) {
+  const hit = fs.readFileSync(this.at(p), 'utf8').split('\n').find((l) => l.includes(text));
+  assert.equal(hit, undefined, `${p} has a line containing "${text}": ${hit}`);
+});

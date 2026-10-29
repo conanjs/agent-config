@@ -19,6 +19,7 @@
 - { source: copilot/frameworks,               target: ~/.copilot/frameworks,               strategy: symlink }
 - { source: copilot/procedures,               target: ~/.copilot/procedures,               strategy: symlink }
 - { source: copilot/patterns,                 target: ~/.copilot/patterns,                 strategy: symlink }
+- { source: copilot/atlas,                    target: ~/.copilot/atlas,                    strategy: symlink }
 - { source: copilot/agents,                  target: ~/.copilot/agents,                  strategy: symlink }
 - { source: copilot/prompts,                  target: ~/.copilot/prompts,                 strategy: symlink }
 - { source: copilot/hooks,                   target: ~/.copilot/hooks,                   strategy: symlink }

@@ -1,0 +1,13 @@
+# Fixture registry for the atlas tool's scenarios.
+repos:
+  - { id: home, root: ., ref: —, url: —, title: "Home repo", summary: "The repo the atlas lives in" }
+areas:
+  - { id: docs, repo: home, parent: root, title: "Docs", summary: "Documents" }
+  - { id: guides, repo: home, parent: docs, title: "Guides", summary: "How-to guides" }
+  - { id: meta, repo: home, parent: root, title: "Atlas", summary: "The atlas itself" }
+kinds:
+  - { id: guide, area: guides, home: "docs/guides/*.md", title: "Guides", summary: "One task each", schema: docs/guide.schema.md, index: docs/index.md, checked-by: "a validator G-1", tests: —, deploy: ~/.demo/guides }
+  - { id: doc, area: docs, home: "docs/**", title: "Docs", summary: "Every other document", schema: —, index: docs/index.md, checked-by: —, tests: —, deploy: — }
+  - { id: atlas-file, area: meta, home: "copilot/atlas/**", title: "Atlas files", summary: "Registry and generated pages", schema: —, index: copilot/atlas/index.md, checked-by: "atlas.mjs", tests: —, deploy: — }
+edges:
+  - { from: guide, to: doc, via: "a guide is listed in the docs index", checked-by: — }
