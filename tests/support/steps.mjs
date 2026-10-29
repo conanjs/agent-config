@@ -86,6 +86,21 @@ Given('{string} is a git repository with everything committed', function (dir) {
   git('commit', '-q', '-m', 'fixture');
 });
 
+Given('the repo\'s {string} folder is copied to {string}', function (from, to) {
+  fs.cpSync(path.join(repo, from), this.at(to), { recursive: true });
+});
+
+Given('the command {string} prints {string}', function (cmd, text) {
+  // A fake command on PATH (the tool entry puts {root}/bin first), e.g. uname reporting another OS.
+  fs.mkdirSync(this.at('bin'), { recursive: true });
+  fs.writeFileSync(this.at(`bin/${cmd}`), `#!/bin/sh\necho '${text}'\n`, { mode: 0o755 });
+});
+
+Given('{string} already links to {string}', function (link, target) {
+  fs.mkdirSync(path.dirname(this.at(link)), { recursive: true });
+  fs.symlinkSync(this.at(target), this.at(link));
+});
+
 // ---- When: run the tool ------------------------------------------------------------------------------
 
 function run(world, extra) {
@@ -109,6 +124,7 @@ When('the tool runs', function () {
   return run(this, []);
 });
 
+// Also used as a precondition ("Given the tool runs with …"); Cucumber matches steps regardless of keyword.
 When('the tool runs with {string}', function (a) {
   return run(this, fill(this, a).split(' '));
 });
@@ -146,3 +162,36 @@ Then('every rule code the tool prints is a rule row in its schemas', function ()
   const missing = t.codes().filter((c) => !new RegExp(`^\\| ${c} \\|`, 'm').test(text));
   assert.deepEqual(missing, [], 'rule codes with no rule row');
 });
+
+// ---- Then: files the tool left behind ------------------------------------------------------------
+
+/** A path under the scenario folder; "<timestamp>" stands for the one timestamped folder in its parent. */
+function resolveStamped(world, p) {
+  if (!p.includes('<timestamp>')) return world.at(p);
+  const [before, after] = p.split('<timestamp>');
+  const dirs = fs.readdirSync(world.at(before));
+  assert.equal(dirs.length, 1, `expected one timestamped folder in ${before}, found: ${dirs.join(', ')}`);
+  return path.join(world.at(before), dirs[0], after);
+}
+
+Then('{string} is a symlink to {string}', function (link, target) {
+  const p = resolveStamped(this, link);
+  assert.ok(fs.lstatSync(p).isSymbolicLink(), `${link} is not a symlink`);
+  assert.equal(fs.readlinkSync(p), this.at(target));
+});
+
+Then('{string} is a real file or folder, not a symlink', function (p) {
+  assert.ok(!fs.lstatSync(this.at(p)).isSymbolicLink(), `${p} is a symlink`);
+});
+
+Then('{string} does not exist', function (p) {
+  assert.ok(!fs.existsSync(this.at(p)) && !isLink(this.at(p)), `${p} exists`);
+});
+
+Then('the file {string} contains exactly:', function (p, doc) {
+  assert.equal(fs.readFileSync(resolveStamped(this, p), 'utf8'), doc + '\n');
+});
+
+function isLink(p) {
+  try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; }
+}
