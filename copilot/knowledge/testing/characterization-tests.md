@@ -62,6 +62,8 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | The code does something that looks wrong | Pin it as it is, and list it as a finding with options; change it later under its own spec |
 | A gap the check misses (a repeated paragraph right under its heading) | Pin the gap too, as a scenario that passes, so a later fix shows up as a deliberate scenario change |
 | A step with no definition | The run must fail, not skip: Cucumber's default `strict` mode does this |
+| The same step text used as a precondition and as an assertion | Word them differently ("`… already links to …`" vs "`… is a symlink to …`"): Cucumber ignores the Given/When/Then keyword when it matches a step, so two definitions with one text are ambiguous. ✅ [^3] Tested on 13.3.0: 30 scenarios reported "ambiguous". ✅ |
+| Temp folders on macOS | Resolve the temp folder's real path before using it as `{root}`: `os.tmpdir()` is under `/var`, a symlink to `/private/var`, so a tool that prints real paths shows `/private{root}`. Tested on macOS 26 with Node 24.22.1. ✅ |
 
 ## Trade-offs
 | Choice | Pros | Cons |
@@ -83,7 +85,7 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | foundation rule | TST-14 | Source: |
 
 ## Verification status
-- Verified: 11 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
+- Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
 ## References
 - [Empirical Characterization Testing](https://blog.ploeh.dk/2025/11/03/empirical-characterization-testing/) — Mark Seemann, 2025-11-03; cites Michael Feathers, *Working Effectively with Legacy Code* (2004), ch. 13. Backs: How it works 1–2. [^1]

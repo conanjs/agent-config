@@ -13,6 +13,14 @@ import { Given, Then, When } from '@cucumber/cucumber';
 import { getTool, repo } from './tools.mjs';
 
 const unescape = (s) => s.replace(/\\n/g, '\n');
+
+// The environment for every process a scenario starts, without the GIT_* variables of an outer git command.
+// A pre-commit hook runs these tests with GIT_INDEX_FILE (and for some commands GIT_DIR) set; inherited, they
+// would make the scenarios' own git calls write into the outer repository's index.
+const cleanEnv = (extra = {}) => ({
+  ...Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('GIT_'))),
+  ...extra,
+});
 const fill = (world, s) => (world.server ? s.replaceAll('{server}', world.server.url) : s).replaceAll('{root}', world.root);
 
 // ---- Given: the fixture and changes to it --------------------------------------------------------
@@ -80,7 +88,7 @@ Given('a local web server that answers:', function (doc) {
 });
 
 Given('{string} is a git repository with everything committed', function (dir) {
-  const git = (...a) => execFileSync('git', ['-C', this.at(dir), '-c', 'user.name=test', '-c', 'user.email=test@example.com', ...a], { stdio: 'pipe' });
+  const git = (...a) => execFileSync('git', ['-C', this.at(dir), '-c', 'user.name=test', '-c', 'user.email=test@example.com', ...a], { stdio: 'pipe', env: cleanEnv() });
   git('init', '-q', '-b', 'main');
   git('add', '-A');
   git('commit', '-q', '-m', 'fixture');
@@ -107,7 +115,7 @@ function run(world, extra) {
   const t = getTool(world.toolName);
   const { file, args, env } = t.run(world, extra);
   return new Promise((resolve) => {
-    execFile(file, args, { encoding: 'utf8', env: { ...process.env, ...env } }, (err, stdout, stderr) => {
+    execFile(file, args, { encoding: 'utf8', env: cleanEnv(env) }, (err, stdout, stderr) => {
       let lines = (stdout + stderr).trimEnd().split('\n');
       // A tool that stops before printing its header (a missing root file, say) is compared in full.
       if (t.header && t.header.test(lines[0])) lines = lines.slice(1);
