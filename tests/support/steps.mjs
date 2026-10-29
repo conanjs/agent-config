@@ -5,7 +5,7 @@
 // local web server's address reads {server}.
 
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -77,6 +77,13 @@ Given('a local web server that answers:', function (doc) {
       resolve();
     });
   });
+});
+
+Given('{string} is a git repository with everything committed', function (dir) {
+  const git = (...a) => execFileSync('git', ['-C', this.at(dir), '-c', 'user.name=test', '-c', 'user.email=test@example.com', ...a], { stdio: 'pipe' });
+  git('init', '-q', '-b', 'main');
+  git('add', '-A');
+  git('commit', '-q', '-m', 'fixture');
 });
 
 // ---- When: run the tool ------------------------------------------------------------------------------
