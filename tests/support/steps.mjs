@@ -60,6 +60,25 @@ Given('a local web server that answers {string} with that status code', function
   });
 });
 
+Given('a local web server that answers:', function (doc) {
+  // One route per line: <path> <status> <body>, e.g. /repos/o/n/releases/latest 200 {"tag_name":"v1.0.0"}
+  const routes = new Map(doc.split('\n').filter((l) => l.trim()).map((l) => {
+    const [p, status, ...body] = l.trim().split(' ');
+    return [p, { status: Number(status), body: body.join(' ') }];
+  }));
+  return new Promise((resolve) => {
+    const srv = http.createServer((req, res) => {
+      const r = routes.get(req.url) ?? { status: 404, body: '{"message":"Not Found"}' };
+      res.writeHead(r.status, { 'content-type': 'application/json' });
+      res.end(r.body);
+    });
+    srv.listen(0, '127.0.0.1', () => {
+      this.server = { srv, url: `http://127.0.0.1:${srv.address().port}` };
+      resolve();
+    });
+  });
+});
+
 // ---- When: run the tool ------------------------------------------------------------------------------
 
 function run(world, extra) {
