@@ -18,3 +18,5 @@ logs/
 # ~/.agent-config-backups/ — nothing to ignore here for that anymore.
 
 **/synced
+# Tool-test dependencies (package.json, specs/003).
+node_modules/

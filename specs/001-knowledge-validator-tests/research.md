@@ -9,6 +9,7 @@
 - **Confidence:** high
 - **Supersedes:** none
 - **Decided by:** engineering · **Approved at:** G3 (2026-10-29)
+- **Superseded by:** DR-003 in `specs/003-cucumber-runner/research.md` (V chose option B, Cucumber.js with pnpm, 2026-10-29)
 
 ## DR-002: Where the scenarios and fixtures live
 - **Tree path:** none

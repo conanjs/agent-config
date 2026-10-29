@@ -44,7 +44,7 @@ The feeling behind it is distrust of invisible drift: a tool that guards every d
 | Coverage | Unknown | 61 of 61 `fail`/`warn` call sites caught when switched off one at a time |
 
 
-The After column is the state at the end of spec 001. Spec 002 then renamed the printed codes to the schema rule ids, so that check now prints `KD-9` instead of `VS`, and the scenario's title starts with `KD-9`.
+The After column is the state at the end of spec 001. Spec 003 later replaced the `node --test` runner with Cucumber.js (installed with pnpm); the scenarios themselves did not change. Spec 002 then renamed the printed codes to the schema rule ids, so that check now prints `KD-9` instead of `VS`, and the scenario's title starts with `KD-9`.
 
 ## Checklist
 - [ ] No spec rewritten after the fact; the existing code is the context

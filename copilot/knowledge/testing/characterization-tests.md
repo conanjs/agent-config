@@ -39,7 +39,7 @@ Scenario: DD-4 a deep dive updated after its synthesis warns
 1. **What it is.** A characterization test is written after the fact against existing code and records what the code does at that time, which is not necessarily correct or desirable. ✅ [^1]
 2. **Feathers' recipe.** Put the code under a test harness, write an assertion you expect to fail, let the failure show the actual behavior, then make the test expect that behavior. ✅ [^1] The risk is a test that only repeats whatever the code does; Seemann's check is to sabotage the code and confirm the test fails. ✅ [^1]
 3. **No retroactive spec.** Spec Kit's guide for existing projects says you do not need to recreate an existing system from specifications: the new `spec.md` defines the change you intend to make, not every existing behavior. ✅ [^2] The characterization tests cover the rest.
-4. **Readable requirements.** Writing the tests as Gherkin keeps them readable without code: `Background` steps run before each scenario, and text between `"""` lines is a doc string passed to the step. ✅ [^3] A small runner on `node:test` can read that subset, so a repo with no `package.json` needs nothing installed.
+4. **Readable requirements.** Writing the tests as Gherkin keeps them readable without code: `Background` steps run before each scenario, and text between `"""` lines is a doc string passed to the step. ✅ [^3] agent-config first ran them with a small runner of its own on `node:test`, to avoid a `package.json`; since 2026-10-29 it uses Cucumber.js, the official Gherkin runner, installed with pnpm, and the feature files did not change. Cucumber fails the run (exit 1) on a step with no definition; tested on 13.3.0. ✅ Cucumber.js 13.3.0 declares Node `22 || 24 || >=26` in its `engines` field. ✅ [^6] It reads its options from `cucumber.mjs`, among other file names. ✅ [^5]
 5. **Proving the tests guard every check.** Switch off one check at a time (here: replace one `fail(`/`warn(` call with a no-op), run the scenarios, and confirm at least one fails. Tested on 2026-10-29 against `validate-knowledge.mjs` on Node 24.22.1: 61 call sites, 61 caught. ✅
 6. **Running `node:test`.** `node --test` takes glob patterns as arguments, and with none it runs files such as `**/*.test.mjs`. ✅ [^4] Passing a folder does not search it: `node --test tests/` failed with `Cannot find module '…/tests'` on Node 24.22.1 (tested 2026-10-29). ✅ Listing the files (`find tests -name '*.test.mjs'`) works whatever the glob support.
 
@@ -61,13 +61,13 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | Two results finish in a nondeterministic order | Give each its own scenario rather than sorting the output |
 | The code does something that looks wrong | Pin it as it is, and list it as a finding with options; change it later under its own spec |
 | A gap the check misses (a repeated paragraph right under its heading) | Pin the gap too, as a scenario that passes, so a later fix shows up as a deliberate scenario change |
-| A Gherkin feature the runner does not support (`Scenario Outline`, tables, tags) | Fail the run loudly instead of skipping the scenario |
+| A step with no definition | The run must fail, not skip: Cucumber's default `strict` mode does this |
 
 ## Trade-offs
 | Choice | Pros | Cons |
 |---|---|---|
 | Own Gherkin runner on `node:test` | Nothing to install; scenarios stay standard Gherkin | Only a subset of Gherkin; the runner is code to maintain |
-| Cucumber.js | Full Gherkin, reports, wide adoption | Needs `npm install` and a `package.json` |
+| Cucumber.js (chosen in agent-config since 2026-10-29) | Full Gherkin, official runner, reports, parallel workers | Needs a `package.json`, a lockfile and `pnpm install` before tests run |
 | Exact output comparison | Catches any change to a message, which is part of what the tool promises | Every wording change edits scenarios |
 | Snapshot files | Quick to regenerate | The expected value lives away from its scenario, and regenerating invites blind updates |
 
@@ -83,13 +83,15 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | foundation rule | TST-14 | Source: |
 
 ## Verification status
-- Verified: 8 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
+- Verified: 11 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
 ## References
 - [Empirical Characterization Testing](https://blog.ploeh.dk/2025/11/03/empirical-characterization-testing/) — Mark Seemann, 2025-11-03; cites Michael Feathers, *Working Effectively with Legacy Code* (2004), ch. 13. Backs: How it works 1–2. [^1]
 - [Adopting Spec Kit in an Existing Project](https://github.github.io/spec-kit/guides/existing-projects.html) — GitHub, living. Backs: How it works 3. [^2]
 - [Gherkin: Reference](https://cucumber.io/docs/gherkin/reference/) — Cucumber, living. Backs: How it works 4. [^3]
 - [Test runner — Running tests from the command line](https://nodejs.org/api/test.html#running-tests-from-the-command-line) — Node.js, living. Backs: How it works 6. [^4]
+- [Configuration](https://github.com/cucumber/cucumber-js/blob/main/docs/configuration.md) — Cucumber.js, living. Backs: How it works 4 (config file names, `paths`, `import`, `strict`, `parallel`). [^5]
+- [cucumber-js v13.3.0 package.json](https://github.com/cucumber/cucumber-js/blob/v13.3.0/package.json) — Cucumber, 2026-10-05. Backs: How it works 4 (Node engines). [^6]
 - `specs/001-knowledge-validator-tests/` and `tests/validate-knowledge/` in agent-config — the worked example, its findings and the sabotage results.
 
 ## Related
