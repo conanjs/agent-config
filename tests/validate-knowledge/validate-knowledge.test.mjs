@@ -76,12 +76,24 @@ const feature = runFeature(featureFile, {
   cleanup: (ctx) => { fs.rmSync(ctx.root, { recursive: true, force: true }); ctx.server?.srv.close(); },
 });
 
-// FR-004: every rule code the validator can print is named in at least one scenario title.
-test('every rule code in the validator has a scenario', () => {
+// Every rule code the validator can print, read from its fail(…)/warn(…) calls.
+function printedCodes() {
   const src = fs.readFileSync(validator, 'utf8');
   const codes = new Set();
   for (const m of src.matchAll(/\b(?:fail|warn)\)?\(([^,]+),/g)) for (const c of m[1].matchAll(/'([A-Z][A-Z0-9-]*)'/g)) codes.add(c[1]);
   assert.ok(codes.size > 10, `found only ${codes.size} rule codes; the extraction pattern no longer matches the validator`);
+  return [...codes].sort();
+}
+
+// specs/001 FR-004: every rule code the validator can print is named in at least one scenario title.
+test('every rule code in the validator has a scenario', () => {
   const named = (code) => feature.scenarios.some((s) => new RegExp(`(^|[^\\w-])${code}([^\\w-]|$)`).test(s.name));
-  assert.deepEqual([...codes].filter((c) => !named(c)).sort(), [], 'rule codes with no scenario');
+  assert.deepEqual(printedCodes().filter((c) => !named(c)), [], 'rule codes with no scenario');
+});
+
+// specs/002 FR-007: every rule code the validator can print is a rule row (`| <code> |`) in the knowledge schemas.
+test('every rule code in the validator is a rule in the knowledge schemas', () => {
+  const dir = path.join(repo, 'copilot/frameworks/knowledge/schemas');
+  const schemas = fs.readdirSync(dir).filter((f) => f.endsWith('.md')).map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
+  assert.deepEqual(printedCodes().filter((c) => !new RegExp(`^\\| ${c} \\|`, 'm').test(schemas)), [], 'rule codes with no rule row in the schemas');
 });

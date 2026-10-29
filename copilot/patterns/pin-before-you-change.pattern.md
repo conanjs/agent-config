@@ -40,8 +40,11 @@ The feeling behind it is distrust of invisible drift: a tool that guards every d
 | Where the VS count rule was written | Only in the code: `if (+sm[1] !== nOk \|\| +sm[2] !== nNo) warn('VS', …)` | `tests/validate-knowledge/validate-knowledge.feature`: `Scenario: VS a count that differs from the ✅ marks in the body warns` |
 | How it was checked | Once, by hand, in a chat session | On every commit, hook and CI run: `node --test` from `scripts/check-docs.sh` |
 | What happens if the check is deleted | Nothing; CI stays green | `✖ VS a count that differs from the ✅ marks in the body warns`, with expected and actual output |
-| A behavior that looked wrong | Unnoticed | Pinned as found, listed as finding F-1…F-4 in `research.md` with options |
+| A behavior that looked wrong | Unnoticed | Pinned as found, listed as finding F-1…F-4 in `research.md` with options, then fixed under its own spec (`specs/002-knowledge-validator-findings/`), which edited only the scenarios it changed |
 | Coverage | Unknown | 61 of 61 `fail`/`warn` call sites caught when switched off one at a time |
+
+
+The After column is the state at the end of spec 001. Spec 002 then renamed the printed codes to the schema rule ids, so that check now prints `KD-9` instead of `VS`, and the scenario's title starts with `KD-9`.
 
 ## Checklist
 - [ ] No spec rewritten after the fact; the existing code is the context

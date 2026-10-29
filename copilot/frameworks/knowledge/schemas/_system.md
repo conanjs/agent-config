@@ -1,6 +1,6 @@
 ---
 schema: schema-system/v1
-last-updated: 2026-10-27
+last-updated: 2026-10-29
 ---
 
 # Knowledge Framework: Schema System
@@ -18,7 +18,7 @@ last-updated: YYYY-MM-DD
 ---
 ```
 
-Only the keys listed in each schema's Front-matter table are allowed; any other key (e.g. `revision:`) fails `FM-KEYS` in `validate-knowledge.mjs`. To track something new, add the key to the schema first.
+Only the keys listed in each schema's Front-matter table are allowed; any other key (e.g. `revision:`) fails `KB-10` in `validate-knowledge.mjs`. To track something new, add the key to the schema first.
 
 ## 2. Shared sections
 
@@ -66,6 +66,10 @@ The **Verification status** section (knowledge-doc) counts these.
 | KB-6 | Technical/abstract terms get an analogy + one concrete artifact (global instruction) | llm |
 | KB-7 | **Stands alone.** The doc reads correctly without the conversation it was drafted in: no answer to a question the doc never states, no "as discussed", "you asked", "in my previous answer", no sentence that only makes sense as a reply to someone. Applies with extra care to text drafted in another AI chat and pasted in | script (heuristic warn) + llm |
 | KB-8 | **One canonical copy.** A diagram, code block, table or paragraph that already exists in another doc is linked, not copied; a doc does not repeat its own paragraphs. A short summary next to the link is fine | script (identical 5+-line blocks, repeated paragraphs: warn) + llm |
+| KB-9 | **Front-matter values are valid.** Every required key is present; `status` is `draft`, `verified` or `stale`; `applies-to` is a list; dates are `YYYY-MM-DD`; `topic` equals the doc's folder; a knowledge doc's `type` is one of its schema's types; a verified deep dive has `last-verified` (for a knowledge doc that case is KD-2) | script |
+| KB-10 | **Only defined front-matter keys.** A key not listed in the schema's Front-matter table fails; to track something new, add the key to the schema first | script |
+| KB-11 | **Title and Summary head.** Every v1 file has a `# Title` line. Knowledge docs and deep dives open with `## Summary` holding `**TL;DR:**` and `**Use this when:**` (a deep dive also has `**Depth:**`, DD-1) | script |
+| KB-12 | **References and Related are real.** `## References` has at least one entry, `## Related` has at least one entry (`- _None yet._` when empty), and every footnote used in the body (`[^n]`) has a References entry carrying it | script |
 
 ## 5. Registry
 

@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-04
+last-updated: 2026-10-29
 ---
 
 # Schema: Topic Index (`topic-index/v1`)
@@ -41,10 +41,15 @@ last-updated: 2026-10-04
 
 ## Rules
 
-- Every **v1** doc in the folder (front-matter `schema: knowledge-doc/v1` or `deep-dive/v1`) has exactly one Docs row, and every row's file exists. Deep dives use Type `deep-dive`. Legacy docs may be listed with Type `legacy` and Status `—`.
-- A topic folder needs an `index.md` only once it contains a v1 doc (knowledge-doc or deep-dive).
-- `Type` and `Status` copy the doc's front-matter.
-- Subfolders go at most one level deep.
+| Id | Rule | Holds when | Enforced by |
+|---|---|---|---|
+| TI-1 | The file is named `index.md`; `kind` is `root`, `topic` or `subtopic`, and `root` exactly at `knowledge/index.md`; `topic` equals the folder path (not root); `last-updated` is set | front-matter matches the location | script |
+| TI-2 | The index ends with `## References`, `## Related` | last two headings | script |
+| TI-3 | The root index has `## Topics`, lists every topic folder, and lists no folder that does not exist | Topics table ↔ folders | script |
+| TI-4 | A topic or subtopic index has `## Docs`. Every **v1** doc in the folder (front-matter `schema: knowledge-doc/v1` or `deep-dive/v1`) has exactly one Docs row, and every row's file exists | Docs table ↔ files | script |
+| TI-5 | `Type` and `Status` copy the doc's front-matter. Deep dives use Type `deep-dive`. Legacy docs may be listed, with Type `legacy` and Status `—` | each row matches its doc | script |
+| TI-6 | Subfolders go at most one level deep: a subtopic has none, and a topic lists each of its subfolders in `## Subtopics` | folders ↔ Subtopics table | script |
+| TI-7 | A topic folder needs an `index.md` (`topic-index/v1`) once it holds or contains a v1 doc (knowledge-doc or deep-dive), up to the root | every v1 doc has an index chain | script |
 
 ## Example
 
@@ -79,4 +84,4 @@ Not covered: framework-level performance (see `web-performance/`).
 
 | Check | Tool |
 |---|---|
-| Docs table ↔ folder contents; Type/Status match | `validate-knowledge.mjs` |
+| TI-1 … TI-7, plus the shared KB-11 (title) | `validate-knowledge.mjs`, run by `scripts/check-docs.sh` |

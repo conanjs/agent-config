@@ -24,6 +24,8 @@
 
 These scenarios record what the validator did on 2026-10-29. The items below look questionable. They are **not** changed here (FR-008); each needs its own spec if V decides to change it.
 
+**Outcome:** V chose to fix all four ("Fix all of them", 2026-10-29), each with the recommended option (B for F-1, F-2, F-4; A for F-3). Done in `specs/002-knowledge-validator-findings/`.
+
 | Id | Scenario | What happens today | Why it may be wrong | Options |
 |---|---|---|---|---|
 | F-1 | IDX a subtopic with its own subfolder fails | A subtopic index with a subfolder gets two failures: "subfolders nest at most one level deep" and "subfolder … not listed in Subtopics". | The second failure asks the author to list a subfolder that the first failure says must not exist. | A. Keep both lines. B. Report only the nesting failure for a subtopic. |

@@ -51,6 +51,7 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 3. Three first-run mismatches. Two were mistakes in the scenarios (a line count of 451 instead of 450, and a paragraph too short to trigger the check). The third showed real behavior: a subtopic with a subfolder gets both "subfolders nest at most one level deep" and "subfolder "deeper" not listed in Subtopics". That went into `research.md` as finding F-1 rather than being "fixed" in the test. Writing this doc found a fourth (F-4): check marks inside code blocks are counted as claims.
 4. Sabotage check: 61 of 61 checks caught. The whole run takes about 2.6 s.
 5. A coverage test fails when the validator gains a rule code that no scenario title names.
+6. The findings were then fixed under their own spec (`specs/002-knowledge-validator-findings/`): the scenarios for the changed behavior were edited first and failed (44 of 71 red), the validator was changed until all 71 passed, and the sabotage check still caught 61 of 61.
 
 ## Edge cases
 | Case | What to do |

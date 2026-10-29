@@ -1,8 +1,7 @@
 # Requirements for copilot/frameworks/knowledge/tools/validate-knowledge.mjs, as executable scenarios (specs/001).
 # Each scenario title starts with the rule code it covers. The rules themselves are defined in
 # copilot/frameworks/knowledge/schemas/ (knowledge-doc, deep-dive, topic-index, _system).
-# Not every printed code is a schema rule id yet: VS is KD-9, and FM, FM-KEYS, HEAD, REF and IDX have
-# no rule row (specs/001-knowledge-validator-tests/research.md, finding F-3).
+# Every printed code is a rule id in those schemas (specs/002), and a test checks it.
 #
 # Change policy (constitution principle IV):
 # - A rule changes: change its scenario in the same commit as the validator.
@@ -10,7 +9,8 @@
 # - The output text of a check is part of the requirement: scenarios compare it exactly.
 #
 # These scenarios were first written as characterization tests: they pin what the validator did on
-# 2026-10-29. Behavior that looked questionable is listed in specs/001-knowledge-validator-tests/research.md.
+# 2026-10-29. Behavior that looked questionable is listed in specs/001-knowledge-validator-tests/research.md
+# and was fixed by specs/002-knowledge-validator-findings.
 
 Feature: Knowledge validator
   The validator checks the v1 docs in a knowledge tree against the knowledge framework schemas.
@@ -46,69 +46,69 @@ Feature: Knowledge validator
         KD-1  demo/concept.md: missing section(s) "## Related"
       """
 
-  Scenario: FM-KEYS a front-matter key the schema does not define fails
+  Scenario: KB-10 a front-matter key the schema does not define fails
     Given in "knowledge/demo/concept.md", `tags: [fixture]` becomes `tags: [fixture]\nowner: me`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        FM-KEYS  demo/concept.md: front-matter key "owner" is not defined by knowledge-doc/v1 (allowed: schema, type, topic, status, applies-to, last-verified, last-updated, tags, derived-from)
+        KB-10  demo/concept.md: front-matter key "owner" is not defined by knowledge-doc/v1 (allowed: schema, type, topic, status, applies-to, last-verified, last-updated, tags, derived-from)
       """
 
-  Scenario: FM a missing required front-matter key fails
+  Scenario: KB-9 a missing required front-matter key fails
     Given in "knowledge/demo/concept.md", `applies-to: ["any"]\n` becomes ``
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        FM  demo/concept.md: front-matter "applies-to" missing
+        KB-9  demo/concept.md: front-matter "applies-to" missing
       """
 
-  Scenario: FM an unknown status fails, and the index row no longer matches
+  Scenario: KB-9 an unknown status fails, and the index row no longer matches
     Given in "knowledge/demo/concept.md", `status: verified` becomes `status: done`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (2)
-        FM  demo/concept.md: status "done" not one of draft|verified|stale
-        IDX  demo/index.md: concept.md Status "verified" ≠ "done"
+        KB-9  demo/concept.md: status "done" not one of draft|verified|stale
+        TI-5  demo/index.md: concept.md Status "verified" ≠ "done"
       """
 
-  Scenario: FM applies-to that is not a list fails
+  Scenario: KB-9 applies-to that is not a list fails
     Given in "knowledge/demo/concept.md", `applies-to: ["any"]` becomes `applies-to: any`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        FM  demo/concept.md: applies-to must be a list
+        KB-9  demo/concept.md: applies-to must be a list
       """
 
-  Scenario: FM a last-updated date not in YYYY-MM-DD form fails
+  Scenario: KB-9 a last-updated date not in YYYY-MM-DD form fails
     Given in "knowledge/demo/concept.md", `last-updated: 2026-10-01` becomes `last-updated: 1 Oct 2026`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        FM  demo/concept.md: last-updated must be YYYY-MM-DD
+        KB-9  demo/concept.md: last-updated must be YYYY-MM-DD
       """
 
-  Scenario: FM a topic that differs from the doc's folder fails
+  Scenario: KB-9 a topic that differs from the doc's folder fails
     Given in "knowledge/demo/concept.md", `topic: demo` becomes `topic: other`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        FM  demo/concept.md: topic "other" ≠ folder "demo"
+        KB-9  demo/concept.md: topic "other" ≠ folder "demo"
       """
 
-  Scenario: FM an unknown doc type fails and skips the doc's other checks
+  Scenario: KB-9 an unknown doc type fails and skips the doc's other checks
     Given in "knowledge/demo/concept.md", `type: concept` becomes `type: essay`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (2)
-        FM  demo/concept.md: type "essay" not one of concept|how-to|reference|case-study
-        IDX  demo/index.md: concept.md Type "concept" ≠ "essay"
+        KB-9  demo/concept.md: type "essay" not one of concept|how-to|reference|case-study
+        TI-5  demo/index.md: concept.md Type "concept" ≠ "essay"
       """
 
   Scenario: KD-2 a verified doc without last-verified fails
@@ -120,12 +120,12 @@ Feature: Knowledge validator
         KD-2  demo/concept.md: status verified needs last-verified (YYYY-MM-DD)
       """
 
-  Scenario: KD-2 a verified doc with an unverified claim fails, and VS warns about the count
+  Scenario: KD-2 a verified doc with an unverified claim fails, and KD-9 warns about the count
     Given in "knowledge/demo/concept.md", `## Edge cases\nNone.` becomes `## Edge cases\nNone. ⚠️ unverified`
     When the validator runs
     Then it exits with 1 and prints:
       """
-        warn  VS  demo/concept.md: Verification status says 1 ✅ / 0 ⚠️ but body has 1 / 1
+        warn  KD-9  demo/concept.md: Verification status says 1 ✅ / 0 ⚠️ but body has 1 / 1
       FAIL (1)
         KD-2  demo/concept.md: status verified but contains "⚠️ unverified" claims
       """
@@ -141,115 +141,115 @@ Feature: Knowledge validator
 
   # ---- Summary head, title and tail sections (knowledge docs and deep dives) --------------------
 
-  Scenario: HEAD a Summary without TL;DR fails
+  Scenario: KB-11 a Summary without TL;DR fails
     Given in "knowledge/demo/concept.md", `**TL;DR:**` becomes `**Summary:**`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        HEAD  demo/concept.md: Summary lacks **TL;DR:**
+        KB-11  demo/concept.md: Summary lacks **TL;DR:**
       """
 
-  Scenario: HEAD a Summary without Use this when fails
+  Scenario: KB-11 a Summary without Use this when fails
     Given in "knowledge/demo/concept.md", `**Use this when:**` becomes `**When:**`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        HEAD  demo/concept.md: Summary lacks **Use this when:**
+        KB-11  demo/concept.md: Summary lacks **Use this when:**
       """
 
-  Scenario: HEAD a doc without a "# Title" line fails
+  Scenario: KB-11 a doc without a "# Title" line fails
     Given in "knowledge/demo/concept.md", `# Demo concept` becomes `Demo concept`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        HEAD  demo/concept.md: no "# Title"
+        KB-11  demo/concept.md: no "# Title"
       """
 
-  Scenario: REF a References section with no entries fails
+  Scenario: KB-12 a References section with no entries fails
     Given in "knowledge/demo/deep-dive.md", `## References\n- ` becomes `## References\nSee `
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        REF  demo/deep-dive.md: References has no entries
+        KB-12  demo/deep-dive.md: References has no entries
       """
 
-  Scenario: REF a Related section with no entries fails
+  Scenario: KB-12 a Related section with no entries fails
     Given in "knowledge/demo/deep-dive.md", `## Related\n- ` becomes `## Related\nSee `
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        REF  demo/deep-dive.md: Related is empty (use "- _None yet._")
+        KB-12  demo/deep-dive.md: Related is empty (use "- _None yet._")
       """
 
-  Scenario: REF a footnote with no References entry fails
+  Scenario: KB-12 a footnote with no References entry fails
     Given in "knowledge/demo/concept.md", `✅ [^1]` becomes `✅ [^2]`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        REF  demo/concept.md: footnote [^2] is used but no References entry carries it
+        KB-12  demo/concept.md: footnote [^2] is used but no References entry carries it
       """
 
   # ---- VS: the Verification status line -------------------------------------------------------
 
-  Scenario: VS a missing Verification status line fails
+  Scenario: KD-9 a missing Verification status line fails
     Given in "knowledge/demo/concept.md", `- Verified: 1 claim (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-01` becomes `- Checked.`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        VS  demo/concept.md: Verification status line missing ("- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: date")
+        KD-9  demo/concept.md: Verification status line missing ("- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: date")
       """
 
-  Scenario: VS a count that differs from the ✅ marks in the body warns
+  Scenario: KD-9 a count that differs from the ✅ marks in the body warns
     Given in "knowledge/demo/concept.md", `Verified: 1 claim (✅)` becomes `Verified: 2 claims (✅)`
     When the validator runs
     Then it exits with 0 and prints:
       """
-        warn  VS  demo/concept.md: Verification status says 2 ✅ / 0 ⚠️ but body has 1 / 0
+        warn  KD-9  demo/concept.md: Verification status says 2 ✅ / 0 ⚠️ but body has 1 / 0
       PASS (1 warning(s))
       """
 
-  Scenario: VS ✅ marks inside a fenced code block are counted as claims
-    # Recorded as found: research.md, finding F-4.
+  Scenario: KD-9 ✅ marks inside a fenced code block are not counted as claims
     Given in "knowledge/demo/concept.md", `## Worked example\n` becomes `## Worked example\n```text\nok ✅\n```\n`
     When the validator runs
-    Then it exits with 0 and prints:
-      """
-        warn  VS  demo/concept.md: Verification status says 1 ✅ / 0 ⚠️ but body has 2 / 0
-      PASS (1 warning(s))
-      """
+    Then it passes with no warnings
 
-  Scenario: VS a status line in another wording fails
+  Scenario: KD-2 an unverified marker inside a fenced code block is not a claim
+    Given in "knowledge/demo/concept.md", `## Worked example\n` becomes `## Worked example\n```text\nstill ⚠️ unverified\n```\n`
+    When the validator runs
+    Then it passes with no warnings
+
+  Scenario: KD-9 a status line in another wording fails
     Given in "knowledge/demo/concept.md", `- Verified: 1 claim (✅)` becomes `- Verified: 1 claim ✅`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        VS  demo/concept.md: Verification status line must read exactly "- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: YYYY-MM-DD"
+        KD-9  demo/concept.md: Verification status line must read exactly "- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: YYYY-MM-DD"
       """
 
-  Scenario: VS a wrong singular or plural fails
+  Scenario: KD-9 a wrong singular or plural fails
     Given in "knowledge/demo/concept.md", `Verified: 1 claim (✅)` becomes `Verified: 1 claims (✅)`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        VS  demo/concept.md: write "1 claim" and "0 claims"
+        KD-9  demo/concept.md: write "1 claim" and "0 claims"
       """
 
-  Scenario: VS a date that differs from last-verified fails
+  Scenario: KD-9 a date that differs from last-verified fails
     Given in "knowledge/demo/concept.md", `Last verified: 2026-10-01` becomes `Last verified: 2026-10-02`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        VS  demo/concept.md: Verification status says last verified 2026-10-02, front-matter says 2026-10-01
+        KD-9  demo/concept.md: Verification status says last verified 2026-10-02, front-matter says 2026-10-01
       """
 
   # ---- KD-4: Used by matches the rules that cite the doc --------------------------------------
@@ -350,13 +350,13 @@ Feature: Knowledge validator
         DD-1  demo/deep-dive.md: Summary lacks **Depth:**
       """
 
-  Scenario: FM a verified deep dive without last-verified fails
+  Scenario: KB-9 a verified deep dive without last-verified fails
     Given in "knowledge/demo/deep-dive.md", `last-verified: 2026-10-01\n` becomes ``
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        FM  demo/deep-dive.md: status verified needs last-verified (YYYY-MM-DD)
+        KB-9  demo/deep-dive.md: status verified needs last-verified (YYYY-MM-DD)
       """
 
   Scenario: DD-3 synthesized into a doc that does not exist fails
@@ -389,7 +389,7 @@ Feature: Knowledge validator
 
   # ---- IDX: topic indexes ---------------------------------------------------------------------
 
-  Scenario: IDX a topic index not named index.md fails
+  Scenario: TI-1 a topic index not named index.md fails
     Given the file "knowledge/demo/other.md" contains:
       """
       ---
@@ -405,113 +405,113 @@ Feature: Knowledge validator
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/other.md: topic-index/v1 must be named index.md
+        TI-1  demo/other.md: topic-index/v1 must be named index.md
       """
 
-  Scenario: IDX an unknown kind fails
+  Scenario: TI-1 an unknown kind fails
     Given in "knowledge/demo/index.md", `kind: topic` becomes `kind: chapter`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: kind "chapter" not root|topic|subtopic
+        TI-1  demo/index.md: kind "chapter" not root|topic|subtopic
       """
 
-  Scenario: IDX a kind that does not match the index's location fails
+  Scenario: TI-1 a kind that does not match the index's location fails
     Given in "knowledge/demo/index.md", `kind: topic` becomes `kind: root`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (2)
-        IDX  demo/index.md: kind root does not match location
-        IDX  demo/index.md: root index needs "## Topics"
+        TI-1  demo/index.md: kind root does not match location
+        TI-3  demo/index.md: root index needs "## Topics"
       """
 
-  Scenario: IDX a topic that differs from the index's folder fails
+  Scenario: TI-1 a topic that differs from the index's folder fails
     Given in "knowledge/demo/index.md", `topic: demo` becomes `topic: misc`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: topic "misc" ≠ folder path "demo"
+        TI-1  demo/index.md: topic "misc" ≠ folder path "demo"
       """
 
-  Scenario: IDX an index without last-updated fails
+  Scenario: TI-1 an index without last-updated fails
     Given in "knowledge/demo/index.md", `last-updated: 2026-10-01\n` becomes ``
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: last-updated missing
+        TI-1  demo/index.md: last-updated missing
       """
 
-  Scenario: IDX an index that does not end with References and Related fails
+  Scenario: TI-2 an index that does not end with References and Related fails
     Given in "knowledge/demo/index.md", `## Related` becomes `## See also`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: must end with "## References", "## Related"
+        TI-2  demo/index.md: must end with "## References", "## Related"
       """
 
-  Scenario: IDX a root index without Topics fails, and its folders are then unlisted
+  Scenario: TI-3 a root index without Topics fails, and its folders are then unlisted
     Given in "knowledge/index.md", `## Topics` becomes `## Areas`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (2)
-        IDX  index.md: root index needs "## Topics"
-        IDX  index.md: topic folder "demo" not listed in Topics
+        TI-3  index.md: root index needs "## Topics"
+        TI-3  index.md: topic folder "demo" not listed in Topics
       """
 
-  Scenario: IDX a topic folder missing from the root Topics table fails
+  Scenario: TI-3 a topic folder missing from the root Topics table fails
     Given in "knowledge/index.md", `| [demo/](demo/index.md) | One doc of each kind | 2 |\n` becomes ``
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  index.md: topic folder "demo" not listed in Topics
+        TI-3  index.md: topic folder "demo" not listed in Topics
       """
 
-  Scenario: IDX a root Topics row for a folder that does not exist fails
+  Scenario: TI-3 a root Topics row for a folder that does not exist fails
     Given in "knowledge/index.md", `| [demo/](demo/index.md) | One doc of each kind | 2 |` becomes `| [demo/](demo/index.md) | One doc of each kind | 2 |\n| [gone/](gone/index.md) | Missing | 0 |`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  index.md: Topics lists "gone", which does not exist
+        TI-3  index.md: Topics lists "gone", which does not exist
       """
 
-  Scenario: IDX a topic index without Docs fails, and its docs are then unlisted
+  Scenario: TI-4 a topic index without Docs fails, and its docs are then unlisted
     Given in "knowledge/demo/index.md", `## Docs` becomes `## Pages`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (3)
-        IDX  demo/index.md: "## Docs" missing
-        IDX  demo/index.md: v1 doc concept.md has no Docs row
-        IDX  demo/index.md: v1 doc deep-dive.md has no Docs row
+        TI-4  demo/index.md: "## Docs" missing
+        TI-4  demo/index.md: v1 doc concept.md has no Docs row
+        TI-4  demo/index.md: v1 doc deep-dive.md has no Docs row
       """
 
-  Scenario: IDX a Docs row for a file that does not exist fails
+  Scenario: TI-4 a Docs row for a file that does not exist fails
     Given in "knowledge/demo/index.md", `| [deep-dive.md](deep-dive.md) | deep-dive | A valid deep dive. | verified |` becomes `| [deep-dive.md](deep-dive.md) | deep-dive | A valid deep dive. | verified |\n| [gone.md](gone.md) | concept | Missing. | draft |`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: Docs lists gone.md, which does not exist
+        TI-4  demo/index.md: Docs lists gone.md, which does not exist
       """
 
-  Scenario: IDX a doc listed twice in Docs fails
+  Scenario: TI-4 a doc listed twice in Docs fails
     Given in "knowledge/demo/index.md", `| [concept.md](concept.md) | concept | A valid concept doc. | verified |` becomes `| [concept.md](concept.md) | concept | A valid concept doc. | verified |\n| [concept.md](concept.md) | concept | Again. | verified |`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: concept.md listed twice
+        TI-4  demo/index.md: concept.md listed twice
       """
 
-  Scenario: IDX a legacy doc whose Docs Type is not "legacy" fails
+  Scenario: TI-5 a legacy doc whose Docs Type is not "legacy" fails
     Given the file "knowledge/demo/old.md" contains:
       """
       # Old notes
@@ -523,47 +523,46 @@ Feature: Knowledge validator
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: old.md is a legacy doc; Type must be "legacy"
+        TI-5  demo/index.md: old.md is a legacy doc; Type must be "legacy"
       """
 
-  Scenario: IDX a Docs Type that differs from the doc's type fails
+  Scenario: TI-5 a Docs Type that differs from the doc's type fails
     Given in "knowledge/demo/index.md", `| [concept.md](concept.md) | concept |` becomes `| [concept.md](concept.md) | how-to |`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: concept.md Type "how-to" ≠ "concept"
+        TI-5  demo/index.md: concept.md Type "how-to" ≠ "concept"
       """
 
-  Scenario: IDX a Docs Status that differs from the doc's status fails
+  Scenario: TI-5 a Docs Status that differs from the doc's status fails
     Given in "knowledge/demo/index.md", `| A valid concept doc. | verified |` becomes `| A valid concept doc. | draft |`
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: concept.md Status "draft" ≠ "verified"
+        TI-5  demo/index.md: concept.md Status "draft" ≠ "verified"
       """
 
-  Scenario: IDX a v1 doc with no Docs row fails
+  Scenario: TI-4 a v1 doc with no Docs row fails
     Given in "knowledge/demo/index.md", `| [deep-dive.md](deep-dive.md) | deep-dive | A valid deep dive. | verified |\n` becomes ``
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: v1 doc deep-dive.md has no Docs row
+        TI-4  demo/index.md: v1 doc deep-dive.md has no Docs row
       """
 
-  Scenario: IDX a subfolder missing from Subtopics fails
+  Scenario: TI-6 a subfolder missing from Subtopics fails
     Given the folder "knowledge/demo/extra" exists
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md: subfolder "extra" not listed in Subtopics
+        TI-6  demo/index.md: subfolder "extra" not listed in Subtopics
       """
 
-  Scenario: IDX a subtopic with its own subfolder fails
-    # The second line asks a subtopic to list a subfolder it may not have: research.md, finding F-1.
+  Scenario: TI-6 a subtopic with its own subfolder fails with one line only
     Given the file "knowledge/demo/sub/index.md" contains:
       """
       ---
@@ -590,18 +589,17 @@ Feature: Knowledge validator
     When the validator runs
     Then it exits with 1 and prints:
       """
-      FAIL (2)
-        IDX  demo/sub/index.md: subfolders nest at most one level deep
-        IDX  demo/sub/index.md: subfolder "deeper" not listed in Subtopics
+      FAIL (1)
+        TI-6  demo/sub/index.md: subfolders nest at most one level deep
       """
 
-  Scenario: IDX a folder holding v1 docs without a topic index fails
+  Scenario: TI-7 a folder holding v1 docs without a topic index fails
     Given the file "knowledge/demo/index.md" is removed
     When the validator runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        IDX  demo/index.md (topic-index/v1) is required: folder holds or contains v1 docs
+        TI-7  demo/index.md (topic-index/v1) is required: folder holds or contains v1 docs
       """
 
   # ---- KB: knowledge-base hygiene ---------------------------------------------------------------
@@ -642,11 +640,14 @@ Feature: Knowledge validator
       PASS (1 warning(s))
       """
 
-  Scenario: KB-8 a paragraph directly under its heading is not compared
-    # Recorded as found: research.md, finding F-2.
+  Scenario: KB-8 a paragraph directly under its heading is compared too
     Given in "knowledge/demo/deep-dive.md", `Free-form text.` becomes `A paragraph long enough for the repeated-paragraph check, which ignores anything shorter than one hundred and twenty characters.\n\nA paragraph long enough for the repeated-paragraph check, which ignores anything shorter than one hundred and twenty characters.`
     When the validator runs
-    Then it passes with no warnings
+    Then it exits with 0 and prints:
+      """
+        warn  KB-8  demo/deep-dive.md: paragraph repeated: "A paragraph long enough for the repeated-paragraph check, which ignore…"
+      PASS (1 warning(s))
+      """
 
   Scenario: KB-8 the same fenced block of 5 or more lines in two docs warns
     Given in "knowledge/demo/concept.md", `Change one line, run the validator, read the one new line it prints.` becomes `Change one line.\n\n```\none\ntwo\nthree\nfour\nfive\n```\n`

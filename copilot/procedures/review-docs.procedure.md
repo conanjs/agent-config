@@ -31,7 +31,7 @@ Tool-agnostic review for any change under `knowledge/` or `procedures/` (store B
    | e | **Claims are sourced:** each factual claim about a tool, standard or author is ✅ with a source you opened, or marked ⚠️ unverified (a `verified` doc may not keep ⚠️, so verify or remove that claim only). A reference's title, author and year match the page | KB-1, KD-2, `_system.md` §3 | Reference title that is not the page's title |
    | f | **External tool behaviour is current:** for every flag, path, command or step of a third-party tool, open its current docs and changelog. For a procedure, its `depends-on` lists the tool with the version checked and `last-verified`; never bump either without doing the check | PR-6 | `--ai` flag removed upstream; moved file paths; missing workflow step |
    | g | **Revisions don't erase:** compare old and new version unit by unit; every removed block has a reason (wrong, unverifiable, true duplicate) | `patterns/revise-without-erasing.pattern.md` | Good table silently dropped in a rewrite |
-   | h | **Front-matter is the schema's:** no invented keys; to track something new, change the schema first | FM-KEYS, PR-1 | `revision: 1` |
+   | h | **Front-matter is the schema's:** no invented keys; to track something new, change the schema first | KB-10, PR-1 | `revision: 1` |
 
 4. **Fix, or report.** Fix what you were asked to fix, following `patterns/revise-without-erasing.pattern.md`, then run step 1 again. Otherwise report the findings, most important first, and do not commit.
 
