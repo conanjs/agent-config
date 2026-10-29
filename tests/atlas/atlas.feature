@@ -168,12 +168,12 @@ Feature: Atlas
       """
 
   Scenario: AT-6 an edge to a kind that does not exist fails
-    Given in "copilot/atlas/atlas.yaml", `{ from: guide, to: doc,` becomes `{ from: guide, to: page,`
+    Given in "copilot/atlas/atlas.yaml", `{ from: doc, to: guide,` becomes `{ from: doc, to: page,`
     When the tool runs
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        AT-6  atlas.yaml:13: edge to "page" is not a kind
+        AT-6  atlas.yaml:14: edge to "page" is not a kind
       """
 
   Scenario: AT-7 a repo whose root is not present is skipped with a warning
@@ -240,7 +240,7 @@ Feature: Atlas
       """
     And the file "copilot/atlas/map/other/other-root.md" has the line "- [`x.md`](../../../../elsewhere/x.md)"
 
-  Scenario: --explain shows a file's place, its kind's facts and the files that link to it
+  Scenario: --explain shows a file's place, its kind's facts, the page that lists it, its direct links and its chain
     When the tool runs with "--explain {root}/docs/guides/setup.md"
     Then it exits with 0 and prints:
       """
@@ -252,9 +252,100 @@ Feature: Atlas
         checked by:   a validator G-1
         scenarios:    —
         installed to: ~/.demo/guides
-        linked from:
-          copilot/atlas/map/home/guides.md
+        listed on:    copilot/atlas/map/home/guides.md
+        linked from (direct):
           docs/index.md
+        depends on it (declared chains):
+          ← docs/index.md (doc: the docs index lists each guide)
+            ← README.md (readme: the README points at the docs index)
+      """
+
+  Scenario: --explain finds references written relative to a folder above the citing file
+    Given the file "docs/notes/howto.md" contains:
+      """
+      See `guides/setup.md`, written relative to docs/.
+      """
+    When the tool runs with "--explain {root}/docs/guides/setup.md"
+    Then the output has the line "    docs/notes/howto.md"
+
+  Scenario: --explain finds references written in the installed form {{AGENT_HOME}}/…
+    Given the file "docs/notes/install.md" contains:
+      """
+      The registry is installed at {{AGENT_HOME}}/atlas/atlas.yaml.
+      """
+    When the tool runs with "--explain {root}/copilot/atlas/atlas.yaml"
+    Then the output has the line "    docs/notes/install.md"
+
+  Scenario: --explain puts a dependant under the nearest file it depends on
+    Given in "copilot/atlas/atlas.yaml", `\n  - { from: readme, to: doc,` becomes `\n  - { from: doc, to: doc, via: "a note links the docs index", checked-by: — }\n  - { from: readme, to: doc,`
+    And the file "docs/notes/zz.md" contains:
+      """
+      Read [the index](../index.md) and [setup](../guides/setup.md).
+      """
+    When the tool runs with "--explain {root}/docs/guides/setup.md"
+    Then it exits with 0 and prints:
+      """
+      docs/guides/setup.md
+        place:        Home repo › Docs › Guides › Guides
+        kind:         guide — One task each
+        schema:       docs/guide.schema.md
+        index:        docs/index.md
+        checked by:   a validator G-1
+        scenarios:    —
+        installed to: ~/.demo/guides
+        listed on:    copilot/atlas/map/home/guides.md
+        linked from (direct):
+          docs/index.md
+          docs/notes/zz.md
+        depends on it (declared chains):
+          ← docs/index.md (doc: the docs index lists each guide)
+            ← README.md (readme: the README points at the docs index)
+          ← docs/notes/zz.md (doc: the docs index lists each guide)
+      """
+
+  Scenario: --explain finds a reference relative to the citing file's own folder
+    Given the file "docs/guides/next.md" contains:
+      """
+      Do [the setup](./setup.md) first.
+      """
+    When the tool runs with "--explain {root}/docs/guides/setup.md"
+    Then the output has the line "    docs/guides/next.md"
+
+  Scenario: --explain resolves a path that several files end with to the one nearest the citing file
+    Given the file "docs/a/guides/setup.md" contains:
+      """
+      Setup for part a.
+      """
+    And the file "docs/a/sub/x.md" contains:
+      """
+      See `guides/setup.md`.
+      """
+    When the tool runs with "--explain {root}/docs/a/guides/setup.md"
+    Then the output has the line "    docs/a/sub/x.md"
+
+  Scenario: --explain does not list a file as linked from itself
+    Given the file "docs/notes/self.md" contains:
+      """
+      This page is docs/notes/self.md.
+      """
+    When the tool runs with "--explain {root}/docs/notes/self.md"
+    Then the output has the line "  linked from (direct): —"
+
+  Scenario: --explain on a folder lists the kinds of its files, where each sits and its page
+    When the tool runs with "--explain {root}/docs"
+    Then it exits with 0 and prints:
+      """
+      docs/ (folder, 3 files)
+        guide (1 file) — Home repo › Docs › Guides › Guides — copilot/atlas/map/home/guides.md#guide
+        doc (2 files) — Home repo › Docs › Docs — copilot/atlas/map/home/docs.md#doc
+      """
+
+  Scenario: --explain on a folder with no mapped files says so
+    Given the folder "empty" exists
+    When the tool runs with "--explain {root}/empty"
+    Then it exits with 1 and prints:
+      """
+      empty/: no mapped files under this folder
       """
 
   Scenario: --explain finds a file of another repo by its path in that repo's folder
@@ -276,7 +367,9 @@ Feature: Atlas
         checked by:   —
         scenarios:    —
         installed to: —
-        linked from: —
+        listed on:    copilot/atlas/map/other/other-root.md
+        linked from (direct): —
+        depends on it (declared chains): —
       """
 
   Scenario: --explain on a file that is not on the map says so

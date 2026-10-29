@@ -22,8 +22,8 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (51 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (17 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
-  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (111 files)
-  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (86 files)
+  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (114 files)
+  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (87 files)
   - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (13 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
@@ -117,12 +117,17 @@ How kinds point at each other. Each chain is checked where the last column says.
 |---|---|---|---|
 | Foundations | Knowledge docs | a rule's Source cell cites the doc; the doc's Used by lists the rule | validate-knowledge.mjs KD-4 |
 | Roles | Foundations | the role's Preset knowledge table | validate.mjs ROLE |
-| Skills | Roles | a preset skill lists the role's Preset table, in order | validate.mjs SKILL |
+| Skills | Roles | a preset skill mirrors the role's Preset table; the agentic-sdlc skill reads agents/orchestrator.md | validate.mjs SKILL |
+| Skills | Foundations | a preset skill lists the role's Preset foundations, read in order | validate.mjs SKILL |
+| Skills | Stack profiles | a stack skill reads stacks/<id>/index.md, idioms.md and its framework files | validate.mjs SKILL (one skill per stack) |
+| Skills | Paradigms | a paradigm skill reads paradigms/<id>.md and the stack's overlay | validate.mjs SKILL (one skill per paradigm) |
 | Copilot agents | Roles | an sdlc-* wrapper reads agents/<role>.md | validate.mjs WRAP |
 | Claude Code agents | Roles | an sdlc-* wrapper reads agents/<role>.md and loads its preset skill | validate.mjs WRAP |
 | Codex agents | Roles | an sdlc-* wrapper reads agents/<role>.md | validate.mjs WRAP |
 | Roles | Decision trees | Trees owned; a tree's owner is a role | validate.mjs TREE |
 | Stack reference pins | Composition root and entry point | the stack's reference repo, pinned by tag and commit | validate.mjs REF (--upstream for newer tags) |
+| Stack profiles | Knowledge docs | the stack's Reference topics rows and its idiom rules' Source cells cite knowledge docs | validate.mjs STACK, IDIOM |
+| Paradigms | Knowledge docs | a paradigm rule's Source cell cites a knowledge doc | validate.mjs SRC |
 | Stack profiles | Foundations | Foundation mapping and Enforcement rows say how each lint/test-enforced rule is enforced | validate.mjs IDIOM (warn) |
 | Copilot prompts | Procedures | a prompt is the Copilot wrapper of one procedure | — |
 | Topic indexes | Knowledge docs | a topic index has one Docs row per v1 doc | validate-knowledge.mjs TI-4, TI-5 |

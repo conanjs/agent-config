@@ -43,6 +43,7 @@ Where: `tests/*/{*.feature,tool.mjs}` · Schema: — · Index: — · Checked by
 
 Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
 
+- [`tests/atlas/fixtures/base/README.md`](../../../../tests/atlas/fixtures/base/README.md)
 - [`tests/atlas/fixtures/base/copilot/atlas/atlas.yaml`](../../../../tests/atlas/fixtures/base/copilot/atlas/atlas.yaml)
 - [`tests/atlas/fixtures/base/copilot/atlas/index.md`](../../../../tests/atlas/fixtures/base/copilot/atlas/index.md)
 - [`tests/atlas/fixtures/base/copilot/atlas/map/home/docs.md`](../../../../tests/atlas/fixtures/base/copilot/atlas/map/home/docs.md)

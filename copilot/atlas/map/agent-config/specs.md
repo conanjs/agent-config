@@ -90,6 +90,9 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/011-installer-link-each/research.md`](../../../../specs/011-installer-link-each/research.md)
 - [`specs/011-installer-link-each/spec.md`](../../../../specs/011-installer-link-each/spec.md)
 - [`specs/011-installer-link-each/tasks.md`](../../../../specs/011-installer-link-each/tasks.md)
+- [`specs/012-coordinator-review-fixes/research.md`](../../../../specs/012-coordinator-review-fixes/research.md)
+- [`specs/012-coordinator-review-fixes/spec.md`](../../../../specs/012-coordinator-review-fixes/spec.md)
+- [`specs/012-coordinator-review-fixes/tasks.md`](../../../../specs/012-coordinator-review-fixes/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)

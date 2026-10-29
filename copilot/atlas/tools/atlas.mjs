@@ -5,7 +5,8 @@
 //   atlas.yaml   default: <this tool>/../atlas.yaml; agent-config's root is two folders above it
 //   --repo       use this folder for a repo instead of its registered root (e.g. a reference repo clone)
 //   --write      regenerate index.md and map/<repo>/<area>.md, then check
-//   --explain    print a file's place in the tree, its kind's facts and the files that link to it
+//   --explain    print a file's place in the tree, its kind's facts, the files that name it (direct) and the files that
+//                depend on it through declared edges (chains, nearest first); for a folder, the kinds of its files
 //
 // Checks (schemas/atlas.schema.md): AT-1 every file has a kind; AT-2 every kind has a file; AT-3 named paths exist;
 // AT-4 the tree is whole; AT-5 generated pages are current; AT-6 ids, fields and edges; AT-7 absent repos (warn).
@@ -263,29 +264,94 @@ if (!fails.length) for (const [p, text] of pages) {
   else if (fs.readFileSync(f, 'utf8') !== text) fail('AT-5', `${p} is out of date; run with --write`);
 }
 
+// ---- references between files of one repo (for --explain) ---------------------------------------------
+// A path in a file's text counts as a reference when it names another file of the same repo, written:
+//   relative to the citing file (`../design/x.md`, a Markdown link), or repo-relative (`copilot/…/x.md`), or in the
+//   installed form (`{{AGENT_HOME}}/…`, `~/.copilot/…`), or relative to a folder above the citing file
+//   (`foundations/design/x.md` in a role file of the same framework): then the nearest file with that ending wins.
+// The generated pages are left out: they list every file, which says nothing about dependencies.
+const PATHLIKE = /[\w{}~.@%\\/-]*[\w@-]+\.(?:md|mjs|js|ts|yaml|yml|json|toml|sh|ps1|feature)(?!\w)/g;
+function references(repoId) {
+  const { root, files } = present.get(repoId);
+  const kindOf = new Map([...placed.get(repoId)].flatMap(([kid, fs_]) => fs_.map((f) => [f, kid])));
+  const set = new Set(files);
+  const byBase = new Map();
+  for (const f of files) { const b = path.posix.basename(f); if (!byBase.has(b)) byBase.set(b, []); byBase.get(b).push(f); }
+  const depth = (a, b) => { const x = a.split('/'); const y = b.split('/'); let n = 0; while (n < x.length - 1 && n < y.length - 1 && x[n] === y[n]) n++; return n; };
+  const resolve = (token, citing) => {
+    const t = token.replace(/\\/g, '/').replace(/^\{\{AGENT_HOME\}\}\//, 'copilot/').replace(/^~\/\.copilot\//, 'copilot/').replace(/^%USERPROFILE%\/\.copilot\//, 'copilot/');
+    const rel = posix(path.normalize(path.join(path.dirname(citing), t)));
+    if (set.has(rel)) return rel;
+    if (set.has(t)) return t;
+    const bare = t.replace(/^(\.\.?\/)+/, '');
+    if (!bare.includes('/')) return null;
+    const cands = (byBase.get(path.posix.basename(bare)) ?? []).filter((f) => f.endsWith(`/${bare}`));
+    return cands.sort((a, b) => depth(b, citing) - depth(a, citing))[0] ?? null;
+  };
+  const citedBy = new Map();
+  for (const f of files) {
+    if (generated.has(f) || !/\.(md|mjs|js|ts|yaml|yml|json|toml|sh|ps1|feature)$/.test(f) || !fs.existsSync(path.join(root, f))) continue;
+    for (const m of fs.readFileSync(path.join(root, f), 'utf8').matchAll(PATHLIKE)) {
+      const to = resolve(m[0], f);
+      if (!to || to === f) continue;
+      if (!citedBy.has(to)) citedBy.set(to, new Set());
+      citedBy.get(to).add(f);
+    }
+  }
+  return { citedBy, kindOf };
+}
+
 // ---- --explain ----------------------------------------------------------------------------------------
 if (explain) {
   // The path is read relative to the folder of each present repo that contains it, innermost first.
   const abs = path.resolve(explain);
   const owners = [...present].filter(([, r]) => !path.relative(path.resolve(r.root), abs).startsWith('..')).sort(([, a], [, b]) => b.root.length - a.root.length);
   const target = owners.length ? posix(path.relative(owners[0][1].root, abs)) : posix(path.relative(home, abs));
+  // A folder: the kinds of the files under it, where each sits, and its page.
+  if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) {
+    const [repoId, r] = owners[0] ?? [];
+    const dir = repoId ? posix(path.relative(r.root, abs)) : target;
+    const under = repoId ? r.files.filter((f) => dir === '' || f.startsWith(`${dir}/`)) : [];
+    const byKind = repoId ? reg.kinds.filter((k) => repoOfKind(k) === repoId).map((k) => [k, placed.get(repoId).get(k.id).filter((f) => under.includes(f))]).filter(([, fs_]) => fs_.length) : [];
+    if (!byKind.length) { console.log(`${dir}/: no mapped files under this folder`); process.exit(1); }
+    console.log(`${dir}/ (folder, ${under.length} ${under.length === 1 ? 'file' : 'files'})`);
+    for (const [k, fs_] of byKind) console.log(`  ${k.id} (${fs_.length} ${fs_.length === 1 ? 'file' : 'files'}) — ${[repoById.get(repoId).title, ...chain(k.area).map((id) => areaById.get(id).title).reverse(), k.title].join(' › ')} — ${pagePath(areaById.get(k.area))}#${k.id}`);
+    process.exit(0);
+  }
   const hit = owners.flatMap(([repoId]) => [...placed.get(repoId)].filter(([, fs_]) => fs_.includes(posix(path.relative(present.get(repoId).root, abs)))).map(([kid]) => [repoId, kid]))[0];
   if (!hit) { console.log(`${target}: not on the map (no present repo has it)`); process.exit(1); }
   const [repoId, kid] = hit; const k = kindById.get(kid); const file = posix(path.relative(present.get(repoId).root, abs));
-  const up = chain(k.area).map((id) => areaById.get(id).title).reverse();
+  const placeOf = (kind) => [repoById.get(repoOfKind(kind)).title, ...chain(kind.area).map((id) => areaById.get(id).title).reverse(), kind.title].join(' › ');
   console.log(`${file}`);
-  console.log(`  place:        ${[repoById.get(repoId).title, ...up, k.title].join(' › ')}`);
+  console.log(`  place:        ${placeOf(k)}`);
   console.log(`  kind:         ${k.id} — ${k.summary}`);
   for (const [label, f] of [['schema', 'schema'], ['index', 'index'], ['checked by', 'checked-by'], ['scenarios', 'tests'], ['installed to', 'deploy']]) console.log(`  ${(label + ':').padEnd(14)}${cell(k[f])}`);
-  const root = present.get(repoId).root; const base = path.basename(file);
-  const from = present.get(repoId).files.filter((f) => f !== file && /\.(md|mjs|js|ts|yaml|yml|json|toml|sh|ps1)$/.test(f) && fs.existsSync(path.join(root, f)) && (() => {
-    const t = fs.readFileSync(path.join(root, f), 'utf8');
-    if (t.includes(file)) return true;
-    for (const m of t.matchAll(/\]\(([^)#\s]+)/g)) if (m[1].endsWith(base) && posix(path.normalize(path.join(path.dirname(f), m[1]))) === file) return true;
-    return false;
-  })());
-  console.log(`  linked from:${from.length ? '' : ` ${NONE}`}`);
-  for (const f of from) console.log(`    ${f}`);
+  console.log(`  listed on:    ${pagePath(areaById.get(k.area))}`);
+  const { citedBy, kindOf } = references(repoId);
+  const direct = [...(citedBy.get(file) ?? [])].sort();
+  console.log(`  linked from (direct):${direct.length ? '' : ` ${NONE}`}`);
+  for (const f of direct) console.log(`    ${f}`);
+  // Downstream dependants: follow a referrer only along an edge the registry declares (its kind → this kind), so the
+  // chain shows real dependencies (rule → role → wrapper) rather than every mention.
+  // Breadth first, so each dependant sits under the nearest file it depends on through a declared edge (4 levels at most).
+  const children = new Map(); const seen = new Set([file]);
+  let level = [file];
+  for (let depth = 0; depth < 4 && level.length; depth++) {
+    const next = [];
+    for (const node of level) for (const c of [...(citedBy.get(node) ?? [])].sort()) {
+      const e = reg.edges.find((x) => x.from === kindOf.get(c) && x.to === kindOf.get(node));
+      if (!e || seen.has(c)) continue;
+      seen.add(c); next.push(c);
+      if (!children.has(node)) children.set(node, []);
+      children.get(node).push([c, e]);
+    }
+    level = next;
+  }
+  const lines = [];
+  const print = (node, depth) => { for (const [c, e] of children.get(node) ?? []) { lines.push(`${'  '.repeat(depth + 2)}← ${c} (${e.from}: ${e.via})`); print(c, depth + 1); } };
+  print(file, 0);
+  console.log(`  depends on it (declared chains):${lines.length ? '' : ` ${NONE}`}`);
+  for (const l of lines) console.log(l);
   process.exit(0);
 }
 

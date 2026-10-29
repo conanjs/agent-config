@@ -38,10 +38,14 @@ Knows the map of everything: every repo, area, kind of file and file in the atla
 
 ## Modes
 ### mode: propose
-Walk NAV-Q1 through NAV-Q5 for the request and answer with the entry point: the area page, the kind, the procedure or spec workflow to follow, the checks that will run, and the role that owns it. When a file is named, run `atlas.mjs --explain` and quote its place, kind and links.
+Walk the navigation tree for the request. A lookup (NAV-Q1 YES) is answered from the atlas and stops there. Any other request is classified through NAV-Q2 to NAV-Q5, even when it names a file, and the answer gives the entry point: the area page, the kind, the procedure or spec workflow to follow, the checks that will run, and the role that owns it. When a file or folder is named, run `atlas.mjs --explain` on it and quote what it prints.
+
+"What depends on it" has two answers, and the reply keeps them apart:
+- **linked from (direct):** every file of the same repo whose text names this file, however the path is written.
+- **depends on it (declared chains):** the files that depend on it through edges declared in `atlas.yaml`, followed up to 4 levels (rule → role → wrapper or skill). A reference with no declared edge for its kinds shows only as direct; when that reference is a real dependency, the fix is a new edge (mode: execute).
 
 ### mode: execute
-Change the atlas only: add or edit areas, kinds and chains in `atlas.yaml` so a new file or folder sits under a kind, then run `atlas.mjs --write` and `atlas.mjs`. Done when the atlas check passes with no AT-1 to AT-6 failure.
+Change the atlas only: add or edit areas, kinds and edges in `atlas.yaml` so a new file or folder sits under a kind and a real dependency is a declared edge, then run `atlas.mjs --write` and `atlas.mjs`. Done when the atlas check passes with no AT-1 to AT-6 failure.
 
 ### mode: review
 Review a change for map gaps: new files without a kind, a new kind without schema, index, check or scenarios (or a stated reason), a moved folder that leaves a kind empty, and stale generated pages.
@@ -55,7 +59,7 @@ Review a change for map gaps: new files without a kind, a new kind without schem
 | COORD-R4 | An answer names the entry point, the rules that apply and the checks that will run, with paths. | llm | major |
 
 ## Standalone use
-When invoked directly, read `{{AGENT_HOME}}/atlas/index.md`, walk the navigation tree for the request, and answer with paths. For one file, run `node {{AGENT_HOME}}/atlas/tools/atlas.mjs --explain <path>`. Change nothing outside the atlas.
+When invoked directly, read `{{AGENT_HOME}}/atlas/index.md`, walk the navigation tree for the request, and answer with paths. For one file or folder, run `node {{AGENT_HOME}}/atlas/tools/atlas.mjs --explain <path>`. Change nothing outside the atlas.
 
 ## Escalate when
 - A request fits no area, or two areas equally (the map is missing a branch).

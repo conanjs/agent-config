@@ -7,7 +7,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 ## Tree
 
 - **Home repo** (`home`) — The repo the atlas lives in
-  - [Docs](map/home/docs.md) — Documents (3 files)
+  - [Docs](map/home/docs.md) — Documents (4 files)
     - [Guides](map/home/guides.md) — How-to guides (1 file)
   - [Atlas](map/home/meta.md) — The atlas itself (5 files)
 
@@ -16,6 +16,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | Kind | Area | Where | Schema | Index | Checked by | Scenarios | Installed to |
 |---|---|---|---|---|---|---|---|
 | [Guides](map/home/guides.md#guide) | Guides | `docs/guides/*.md` | `docs/guide.schema.md` | `docs/index.md` | a validator G-1 | — | `~/.demo/guides` |
+| [Readme](map/home/docs.md#readme) | Docs | `README.md` | — | — | — | — | — |
 | [Docs](map/home/docs.md#doc) | Docs | `docs/**` | — | `docs/index.md` | — | — | — |
 | [Atlas files](map/home/meta.md#atlas-file) | Atlas | `copilot/atlas/**` | — | `copilot/atlas/index.md` | atlas.mjs | — | — |
 
@@ -25,4 +26,5 @@ How kinds point at each other. Each chain is checked where the last column says.
 
 | From | To | How | Checked by |
 |---|---|---|---|
-| Guides | Docs | a guide is listed in the docs index | — |
+| Docs | Guides | the docs index lists each guide | — |
+| Readme | Docs | the README points at the docs index | — |

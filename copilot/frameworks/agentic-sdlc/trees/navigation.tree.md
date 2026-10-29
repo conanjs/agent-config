@@ -13,9 +13,9 @@ Decides where a request starts: which area and kind of file it touches, which pr
 
 ## Overview
 ```
-NAV-Q1 Does the request name a file or folder?
-  YES → explain it with the atlas → NAV-Q5
-  NO  → NAV-Q2
+NAV-Q1 Is it only a lookup (where, what, what checks it, what depends on it), with no change asked?
+  YES → answer from the atlas (--explain for a file or folder, the area page otherwise); stop
+  NO  → NAV-Q2 (a named file or folder is explained first, as input only)
 NAV-Q2 Is it a project mission (a feature or a fix in a project repo)?
   YES → orchestrator (P0 intake)
   NO  → NAV-Q3
@@ -29,13 +29,13 @@ NAV-Q5 Which checks and which role own it?
 ```
 
 ## Nodes
-### NAV-Q1 — Does the request name a file or folder?
-- **Criteria:** A path, a file name or a folder in the request.
+### NAV-Q1 — Is it only a lookup?
+- **Criteria:** The request asks where something is, what it is, what checks it, who owns it or what depends on it, and asks for no change. A named path alone does not make it a lookup: "change validation in atlas.mjs" names a file and asks for a change.
 - **Branches:**
-  - YES → run `atlas.mjs --explain <path>`; answer with its place, kind and links → NAV-Q5
-  - NO → NAV-Q2
-- **Default:** NO.
-- **Escalate when:** the path is on no map (AT-1): the file needs a kind first.
+  - YES → answer from the atlas: `atlas.mjs --explain <path>` for a file or a folder, the area page otherwise; quote "linked from (direct)" and "depends on it (declared chains)" as two separate lists. For "who owns it", also walk NAV-Q5. Then stop.
+  - NO → run `atlas.mjs --explain` on any named file or folder, to know its kind and checks, then classify the request → NAV-Q2
+- **Default:** NO: a request that may change something is classified, never only answered.
+- **Escalate when:** `--explain` says a file is "not on the map" (AT-1): the file needs a kind first. "no mapped files under this folder" is not a gap in the map: the folder is empty or outside every repo root, so check the path first.
 
 ### NAV-Q2 — Is it a project mission?
 - **Criteria:** A feature, a fix or a change of behaviour in a project repo that has, or should have, `.specify/` and `docs/architecture.md`.
@@ -82,6 +82,7 @@ The coordinator records nothing for a question. A new area, kind or chain is a c
 ## References
 - `{{AGENT_HOME}}/atlas/schemas/atlas.schema.md` — the registry this tree reads.
 - `foundations/delivery/testing-strategy.md` — TST-13, TST-14 (NAV-Q3).
+- `specs/012-coordinator-review-fixes/` in agent-config — why NAV-Q1 is a lookup test and not a path test.
 
 ## Related
 - `agents/coordinator.md` — the role that owns this tree.

@@ -213,3 +213,7 @@ Then('the file {string} has no line containing {string}', function (p, text) {
   const hit = fs.readFileSync(this.at(p), 'utf8').split('\n').find((l) => l.includes(text));
   assert.equal(hit, undefined, `${p} has a line containing "${text}": ${hit}`);
 });
+
+Then('the output has the line {string}', function (line) {
+  assert.ok(this.result.out.split('\n').includes(line), `no output line "${line}" in:\n${this.result.out}`);
+});

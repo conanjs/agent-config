@@ -14,9 +14,10 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [006](006-sdlc-validator-tests/) | agentic-sdlc framework validator scenarios; `GITHUB_API_URL` | Done | F-1 … F-5 |
 | [007](007-project-validator-tests/) | Project validator scenarios, incl. the git-based `--task` scope check | Done | F-1, F-5, F-6 (F-2 … F-4 fixed by 010) |
 | [008](008-installer-tests/) | Bash installer scenarios | Done | F-1 … F-3 |
-| [009](009-navigation-map/) | The atlas (registry, `atlas.mjs`, generated map of every file) and the new `coordinator` role with its NAV tree | Done | — |
+| [009](009-navigation-map/) | The atlas (registry, `atlas.mjs`, generated map of every file) and the new `coordinator` role with its NAV tree | Done (User Story 3 completed by 012) | — |
 | [011](011-installer-link-each/) | Installer `link-each` (one link per skill): built, tested, then withdrawn; the whole-folder link stays (V) | Withdrawn | — |
 | [010](010-project-validator-bugs/) | Project validator: `Decided by` checked; continuation line read field by field | Done | none |
+| [012](012-coordinator-review-fixes/) | Coordinator review fixes: NAV-Q1 asks "only a lookup?"; `--explain` takes folders, lists every reference and follows declared chains; missing edges declared | Done | none |
 
 ## Open findings, by kind
 

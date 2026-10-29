@@ -8,6 +8,14 @@ Up: [Atlas](../../index.md) › Home repo
 
 Sub-areas: [Guides](guides.md)
 
+## Readme
+
+<a id="readme"></a>Where to start
+
+Where: `README.md` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
+
+- [`README.md`](../../../../README.md)
+
 ## Docs
 
 <a id="doc"></a>Every other document

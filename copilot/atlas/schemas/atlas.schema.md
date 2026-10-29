@@ -47,7 +47,7 @@ edges:
 | Check | Tool |
 |---|---|
 | AT-1 … AT-7 | `node copilot/atlas/tools/atlas.mjs` (also run by `scripts/check-docs.sh`: pre-commit, Claude Code hook, CI) |
-| Where is a file, what checks it, what links to it | `node copilot/atlas/tools/atlas.mjs --explain <path>` |
+| Where is a file or folder, what checks it, what names it, what depends on it | `node copilot/atlas/tools/atlas.mjs --explain <path>` |
 | Regenerate the pages after editing the registry | `node copilot/atlas/tools/atlas.mjs --write` |
 
 ## References

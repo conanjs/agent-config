@@ -121,12 +121,17 @@ kinds:
 edges:
   - { from: sdlc-foundation, to: knowledge-doc, via: "a rule's Source cell cites the doc; the doc's Used by lists the rule", checked-by: "validate-knowledge.mjs KD-4" }
   - { from: sdlc-role, to: sdlc-foundation, via: "the role's Preset knowledge table", checked-by: "validate.mjs ROLE" }
-  - { from: skill, to: sdlc-role, via: "a preset skill lists the role's Preset table, in order", checked-by: "validate.mjs SKILL" }
+  - { from: skill, to: sdlc-role, via: "a preset skill mirrors the role's Preset table; the agentic-sdlc skill reads agents/orchestrator.md", checked-by: "validate.mjs SKILL" }
+  - { from: skill, to: sdlc-foundation, via: "a preset skill lists the role's Preset foundations, read in order", checked-by: "validate.mjs SKILL" }
+  - { from: skill, to: sdlc-stack, via: "a stack skill reads stacks/<id>/index.md, idioms.md and its framework files", checked-by: "validate.mjs SKILL (one skill per stack)" }
+  - { from: skill, to: sdlc-paradigm, via: "a paradigm skill reads paradigms/<id>.md and the stack's overlay", checked-by: "validate.mjs SKILL (one skill per paradigm)" }
   - { from: copilot-agent, to: sdlc-role, via: "an sdlc-* wrapper reads agents/<role>.md", checked-by: "validate.mjs WRAP" }
   - { from: claude-agent, to: sdlc-role, via: "an sdlc-* wrapper reads agents/<role>.md and loads its preset skill", checked-by: "validate.mjs WRAP" }
   - { from: codex-agent, to: sdlc-role, via: "an sdlc-* wrapper reads agents/<role>.md", checked-by: "validate.mjs WRAP" }
   - { from: sdlc-role, to: sdlc-tree, via: "Trees owned; a tree's owner is a role", checked-by: "validate.mjs TREE" }
   - { from: sdlc-stack-reference, to: ref-composition, via: "the stack's reference repo, pinned by tag and commit", checked-by: "validate.mjs REF (--upstream for newer tags)" }
+  - { from: sdlc-stack, to: knowledge-doc, via: "the stack's Reference topics rows and its idiom rules' Source cells cite knowledge docs", checked-by: "validate.mjs STACK, IDIOM" }
+  - { from: sdlc-paradigm, to: knowledge-doc, via: "a paradigm rule's Source cell cites a knowledge doc", checked-by: "validate.mjs SRC" }
   - { from: sdlc-stack, to: sdlc-foundation, via: "Foundation mapping and Enforcement rows say how each lint/test-enforced rule is enforced", checked-by: "validate.mjs IDIOM (warn)" }
   - { from: prompt, to: procedure, via: "a prompt is the Copilot wrapper of one procedure", checked-by: — }
   - { from: knowledge-index, to: knowledge-doc, via: "a topic index has one Docs row per v1 doc", checked-by: "validate-knowledge.mjs TI-4, TI-5" }
