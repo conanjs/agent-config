@@ -4,8 +4,8 @@ type: concept
 topic: software-design/architecture-styles
 status: verified
 applies-to: ["any layered or clean-architecture codebase", "TypeScript stack reference v3.1.0 (flat) and v4.0.0 (option B)"]
-last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-verified: 2026-10-29
+last-updated: 2026-10-29
 tags: [folder-structure, use-case, vertical-slice, cqrs, colocation, module-layout]
 ---
 
@@ -127,7 +127,7 @@ Five places where "outer is general, inner uses outer" needs a second rule:
 | Across layers | `interface/routes/revise-document/` imports `application/revise-document/`, a use-case folder of another layer | The layer rule. A handler imports its own use case, or a shared file at the other layer's root |
 | `modules/shared/` | A sibling of the modules it serves, not a folder around them | Rule 1 still holds: it sits in `modules/`, the modules' common folder. It imports no module (MOD-4) |
 | Kind folders (`application/ports/`, `interface/errors/`, `interface/routes/`) | One level deeper, but not narrower: they sort a layer's shared files by kind | Count them as part of the layer root. `ports/` serves every use case and every adapter |
-| `src/CompositionRoot.ts` and `test/support/` | The composition root, the outermost file, imports the innermost ones (every use case, handler and adapter). Test helpers sit outside `src/`, even when one module's tests use them | The composition root is the one place that wires the app (PDM-class-modeled-R9; Clean Architecture's Main, see `clean-architecture-deep-dive.md`). Tests are outside the layer graph, and lint rejects free functions in `src/` |
+| `src/CompositionRoot.ts`, a module's router, and `test/support/` | The composition root, the outermost file, imports the innermost ones (every use case and adapter). A module's router (`interface/routes/DocumentsRouter.ts`) imports every handler folder below it. Test helpers sit outside `src/`, even when one module's tests use them | The composition root is the one place that wires the app (PDM-class-modeled-R9; Clean Architecture's Main, see `clean-architecture-deep-dive.md`). A module's router is that module's route table: it binds paths to handlers and receives its use cases already built (EXP-2), so it is a wiring file too, one per module. Tests are outside the layer graph, and lint rejects free functions in `src/` |
 
 *(Rules and table: our synthesis of MOD-3, MOD-4, MOD-10 and the layer rule, checked against the stack reference v4.0.0 tree.)*
 
@@ -154,6 +154,7 @@ Adding `ArchiveDocument` to the `documents` module, in each option:
 | A domain rule used by only one use case | It still goes in `domain/`, on the entity | The rule belongs to the entity; a later use case may need it too *(analysis, ours)* |
 | A value object first used by one aggregate, then by a second | Move it from the aggregate folder to the `domain/` root | Depth shows scope, as for use-case files |
 | One aggregate's code imports another aggregate's inner object (`reviewer/` imports `document/Revision.ts`) | Breaks the aggregate | Outside references go only to the root ✅[^5]; import `Document`, or keep only its id |
+| A module router mounted under a path prefix (`app.use("/documents/:id/comments", router)`) | At runtime the child sees the parent's `:id` only with `mergeParams: true` (default `false`) ✅[^6]. In types it never does: handlers typed `Request<{ id: string }>` fail `tsc` with `TS2345` (`Property 'id' is missing`), with or without `mergeParams` | `@types/express` infers params from the child's own path. Tested 2026-10-29 on the stack reference v4.1 branch (Express 5.3, `@types/express` 5.0.6). Use full paths and mount the router at the root |
 | Option D without a separate read model | Two folders of the same kind of class | CQRS is worth it only for some systems ✅[^3] |
 
 ## Trade-offs
@@ -175,7 +176,7 @@ Adding `ArchiveDocument` to the `documents` module, in each option:
 | foundation | MOD-10 | Source: |
 
 ## Verification status
-- Verified: 18 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
+- Verified: 19 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
 ## References
 - [Angular coding style guide](https://angular.dev/style-guide) — Angular team (Google), living. Backs: How it works 1, 6; Edge cases; Trade-offs. [^1]
@@ -183,9 +184,10 @@ Adding `ArchiveDocument` to the `documents` module, in each option:
 - [CQRS](https://martinfowler.com/bliki/CQRS.html) — Martin Fowler, 2011. Backs: How it works 1, 6; Edge cases; Trade-offs. [^3]
 - [JS Boundaries: Elements](https://www.jsboundaries.dev/docs/setup/elements/) and [Selectors](https://www.jsboundaries.dev/docs/setup/selectors/) — `eslint-plugin-boundaries` project, living. Backs: How it works 5 (element types, captured path values, templated selectors). [^4]
 - [DDD_Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html) — Martin Fowler, 2013. Backs: How it works 4, Edge cases (aggregate, root, unit of loading and transactions). [^5]
+- [Express 5.x API: Router](https://expressjs.com/en/5x/api/router/) — Express project, living. Backs: Edge cases (`mergeParams`: preserves the parent's `req.params`, default `false`). [^6]
 - [Screaming Architecture](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) — Robert C. Martin, 2011. Background: folders should show the use cases.
 - `copilot/frameworks/agentic-sdlc/foundations/design/module-boundaries.md` — MOD-9 (first grouping) and MOD-10 (inside a module).
-- `conanjs/agentic-sdlc-reference-typescript-node` v3.1.0 — `src/modules/documents/` (the flat tree measured above) and `eslint.config.mjs` (`layerZones`, `moduleZones`); v4.0.0 — the same module in option B, the artifact above.
+- `conanjs/agentic-sdlc-reference-typescript-node` v3.1.0 — `src/modules/documents/` (the flat tree measured above) and `eslint.config.mjs` (`layerZones`, `moduleZones`); v4.0.0 — the same module in option B, the artifact above; v4.1 branch — `interface/routes/DocumentsRouter.ts`, `CommentsRouter.ts` (module routers) and the prefix-mount typing test.
 
 ## Related
 - `software-design/architecture-styles/screaming-architecture-deep-dive.md` — the level above: what the top of `src/` shows.

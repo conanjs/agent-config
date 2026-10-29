@@ -24,7 +24,7 @@ versions: [4, 5]
 | Id | Rule | Holds when | Typical violation | Enforced by | Source |
 |---|---|---|---|---|---|
 | EXP-1 | Keep handlers as adapters: parse input, call one use case and map the result. | Handler code has no domain branching beyond HTTP adaptation. | A handler checks role invariants or updates repositories directly. | llm | — |
-| EXP-2 | Route modules compose routers and do not build the dependency graph. | Routers receive already-constructed handlers or use cases from `src/main.ts`. | A router creates database clients or concrete repositories. | llm | — |
+| EXP-2 | Route modules compose routers and do not build the dependency graph. | Routers receive already-constructed handlers or use cases from the composition root (`src/main.ts`, or a composition-root class it calls). | A router creates database clients or concrete repositories. | llm | — |
 | EXP-3 | Put auth, correlation id and observability in middleware, not in use cases. | Cross-cutting HTTP concerns are attached before handlers and passed through context/loggers. | Every handler repeats request id parsing or auth token decoding. | llm | — |
 | EXP-4 | Keep domain logic out of middleware. | Middleware only authenticates, authorizes, enriches context or rejects malformed transport state. | Middleware applies business rules such as "role cannot be deleted while in use." | llm | — |
 | EXP-5 | Use one error mapper for HTTP responses. | All handlers call the same mapper for `Result` errors and thrown errors. | Two routes map the same `not-found` result to different status codes. | llm | — |
