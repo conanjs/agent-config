@@ -12,6 +12,11 @@
 #                         for files that accumulate machine-local state
 #                         (e.g. ~/.claude/settings.json permissions, or
 #                         global-variables.md's machine-specific values).
+# strategy: link-each  -> make target a real folder and symlink each entry of
+#                         the source folder into it, so entries other tools
+#                         keep there stay (e.g. ~/.claude/skills/synced, the
+#                         skills Claude Code downloads from claude.ai). An old
+#                         link of the whole folder is replaced (specs/011).
 
 - { source: copilot/instructions,            target: ~/.copilot/instructions,            strategy: symlink }
 - { source: copilot/knowledge,               target: ~/.copilot/knowledge,               strategy: symlink }
@@ -31,6 +36,6 @@
 - { source: codex/agents,                    target: ~/.codex/agents,                    strategy: symlink }
 # skills/ is tool-neutral (SKILL.md is the same format everywhere): ~/.claude/skills
 # for Claude Code, ~/.agents/skills for both Copilot and Codex.
-- { source: skills,                          target: ~/.claude/skills,                   strategy: symlink }
-- { source: skills,                          target: ~/.agents/skills,                   strategy: symlink }
+- { source: skills,                          target: ~/.claude/skills,                   strategy: link-each }
+- { source: skills,                          target: ~/.agents/skills,                   strategy: link-each }
 - { source: global-variables.md,             target: ~/.copilot/global-variables.md,     strategy: seed-once }

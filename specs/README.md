@@ -15,6 +15,7 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [007](007-project-validator-tests/) | Project validator scenarios, incl. the git-based `--task` scope check | Done | F-1, F-5, F-6 (F-2 … F-4 fixed by 010) |
 | [008](008-installer-tests/) | Bash installer scenarios | Done | F-1 … F-3 |
 | [009](009-navigation-map/) | The atlas (registry, `atlas.mjs`, generated map of every file) and the new `coordinator` role with its NAV tree | Done | — |
+| [011](011-installer-link-each/) | Installer `link-each`: skills installed one link per skill, so `~/.claude/skills/synced` stays | Done | Windows run still open (008/F-1) |
 | [010](010-project-validator-bugs/) | Project validator: `Decided by` checked; continuation line read field by field | Done | none |
 
 ## Open findings, by kind

@@ -87,6 +87,9 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/010-project-validator-bugs/research.md`](../../../../specs/010-project-validator-bugs/research.md)
 - [`specs/010-project-validator-bugs/spec.md`](../../../../specs/010-project-validator-bugs/spec.md)
 - [`specs/010-project-validator-bugs/tasks.md`](../../../../specs/010-project-validator-bugs/tasks.md)
+- [`specs/011-installer-link-each/research.md`](../../../../specs/011-installer-link-each/research.md)
+- [`specs/011-installer-link-each/spec.md`](../../../../specs/011-installer-link-each/spec.md)
+- [`specs/011-installer-link-each/tasks.md`](../../../../specs/011-installer-link-each/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)
