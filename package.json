@@ -5,7 +5,7 @@
   "description": "Agent configuration, frameworks and knowledge; package.json exists only for the tool tests (specs/003).",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=24 <25"
   },
   "packageManager": "pnpm@12.15.0",
   "scripts": {
