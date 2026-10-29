@@ -26,6 +26,7 @@ Claude Code's user and project agent folders, the four ways to call an agent, an
 | User agents | `~/.claude/agents/`, available in all projects; project agents in `.claude/agents/` | ✅ [^1] |
 | Ask by name | "Use the sdlc-coordinator agent to …"; Claude delegates | ✅ [^1] |
 | `@`-mention | Pick it after typing `@`, or type `@agent-<name>`; that agent runs, not Claude's choice | ✅ [^1] |
+| `@` in the Claude desktop app (Code tab) | The picker offered only files for `@agent-sdlc-coor`, though the agent was loaded (listed as a subagent the session could launch): observed 2026-10-29. Ask for the agent by name there, or use the terminal CLI | ✅ |
 | A session as the agent | `claude --agent <name>`, or the `agent` setting; the flag wins | ✅ [^1] |
 | New agent files | Picked up within seconds, no restart; except the first file in an `agents` folder that did not exist when the session started | ✅ [^1] |
 | `skills:` in an agent | Preloads those skills' full text into the agent; other skills stay callable | ✅ [^1] |
@@ -34,7 +35,7 @@ Claude Code's user and project agent folders, the four ways to call an agent, an
 
 ## Lookup notes
 - An installer that links the whole `~/.claude/skills` folder to a repo moves `synced/` into its backup. agent-config's installer does this on purpose (V, 2026-10-29: the synced skills are minor and come back once used); the per-skill alternative was built, tested and withdrawn (`specs/011`). To keep a copy, take it from the install run's backup folder.
-- To call the agent-config coordinator: `@agent-sdlc-coordinator where is …`, or `claude --agent sdlc-coordinator` for a whole session.
+- To call the agent-config coordinator: in the terminal CLI, `@agent-sdlc-coordinator where is …` or `claude --agent sdlc-coordinator` for a whole session; in the desktop app, "Use the sdlc-coordinator agent: where is …".
 
 ## Takeaways
 - Linking the whole `~/.claude/skills` folder moves the claude.ai `synced/` skills aside; link each skill instead when they must stay.
@@ -44,7 +45,7 @@ Claude Code's user and project agent folders, the four ways to call an agent, an
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 8 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
+- Verified: 9 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
 ## References
 - [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — Anthropic, living. Backs: Catalog rows 1–6. [^1]
