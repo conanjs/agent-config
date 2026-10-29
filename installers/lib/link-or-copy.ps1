@@ -315,26 +315,6 @@ function Invoke-SymlinkMapping {
   }
 }
 
-# link-each: one link per entry of the source folder, inside a real target folder, so entries that other tools keep
-# there (e.g. the skills Claude Code syncs from claude.ai into ~/.claude/skills/synced) stay where they are (specs/011).
-function Invoke-LinkEachMapping {
-  param([string]$SourceRel, [string]$TargetRaw)
-  $target = Expand-TargetPath $TargetRaw
-  $sourceAbs = Resolve-SourcePath -RepoRoot $RepoRoot -SourceRel $SourceRel
-  if (Test-Path -LiteralPath $target) {
-    $item = Get-Item -LiteralPath $target -Force
-    if ($item.LinkType) {
-      # An older install linked the whole folder: remove only that link entry (never -Recurse: see file header).
-      Write-Host "  replacing the folder link $target with one link per entry"
-      if ($item.PSIsContainer) { [IO.Directory]::Delete($target) } else { Remove-Item -LiteralPath $target -Force }
-    }
-  }
-  if (-not (Test-Path -LiteralPath $target)) { New-Item -ItemType Directory -Path $target -Force | Out-Null }
-  foreach ($entry in Get-ChildItem -LiteralPath $sourceAbs -Force | Where-Object { -not $_.Name.StartsWith('.') }) {
-    Invoke-SymlinkMapping -SourceRel "$SourceRel/$($entry.Name)" -TargetRaw "$TargetRaw/$($entry.Name)"
-  }
-}
-
 function Invoke-SeedOnceMapping {
   param([string]$SourceRel, [string]$TargetRaw)
   $target = Expand-TargetPath $TargetRaw
@@ -366,7 +346,6 @@ function Invoke-Mapping {
     switch ($entry.Strategy) {
       'symlink'   { Invoke-SymlinkMapping -SourceRel $entry.Source -TargetRaw $entry.Target }
       'seed-once' { Invoke-SeedOnceMapping -SourceRel $entry.Source -TargetRaw $entry.Target }
-      'link-each' { Invoke-LinkEachMapping -SourceRel $entry.Source -TargetRaw $entry.Target }
       default     { Write-Host "  unknown strategy '$($entry.Strategy)', skipped" }
     }
   }

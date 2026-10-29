@@ -33,17 +33,16 @@ Feature: Bash installers
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [seed-once] claude/settings.json -> ~/.claude/settings.json
         seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
+      [symlink] skills -> ~/.claude/skills
+        symlinked {root}/home/.claude/skills -> {root}/repo/skills
+      [symlink] skills -> ~/.agents/skills
+        symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Done.
       """
     And "home/.copilot/knowledge" is a symlink to "repo/copilot/knowledge"
     And "home/.claude/CLAUDE.md" is a symlink to "repo/claude/CLAUDE.md"
-    And "home/.claude/skills/demo" is a symlink to "repo/skills/demo"
-    And "home/.agents/skills/demo" is a symlink to "repo/skills/demo"
-    And "home/.claude/skills" is a real file or folder, not a symlink
+    And "home/.claude/skills" is a symlink to "repo/skills"
+    And "home/.agents/skills" is a symlink to "repo/skills"
     And the file "home/.claude/settings.json" contains exactly:
       """
       { "fixture": true }
@@ -63,10 +62,10 @@ Feature: Bash installers
         {root}/home/.claude/CLAUDE.md already correctly symlinked, skipped
       [seed-once] claude/settings.json -> ~/.claude/settings.json
         {root}/home/.claude/settings.json already exists, leaving it alone (seed-once)
-      [link-each] skills -> ~/.claude/skills
-        {root}/home/.claude/skills/demo already correctly symlinked, skipped
-      [link-each] skills -> ~/.agents/skills
-        {root}/home/.agents/skills/demo already correctly symlinked, skipped
+      [symlink] skills -> ~/.claude/skills
+        {root}/home/.claude/skills already correctly symlinked, skipped
+      [symlink] skills -> ~/.agents/skills
+        {root}/home/.agents/skills already correctly symlinked, skipped
       Done.
       """
     And "home/.agent-config-backups" does not exist
@@ -87,10 +86,10 @@ Feature: Bash installers
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [seed-once] claude/settings.json -> ~/.claude/settings.json
         seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
+      [symlink] skills -> ~/.claude/skills
+        symlinked {root}/home/.claude/skills -> {root}/repo/skills
+      [symlink] skills -> ~/.agents/skills
+        symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Backed up pre-existing content to: {root}/home/.agent-config-backups/<timestamp>
       Done.
       """
@@ -101,11 +100,11 @@ Feature: Bash installers
       """
 
   Scenario: Two targets of one source both backed up get .2 on the second backup
-    Given the file "home/.claude/skills/demo/SKILL.md" contains:
+    Given the file "home/.claude/skills/mine/SKILL.md" contains:
       """
       claude skill
       """
-    And the file "home/.agents/skills/demo/SKILL.md" contains:
+    And the file "home/.agents/skills/mine/SKILL.md" contains:
       """
       agents skill
       """
@@ -119,20 +118,20 @@ Feature: Bash installers
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [seed-once] claude/settings.json -> ~/.claude/settings.json
         seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        existing content at {root}/home/.claude/skills/demo -> backing up to {root}/home/.agent-config-backups/<timestamp>/skills/demo
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        existing content at {root}/home/.agents/skills/demo -> backing up to {root}/home/.agent-config-backups/<timestamp>/skills/demo.2
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
+      [symlink] skills -> ~/.claude/skills
+        existing content at {root}/home/.claude/skills -> backing up to {root}/home/.agent-config-backups/<timestamp>/skills
+        symlinked {root}/home/.claude/skills -> {root}/repo/skills
+      [symlink] skills -> ~/.agents/skills
+        existing content at {root}/home/.agents/skills -> backing up to {root}/home/.agent-config-backups/<timestamp>/skills.2
+        symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Backed up pre-existing content to: {root}/home/.agent-config-backups/<timestamp>
       Done.
       """
-    And the file "home/.agent-config-backups/<timestamp>/skills/demo/SKILL.md" contains exactly:
+    And the file "home/.agent-config-backups/<timestamp>/skills/mine/SKILL.md" contains exactly:
       """
       claude skill
       """
-    And the file "home/.agent-config-backups/<timestamp>/skills/demo.2/SKILL.md" contains exactly:
+    And the file "home/.agent-config-backups/<timestamp>/skills.2/mine/SKILL.md" contains exactly:
       """
       agents skill
       """
@@ -150,10 +149,10 @@ Feature: Bash installers
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [seed-once] claude/settings.json -> ~/.claude/settings.json
         seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
+      [symlink] skills -> ~/.claude/skills
+        symlinked {root}/home/.claude/skills -> {root}/repo/skills
+      [symlink] skills -> ~/.agents/skills
+        symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Backed up pre-existing content to: {root}/home/.agent-config-backups/<timestamp>
       Done.
       """
@@ -175,10 +174,10 @@ Feature: Bash installers
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [seed-once] claude/settings.json -> ~/.claude/settings.json
         {root}/home/.claude/settings.json already exists, leaving it alone (seed-once)
-      [link-each] skills -> ~/.claude/skills
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
+      [symlink] skills -> ~/.claude/skills
+        symlinked {root}/home/.claude/skills -> {root}/repo/skills
+      [symlink] skills -> ~/.agents/skills
+        symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Done.
       """
     And the file "home/.claude/settings.json" contains exactly:
@@ -198,111 +197,13 @@ Feature: Bash installers
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [copy] claude/settings.json -> ~/.claude/settings.json
         unknown strategy 'copy', skipped
-      [link-each] skills -> ~/.claude/skills
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
+      [symlink] skills -> ~/.claude/skills
+        symlinked {root}/home/.claude/skills -> {root}/repo/skills
+      [symlink] skills -> ~/.agents/skills
+        symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Done.
       """
     And "home/.claude/settings.json" does not exist
-
-  # ---- link-each: one link per entry, other entries left alone (specs/011) --------------------------------
-
-  Scenario: link-each leaves other entries in the target folder alone
-    Given the file "home/.claude/skills/synced/acct/pdf/SKILL.md" contains:
-      """
-      a skill synced from claude.ai
-      """
-    When the tool runs with "install.sh"
-    Then it exits with 0 and prints:
-      """
-      Installing agent-config from {root}/repo (macOS)
-      [symlink] copilot/knowledge -> ~/.copilot/knowledge
-        symlinked {root}/home/.copilot/knowledge -> {root}/repo/copilot/knowledge
-      [symlink] claude/CLAUDE.md -> ~/.claude/CLAUDE.md
-        symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
-      [seed-once] claude/settings.json -> ~/.claude/settings.json
-        seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
-      Done.
-      """
-    And "home/.claude/skills/demo" is a symlink to "repo/skills/demo"
-    And the file "home/.claude/skills/synced/acct/pdf/SKILL.md" contains exactly:
-      """
-      a skill synced from claude.ai
-      """
-    And "home/.agent-config-backups" does not exist
-
-  Scenario: link-each replaces an older link of the whole folder with one link per entry
-    Given "home/.claude/skills" already links to "repo/skills"
-    When the tool runs with "install.sh"
-    Then it exits with 0 and prints:
-      """
-      Installing agent-config from {root}/repo (macOS)
-      [symlink] copilot/knowledge -> ~/.copilot/knowledge
-        symlinked {root}/home/.copilot/knowledge -> {root}/repo/copilot/knowledge
-      [symlink] claude/CLAUDE.md -> ~/.claude/CLAUDE.md
-        symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
-      [seed-once] claude/settings.json -> ~/.claude/settings.json
-        seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        replacing the folder link {root}/home/.claude/skills with one link per entry
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
-      Done.
-      """
-    And "home/.claude/skills" is a real file or folder, not a symlink
-    And "home/.claude/skills/demo" is a symlink to "repo/skills/demo"
-    And "home/.agent-config-backups" does not exist
-
-  Scenario: link-each backs up an older link of the whole folder that points somewhere else
-    Given "home/.claude/skills" already links to "repo/claude"
-    When the tool runs with "install.sh"
-    Then it exits with 0 and prints:
-      """
-      Installing agent-config from {root}/repo (macOS)
-      [symlink] copilot/knowledge -> ~/.copilot/knowledge
-        symlinked {root}/home/.copilot/knowledge -> {root}/repo/copilot/knowledge
-      [symlink] claude/CLAUDE.md -> ~/.claude/CLAUDE.md
-        symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
-      [seed-once] claude/settings.json -> ~/.claude/settings.json
-        seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        existing content at {root}/home/.claude/skills -> backing up to {root}/home/.agent-config-backups/<timestamp>/skills.link
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
-      Backed up pre-existing content to: {root}/home/.agent-config-backups/<timestamp>
-      Done.
-      """
-    And "home/.claude/skills/demo" is a symlink to "repo/skills/demo"
-    And "home/.agent-config-backups/<timestamp>/skills.link" is a symlink to "repo/claude"
-
-  Scenario: Uninstall removes link-each entries and leaves the rest of the folder
-    Given the file "home/.claude/skills/synced/acct/pdf/SKILL.md" contains:
-      """
-      a skill synced from claude.ai
-      """
-    And the tool runs with "install.sh"
-    When the tool runs with "uninstall.sh"
-    Then it exits with 0 and prints:
-      """
-      Removing symlinks created by install.sh (seed-once files are left untouched — they've diverged from the repo by design).
-      removing symlink {root}/home/.copilot/knowledge
-      removing symlink {root}/home/.claude/CLAUDE.md
-      removing symlink {root}/home/.claude/skills/demo
-      removing symlink {root}/home/.agents/skills/demo
-      Done. Any pre-existing content backed up during install is at ~/.agent-config-backups/<timestamp>/ — restore it manually if needed.
-      """
-    And "home/.claude/skills/demo" does not exist
-    And the file "home/.claude/skills/synced/acct/pdf/SKILL.md" contains exactly:
-      """
-      a skill synced from claude.ai
-      """
 
   # ---- routing by OS -----------------------------------------------------------------------------------
 
@@ -349,13 +250,12 @@ Feature: Bash installers
       Removing symlinks created by install.sh (seed-once files are left untouched — they've diverged from the repo by design).
       removing symlink {root}/home/.copilot/knowledge
       removing symlink {root}/home/.claude/CLAUDE.md
-      removing symlink {root}/home/.claude/skills/demo
-      removing symlink {root}/home/.agents/skills/demo
+      removing symlink {root}/home/.claude/skills
+      removing symlink {root}/home/.agents/skills
       Done. Any pre-existing content backed up during install is at ~/.agent-config-backups/<timestamp>/ — restore it manually if needed.
       """
     And "home/.copilot/knowledge" does not exist
-    And "home/.claude/skills/demo" does not exist
-    And "home/.claude/skills" is a real file or folder, not a symlink
+    And "home/.claude/skills" does not exist
     And the file "home/.claude/settings.json" contains exactly:
       """
       { "fixture": true }
@@ -392,10 +292,10 @@ Feature: Bash installers
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [seed-once] claude/settings.json -> ~/.claude/settings.json
         seeded {root}/home/.claude/settings.json from {root}/repo/claude/settings.json (will not be touched by future installs)
-      [link-each] skills -> ~/.claude/skills
-        symlinked {root}/home/.claude/skills/demo -> {root}/repo/skills/demo
-      [link-each] skills -> ~/.agents/skills
-        symlinked {root}/home/.agents/skills/demo -> {root}/repo/skills/demo
+      [symlink] skills -> ~/.claude/skills
+        symlinked {root}/home/.claude/skills -> {root}/repo/skills
+      [symlink] skills -> ~/.agents/skills
+        symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Done.
       """
     And "home/.copilot/knowledge" is a symlink to "repo/copilot/knowledgebase"

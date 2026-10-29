@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-29
 
-**Status**: Done
+**Status**: Withdrawn 2026-10-29 — built and tested, then reverted at V's request: the installer keeps the whole-folder link (option B). Kept here as the record of option A (`git show f853077` has the implementation and scenarios)
 
 **Input**: V chose option A ("link each repo skill into the existing folder") and asked to test option B (the whole-folder link) to confirm whether the claude.ai skills in `~/.claude/skills/synced` come back.
 

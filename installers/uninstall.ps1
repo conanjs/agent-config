@@ -13,20 +13,6 @@ $RepoRoot = Split-Path -Parent $ScriptDir
 Write-Host "Removing links created by install.ps1 (seed-once files are left untouched - they've diverged from the repo by design)."
 
 foreach ($entry in Get-MappingEntries -MappingFile (Join-Path $RepoRoot 'mapping.yaml')) {
-  if ($entry.Strategy -eq 'link-each') {
-    # Only the links this repo made; the folder and anything else in it stay.
-    $sourceAbs = Resolve-SourcePath -RepoRoot $RepoRoot -SourceRel $entry.Source
-    foreach ($child in Get-ChildItem -LiteralPath $sourceAbs -Force | Where-Object { -not $_.Name.StartsWith('.') }) {
-      $t = Join-Path (Expand-TargetPath $entry.Target) $child.Name
-      if (-not (Test-Path -LiteralPath $t)) { continue }
-      $item = Get-Item -LiteralPath $t -Force
-      if ($item.LinkType) {
-        Write-Host "removing $($item.LinkType.ToLower()) $t"
-        if ($item.PSIsContainer) { [IO.Directory]::Delete($t) } else { [IO.File]::Delete($t) }
-      }
-    }
-    continue
-  }
   if ($entry.Strategy -ne 'symlink') { continue }
   $target = Expand-TargetPath $entry.Target
   if (-not (Test-Path -LiteralPath $target)) { continue }

@@ -6,3 +6,4 @@
 - [x] T004 `Invoke-LinkEachMapping` in `installers/lib/link-or-copy.ps1`; `uninstall.ps1`
 - [x] T005 `mapping.yaml` uses `link-each` for both skills targets; README "Install strategies"
 - [x] T006 Install option A on this machine; call the coordinator
+- [x] T007 Revert to the whole-folder link at V's request; keep this spec as the record

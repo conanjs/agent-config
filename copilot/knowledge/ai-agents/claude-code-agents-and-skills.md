@@ -12,7 +12,7 @@ tags: [claude-code, subagents, skills, install, synced]
 # Claude Code subagents and skills: where they load and how to call them
 
 ## Summary
-**TL;DR:** User-level agents load from `~/.claude/agents/` and project agents from `.claude/agents/`. Call one by asking for it by name, by `@`-mentioning it, or by running a whole session as it with `claude --agent <name>`. `~/.claude/skills/` can also hold a `synced/` folder with the skills enabled on claude.ai; replacing `~/.claude/skills` with a link moves that folder, and a later session did not download it again, so install skills one link per skill.
+**TL;DR:** User-level agents load from `~/.claude/agents/` and project agents from `.claude/agents/`. Call one by asking for it by name, by `@`-mentioning it, or by running a whole session as it with `claude --agent <name>`. `~/.claude/skills/` can also hold a `synced/` folder with the skills enabled on claude.ai; replacing `~/.claude/skills` with a link moves that folder, and the next session did not download it again.
 **Use this when:** installing agents or skills into a home folder, or calling an agent in Claude Code.
 **Not this doc:** how agent-config's installer works → `README.md` "Install strategies"; what each `sdlc-*` agent does → `{{AGENT_HOME}}/frameworks/agentic-sdlc/index.md`.
 
@@ -33,11 +33,11 @@ Claude Code's user and project agent folders, the four ways to call an agent, an
 | Moving `synced/` away | Not downloaded again by the next session: tested 2026-10-29 by replacing `~/.claude/skills` with a link (the folder went to a backup) and running `claude -p` with 2.1.129; no `synced/` appeared within a minute | ✅ |
 
 ## Lookup notes
-- An installer that links the whole `~/.claude/skills` folder to a repo moves `synced/` into its backup. agent-config's installer therefore links each skill on its own (`link-each`, `specs/011`), which leaves `synced/` in place.
+- An installer that links the whole `~/.claude/skills` folder to a repo moves `synced/` into its backup. agent-config's installer does this on purpose (V, 2026-10-29: the synced skills are minor and come back once used); the per-skill alternative was built, tested and withdrawn (`specs/011`). To keep a copy, take it from the install run's backup folder.
 - To call the agent-config coordinator: `@agent-sdlc-coordinator where is …`, or `claude --agent sdlc-coordinator` for a whole session.
 
 ## Takeaways
-- Install user skills one link per skill, never by linking the whole `~/.claude/skills` folder.
+- Linking the whole `~/.claude/skills` folder moves the claude.ai `synced/` skills aside; link each skill instead when they must stay.
 - Use `@agent-<name>` when a specific agent must answer; plain requests let Claude choose.
 
 ## Used by

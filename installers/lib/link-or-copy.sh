@@ -77,30 +77,6 @@ apply_seed_once() {
   echo "  seeded $target from $source_abs (will not be touched by future installs)"
 }
 
-# link-each: one link per entry of the source folder, inside a real target folder, so entries that other tools keep
-# there (e.g. ~/.claude/skills/synced, the skills Claude Code syncs from claude.ai) stay where they are (specs/011).
-apply_link_each() {
-  local source_rel="$1" target_raw="$2"
-  local target; target="$(expand_target "$target_raw")"
-  local source_abs="$REPO_ROOT/$source_rel"
-  if [ -L "$target" ]; then
-    if [ "$(readlink "$target")" = "$source_abs" ]; then
-      # An older install linked the whole folder to this repo: remove only that link (nothing in it is lost).
-      echo "  replacing the folder link $target with one link per entry"
-      rm "$target"
-    else
-      # Backed up under a .link name, so later backups of entries never pass through this link.
-      backup_existing "$target" "" "$source_rel.link" || true
-    fi
-  fi
-  mkdir -p "$target"
-  local entry
-  for entry in "$source_abs"/*; do
-    [ -e "$entry" ] || continue
-    apply_symlink "$source_rel/$(basename "$entry")" "$target_raw/$(basename "$entry")"
-  done
-}
-
 apply_mapping() {
   local mapping_file="$1"
   while IFS= read -r line; do
@@ -115,7 +91,6 @@ apply_mapping() {
     case "$strategy" in
       symlink)   apply_symlink "$source" "$target" ;;
       seed-once) apply_seed_once "$source" "$target" ;;
-      link-each) apply_link_each "$source" "$target" ;;
       *) echo "  unknown strategy '$strategy', skipped" ;;
     esac
   done < "$mapping_file"

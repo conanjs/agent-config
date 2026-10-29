@@ -3,6 +3,6 @@
 - { source: copilot/knowledge,   target: ~/.copilot/knowledge,   strategy: symlink }
 - { source: claude/CLAUDE.md,    target: ~/.claude/CLAUDE.md,    strategy: symlink }
 - { source: claude/settings.json, target: ~/.claude/settings.json, strategy: seed-once }
-# skills/ maps to two targets, like the real mapping: one link per skill, so other entries in those folders stay.
-- { source: skills,              target: ~/.claude/skills,       strategy: link-each }
-- { source: skills,              target: ~/.agents/skills,       strategy: link-each }
+# skills/ maps to two targets, like the real mapping.
+- { source: skills,              target: ~/.claude/skills,       strategy: symlink }
+- { source: skills,              target: ~/.agents/skills,       strategy: symlink }

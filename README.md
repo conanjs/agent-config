@@ -162,7 +162,6 @@ Existing real content at a destination path is backed up before a link replaces 
 ## Install strategies (`mapping.yaml`)
 
 - **`symlink`** — target becomes a symlink into this repo. Edit either place, both stay in sync. Any existing real file/dir at the target is backed up first, once. **On Windows**, if a real symlink can't be created (see below), it degrades to a **Junction** (directories), **Hard Link** (files) or, with consent, a copy — see "Windows notes" below.
-- **`link-each`** — the target stays a real folder, and each entry of the source folder is linked into it one by one (backups and Windows fallbacks as for `symlink`, per entry). Used for `skills/`: `~/.claude/skills` also holds `synced/`, the skills Claude Code downloads from claude.ai, which a whole-folder link would move into the backup (tested 2026-10-29: Claude Code 2.1.129 did not download them again on the next session). An older whole-folder link to this repo is replaced; uninstall removes only the entry links.
 - **`seed-once`** — copied in only if the target doesn't already exist; never touched again after that. Used for `claude/settings.json` (accumulates machine-local permission grants) and `global-variables.md` (accumulates machine-specific variable values) — a symlink would sync those values across every machine, which isn't what you want.
 
 ## OS support
