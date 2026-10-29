@@ -639,10 +639,11 @@ if (taskArg) {
   if (!t) fail('SCOPE', `--task ${taskArg}: no such [llm] task with a procedure: field in specs/*/tasks.md`);
   else if (t.procedure === 'none') warnings.push(`SCOPE  ${taskArg}: procedure: none, so there is no scope to check`);
   else {
-    const git = (...a) => execFileSync('git', ['-C', projectRoot, ...a], { encoding: 'utf8' }).split('\n').filter(Boolean);
+    // git's own messages are captured, not passed through: their wording differs between git versions.
+    const git = (...a) => execFileSync('git', ['-C', projectRoot, ...a], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).split('\n').filter(Boolean);
     let changed = [];
     try { changed = [...new Set([...git('diff', '--relative', '--name-only', baseArg), ...git('ls-files', '--others', '--exclude-standard')])]; }
-    catch (e) { fail('SCOPE', `--task ${taskArg}: git failed (${String(e.message).split('\n')[0]})`); }
+    catch (e) { fail('SCOPE', `--task ${taskArg}: git failed (${String(e.stderr ?? '').trim().split('\n')[0] || String(e.message).split('\n')[0]})`); }
     const compDir = normDir(t.component.path);
     // {input} placeholders take the task's input value; an empty optional input collapses its path segment.
     const fill = (g) => g.replace(/\{([^}]+)\}/g, (_, k) => t.given.get(k) ?? '').replace(/\/{2,}/g, '/').replace(/^\//, '');
