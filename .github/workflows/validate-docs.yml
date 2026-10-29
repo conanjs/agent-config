@@ -3,7 +3,7 @@
 name: validate-docs
 on:
   push:
-    paths: ['copilot/knowledge/**', 'copilot/procedures/**', 'copilot/frameworks/knowledge/**', 'copilot/frameworks/agentic-sdlc/**', 'scripts/check-docs.sh', '.github/workflows/validate-docs.yml']
+    paths: ['copilot/knowledge/**', 'copilot/procedures/**', 'copilot/frameworks/knowledge/**', 'copilot/frameworks/agentic-sdlc/**', 'scripts/check-docs.sh', 'tests/**', '.github/workflows/validate-docs.yml']
   # No paths filter on pull_request: this check is required on main, and GitHub leaves a required check from a
   # path-filtered (skipped) workflow "Pending", which blocks the merge. The job takes seconds.
   pull_request:

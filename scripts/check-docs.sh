@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# check-docs.sh — runs the repo's document validators (layer 1 of the doc guards): knowledge, procedures, agentic-sdlc.
+# check-docs.sh — runs the repo's document validators (layer 1 of the doc guards): knowledge, procedures, agentic-sdlc,
+# then the scenario tests that pin what those validators do (tests/, specs/001).
 # Used by .githooks/pre-commit, the Claude Code hook (.claude/settings.json) and CI (.github/workflows/validate-docs.yml).
 #
 # Usage: scripts/check-docs.sh   (network checks are separate: validate-knowledge.mjs --urls, validate-procedures.mjs --upstream)
@@ -22,4 +23,6 @@ status=0
 "$node_bin" "$root/copilot/frameworks/knowledge/tools/validate-knowledge.mjs" || status=1
 "$node_bin" "$root/copilot/procedures/tools/validate-procedures.mjs" || status=1
 "$node_bin" "$root/copilot/frameworks/agentic-sdlc/tools/validate.mjs" || status=1
+# node --test takes files or glob patterns, not folders; listing the files keeps it independent of glob support.
+(cd "$root" && "$node_bin" --test --test-reporter=dot $(find tests -name '*.test.mjs' | sort)) || status=1
 exit $status
