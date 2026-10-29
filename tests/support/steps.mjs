@@ -87,10 +87,8 @@ function run(world, extra) {
   return new Promise((resolve) => {
     execFile(file, args, { encoding: 'utf8', env: { ...process.env, ...env } }, (err, stdout, stderr) => {
       let lines = (stdout + stderr).trimEnd().split('\n');
-      if (t.header) {
-        assert.match(lines[0], t.header, `first line is not the header:\n${stdout}${stderr}`);
-        lines = lines.slice(1);
-      }
+      // A tool that stops before printing its header (a missing root file, say) is compared in full.
+      if (t.header && t.header.test(lines[0])) lines = lines.slice(1);
       let out = lines.join('\n').replaceAll(world.root, '{root}');
       if (world.server) out = out.replaceAll(world.server.url, '{server}');
       for (const [re, to] of t.normalize ?? []) out = out.replace(re, to);

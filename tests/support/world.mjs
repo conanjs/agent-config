@@ -6,7 +6,9 @@ import path from 'node:path';
 import { After, Before, setWorldConstructor, World } from '@cucumber/cucumber';
 
 class ToolWorld extends World {
-  root = fs.mkdtempSync(path.join(os.tmpdir(), 'tool-test-'));
+  // Real path: on macOS the temp folder sits behind a symlink (/var → /private/var), and tools that resolve real
+  // paths would otherwise print a path the {root} placeholder does not match.
+  root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'tool-test-')));
   /** @type {string | undefined} */ toolName;
   /** @type {{ code: number, out: string } | undefined} */ result;
   /** @type {{ srv: import('node:http').Server, url: string } | undefined} */ server;

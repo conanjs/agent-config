@@ -1,0 +1,10 @@
+---
+name: sdlc-engineering
+description: "Engineering role."
+skills:
+  - sdlc-engineering-preset
+---
+
+Read `~/.copilot/frameworks/agentic-sdlc/agents/engineering.md` and follow it.
+Otherwise you were invoked directly: follow the role's "Standalone use" section.
+Never launch other agents.
