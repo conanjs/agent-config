@@ -63,6 +63,7 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | A gap the check misses (a repeated paragraph right under its heading) | Pin the gap too, as a scenario that passes, so a later fix shows up as a deliberate scenario change |
 | A step with no definition | The run must fail, not skip: Cucumber's default `strict` mode does this |
 | The same step text used as a precondition and as an assertion | Word them differently ("`… already links to …`" vs "`… is a symlink to …`"): Cucumber ignores the Given/When/Then keyword when it matches a step, so two definitions with one text are ambiguous. ✅ [^3] Tested on 13.3.0: 30 scenarios reported "ambiguous". ✅ |
+| Tests that run git, started from a git hook | Start every test process without the outer command's `GIT_*` variables. Git exports `GIT_DIR`, `GIT_WORK_TREE` and others to hooks so that their git commands find the repository, and a hook that works in another repository should clear them (git's documented way: `unset $(git rev-parse --local-env-vars)`). ✅ [^7] Observed in agent-config: under `git commit -a`, a scenario's `git add` in its fixture repo wrote into the outer commit's index (`GIT_INDEX_FILE`), until the test environment dropped `GIT_*`. ✅ |
 | Temp folders on macOS | Resolve the temp folder's real path before using it as `{root}`: `os.tmpdir()` is under `/var`, a symlink to `/private/var`, so a tool that prints real paths shows `/private{root}`. Tested on macOS 26 with Node 24.22.1. ✅ |
 
 ## Trade-offs
@@ -85,7 +86,7 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 | foundation rule | TST-14 | Source: |
 
 ## Verification status
-- Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
+- Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
 ## References
 - [Empirical Characterization Testing](https://blog.ploeh.dk/2025/11/03/empirical-characterization-testing/) — Mark Seemann, 2025-11-03; cites Michael Feathers, *Working Effectively with Legacy Code* (2004), ch. 13. Backs: How it works 1–2. [^1]
@@ -94,6 +95,7 @@ The knowledge validator in agent-config, migrated on 2026-10-29 (`specs/001-know
 - [Test runner — Running tests from the command line](https://nodejs.org/api/test.html#running-tests-from-the-command-line) — Node.js, living. Backs: How it works 6. [^4]
 - [Configuration](https://github.com/cucumber/cucumber-js/blob/main/docs/configuration.md) — Cucumber.js, living. Backs: How it works 4 (config file names, `paths`, `import`, `strict`, `parallel`). [^5]
 - [cucumber-js v13.3.0 package.json](https://github.com/cucumber/cucumber-js/blob/v13.3.0/package.json) — Cucumber, 2026-10-05. Backs: How it works 4 (Node engines). [^6]
+- [githooks](https://git-scm.com/docs/githooks) — Git, living. Backs: Edge cases (hooks export `GIT_DIR` and others; clear them for a foreign repository). [^7]
 - `specs/001-knowledge-validator-tests/` and `tests/validate-knowledge/` in agent-config — the worked example, its findings and the sabotage results.
 
 ## Related
