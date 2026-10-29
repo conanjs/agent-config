@@ -605,14 +605,19 @@ Feature: Project validator
         DR  specs/001-demo/research.md DR-001: Supersedes target DR-000 does not exist
       """
 
-  Scenario: DR a Decided by that is not a role or human is not caught today
-    # Pinned as found: the check never matches (research.md, finding F-2).
+  Scenario: DR a Decided by that is not a role or human fails
     Given in "project/specs/001-demo/research.md", `- **Decided by:** human` becomes `- **Decided by:** boss`
     When the tool runs
-    Then it exits with 0 and prints:
+    Then it exits with 1 and prints:
       """
-      PASS (0 warning(s))
+      FAIL (1)
+        DR  specs/001-demo/research.md DR-001: Decided by boss is not a role id or human
       """
+
+  Scenario: DR a Decided by that names a role passes
+    Given in "project/specs/001-demo/research.md", `- **Decided by:** human` becomes `- **Decided by:** engineering`
+    When the tool runs
+    Then it passes with no warnings
 
   Scenario: TASK a task without a department tag fails
     Given in "project/specs/001-demo/tasks.md", `[Eng] [script]` becomes `[script]`
@@ -668,17 +673,13 @@ Feature: Project validator
         TASK  specs/001-demo/tasks.md:4: integration billing has no architecture §6 row
       """
 
-  Scenario: TASK an empty refs is misread as the procedure field
-    # Pinned as found: research.md, finding F-3.
+  Scenario: TASK an empty refs fails, and the rest of the line is still read
     Given in "project/specs/001-demo/tasks.md", `refs: docs/architecture.md ·` becomes `refs:  ·`
     When the tool runs
     Then it exits with 1 and prints:
       """
-      FAIL (2)
-        TASK  specs/001-demo/tasks.md:4: refs path · procedure: demo/add-entity does not exist
-        TASK  specs/001-demo/tasks.md:5: inputs: given but the task has no procedure
-      WARN (1)
-        TASK  specs/001-demo/tasks.md:4: stack demo has a procedure catalog; state procedure: none or procedure: demo/<slug>
+      FAIL (1)
+        TASK  specs/001-demo/tasks.md:4: refs must be explicit (none or paths)
       """
 
   Scenario: TASK an empty refs at the end of the line fails
@@ -692,19 +693,24 @@ Feature: Project validator
         TASK  specs/001-demo/tasks.md:4: stack demo has a procedure catalog; state procedure: none or procedure: demo/<slug>
       """
 
-  Scenario: TASK an invalid hot-path value is swallowed into refs
-    # Pinned as found: the line pattern accepts only yes or no, so the rest of the line is read as refs and the
-    # hot-path check itself never runs (research.md, findings F-3 and F-4).
+  Scenario: TASK a hot-path other than yes or no fails
     Given in "project/specs/001-demo/tasks.md", `procedure: demo/add-entity` becomes `procedure: demo/add-entity · hot-path: maybe`
     When the tool runs
     Then it exits with 1 and prints:
       """
-      FAIL (2)
-        TASK  specs/001-demo/tasks.md:4: refs path docs/architecture.md · procedure: demo/add-entity · hot-path: maybe does not exist
-        TASK  specs/001-demo/tasks.md:5: inputs: given but the task has no procedure
-      WARN (1)
-        TASK  specs/001-demo/tasks.md:4: stack demo has a procedure catalog; state procedure: none or procedure: demo/<slug>
+      FAIL (1)
+        TASK  specs/001-demo/tasks.md:4: hot-path must be yes or no
       """
+
+  Scenario: TASK a hot-path of yes passes
+    Given in "project/specs/001-demo/tasks.md", `procedure: demo/add-entity` becomes `procedure: demo/add-entity · hot-path: yes`
+    When the tool runs
+    Then it passes with no warnings
+
+  Scenario: TASK continuation fields may come in another order
+    Given in "project/specs/001-demo/tasks.md", `touches: none · refs: docs/architecture.md · procedure: demo/add-entity` becomes `refs: docs/architecture.md · procedure: demo/add-entity · touches: none`
+    When the tool runs
+    Then it passes with no warnings
 
   Scenario: TASK a refs path that does not exist fails
     Given in "project/specs/001-demo/tasks.md", `refs: docs/architecture.md` becomes `refs: docs/missing.md`

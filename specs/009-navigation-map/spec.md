@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-29
 
-**Status**: Draft — a proposal; needs V's choices (Open questions) before planning
+**Status**: Clarified 2026-10-29 — option B, a new coordinator role, and a map of everything (Clarifications); ready for `/speckit-plan`
 
 **Input**: V: "later I will also need a coordinator/controller/orchestrator to know the navigation table, what to do, and so on for hierarchical trees, branches, chains for every thing, so they can link and know. One person onboarding this cannot know everything."
 
@@ -47,20 +47,38 @@ A newcomer or an agent with a task ("add a stack", "change a validator", "write 
 
 A coordinator then reads the registry: the agentic-sdlc Orchestrator already routes project missions; for this repo it would route maintenance tasks ("add a stack", "change a validator") to the procedure, the spec workflow and the checks the registry names.
 
-## Open questions
+## Clarifications
 
-1. Option A, B or C? (Recommended: B now, C later.)
-2. Should the coordinator be a new agent role, or an extension of the existing Orchestrator with a "repo maintenance" mission type?
-3. Does the map cover the reference repos too (stack → reference repo → its specs and tests), or only agent-config?
+### Session 2026-10-29
 
-## Requirements (draft, for option B)
+- Q: Option A, B or C? → A: **B** — one registry, a validator, generated views (V).
+- Q: A new coordinator role, or the Orchestrator with a "repo maintenance" mission type? → A: **a new coordinator agent role** (V), compared below.
+- Q: Does the map cover the reference repos too? → A: **Yes, everything**, however deeply nested: agent-config, the reference repos and their maintained variants. Every node is linked from another node above it in the tree, so nothing is reachable only by knowing its name (V).
+
+### Coordinator: the options compared
+
+| | A. New coordinator role (chosen) | B. Orchestrator + "repo maintenance" mission | C. A navigator skill only |
+|---|---|---|---|
+| Job | Knows the map: answers "where is X, what checks it, what depends on it, where do I start", and keeps the registry true (proposes entries for new files) | The Orchestrator would also route maintenance work, next to project missions | Any agent loads the map as a skill and finds its own way |
+| Entry point | Invoked directly by a person onboarding or by any agent; the Orchestrator asks it at P0 when a mission touches framework or repo files | Only through the Orchestrator's intake | Whichever agent is running |
+| Fits the framework | A new row in `conventions.md` §1 with its own `agents/coordinator.md`, wrappers (Copilot, Claude, Codex) and preset skill, all checked by `validate.mjs` | Changes the Orchestrator's P0 table and grows its role file | Skill wrapper only; no role, no rubric |
+| Context per call | Small: the registry and the asked-for chain | Large: the Orchestrator's whole workflow plus the map | Small, but every agent pays it |
+| Ownership of the map | Clear: the coordinator owns `atlas.yaml` and its review | Shared with mission routing | Nobody |
+| Risk | Two top-level agents: must say who decides what (the coordinator routes and explains; it never launches roles or runs gates) | One agent doing two jobs; project and repo work mix in one intake | The map drifts, because nobody maintains it |
+
+Why A: it gives the map one owner, keeps the Orchestrator focused on missions, and is the one entry point a newcomer can ask without knowing the framework first. It reuses everything a role already has (wrappers, preset skill, rubric, validator checks). A thin "navigator" skill can still expose the registry to other agents later; it would read the coordinator's registry, not keep a second one.
+
+## Requirements
 
 - **FR-001**: One registry MUST list every artifact kind with: home globs, schema, index, validator check codes, scenario feature, deployment (`mapping.yaml` entry or "not deployed"), and outgoing edge types.
 - **FR-002**: The validator MUST fail on a file that matches no registered kind, and on a kind that names a schema, index, validator or feature that does not exist.
 - **FR-003**: Edges already checked pairwise (Source ↔ Used by, Preset ↔ preset skill, wrapper ↔ role) MUST be declared in the registry so the map can show whole chains.
 - **FR-004**: The readable map MUST be generated from the registry, never edited by hand.
+- **FR-005**: The registry MUST cover agent-config, each stack reference repo and each maintained variant branch, down to every file.
+- **FR-006**: Every node except the root MUST have a parent edge (the tree: root → area → kind → folder → file), so every node is reachable by browsing; cross-links (chains) come on top of the tree, not instead of it.
+- **FR-007**: A new `coordinator` role MUST own the registry: its role file, wrappers and preset skill follow the role schemas, and it routes and explains without launching other roles or running gates.
 
 ## Success Criteria
 
-- **SC-001**: 0 unreachable files (today: 63).
+- **SC-001**: 0 unreachable files (today: 63 in agent-config alone), in agent-config and in every reference repo and variant.
 - **SC-002**: Every artifact kind has a schema, a validator check and scenarios, or is listed as exempt with a reason.
