@@ -95,6 +95,16 @@ The component list is LangChain's ✅[^lc_anatomy]. Examples and defaults come f
 
 ---
 
+### Session-start hooks: a reminder that does not depend on memory
+
+A hook at session start can put state in front of the model before the first prompt, and show it to the person too:
+- **Claude Code `SessionStart`:** the hook's plain stdout, or `hookSpecificOutput.additionalContext`, is added to the model's context ✅[^cc_hooks_ref]. The top-level `systemMessage` is shown to the user ✅[^cc_hooks_ref].
+- **Copilot CLI `sessionStart`:** only `additionalContext` is used ✅[^copilot_hooks]. User-level hook files load from `~/.copilot/hooks/` ✅[^copilot_hooks].
+
+**Tested 2026-10-30** with this repo's tracker (`copilot/tracker/`, `specs/015-tracker/`):
+- **Minimal `PATH`.** A hook may start without the login shell's `PATH`. Its launcher found nvm's Node under `env -i PATH=/usr/bin:/bin`, and both outputs were valid JSON.
+- **Global settings.** Claude Code's auto mode refused an agent's edit to `~/.claude/settings.json` that adds a hook, as self-modification. Wiring a global hook is therefore the user's step.
+
 ## 5. Guides and sensors (Böckeler's model)
 
 Two axes:
@@ -299,6 +309,8 @@ The guide (the schema doc) said the same thing earlier. The sensor made sure it 
 - [LangChain: The Anatomy of an Agent Harness](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness) — Vivek Trivedy, 2026. Backs: §1; §2; §3; §4 component list; §8; §10. [^lc_anatomy]
 - [Birgitta Böckeler: Harness engineering for coding agent users](https://martinfowler.com/articles/harness-engineering.html) — martinfowler.com, 2026. Backs: §1 guides, sensors, controls, user harness; §2; §3; §5; §9; §10. [^fowler]
 - [Claude Code: Automate actions with hooks](https://code.claude.com/docs/en/hooks-guide) — Anthropic, living. Backs: §1 hook; §4; §7 exit 2 feedback; §8; §9. [^cc_hooks]
+- [Claude Code: Hooks reference](https://code.claude.com/docs/en/hooks) — Anthropic, living; read 2026-10-30. Backs: §4 SessionStart stdout and `additionalContext` reach the model, `systemMessage` is shown to the user. [^cc_hooks_ref]
+- [GitHub Copilot CLI: hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living; read 2026-10-30. Backs: §4 `sessionStart` consumes only `additionalContext`; `~/.copilot/hooks/`. [^copilot_hooks]
 - [Claude Code: How Claude remembers your project](https://code.claude.com/docs/en/memory) — Anthropic, living. Backs: §4 memory; §8 and §9 context vs. enforcement, 200 lines. [^cc_memory]
 - [AGENTS.md](https://agents.md/) — Agentic AI Foundation (Linux Foundation), living. Backs: §4 memory; nearest file in the tree wins. [^agentsmd]
 - [Anthropic: Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — Anthropic, 2025. Backs: §3; §4 context management. [^ant_ctx]
@@ -307,6 +319,7 @@ The guide (the schema doc) said the same thing earlier. The sensor made sure it 
 - [Anthropic: Prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices) — Anthropic, living. Backs: §9 test-specific solutions. [^ant_bp]
 - `.claude/settings.json`, `scripts/claude-doc-hook.sh`, `scripts/check-docs.sh` — this repo's computational sensor: validators and scenarios after every doc edit, exit 2 on failure.
 - `copilot/atlas/`, `copilot/frameworks/knowledge/tools/validate-knowledge.mjs` — this repo's map and doc checks (guide and sensor).
+- `copilot/tracker/`, `specs/015-tracker/` — this repo's tracker: an instruction (guide) plus session-start hooks (sensor), tested as described in §4.
 
 ## Related
 

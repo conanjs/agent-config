@@ -99,6 +99,9 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/014-nested-tsconfig-and-shared-names/research.md`](../../../../specs/014-nested-tsconfig-and-shared-names/research.md)
 - [`specs/014-nested-tsconfig-and-shared-names/spec.md`](../../../../specs/014-nested-tsconfig-and-shared-names/spec.md)
 - [`specs/014-nested-tsconfig-and-shared-names/tasks.md`](../../../../specs/014-nested-tsconfig-and-shared-names/tasks.md)
+- [`specs/015-tracker/research.md`](../../../../specs/015-tracker/research.md)
+- [`specs/015-tracker/spec.md`](../../../../specs/015-tracker/spec.md)
+- [`specs/015-tracker/tasks.md`](../../../../specs/015-tracker/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)

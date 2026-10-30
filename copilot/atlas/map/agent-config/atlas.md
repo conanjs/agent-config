@@ -56,6 +56,7 @@ Where: `copilot/atlas/{index.md,map/**}` · Schema: — · Index: `copilot/atlas
 - [`copilot/atlas/map/agent-config/templates.md`](templates.md)
 - [`copilot/atlas/map/agent-config/tests.md`](tests.md)
 - [`copilot/atlas/map/agent-config/tooling.md`](tooling.md)
+- [`copilot/atlas/map/agent-config/tracker.md`](tracker.md)
 - [`copilot/atlas/map/reference-typescript-node-layer-first/lf-records.md`](../reference-typescript-node-layer-first/lf-records.md)
 - [`copilot/atlas/map/reference-typescript-node-layer-first/lf-src.md`](../reference-typescript-node-layer-first/lf-src.md)
 - [`copilot/atlas/map/reference-typescript-node-layer-first/lf-tests.md`](../reference-typescript-node-layer-first/lf-tests.md)

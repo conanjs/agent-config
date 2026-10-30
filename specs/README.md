@@ -20,6 +20,7 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [012](012-coordinator-review-fixes/) | Coordinator review fixes: NAV-Q1 asks "only a lookup?"; `--explain` takes folders, lists every reference and follows declared chains; missing edges declared | Done | none |
 | [013](013-cross-repo-and-name-references/) | `--explain` across repos (web links, installed form, `cites`), names without a path, TypeScript `.js` imports and `paths` aliases; ref-listed repos read at their ref | Done | none |
 | [014](014-nested-tsconfig-and-shared-names/) | `--explain`: nearest `tsconfig.json` with `extends`; shared names go to the nearest file, ties marked; one-word names as Markdown code | Done | none |
+| [015](015-tracker/) | The tracker: `TRACKER.md` per repo (`tracker/v1`), `tracker.mjs` (check, brief, add/update/close/drop, done-when checks), session-start hooks for Claude Code and Copilot CLI | Done (T008 is the user's step) | none |
 
 ## Open findings, by kind
 
