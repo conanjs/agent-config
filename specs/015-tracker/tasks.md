@@ -7,4 +7,4 @@
 - [x] T005 `tracker-hook.sh`; `copilot/hooks/tracker.json`; `claude/settings.json` seed; `mapping.yaml`; instruction bullet; `scripts/check-docs.sh`; atlas area and kinds
 - [x] T006 Sabotage: 68 of 68 caught
 - [x] T007 agent-config's own `TRACKER.md`, seeded with the work left on this branch
-- [ ] T008 Merge the `SessionStart` hook into this machine's `~/.claude/settings.json` (the user's step; refused to the agent as self-modification) and confirm the reminder in a new session
+- [x] T008 Merge the `SessionStart` hook into this machine's `~/.claude/settings.json` (done by V on 2026-10-31; refused to the agent as self-modification) and confirm the reminder in a new session

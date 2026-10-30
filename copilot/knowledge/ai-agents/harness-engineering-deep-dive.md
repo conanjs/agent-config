@@ -104,6 +104,7 @@ A hook at session start can put state in front of the model before the first pro
 **Tested 2026-10-30** with this repo's tracker (`copilot/tracker/`, `specs/015-tracker/`):
 - **Minimal `PATH`.** A hook may start without the login shell's `PATH`. Its launcher found nvm's Node under `env -i PATH=/usr/bin:/bin`, and both outputs were valid JSON.
 - **Global settings.** Claude Code's auto mode refused an agent's edit to `~/.claude/settings.json` that adds a hook, as self-modification. Wiring a global hook is therefore the user's step.
+- **Live session (2026-10-31).** After the user merged the hook, a headless session (`claude -p --output-format stream-json`) logged the hook's `hook_response`. Asked for the ids of the open items it had been given, the model listed all four.
 
 ## 5. Guides and sensors (Böckeler's model)
 

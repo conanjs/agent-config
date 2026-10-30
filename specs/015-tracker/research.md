@@ -35,4 +35,4 @@
 | Scenarios | `tests/tracker`, then the whole suite | 40 tracker scenarios pass; 487 in all |
 | Sabotage | Every `fail`/`warn` call switched off, plus 49 targeted breaks of the brief, hook, edit and check rules | 68 of 68 caught. The first run left 7 alive: 4 checks had no scenario (2 scenarios added), the tie-break duplicated the file's own order (removed), key order was untested (the update scenario now compares the whole file), and the date check had three redundant parts (now one comparison) |
 | Hook commands | Pipe test of both launch commands on agent-config, and with a minimal `PATH` on a copy outside any repo | Valid JSON; summary for the user; 1,145 characters of context |
-| Live Claude Code session | Needs the user's settings merge (above) | Not yet verified |
+| Live Claude Code session | After V merged the hook (2026-10-31): `claude -p … --output-format stream-json` in agent-config, asking for the ids of the items it was given | The `SessionStart` hook ran (`hook_response` with the summary), and the model answered "T-1, T-2, T-3, T-4" |
