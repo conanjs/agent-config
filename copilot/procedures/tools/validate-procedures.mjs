@@ -5,7 +5,8 @@
 //   procedures-root  default: <this tool>/..  (repo: copilot/procedures, installed: ~/.copilot/procedures)
 //   --max-age        days before a verified dependency counts as due for re-verification (default 90)
 //   --upstream       also ask GitHub for the latest release of every dependency with a `repo:` and warn when it
-//                    differs from `verified-against` (network; uses GITHUB_TOKEN when set)
+//                    differs from `verified-against` (network; uses GITHUB_TOKEN when set, and GITHUB_API_URL when set,
+//                    as GitHub Actions and GitHub Enterprise do; default https://api.github.com)
 //
 // Checks: PR-1 front-matter (schema, keys, dates); PR-2 depends-on entries; PR-3 required sections and order;
 // PR-4 freshness (warn): unverified dependencies, last-verified older than --max-age; PR-5 upstream drift (warn);
@@ -122,9 +123,10 @@ for (const f of files) {
 if (upstream) {
   const headers = { 'user-agent': 'validate-procedures', accept: 'application/vnd.github+json', ...(process.env.GITHUB_TOKEN ? { authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) };
   const norm = (v) => String(v).replace(/^v/, '');
+  const api = (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\/+$/, '');
   for (const [f, d] of drift) {
     try {
-      const res = await fetch(`https://api.github.com/repos/${d.repo}/releases/latest`, { headers, signal: AbortSignal.timeout(15000) });
+      const res = await fetch(`${api}/repos/${d.repo}/releases/latest`, { headers, signal: AbortSignal.timeout(15000) });
       if (!res.ok) { warn('PR-5', `${rel(f)}: ${d.repo} latest release → HTTP ${res.status}`); continue; }
       const tag = (await res.json()).tag_name;
       if (norm(tag) !== norm(d['verified-against'])) warn('PR-5', `${rel(f)}: ${d.tool} verified against ${d['verified-against']}, upstream latest is ${tag}; re-verify the procedure`);

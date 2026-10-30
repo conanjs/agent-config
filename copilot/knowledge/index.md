@@ -1,7 +1,7 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-10-26
+last-updated: 2026-10-29
 ---
 
 # Global knowledge
@@ -22,6 +22,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [kubernetes/](kubernetes/index.md) | How workloads get configuration and credentials from the cluster (Secret vs volume vs mounted folder, `secret:` vs `projected:` volumes, external secret stores), and how container CPU/memory limits work: vCPU, CPU throttling, OOM kills, eviction | topic index |
 | [operations/](operations/index.md) | Runtime operation concerns in code: config at startup, structured logging | topic index |
 | [web-apis/](web-apis/index.md) | HTTP API design: mapping errors to status codes and problem details | topic index |
+| [testing/](testing/index.md) | Putting tests around code and tools that have none: characterization tests, Gherkin scenarios, proving coverage by sabotage | topic index |
 | [windows/](windows/index.md) | Windows specifics: creating symlinks needs admin, Developer Mode or the symlink user right regardless of shell or PowerShell version | 1 |
 | [ai-agents/](ai-agents/index.md) | Graph Engineering study guide, comparison with SDD / AI-DLC / Spec Kit, and existing loop-engineering guides | 2 concepts + 3 legacy |
 | [analytics/](analytics/) | *legacy* — GTM → GA4 → BigQuery → Looker Studio pipeline | 5 |

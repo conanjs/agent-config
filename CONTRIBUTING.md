@@ -11,7 +11,7 @@ Thanks for taking the time to contribute.
 
 1. Fork the repo (or branch directly, if you have write access).
 2. Branch off the default branch: `git checkout -b <type>/<short-description>` (e.g. `fix/broken-symlink-check`, `feat/windows-installer`).
-3. Make the change. Keep the diff scoped to one logical change — unrelated cleanup belongs in its own PR.
+3. Make the change. Keep the diff scoped to one logical change — unrelated cleanup belongs in its own PR. A change to a validator, installer or script starts as a Spec Kit spec under `specs/` and changes that tool's scenarios in `tests/` in the same commit (`.specify/memory/constitution.md`, principle IV); run `pnpm install` once and `scripts/check-docs.sh` before pushing.
 4. Write a clear commit message: a short summary line, a blank line, then the *why* if it isn't obvious from the diff.
 5. Push and open a pull request against the default branch.
 

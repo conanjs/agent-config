@@ -3,7 +3,7 @@
 name: validate-docs
 on:
   push:
-    paths: ['copilot/knowledge/**', 'copilot/procedures/**', 'copilot/frameworks/knowledge/**', 'copilot/frameworks/agentic-sdlc/**', 'scripts/check-docs.sh', '.github/workflows/validate-docs.yml']
+    paths: ['copilot/knowledge/**', 'copilot/procedures/**', 'copilot/frameworks/knowledge/**', 'copilot/frameworks/agentic-sdlc/**', 'copilot/frameworks/agent-foundry/**', 'scripts/check-docs.sh', 'tests/**', 'package.json', 'pnpm-lock.yaml', 'cucumber.mjs', '.nvmrc', '.github/workflows/validate-docs.yml']
   # No paths filter on pull_request: this check is required on main, and GitHub leaves a required check from a
   # path-filtered (skipped) workflow "Pending", which blocks the merge. The job takes seconds.
   pull_request:
@@ -17,9 +17,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24 # current LTS (Krypton); the validators need >= 18
+          node-version-file: .nvmrc # 24, the current LTS line (Krypton); setup-node takes its newest release
           package-manager-cache: false
-      - name: Validate knowledge and procedures
+      - run: corepack enable && pnpm install --frozen-lockfile # pnpm version from package.json packageManager
+      - name: Validate knowledge, procedures and frameworks; run the tool scenarios
         run: scripts/check-docs.sh
       - name: Check upstream versions of procedure dependencies (warnings only)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

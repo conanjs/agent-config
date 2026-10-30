@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-04
+last-updated: 2026-10-29
 rule-prefix: TST
 subject: delivery
 ---
@@ -25,6 +25,8 @@ How qa sets the testing bar and how test tasks are written: what to test at whic
 | TST-10 | Regression first. A bug fix starts with a failing test that reproduces it (`../../../conventions.md` §8). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
 | TST-11 | Test code is production code for readability and review; it follows `../code/coding-standards.md`. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
 | TST-12 | Fast feedback. The unit suite runs in under the constitution's limit (default: 60 s); slow tests move to integration. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
+| TST-13 | Characterize before changing untested code. Before a behavior change to code that has no tests, first add characterization tests that pin what it does today, and list behavior that looks wrong for a decision instead of fixing it in the same change. Do not write specs for the existing behavior after the fact; the next spec covers only the change. | Untested code that a task changes has characterization tests committed before or with the change, and questionable behavior is listed in research.md. | A behavior change to untested code with no tests, or a characterization test whose expected output was "corrected" to what the code should do. | llm | knowledge/testing/characterization-tests.md |
+| TST-14 | Mechanical tools have requirements and tests. Every validator, lint config, hook, installer or check script has its checks written as Given/When/Then scenarios that run in the repo's check command, each check traces to a rule id, and a coverage check fails when a rule id has no scenario. A behavior change edits its scenario in the same commit. | The tool's scenarios run in CI, and the coverage check passes. | A validator check added or changed with no scenario, or a tool whose only test was a one-off run in chat. | llm | knowledge/testing/characterization-tests.md |
 
 ## Interpreting
 
@@ -58,6 +60,20 @@ How qa sets the testing bar and how test tasks are written: what to test at whic
 - Never write assertion-free tests to raise coverage; a test without a meaningful assertion is a finding.
 - Mutation testing, where the stack profile supports it, is the stronger signal for domain logic.
 
+**Code that has no tests yet (TST-13)**
+
+Existing untested code is not specified again from scratch. Spec Kit's guide for existing projects says the new `spec.md` covers only the change you intend to make. The safety net for everything else is characterization tests: tests that record what the code does now, right or wrong.
+
+1. Start from a small input the code handles without complaint.
+2. Write one test per behavior, with an expected value you know is wrong; run it, read the actual value, and paste it in (Feathers' recipe).
+3. Read every pasted value. Anything that looks wrong goes into `research.md` as a finding with options, not into the test.
+4. Prove the tests guard the code: disable each check or branch one at a time and confirm a test fails. Mutation testing tools do this automatically where the stack has one.
+5. Only then change the behavior, under a new spec, editing the scenarios the change affects.
+
+**Mechanical tools (TST-14)**
+
+Validators and scripts get the same treatment as product code, at the integration level: each scenario builds a small input tree, runs the tool as a process, and compares the exit code and output. Keep the scenarios in a Gherkin feature file so the requirement reads without the code, and compare output text exactly, because the message is part of what the tool promises. Reference implementation: `tests/validate-knowledge/` in agent-config (`specs/001-knowledge-validator-tests/`).
+
 **Depth by risk**
 
 Raise the bar for HIGH risk-tier features: every authorization rule gets a negative test; every state transition gets a test; contract and integration tests are mandatory, not optional.
@@ -82,6 +98,9 @@ Raise the bar for HIGH risk-tier features: every authorization rule gets a negat
 - Gerard Meszaros, *xUnit Test Patterns* (2007) — test doubles profile registry.
 - Kent Beck, *Test-Driven Development: By Example* (2002).
 - Google Testing Blog, "Flaky Tests at Google and How We Mitigate Them" (2016).
+- Michael Feathers, *Working Effectively with Legacy Code* (2004) — characterization tests: tests that record what code actually does (TST-13).
+- [Spec Kit existing-projects guide](https://github.github.io/spec-kit/guides/existing-projects.html) — "not a retroactive specification of every existing behavior" (TST-13).
+- [Gherkin: Reference](https://cucumber.io/docs/gherkin/reference/) — Feature, Scenario, Given/When/Then and doc strings (TST-14).
 
 ## Related
 

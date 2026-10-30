@@ -13,6 +13,7 @@ A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, Git
 | Work inside a specific company's KB (e.g. OTS) | [`copilot/companies/ots/index.md`](copilot/companies/ots/index.md) |
 | Bootstrap Spec-Driven Development (Spec Kit) in a project | [`copilot/procedures/spec-driven-development.procedure.md`](copilot/procedures/spec-driven-development.procedure.md) |
 | Review a knowledge doc or procedure before committing (validators + the checks they can't do) | [`copilot/procedures/review-docs.procedure.md`](copilot/procedures/review-docs.procedure.md); enable the automatic checks with `git config core.hooksPath .githooks` (see `SETUP.md` step 10) |
+| Change a validator, installer or script in this repo (spec first, then its Cucumber scenarios) | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) principle IV, [`specs/`](specs/) (one folder per change), [`tests/`](tests/) (one feature file per tool); `pnpm install` once, then `pnpm test` |
 | Add standard GitHub repo governance to a repo | [`copilot/procedures/init-github-governance.procedure.md`](copilot/procedures/init-github-governance.procedure.md) |
 | Install/update the eight Windows apps after a restart | Select `/agent windows-software`, then send `run`; see [`copilot/agents/windows-software.agent.md`](copilot/agents/windows-software.agent.md). Installers stay in Downloads; nvm, Notepad++, Git, and WinRAR go under `D:\win11 software`. |
 | Look up a path/preference variable (`{{AGENT_HOME}}` etc.) | [`global-variables.md`](global-variables.md) |
@@ -73,6 +74,9 @@ agent-config/
 ├── codex/AGENTS.md                 # -> ~/.codex/AGENTS.md (or %USERPROFILE%\.codex on Windows)
 ├── codex/agents/                   # -> ~/.codex/agents (sdlc-* role wrappers, TOML)
 ├── skills/                         # -> ~/.claude/skills AND ~/.agents/skills (Copilot + Codex) — tool-neutral SKILL.md
+├── .specify/, specs/               # NOT deployed — Spec Kit for this repo: constitution + one spec folder per change
+├── tests/                          # NOT deployed — Cucumber scenarios for every validator and installer (one folder per tool)
+├── package.json, cucumber.mjs      # NOT deployed — test dependencies only (pnpm install)
 └── templates/github-repo/          # NOT deployed via mapping.yaml — copied into OTHER repos on demand by
                                      # init-github-governance.procedure.md, not into ~/.copilot at all
     ├── CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CODEOWNERS
@@ -88,11 +92,11 @@ Four layers keep knowledge docs, procedures and the agentic-sdlc framework from 
 | Layer | Catches | Runs | Files |
 |---|---|---|---|
 | 1. Wiring | any validator failure | Claude Code after every edit here (`.claude/settings.json`); git pre-commit (enable once per clone: `git config core.hooksPath .githooks`); CI on every push/PR, **required to merge into `main`** (branch protection check `validate-docs`) | `scripts/check-docs.sh`, `scripts/claude-doc-hook.sh`, `.githooks/pre-commit`, `.github/workflows/validate-docs.yml` |
-| 2. Mechanical checks | shape: unknown front-matter keys, malformed Verification status, copied blocks, repeated paragraphs, chat leftovers (warn) | inside the validators | `copilot/frameworks/knowledge/tools/validate-knowledge.mjs`, `copilot/frameworks/agentic-sdlc/tools/validate.mjs` |
+| 2. Mechanical checks | shape: unknown front-matter keys, malformed Verification status, copied blocks, repeated paragraphs, chat leftovers (warn) | inside the validators; each validator's own behavior is pinned by Cucumber scenarios in `tests/` (TST-14) | `copilot/frameworks/knowledge/tools/validate-knowledge.mjs`, `copilot/frameworks/agentic-sdlc/tools/validate.mjs`, `copilot/frameworks/agent-foundry/tools/validate-foundry.mjs`, `tests/<tool>/<tool>.feature` |
 | 3. Judgment review | meaning: doc stands alone, sections do their job, claims sourced, tool facts current, nothing erased | before committing, by procedure (required by `personal-defaults.instructions.md`; `review-docs` skill) | `copilot/procedures/review-docs.procedure.md`, `skills/review-docs/SKILL.md` |
 | 4. Freshness | staleness: procedures record the version of each outside tool they describe; warns when unverified, > 90 days old, or behind upstream | validator on every run; upstream check weekly in CI | `copilot/procedures/procedure.schema.md`, `copilot/procedures/tools/validate-procedures.mjs` |
 
-Run everything locally: `scripts/check-docs.sh` (finds Node.js ≥ 18 itself). Rules: `copilot/frameworks/knowledge/schemas/_system.md` (KB-1 … KB-8), `knowledge-doc.schema.md` (KD-1 … KD-9), `procedure.schema.md` (PR-1 … PR-6).
+Run everything locally: `pnpm install` once, then `scripts/check-docs.sh` (finds Node.js 24 itself, the version in `.nvmrc`; the validators alone need ≥ 18). Rules: `copilot/frameworks/knowledge/schemas/_system.md` (KB-1 … KB-8), `knowledge-doc.schema.md` (KD-1 … KD-9), `procedure.schema.md` (PR-1 … PR-6).
 
 ## Path & preference variables
 

@@ -10,12 +10,13 @@
 // Only v1 docs are checked (front-matter `schema:` = knowledge-doc/v1 | deep-dive/v1 | topic-index/v1).
 // Legacy docs (no such schema) are skipped: schemas/_system.md §6, no retrofit.
 //
+// Every code printed is a rule id in ../schemas/ (a test checks this: tests/validate-knowledge/).
 // Checks: knowledge-doc KD-1 (sections/order), KD-2 (verified ⇒ no ⚠️ + last-verified), KD-4 (Used by = real
-// Source backlinks from agentic-sdlc), KD-6 (concept ≤ 400 lines, warn), KD-7 (derived-from ↔ synthesized-into);
-// deep-dive DD-1, DD-3, DD-4 (warn); topic-index rules (Docs table ↔ folder, Type/Status copy, index required);
-// shared front-matter, Summary head, References non-empty, footnotes resolve, Verification counts (warn);
-// FM-KEYS (front-matter keys the schema does not define), VS (exact Verification status line, singular/plural,
-// date = last-verified); KB-2 (company / repo names from the Company KB as a deny-list); KB-3 with --urls;
+// Source backlinks from agentic-sdlc), KD-6 (concept ≤ 400 lines, warn), KD-7 (derived-from ↔ synthesized-into),
+// KD-9 (exact Verification status line, singular/plural, date = last-verified; counts warn);
+// deep-dive DD-1, DD-3, DD-4 (warn); topic-index TI-1 … TI-7; shared KB-9 (front-matter values),
+// KB-10 (only keys the schema defines), KB-11 (title and Summary head), KB-12 (References, Related, footnotes);
+// KB-2 (company / repo names from the Company KB as a deny-list); KB-3 with --urls;
 // KB-7 conversation residue (warn, heuristic); KB-8 duplicated fenced blocks across docs / repeated paragraphs (warn).
 // LLM-only rules (KD-3, KD-5, KD-8, KB-1, KB-5, KB-6, KB-7 in full, DD-2) are not checked here:
 // see {{AGENT_HOME}}/procedures/review-docs.procedure.md.
@@ -107,7 +108,7 @@ const TAIL = ['Takeaways', 'Used by', 'Verification status', 'References', 'Rela
 const STATUS = ['draft', 'verified', 'stale'];
 const V1 = ['knowledge-doc/v1', 'deep-dive/v1', 'topic-index/v1'];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
-// Front-matter keys each schema defines (schemas/*.schema.md "Front-matter" tables). Anything else fails FM-KEYS.
+// Front-matter keys each schema defines (schemas/*.schema.md "Front-matter" tables). Anything else fails KB-10.
 const KEYS = {
   'knowledge-doc/v1': ['schema', 'type', 'topic', 'status', 'applies-to', 'last-verified', 'last-updated', 'tags', 'derived-from'],
   'deep-dive/v1': ['schema', 'topic', 'status', 'applies-to', 'last-updated', 'last-verified', 'synthesized-into', 'tags'],
@@ -133,38 +134,38 @@ function checkSequence(f, got, expected) {
 
 function checkKeys(f, fm) {
   const allowed = KEYS[fm.schema] ?? [];
-  for (const k of Object.keys(fm)) if (!allowed.includes(k)) fail('FM-KEYS', `${rel(f)}: front-matter key "${k}" is not defined by ${fm.schema} (allowed: ${allowed.join(', ')})`);
+  for (const k of Object.keys(fm)) if (!allowed.includes(k)) fail('KB-10', `${rel(f)}: front-matter key "${k}" is not defined by ${fm.schema} (allowed: ${allowed.join(', ')})`);
 }
 
 function checkCommonFrontMatter(f, fm, kind) {
-  for (const k of ['topic', 'status', 'applies-to', 'last-updated']) if (fm[k] === undefined || fm[k] === '') fail('FM', `${rel(f)}: front-matter "${k}" missing`);
-  if (fm.status && !STATUS.includes(fm.status)) fail('FM', `${rel(f)}: status "${fm.status}" not one of ${STATUS.join('|')}`);
-  if (fm['applies-to'] !== undefined && !Array.isArray(fm['applies-to'])) fail('FM', `${rel(f)}: applies-to must be a list`);
-  if (fm['last-updated'] && !DATE.test(fm['last-updated'])) fail('FM', `${rel(f)}: last-updated must be YYYY-MM-DD`);
+  for (const k of ['topic', 'status', 'applies-to', 'last-updated']) if (fm[k] === undefined || fm[k] === '') fail('KB-9', `${rel(f)}: front-matter "${k}" missing`);
+  if (fm.status && !STATUS.includes(fm.status)) fail('KB-9', `${rel(f)}: status "${fm.status}" not one of ${STATUS.join('|')}`);
+  if (fm['applies-to'] !== undefined && !Array.isArray(fm['applies-to'])) fail('KB-9', `${rel(f)}: applies-to must be a list`);
+  if (fm['last-updated'] && !DATE.test(fm['last-updated'])) fail('KB-9', `${rel(f)}: last-updated must be YYYY-MM-DD`);
   const folder = path.relative(kRoot, path.dirname(f)).split(path.sep).join('/');
-  if (fm.topic && fm.topic !== folder) fail('FM', `${rel(f)}: topic "${fm.topic}" ≠ folder "${folder}"`);
+  if (fm.topic && fm.topic !== folder) fail('KB-9', `${rel(f)}: topic "${fm.topic}" ≠ folder "${folder}"`);
   if (fm.status === 'verified') {
-    if (!fm['last-verified'] || !DATE.test(fm['last-verified'])) fail(kind === 'deep-dive' ? 'FM' : 'KD-2', `${rel(f)}: status verified needs last-verified (YYYY-MM-DD)`);
+    if (!fm['last-verified'] || !DATE.test(fm['last-verified'])) fail(kind === 'deep-dive' ? 'KB-9' : 'KD-2', `${rel(f)}: status verified needs last-verified (YYYY-MM-DD)`);
   }
 }
 
 function checkSummary(f, t, needDepth) {
   const s = section(t, 'Summary');
   if (s === null) return;
-  if (!/\*\*TL;DR:\*\*/.test(s)) fail('HEAD', `${rel(f)}: Summary lacks **TL;DR:**`);
-  if (!/\*\*Use this when:\*\*/.test(s)) fail('HEAD', `${rel(f)}: Summary lacks **Use this when:**`);
+  if (!/\*\*TL;DR:\*\*/.test(s)) fail('KB-11', `${rel(f)}: Summary lacks **TL;DR:**`);
+  if (!/\*\*Use this when:\*\*/.test(s)) fail('KB-11', `${rel(f)}: Summary lacks **Use this when:**`);
   if (needDepth && !/\*\*Depth:\*\*/.test(s)) fail('DD-1', `${rel(f)}: Summary lacks **Depth:**`);
 }
 
 function checkTail(f, t, fm) {
   const refs = section(t, 'References');
-  if (refs !== null && !/^\s*[-*] /m.test(refs)) fail('REF', `${rel(f)}: References has no entries`);
+  if (refs !== null && !/^\s*[-*] /m.test(refs)) fail('KB-12', `${rel(f)}: References has no entries`);
   const rel_ = section(t, 'Related');
-  if (rel_ !== null && !/^\s*[-*] /m.test(rel_)) fail('REF', `${rel(f)}: Related is empty (use "- _None yet._")`);
+  if (rel_ !== null && !/^\s*[-*] /m.test(rel_)) fail('KB-12', `${rel(f)}: Related is empty (use "- _None yet._")`);
   const b = stripFences(body(t));
   const used = new Set([...b.replace(refs ?? '', '').matchAll(/\[\^(\w+)\](?!:)/g)].map((m) => m[1]));
   const defined = new Set([...(refs ?? '').matchAll(/\[\^(\w+)\]/g)].map((m) => m[1]));
-  for (const n of used) if (!defined.has(n)) fail('REF', `${rel(f)}: footnote [^${n}] is used but no References entry carries it`);
+  for (const n of used) if (!defined.has(n)) fail('KB-12', `${rel(f)}: footnote [^${n}] is used but no References entry carries it`);
   if (fm.status === 'verified' && /⚠️\s*unverified/.test(b.replace(section(t, 'Verification status') ?? '', ''))) fail('KD-2', `${rel(f)}: status verified but contains "⚠️ unverified" claims`);
 }
 
@@ -224,14 +225,15 @@ for (const [f, { fm, text }] of docs) {
     const u = (m[1] || m[2] || m[3]).replace(/[.,;]+$/, '');
     if (!urls.has(u)) urls.set(u, f);
   }
-  if (!/^# \S/m.test(stripFences(b))) fail('HEAD', `${rel(f)}: no "# Title"`);
+  if (!/^# \S/m.test(stripFences(b))) fail('KB-11', `${rel(f)}: no "# Title"`);
   checkKeys(f, fm);
   // KB-7 (warn): conversation residue, outside code and quoted material
   const prose = stripFences(b).split('\n').filter((l) => !/^\s*>/.test(l)).join('\n');
   for (const [re, why] of RESIDUE) { const m = prose.match(re); if (m) warn('KB-7', `${rel(f)}: "${m[0]}" — ${why}`); }
-  // KB-8 (warn): the same paragraph twice in one doc
+  // KB-8 (warn): the same paragraph twice in one doc. Heading lines are dropped first, so a paragraph
+  // written directly under its heading is compared too.
   const seenPara = new Set();
-  for (const para of stripFences(b).split(/\n\s*\n/).map((x) => x.trim().replace(/\s+/g, ' '))) {
+  for (const para of stripFences(b).replace(/^#{1,6} .*$/gm, '').split(/\n\s*\n/).map((x) => x.trim().replace(/\s+/g, ' '))) {
     if (para.length < 120 || /^(\||#|- \[\^)/.test(para)) continue;
     if (seenPara.has(para)) warn('KB-8', `${rel(f)}: paragraph repeated: "${para.slice(0, 70)}…"`);
     seenPara.add(para);
@@ -246,26 +248,26 @@ for (const [f, { fm, text }] of docs) {
 
   if (fm.schema === 'knowledge-doc/v1') {
     checkCommonFrontMatter(f, fm, 'knowledge-doc');
-    if (!TYPES[fm.type]) { fail('FM', `${rel(f)}: type "${fm.type}" not one of ${Object.keys(TYPES).join('|')}`); continue; }
+    if (!TYPES[fm.type]) { fail('KB-9', `${rel(f)}: type "${fm.type}" not one of ${Object.keys(TYPES).join('|')}`); continue; }
     checkSequence(f, heads, [['Summary', 1], ...TYPES[fm.type], ...TAIL.map((n) => [n, 1])]);
     checkSummary(f, text, false);
     checkTail(f, text, fm);
     // KD-6
     if (fm.type === 'concept' && text.split('\n').length > 400) warn('KD-6', `${rel(f)}: ${text.split('\n').length} lines (> ~400); split or move to a deep dive`);
-    // Verification counts (warn)
+    // KD-9 counts (warn): claim markers outside fenced code blocks, which only quote text
     const vs = section(text, 'Verification status') ?? '';
-    const claimText = b.replace(vs, '').replace(section(text, 'References') ?? '', '');
+    const claimText = stripFences(b).replace(vs, '').replace(section(text, 'References') ?? '', '');
     const nOk = (claimText.match(/✅/g) || []).length; const nNo = (claimText.match(/⚠️\s*unverified/g) || []).length;
     const sm = vs.match(/Verified:\s*(\d+)[^·]*·\s*Unverified:\s*(\d+)/);
     const exact = vs.match(/^- Verified: (\d+) (claims?) \(✅\) · Unverified: (\d+) (claims?) \(⚠️\) · Last verified: (\S+?)\.?\s*$/m);
-    if (!sm) fail('VS', `${rel(f)}: Verification status line missing ("- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: date")`);
+    if (!sm) fail('KD-9', `${rel(f)}: Verification status line missing ("- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: date")`);
     else {
-      if (+sm[1] !== nOk || +sm[2] !== nNo) warn('VS', `${rel(f)}: Verification status says ${sm[1]} ✅ / ${sm[2]} ⚠️ but body has ${nOk} / ${nNo}`);
-      if (!exact) fail('VS', `${rel(f)}: Verification status line must read exactly "- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: YYYY-MM-DD"`);
+      if (+sm[1] !== nOk || +sm[2] !== nNo) warn('KD-9', `${rel(f)}: Verification status says ${sm[1]} ✅ / ${sm[2]} ⚠️ but body has ${nOk} / ${nNo}`);
+      if (!exact) fail('KD-9', `${rel(f)}: Verification status line must read exactly "- Verified: n claims (✅) · Unverified: n claims (⚠️) · Last verified: YYYY-MM-DD"`);
       else {
         const noun = (n) => (+n === 1 ? 'claim' : 'claims');
-        if (exact[2] !== noun(exact[1]) || exact[4] !== noun(exact[3])) fail('VS', `${rel(f)}: write "${exact[1]} ${noun(exact[1])}" and "${exact[3]} ${noun(exact[3])}"`);
-        if (fm['last-verified'] && exact[5] !== fm['last-verified']) fail('VS', `${rel(f)}: Verification status says last verified ${exact[5]}, front-matter says ${fm['last-verified']}`);
+        if (exact[2] !== noun(exact[1]) || exact[4] !== noun(exact[3])) fail('KD-9', `${rel(f)}: write "${exact[1]} ${noun(exact[1])}" and "${exact[3]} ${noun(exact[3])}"`);
+        if (fm['last-verified'] && exact[5] !== fm['last-verified']) fail('KD-9', `${rel(f)}: Verification status says last verified ${exact[5]}, front-matter says ${fm['last-verified']}`);
       }
     }
     // KD-4
@@ -299,47 +301,50 @@ for (const [f, { fm, text }] of docs) {
     }
   } else if (fm.schema === 'topic-index/v1') {
     const isRoot = path.dirname(f) === kRoot;
-    if (path.basename(f) !== 'index.md') { fail('IDX', `${rel(f)}: topic-index/v1 must be named index.md`); continue; }
+    if (path.basename(f) !== 'index.md') { fail('TI-1', `${rel(f)}: topic-index/v1 must be named index.md`); continue; }
     const kind = fm.kind;
-    if (!['root', 'topic', 'subtopic'].includes(kind)) fail('IDX', `${rel(f)}: kind "${kind}" not root|topic|subtopic`);
-    if (isRoot !== (kind === 'root')) fail('IDX', `${rel(f)}: kind ${kind} does not match location`);
-    if (!isRoot && fm.topic !== rel(path.dirname(f))) fail('IDX', `${rel(f)}: topic "${fm.topic}" ≠ folder path "${rel(path.dirname(f))}"`);
-    if (!fm['last-updated']) fail('IDX', `${rel(f)}: last-updated missing`);
-    if (heads.slice(-2).join('|') !== 'References|Related') fail('IDX', `${rel(f)}: must end with "## References", "## Related"`);
+    if (!['root', 'topic', 'subtopic'].includes(kind)) fail('TI-1', `${rel(f)}: kind "${kind}" not root|topic|subtopic`);
+    if (isRoot !== (kind === 'root')) fail('TI-1', `${rel(f)}: kind ${kind} does not match location`);
+    if (!isRoot && fm.topic !== rel(path.dirname(f))) fail('TI-1', `${rel(f)}: topic "${fm.topic}" ≠ folder path "${rel(path.dirname(f))}"`);
+    if (!fm['last-updated']) fail('TI-1', `${rel(f)}: last-updated missing`);
+    if (heads.slice(-2).join('|') !== 'References|Related') fail('TI-2', `${rel(f)}: must end with "## References", "## Related"`);
     const dir = path.dirname(f);
     if (kind === 'root') {
       const tb = tables(section(text, 'Topics') ?? '').flatMap((x) => x.rows);
-      if (section(text, 'Topics') === null) fail('IDX', `${rel(f)}: root index needs "## Topics"`);
+      if (section(text, 'Topics') === null) fail('TI-3', `${rel(f)}: root index needs "## Topics"`);
       const listed = new Set(tb.map((r) => linkTarget(r.Topic ?? '').replace(/\/?(index\.md)?$/, '')));
       for (const d of fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory() && !e.name.startsWith('.'))) {
-        if (!listed.has(d.name)) fail('IDX', `${rel(f)}: topic folder "${d.name}" not listed in Topics`);
+        if (!listed.has(d.name)) fail('TI-3', `${rel(f)}: topic folder "${d.name}" not listed in Topics`);
       }
-      for (const t of listed) if (t && !exists(path.join(dir, t))) fail('IDX', `${rel(f)}: Topics lists "${t}", which does not exist`);
+      for (const t of listed) if (t && !exists(path.join(dir, t))) fail('TI-3', `${rel(f)}: Topics lists "${t}", which does not exist`);
     } else {
-      if (section(text, 'Docs') === null) fail('IDX', `${rel(f)}: "## Docs" missing`);
+      if (section(text, 'Docs') === null) fail('TI-4', `${rel(f)}: "## Docs" missing`);
       const rows = tables(section(text, 'Docs') ?? '').flatMap((x) => x.rows);
       const seen = new Map();
       for (const r of rows) {
         const target = linkTarget(r.Doc ?? '');
         if (!target || target === '—') continue;
         const p = path.join(dir, target);
-        if (!exists(p)) { fail('IDX', `${rel(f)}: Docs lists ${target}, which does not exist`); continue; }
-        if (seen.has(p)) fail('IDX', `${rel(f)}: ${target} listed twice`);
+        if (!exists(p)) { fail('TI-4', `${rel(f)}: Docs lists ${target}, which does not exist`); continue; }
+        if (seen.has(p)) fail('TI-4', `${rel(f)}: ${target} listed twice`);
         seen.set(p, r);
         const d = docs.get(p);
-        if (!d) { if (stripCode(r.Type) !== 'legacy') fail('IDX', `${rel(f)}: ${target} is a legacy doc; Type must be "legacy"`); continue; }
+        if (!d) { if (stripCode(r.Type) !== 'legacy') fail('TI-5', `${rel(f)}: ${target} is a legacy doc; Type must be "legacy"`); continue; }
         const want = d.fm.schema === 'deep-dive/v1' ? 'deep-dive' : d.fm.type;
-        if (stripCode(r.Type) !== want) fail('IDX', `${rel(f)}: ${target} Type "${r.Type}" ≠ "${want}"`);
-        if (stripCode(r.Status) !== d.fm.status) fail('IDX', `${rel(f)}: ${target} Status "${r.Status}" ≠ "${d.fm.status}"`);
+        if (stripCode(r.Type) !== want) fail('TI-5', `${rel(f)}: ${target} Type "${r.Type}" ≠ "${want}"`);
+        if (stripCode(r.Status) !== d.fm.status) fail('TI-5', `${rel(f)}: ${target} Status "${r.Status}" ≠ "${d.fm.status}"`);
       }
       for (const [p, d] of docs) {
-        if (path.dirname(p) === dir && d.fm.schema !== 'topic-index/v1' && !seen.has(p)) fail('IDX', `${rel(f)}: v1 doc ${path.basename(p)} has no Docs row`);
+        if (path.dirname(p) === dir && d.fm.schema !== 'topic-index/v1' && !seen.has(p)) fail('TI-4', `${rel(f)}: v1 doc ${path.basename(p)} has no Docs row`);
       }
       const subs = fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory() && !e.name.startsWith('.'));
       if (subs.length) {
-        if (kind === 'subtopic') fail('IDX', `${rel(f)}: subfolders nest at most one level deep`);
-        const st = tables(section(text, 'Subtopics') ?? '').flatMap((x) => x.rows).map((r) => linkTarget(r.Subtopic ?? '').replace(/\/?(index\.md)?$/, ''));
-        for (const s of subs) if (!st.includes(s.name)) fail('IDX', `${rel(f)}: subfolder "${s.name}" not listed in Subtopics`);
+        // A subtopic may not have subfolders at all, so asking it to list them would contradict the first message.
+        if (kind === 'subtopic') fail('TI-6', `${rel(f)}: subfolders nest at most one level deep`);
+        else {
+          const st = tables(section(text, 'Subtopics') ?? '').flatMap((x) => x.rows).map((r) => linkTarget(r.Subtopic ?? '').replace(/\/?(index\.md)?$/, ''));
+          for (const s of subs) if (!st.includes(s.name)) fail('TI-6', `${rel(f)}: subfolder "${s.name}" not listed in Subtopics`);
+        }
       }
     }
   }
@@ -353,7 +358,7 @@ for (const f of docs.keys()) {
   if (path.basename(f) === 'index.md') continue;
   for (let d = path.dirname(f); ; d = path.dirname(d)) {
     const idx = path.join(d, 'index.md');
-    if (!docs.has(idx) || docs.get(idx).fm.schema !== 'topic-index/v1') fail('IDX', `${rel(d) || '.'}/index.md (topic-index/v1) is required: folder holds or contains v1 docs`);
+    if (!docs.has(idx) || docs.get(idx).fm.schema !== 'topic-index/v1') fail('TI-7', `${rel(d) || '.'}/index.md (topic-index/v1) is required: folder holds or contains v1 docs`);
     if (d === kRoot || !d.startsWith(kRoot)) break;
   }
 }

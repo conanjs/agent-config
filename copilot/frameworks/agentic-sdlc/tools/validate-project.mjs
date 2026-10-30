@@ -505,7 +505,7 @@ for (const [id, rec] of allDecisionRecords) {
   if (confidence && !/^(high|medium|low)\b/.test(confidence)) fail('DR', `${label}: Confidence must be high, medium, or low`);
   const supersedes = body.match(/^- \*\*Supersedes:\*\*\s*(.+)$/m)?.[1]?.trim();
   if (supersedes && supersedes !== 'none' && !decisionExists(supersedes)) fail('DR', `${label}: Supersedes target ${supersedes} does not exist`);
-  const decided = body.match(/^- \*\*Decided by:\*\*\s*([^·\n]+)/)?.[1]?.trim();
+  const decided = body.match(/^- \*\*Decided by:\*\*\s*([^·\n]+)/m)?.[1]?.trim();
   if (decided && decided !== 'human' && !roleIds.has(decided)) fail('DR', `${label}: Decided by ${decided} is not a role id or human`);
 }
 
@@ -579,10 +579,12 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
     if (!exec) fail('TASK', `${label}:${i + 1}: missing executor tag [llm] or [script]`);
     const next = lines[i + 1] ?? '';
     if (exec === 'llm') {
-      const cont = /^\s+touches:\s*(.*?)\s+·\s+refs:\s*(.*?)(?:\s+·\s+procedure:\s*(\S+))?(?:\s+·\s+hot-path:\s*(yes|no))?\s*$/.exec(next);
-      if (!cont) { fail('TASK', `${label}:${i + 1}: [llm] task missing continuation line with touches/refs`); continue; }
-      const touches = cont[1].split(',').map((s) => s.trim()).filter(Boolean);
-      const refs = cont[2].split(',').map((s) => s.trim()).filter(Boolean);
+      // Continuation line: "touches: … · refs: … · procedure: … · hot-path: …", read field by field, so an empty or
+      // wrong value is reported as itself instead of being swallowed by the field before it.
+      const fields = new Map(/^\s+[\w-]+:/.test(next) ? next.trim().split('·').map((f) => f.trim().match(/^([\w-]+):\s*(.*)$/)).filter(Boolean).map((m) => [m[1], m[2].trim()]) : []);
+      if (!fields.has('touches') || !fields.has('refs')) { fail('TASK', `${label}:${i + 1}: [llm] task missing continuation line with touches/refs`); continue; }
+      const touches = fields.get('touches').split(',').map((s) => s.trim()).filter(Boolean);
+      const refs = fields.get('refs').split(',').map((s) => s.trim()).filter(Boolean);
       if (!touches.length) fail('TASK', `${label}:${i + 2}: touches must be explicit (none or integration:<svc>)`);
       for (const t of touches) if (t !== 'none') {
         const svc = t.match(/^integration:([A-Za-z0-9_-]+)$/)?.[1];
@@ -594,13 +596,13 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
         const rp = resolveRef(r);
         if (rp && !exists(rp)) fail('TASK', `${label}:${i + 2}: refs path ${r} does not exist`);
       }
-      const hot = cont[4];
+      const hot = fields.get('hot-path');
       if (hot && !['yes', 'no'].includes(hot)) fail('TASK', `${label}:${i + 2}: hot-path must be yes or no`);
       // procedure: (task-line.schema.md) — a bounded scope chosen at P5
       const id = line.match(/^- \[[ xX]\]\s+(T\d+)/)[1];
       const taskPath = line.match(/\(([^()]+)\)\s*(?:\[|$)/)?.[1]?.trim();
       const comp = taskPath ? componentFor(taskPath) : null;
-      const proc = cont[3];
+      const proc = fields.get('procedure') || undefined;
       const inputsLine = /^\s+inputs:\s*(.*)$/.exec(lines[i + 2] ?? '');
       if (!proc) {
         if (comp?.stack && exists(path.join(proceduresRoot, comp.stack, 'index.md'))) warn('TASK', `${label}:${i + 2}: stack ${comp.stack} has a procedure catalog; state procedure: none or procedure: ${comp.stack}/<slug>`);
@@ -637,10 +639,11 @@ if (taskArg) {
   if (!t) fail('SCOPE', `--task ${taskArg}: no such [llm] task with a procedure: field in specs/*/tasks.md`);
   else if (t.procedure === 'none') warnings.push(`SCOPE  ${taskArg}: procedure: none, so there is no scope to check`);
   else {
-    const git = (...a) => execFileSync('git', ['-C', projectRoot, ...a], { encoding: 'utf8' }).split('\n').filter(Boolean);
+    // git's own messages are captured, not passed through: their wording differs between git versions.
+    const git = (...a) => execFileSync('git', ['-C', projectRoot, ...a], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).split('\n').filter(Boolean);
     let changed = [];
     try { changed = [...new Set([...git('diff', '--relative', '--name-only', baseArg), ...git('ls-files', '--others', '--exclude-standard')])]; }
-    catch (e) { fail('SCOPE', `--task ${taskArg}: git failed (${String(e.message).split('\n')[0]})`); }
+    catch (e) { fail('SCOPE', `--task ${taskArg}: git failed (${String(e.stderr ?? '').trim().split('\n')[0] || String(e.message).split('\n')[0]})`); }
     const compDir = normDir(t.component.path);
     // {input} placeholders take the task's input value; an empty optional input collapses its path segment.
     const fill = (g) => g.replace(/\{([^}]+)\}/g, (_, k) => t.given.get(k) ?? '').replace(/\/{2,}/g, '/').replace(/^\//, '');

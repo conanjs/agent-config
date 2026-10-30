@@ -1,27 +1,27 @@
 ---
 schema: stack-reference/v1
-last-updated: 2026-10-28
+last-updated: 2026-10-29
 stack: typescript-node
 repo: conanjs/agentic-sdlc-reference-typescript-node
-pinned: v4.0.0
-commit: ce689e533f4163d2f991c4cbfad9470f5d8fdae6
-verified: 2026-10-28
+pinned: v4.1.1
+commit: c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784
+verified: 2026-10-29
 layout: feature-first
 variants:
-  - { layout: layer-first, branch: layout/layer-first, pinned: v1.5.0, commit: 0269dae5009fa0452aaa7b2a34d7e55c3a3a036f, verified: 2026-10-28 }
+  - { layout: layer-first, branch: layout/layer-first, pinned: v1.5.1, commit: fca5d5de1f65e36ad6d5d1ad3d02f6d818c6691e, verified: 2026-10-29 }
 ---
 
 # Reference: TypeScript on Node.js
 
 ## What it shows
 
-A small Express service for text documents, built through every layer of one feature module (`src/modules/documents/`), next to a `src/modules/shared/` module: create (`POST /documents`, 201 + `Location`), list with a cursor (`GET /documents?cursor=&limit=`), read (`GET /documents/:id`), revise without overwriting a newer change (`PUT /documents/:id`, optimistic concurrency), version history (`GET /documents/:id/versions`) and delete (`DELETE /documents/:id`, 204). It shows entity, ports, use cases, adapters, one handler per route, error mapper, composition root, entry point, unit and integration tests. It exists to be read and copied, not deployed. Every file passes the stack's lint, including the documentation and import-path rules.
+A small Express service for text documents, built through every layer of one feature module (`src/modules/documents/`), next to a `src/modules/shared/` module and a second feature module, `src/modules/comments/`, that reaches documents only through its public `GetDocument` use case: create (`POST /documents`, 201 + `Location`), list with a cursor (`GET /documents?cursor=&limit=`), read (`GET /documents/:id`), revise without overwriting a newer change (`PUT /documents/:id`, optimistic concurrency), version history (`GET /documents/:id/versions`), delete (`DELETE /documents/:id`, 204), and comments on a document (`POST`/`GET /documents/:id/comments`, `GET /documents/:id/comments/:commentId`). Operational: `GET /healthz`, a request id echoed in `X-Request-Id`, one log line per request, and an `about:blank` 404 problem for requests no route serves. It shows entity, ports, use cases, adapters, one handler per route, error mapper, composition root, entry point, unit and integration tests. It exists to be read and copied, not deployed. Every file passes the stack's lint, including the documentation and import-path rules.
 
 The code lives in its own repo, [`conanjs/agentic-sdlc-reference-typescript-node`](https://github.com/conanjs/agentic-sdlc-reference-typescript-node), pinned above by tag and full commit SHA (a tag can move; a SHA cannot). `main` is feature-first, the framework default (MOD-9). The same code with the four layers at the top of `src/` is kept current on branch `layout/layer-first` (tags `v1.x`), pinned under `variants`. This file is the framework's map of it: the Choices table below says which rule each file shows, so a role can find the right file before cloning anything. The repo's own records — `docs/architecture.md`, `.specify/memory/constitution.md`, `docs/glossary.md` — live only in the repo.
 
 ## Choices
 
-All paths are relative to the reference repo's root, at the pinned (feature-first) commit. In the layer-first variant, drop the module folders: `src/modules/documents/domain/` is `src/domain/`, and `src/modules/shared/<layer>/` is `src/<layer>/`.
+All paths are relative to the reference repo's root, at the pinned (feature-first) commit. In the layer-first variant, drop the module folders: `src/modules/documents/domain/` is `src/domain/`, and `src/modules/shared/<layer>/` is `src/<layer>/`. The layer-first variant (`v1.5.1`) has the documents module only: the comments module, routers, request log and `/healthz` (`v4.1.x`) are feature-first only so far.
 
 | Concern | Choice | Rule | Where |
 |---|---|---|---|
@@ -34,7 +34,10 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | Ports | Declared next to the use cases that consume them | TSN-2 | `src/modules/documents/application/ports/DocumentStore.ts` |
 | Create contract | `201 Created`, `Location: /documents/<id>`, the new document as the body; the id comes from a `DocumentIds` port (UUID adapter in production, sequential in tests) | NAM-7, TSN-2 | `src/modules/documents/application/ports/DocumentIds.ts`, `src/modules/documents/interface/routes/create-document/CreateDocumentHandler.ts`, `specs/002-document-lifecycle/research.md` DR-006 |
 | List contract | Cursor pagination: `{ items, nextCursor }`, ascending id, `limit` 1 to 100 (default 20), `nextCursor` `null` on the last page; a bad query is a 400 problem | EXP-7 | `src/modules/documents/application/list-documents/ListDocuments.ts`, `src/modules/documents/interface/routes/list-documents/ListDocumentsQuery.ts`, DR-005 |
-| Queries and commands | One use case and one handler per route; queries (`Get…`, `List…`) change nothing | NAM-4, EXP-1 | `src/modules/documents/application/`, `src/CompositionRoot.ts` (route table) |
+| Queries and commands | One use case and one handler per route; queries (`Get…`, `List…`) change nothing | NAM-4, EXP-1 | `src/modules/documents/application/`, `src/modules/documents/interface/routes/DocumentsRouter.ts` (route table) |
+| Wiring (shape W1) | One composition root builds every use case and hands each module's use cases to that module's router class, which owns its paths, handlers and mapper; routers use full paths and mount at the root, because a prefix mount loses the `:id` param types | EXP-2, MOD-7, MOD-10 | `src/CompositionRoot.ts`, `src/modules/<module>/interface/routes/<Module>Router.ts`, `specs/003-comments-and-operations/research.md` DR-010 |
+| Cross-module use | Comments call documents only through its public use case `GetDocument`; module edges enforced in lint with a `mayDependOn` map | MOD-3, MOD-4 | `src/modules/comments/application/add-comment/AddComment.ts`, `eslint.config.mjs` (`mayDependOn`), DR-007 |
+| Request id and request log | A plain incoming `X-Request-Id` is kept, anything else replaced by a UUID; one log line per request, `request.aborted` when the client disconnects | TSN-10 | `src/modules/shared/interface/RequestLogMiddleware.ts`, DR-009 |
 | Paradigm | class-modeled@1: entity state in `readonly #fields`, collaborators as `private readonly` parameters | PDM-class-modeled-R1, R7 | `src/modules/documents/domain/document/Document.ts`, `src/modules/documents/application/revise-document/ReviseDocument.ts` |
 | Tier B files | Only `src/main.ts` and `src/modules/shared/infrastructure/config.ts` hold free functions | PDM-class-modeled-R7 | `docs/architecture.md` §7, `eslint.config.mjs` (`tierB`) |
 | Port roles | Input port = the use case's public `run()` (no separate interface); gateway port = an explicit interface; no output port (request/response form) | CA-2 | `docs/architecture.md` §4 |
@@ -51,6 +54,7 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | Tests | Unit tests next to the code; integration tests in `test/integration/`; helpers in `test/support/` via `@/test/*` | testing-strategy | `vitest.config.ts`, `vitest.integration.config.ts` |
 | Framework sections of the constitution | Default paradigm, unit-size defaults, no deviations, budgets | constitution-sdlc/v1 | `.specify/memory/constitution.md` |
 | Task-line suffixes | `touches:`, `refs:`, `procedure:` (+ `inputs:`) on every `[llm]` task; T002 names `typescript-node/add-port-and-adapter` | task-line/v1, D11 | `specs/001-revise-document/tasks.md` |
+| Script requirements | The repo's own scripts have Cucumber scenarios in `scripts/test/`, run by `pnpm run test:scripts` inside `pnpm run check` | TST-14 | `scripts/test/*.feature`, `cucumber.mjs`, `specs/004-script-scenarios/research.md` DR-011 |
 
 ## File map
 
@@ -71,11 +75,15 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | `src/modules/documents/interface/errors/HttpErrorMapper.ts` | mapper | Exhaustive refusal-to-problem table |
 | `src/modules/shared/interface/ProblemDetails.ts` | value | The RFC 9457 body and how it is sent |
 | `src/modules/shared/interface/ErrorMiddleware.ts` | middleware | Thrown errors to `about:blank` problems; logs every 500 |
-| `src/CompositionRoot.ts` | composition root | The only importer of adapters; the route table |
+| `src/CompositionRoot.ts` | composition root | The only importer of adapters; builds every use case and mounts one router per module (W1) |
+| `src/modules/documents/interface/routes/DocumentsRouter.ts`, `src/modules/comments/interface/routes/CommentsRouter.ts` | routers | Each module's paths, handlers and mapper, from already-built use cases |
+| `src/modules/comments/` | feature module | A second module that depends on documents only through `GetDocument` |
+| `src/modules/shared/interface/RequestLogMiddleware.ts`, `HealthHandler.ts`, `NotFoundHandler.ts` | middleware, handlers | Request id and log, `/healthz`, the `about:blank` 404 |
 | `src/main.ts` | Tier B entry | Config, logger, listen |
 | `src/**/*.test.ts`, `test/integration/*.int.test.ts` | tests | Unit, concurrency and HTTP tests |
 | `eslint.config.mjs` | lint | Every lint rule of the stack, with the flat-config pitfalls handled |
 | `scripts/check-doc-links.mjs` | link check | Fails `pnpm run check` on any `{@link}` an editor could not follow (TSN-13) |
+| `scripts/test/` | script scenarios | Cucumber requirements for both scripts (TST-14) |
 | `eslint/local-docs.mjs` | lint plugin | `specific-summary` (CMT-13 floor) and `implementation-summary` (CMT-12); copy it into each repo |
 | `docs/`, `.specify/`, `specs/` | records | Architecture, glossary, constitution, decision records, task plan, as any project has |
 | `.github/workflows/check.yml` | CI | `pnpm run check`, then this framework's `validate-project.mjs` at a pinned framework commit |
@@ -85,21 +93,21 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
 
 1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
-2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet ce689e533f4163d2f991c4cbfad9470f5d8fdae6` (feature-first, `v4.0.0`), or `… checkout --quiet 0269dae5009fa0452aaa7b2a34d7e55c3a3a036f` for the layer-first variant (`v1.5.0`).
-3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/ce689e533f4163d2f991c4cbfad9470f5d8fdae6/<path>`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784` (feature-first, `v4.1.1`), or `… checkout --quiet fca5d5de1f65e36ad6d5d1ad3d02f6d818c6691e` for the layer-first variant (`v1.5.1`).
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784/<path>`.
 
 A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 
 ## How to check
 
-In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, doc links, unit and integration tests, build, smoke import of `dist/`). Then `node {{AGENT_HOME}}/frameworks/agentic-sdlc/tools/validate-project.mjs .`. The repo's CI runs both on every push, the second at a pinned framework commit. A failure means the reference no longer matches the stack's rules; fix the reference or the rule, as a pair of pull requests (below).
+In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, doc links, script scenarios, unit and integration tests, build, smoke import of `dist/`). Then `node {{AGENT_HOME}}/frameworks/agentic-sdlc/tools/validate-project.mjs .`. The repo's CI runs both on every push, the second at a pinned framework commit. A failure means the reference no longer matches the stack's rules; fix the reference or the rule, as a pair of pull requests (below).
 
 ## Which layout
 
 | Layout | Copy it when | Tag | Commit |
 |---|---|---|---|
-| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v4.0.0` | `ce689e533f4163d2f991c4cbfad9470f5d8fdae6` |
-| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.5.0` | `0269dae5009fa0452aaa7b2a34d7e55c3a3a036f` |
+| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v4.1.1` | `c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784` |
+| Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.5.1` | `fca5d5de1f65e36ad6d5d1ad3d02f6d818c6691e` |
 
 Both variants get every rule fix, one pull request each (`{{AGENT_HOME}}/patterns/maintained-variant.pattern.md`).
 

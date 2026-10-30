@@ -6,7 +6,8 @@
 //
 // Usage: node tools/validate.mjs [frameworkRoot] [--repo <agent-config repo root>] [--upstream]
 //   --upstream also asks GitHub for the latest tag of every stack reference repo (stacks/<id>/reference.md)
-//   and warns when it differs from the pinned tag (network; uses GITHUB_TOKEN when set).
+//   and warns when it differs from the pinned tag (network; uses GITHUB_TOKEN when set, and GITHUB_API_URL when set,
+//   as GitHub Actions and GitHub Enterprise do; default https://api.github.com).
 //   frameworkRoot defaults to this script's parent dir. The repo root (for
 //   wrappers and skills) defaults to <frameworkRoot>/../../.. when it holds
 //   skills/; otherwise wrapper/skill checks are skipped with a notice.
@@ -522,10 +523,11 @@ if (repo) {
 
 // ---- reference pins vs upstream (--upstream) ----------------------------------------------------
 if (upstream) {
+  const api = (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\/+$/, '');
   const headers = { 'user-agent': 'agentic-sdlc-validate', accept: 'application/vnd.github+json', ...(process.env.GITHUB_TOKEN ? { authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) };
   for (const [stack, repoName, pinned] of refPins) {
     try {
-      const res = await fetch(`https://api.github.com/repos/${repoName}/tags?per_page=100`, { headers, signal: AbortSignal.timeout(15000) });
+      const res = await fetch(`${api}/repos/${repoName}/tags?per_page=100`, { headers, signal: AbortSignal.timeout(15000) });
       if (!res.ok) { warn('REF', `stacks/${stack}/reference.md: ${repoName} tags → HTTP ${res.status}`); continue; }
       const tags = (await res.json()).map((t) => t.name).filter((t) => /^v?\d+\.\d+\.\d+$/.test(t));
       const num = (t) => t.replace(/^v/, '').split('.').map(Number);

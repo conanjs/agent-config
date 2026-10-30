@@ -1,6 +1,6 @@
 ---
 schema: pattern/v1
-last-updated: 2026-10-27
+last-updated: 2026-10-29
 origin: 2026-10-27 — a review of three AI-drafted docs and one procedure found nine defects the existing validator never ran on; the user asked how to stop agents repeating them
 related-patterns: [shared-procedure-thin-wrapper, revise-without-erasing]
 ---
@@ -39,7 +39,7 @@ The four layers as built in this repo:
 | Layer | Kind of mistake | Where it runs | File |
 |---|---|---|---|
 | 1. Wiring | any validator failure | Claude Code post-edit hook, git pre-commit, required CI check `validate-docs` on `main` | `scripts/check-docs.sh`, `.githooks/pre-commit`, `.claude/settings.json`, `.github/workflows/validate-docs.yml` |
-| 2. Mechanical checks | shape | inside the validators | `copilot/frameworks/knowledge/tools/validate-knowledge.mjs` (`FM-KEYS`, `VS`, `KB-7`, `KB-8`) |
+| 2. Mechanical checks | shape | inside the validators | `copilot/frameworks/knowledge/tools/validate-knowledge.mjs` (`KB-10`, `KD-9`, `KB-7`, `KB-8`; printed as `FM-KEYS` and `VS` before 2026-10-29) |
 | 3. Judgment review | meaning | before commit, by procedure | `copilot/procedures/review-docs.procedure.md`, `skills/review-docs/SKILL.md` |
 | 4. Freshness | staleness | validator + weekly CI | `copilot/procedures/procedure.schema.md`, `copilot/procedures/tools/validate-procedures.mjs` |
 
@@ -51,13 +51,13 @@ Rule 6 in practice: layer 2 run against the unfixed commit `5c6ef76` printed, am
   FM-KEYS  ai-agents/graph-engineering-study-guide.md: front-matter key "revision" is not defined by knowledge-doc/v1 (…)
 ```
 
-and on the fixed tree printed `PASS (0 warning(s))`. Layer 4 with a procedure set back to `verified-against: v1.2.0`:
+and on the fixed tree printed `PASS (0 warning(s))`. (Since 2026-10-29 the validator prints `KB-10` where this output says `FM-KEYS`: every printed code is now a rule id in the knowledge schemas.) Layer 4 with a procedure set back to `verified-against: v1.2.0`:
 
 ```text
   warn  PR-5  spec-driven-development.procedure.md: GitHub Spec Kit (specify CLI) verified against v1.2.0, upstream latest is v1.2.3; re-verify the procedure
 ```
 
-Rule 3 in practice: `KB-7` and `KB-8` only warn, because a line starting with "**No,**" can be legitimate; `FM-KEYS` fails, because an undefined key is never legitimate.
+Rule 3 in practice: `KB-7` and `KB-8` only warn, because a line starting with "**No,**" can be legitimate; `KB-10` (formerly `FM-KEYS`) fails, because an undefined key is never legitimate.
 
 ## Checklist
 

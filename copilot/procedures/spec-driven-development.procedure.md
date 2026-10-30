@@ -1,7 +1,7 @@
 ---
 schema: procedure/v1
-last-updated: 2026-10-27
-last-verified: 2026-10-27
+last-updated: 2026-10-29
+last-verified: 2026-10-29
 depends-on:
   - tool: GitHub Spec Kit (specify CLI)
     verified-against: v1.2.3
@@ -30,7 +30,8 @@ Tool-agnostic procedure for adopting [GitHub Spec Kit](https://github.com/github
 
 2. **Initialize, based on which case applies:**
    - **Brand-new project** (nothing there yet): `uv tool install specify-cli` once (global, one-time), then `specify init <project-name> --integration <key>`.
-   - **Existing repo** (already has code, like most real work here): `specify init --here --integration <key>` from inside the repo. If the directory isn't empty, `specify` will ask to confirm; `--force` skips that prompt — only pass `--force` after confirming with whoever's running this that it's actually wanted, same as any other command that writes into an existing tree unprompted. Upstream's existing-project guide uses `specify init --here --force --integration <key>`, and warns that `--force` "may replace files at conflicting managed paths" (it does not delete the rest of the application) — so commit or stash first and do the adoption on its own branch.
+   - **Existing repo** (already has code, like most real work here): `specify init --here --integration <key>` from inside the repo. If the directory isn't empty, `specify` will ask to confirm; `--force` skips that prompt — only pass `--force` after confirming with whoever's running this that it's actually wanted, same as any other command that writes into an existing tree unprompted. Upstream's existing-project guide uses `specify init --here --force --integration <key>`, and warns that `--force` "may replace files at conflicting managed paths" (it does not delete the rest of the application) — so commit or stash first and do the adoption on its own branch. The same guide says not to write specs for what already exists: "You do not need to recreate an existing system from specifications". Each new `spec.md` covers one change, and the existing code is the context it builds on (checked 2026-10-29).
+   - **Run by an agent** (no keyboard for prompts): add `--non-interactive`, and always pass `--integration`, because without it a non-interactive init picks Copilot. Checked with `specify init --help` on v1.2.3 (2026-10-29), whose own example is `specify init --here --force --non-interactive --integration claude`; `--script sh|ps|py` picks the helper script type.
    - **One-off, without installing anything globally**: `uvx --from git+https://github.com/github/spec-kit.git specify init <args>` (e.g. `… specify init --here --integration <key>`) — same effect, nothing left behind afterward except the project's own `.specify/` output.
 
 3. **Verify the working tree was clean before Step 2 ran** (`git status`) — same standing habit as every other procedure here; makes the change trivially reviewable/revertable as a single diff.
@@ -71,7 +72,7 @@ Tool-agnostic procedure for adopting [GitHub Spec Kit](https://github.com/github
 **External authoritative sources:**
 - [github/spec-kit](https://github.com/github/spec-kit) — the project itself; canonical source for the CLI and templates.
 - [Spec Kit installation guide](https://github.github.com/spec-kit/installation.html) — `uv` install, Python 3.11+, and `specify init` flags (`--here`, `--integration`, `--force`) referenced in Steps 1–2; notes that the old `--ai` form fails.
-- [Spec Kit existing-projects guide](https://github.github.io/spec-kit/guides/existing-projects.html) — `specify init --here --force --integration <key>`, the `--force` warning, and commit/branch-first advice (Step 2).
+- [Spec Kit existing-projects guide](https://github.github.io/spec-kit/guides/existing-projects.html) — `specify init --here --force --integration <key>`, the `--force` warning, commit/branch-first advice, and "no retroactive specification of every existing behavior" (Step 2).
 - [Spec Kit one-time usage (uvx)](https://github.com/github/spec-kit/blob/main/docs/install/one-time.md) — the `uvx --from git+…` forms in Step 2.
 - [Spec Kit Claude Code integration](https://github.github.io/spec-kit/integrations/claude.html) — skills at `.claude/skills/speckit-<command>/SKILL.md`, invoked as `/speckit-<command>` (Steps 4–5).
 - [Spec Kit quickstart](https://github.github.com/spec-kit/quickstart.html) — the full and shorter paths, and the implement → converge loop until **Converged** (Step 5).
