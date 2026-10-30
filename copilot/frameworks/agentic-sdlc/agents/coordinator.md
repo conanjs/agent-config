@@ -42,7 +42,7 @@ Walk the navigation tree for the request. A lookup (NAV-Q1 YES) is answered from
 
 "What depends on it" has three answers, and the reply keeps them apart:
 - **linked from (direct):** every file of any present repo whose text names this file by path, however the path is written (relative, repo-relative, installed form, a web link, a TypeScript import or alias). A file of another repo shows as `<repo>:<path>`.
-- **mentioned by name:** files that name it without a path (`module-boundaries`, `CompositionRoot`). Weaker evidence: the same word can name something else, such as a lint rule; check before relying on it.
+- **mentioned by name:** files that name it without a path (`module-boundaries`, `CompositionRoot`, or a one-word name written as code, `` `qa` ``). When several files have the name, the nearest one gets it; a tie is marked `(one of N nearest files with this name)`. Weaker evidence: the same word can name something else, such as a lint rule; check before relying on it.
 - **depends on it (declared chains):** the files that depend on it through edges declared in `atlas.yaml`, followed up to 4 levels (rule → role → wrapper or skill). A reference with no declared edge for its kinds shows only as direct; when that reference is a real dependency, the fix is a new edge (mode: execute).
 
 ### mode: execute

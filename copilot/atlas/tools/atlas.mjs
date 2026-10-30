@@ -6,7 +6,7 @@
 //   --repo       use this folder for a repo instead of its registered root (e.g. a reference repo clone)
 //   --write      regenerate index.md and map/<repo>/<area>.md, then check
 //   --explain    print a file's place in the tree, its kind's facts, the files of any present repo that name it by
-//                path (direct) or by name alone, and the files that depend on it through declared edges (chains,
+//                path (direct) or by name alone (nearest file wins), and the files that depend on it through declared edges (chains,
 //                nearest first); for a folder, the kinds of its files
 //
 // Checks (schemas/atlas.schema.md): AT-1 every file has a kind; AT-2 every kind has a file; AT-3 named paths exist;
@@ -274,14 +274,19 @@ if (!fails.length) for (const [p, text] of pages) {
 //   in its own repo. The installed form (`{{AGENT_HOME}}/…`, `~/.copilot/…`) is a path in the home repo, from any repo.
 //   A web link `<repo web>/(blob|tree|raw)/<ref>/<path>` is a path in that repo (`web`, or `url` without its ref).
 //   A `.js` path with no such file is read as the `.ts` file a TypeScript ESM import means, and a path that starts
-//   with an alias of the repo's root tsconfig.json `compilerOptions.paths` (`@/…`) as the path it stands for (relative to
-//   `baseUrl` when set).
-// A name without a path is a mention: a hyphenated or PascalCase word equal to the name of exactly one file of the
-// cited or own repo, less its extension (`module-boundaries`, `CompositionRoot`). Mentions are listed apart and
-// make no chain.
+//   with an alias of `compilerOptions.paths` (`@/…`) as the path it stands for. The aliases are those of the nearest
+//   tsconfig.json at or above the citing file's folder, with what it inherits through `extends` (relative files only;
+//   later entries win, `paths` whole): relative to `baseUrl` when one is set, else to the file that sets `paths`, and
+//   `${configDir}` is the folder of the tsconfig.json in use.
+// A name without a path is a mention: a hyphenated or PascalCase word equal to a file's name less its extension
+// (`module-boundaries`, `CompositionRoot`), in the cited repo first, then the own one. When several files have the
+// name, the ones nearest the citing file count (most leading folders in common), a tie marked. A one-word name counts
+// only when Markdown writes it as code (`setup`), and only when one file is nearest. A file's own name is not a
+// mention. Mentions are listed apart and make no chain.
 // The generated pages are left out: they list every file, which says nothing about dependencies.
 const TEXT = /\.(md|mjs|js|ts|yaml|yml|json|toml|sh|ps1|feature)$/;
 const PATHLIKE = /[\w{}~.@%\\/-]*[\w@-]+\.(?:md|mjs|js|ts|yaml|yml|json|toml|sh|ps1|feature)(?!\w)/g;
+const CODE_WORD = /`([A-Za-z][A-Za-z0-9_]*)`/g; // a one-word name written as Markdown code
 const NAME = /(?<![\w./\\-])(?:[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+|[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+)(?![\w\\/-]|\.\w)/g;
 const homeId = [...present].find(([, r]) => path.resolve(r.root) === home)?.[0];
 const webOf = (r) => (r.web && r.web !== NONE ? r.web : r.url && r.url !== NONE ? r.url.replace(/\/(?:blob|tree)\/[^/]+\/?$/, '') : null);
@@ -324,18 +329,47 @@ function references() {
     const cands = (r.byBase.get(path.posix.basename(bare)) ?? []).filter((f) => f.endsWith(`/${bare}`));
     return cands.sort((a, b) => depth(b, citing) - depth(a, citing))[0] ?? null;
   };
-  // TypeScript path aliases from each repo's root tsconfig.json (`"@/*": ["./src/*"]`), longest prefix first.
+  // TypeScript path aliases (`"@/*": ["./src/*"]`), longest prefix first, per tsconfig.json; a file uses the nearest one.
   const texts = new Map([...present.keys()].map((id) => [id, textsOf(id)]));
-  const aliases = new Map();
+  const jsonc = (t) => JSON.parse(t.replace(/("(?:[^"\\]|\\.)*")|\/\/[^\n]*|\/\*[\s\S]*?\*\//g, (m, str) => str ?? '').replace(/,(\s*[}\]])/g, '$1'));
+  // The options a config ends with: its bases' first (in order), then its own. Each relative path is read from the file
+  // that sets it. A package base is not in the repo, and a loop stops where it closes.
+  const options = (t, file, seen = new Set()) => {
+    let json; try { json = jsonc(t.get(file)); } catch (e) { if (e instanceof SyntaxError) return {}; throw e; } // not JSON: no options
+    const out = {}; seen.add(file);
+    for (const ext of [json.extends ?? []].flat()) {
+      if (typeof ext !== 'string' || !ext.startsWith('.')) continue;
+      const p = posix(path.normalize(path.join(path.dirname(file), ext)));
+      const base = [p, `${p}.json`].find((x) => t.has(x));
+      if (base && !seen.has(base)) Object.assign(out, options(t, base, seen));
+    }
+    const co = json.compilerOptions ?? {};
+    if (co.paths) Object.assign(out, { paths: co.paths, pathsDir: path.dirname(file) });
+    if (typeof co.baseUrl === 'string') out.baseUrl = path.join(path.dirname(file), co.baseUrl);
+    return out;
+  };
+  const aliases = new Map(); // repo id -> Map(tsconfig.json path -> [[alias prefix, folder]])
   for (const [repoId, t] of texts) {
-    let opts = {};
-    try { opts = JSON.parse((t.get('tsconfig.json') ?? '{}').replace(/("(?:[^"\\]|\\.)*")|\/\/[^\n]*|\/\*[\s\S]*?\*\//g, (m, str) => str ?? '').replace(/,(\s*[}\]])/g, '$1')).compilerOptions ?? {}; } catch { /* not JSON: no aliases */ }
-    const dir = (p) => { const d = posix(path.normalize(path.join(opts.baseUrl ?? '.', p))); return d === '.' ? '' : d.endsWith('/') ? d : `${d}/`; };
-    aliases.set(repoId, Object.entries(opts.paths ?? {}).filter(([k, v]) => k.endsWith('/*') && v[0]?.endsWith('*'))
-      .map(([k, v]) => [k.slice(0, -1), dir(v[0].slice(0, -1))]).sort((a, b) => b[0].length - a[0].length));
+    const byConfig = new Map();
+    for (const file of t.keys()) {
+      if (path.posix.basename(file) !== 'tsconfig.json') continue;
+      const o = options(t, file);
+      const dir = (p) => { const d = posix(path.normalize(p.includes('${configDir}') ? p.replace('${configDir}', path.dirname(file)) : path.join(o.baseUrl ?? o.pathsDir, p))); return d === '.' ? '' : d.endsWith('/') ? d : `${d}/`; };
+      byConfig.set(file, Object.entries(o.paths ?? {}).filter(([k, v]) => k.endsWith('/*') && v[0]?.endsWith('*'))
+        .map(([k, v]) => [k.slice(0, -1), dir(v[0].slice(0, -1))]).sort((a, b) => b[0].length - a[0].length));
+    }
+    aliases.set(repoId, byConfig);
   }
+  const aliasesFor = (repoId, citing) => { // the nearest tsconfig.json at or above the citing file's folder
+    const byConfig = aliases.get(repoId);
+    for (let d = path.posix.dirname(citing); ; d = path.posix.dirname(d)) {
+      const c = byConfig.get(d === '.' ? 'tsconfig.json' : `${d}/tsconfig.json`);
+      if (c) return c;
+      if (d === '.') return [];
+    }
+  };
   const resolve = (token, repoId, citing, cites) => {
-    const alias = aliases.get(repoId).find(([from]) => token.startsWith(from));
+    const alias = aliasesFor(repoId, citing).find(([from]) => token.startsWith(from));
     if (alias) { const f = inRepo(repoId, alias[1] + token.slice(alias[0].length), citing) ?? inRepo(repoId, alias[1] + token.slice(alias[0].length).replace(/\.js$/, '.ts').replace(/\.mjs$/, '.mts'), citing); return f ? [repoId, f] : null; }
     const t0 = token.replace(/\\/g, '/');
     const t = t0.replace(/^\{\{AGENT_HOME\}\}\//, 'copilot/').replace(/^~\/\.copilot\//, 'copilot/').replace(/^%USERPROFILE%\/\.copilot\//, 'copilot/');
@@ -360,10 +394,19 @@ function references() {
         if (target) add(citedBy, key(target.r.id, p), from);
       }
       for (const m of text.matchAll(PATHLIKE)) { const to = resolve(m[0], repoId, f, cites); if (to) add(citedBy, key(...to), from); }
-      for (const m of text.matchAll(NAME)) for (const r of cites ? [cites, repoId] : [repoId]) {
-        const hits = idx.get(r).byStem.get(m[0]);
-        if (hits?.length === 1) { add(named, key(r, hits[0]), from); break; }
-      }
+      const own = path.posix.basename(f).replace(/\.[^.]+$/, '');
+      const mention = (w, oneWord) => {
+        if (w === own) return;
+        for (const r of cites ? [cites, repoId] : [repoId]) {
+          const hits = (idx.get(r).byStem.get(w) ?? []).filter((h) => !(r === repoId && h === f));
+          if (!hits.length) continue;
+          const near = Math.max(...hits.map((h) => depth(h, f))); const top = hits.filter((h) => depth(h, f) === near);
+          if (top.length === 1 || !oneWord) for (const h of top) { const to = key(r, h); if (!named.has(to)) named.set(to, new Map()); named.get(to).set(from, top.length); }
+          return;
+        }
+      };
+      for (const m of text.matchAll(NAME)) mention(m[0], false);
+      if (f.endsWith('.md')) for (const m of text.matchAll(CODE_WORD)) if (!/^[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+$/.test(m[1])) mention(m[1], true);
     }
   }
   for (const [to, froms] of named) for (const f of citedBy.get(to) ?? []) froms.delete(f);
@@ -402,9 +445,9 @@ if (explain) {
   const direct = [...(citedBy.get(self) ?? [])].sort();
   console.log(`  linked from (direct):${direct.length ? '' : ` ${NONE}`}`);
   for (const f of direct) console.log(`    ${label(f)}`);
-  const byName = [...(named.get(self) ?? [])].sort();
+  const byName = [...(named.get(self) ?? [])].sort(([a], [b]) => (a < b ? -1 : 1));
   console.log(`  mentioned by name:${byName.length ? '' : ` ${NONE}`}`);
-  for (const f of byName) console.log(`    ${label(f)}`);
+  for (const [f, n] of byName) console.log(`    ${label(f)}${n > 1 ? ` (one of ${n} nearest files with this name)` : ''}`);
   // Downstream dependants: follow a referrer only along an edge the registry declares (its kind → this kind), so the
   // chain shows real dependencies (rule → role → wrapper) rather than every mention.
   // Breadth first, so each dependant sits under the nearest file it depends on through a declared edge (4 levels at most).

@@ -3,10 +3,10 @@ schema: knowledge-doc/v1
 type: concept
 topic: js-runtime
 status: verified
-applies-to: ["Node ≥ 14.6 / 12.19", "TypeScript ≥ 4.7 (node16/nodenext/bundler resolution)"]
+applies-to: ["Node ≥ 14.6 / 12.19", "TypeScript ≥ 4.7 (node16/nodenext/bundler resolution); tsconfig behaviour tested on 6.0.3"]
 last-verified: 2026-10-30
 last-updated: 2026-10-30
-tags: [subpath-imports, package-json, imports, aliases, module-resolution]
+tags: [subpath-imports, package-json, imports, aliases, module-resolution, tsconfig, extends]
 ---
 
 # Subpath imports: why Node aliases start with `#`
@@ -46,6 +46,11 @@ import { Role as R } from "core/domain/Role"; // read as package "core" → not 
 6. With Node's built-in TypeScript type stripping, tsconfig `paths` are not applied either. The documented alternative is subpath imports, which must start with `#`. ✅[^3]
 7. `paths` targets are read relative to `baseUrl` when it is set, otherwise relative to the tsconfig file itself. ✅[^2]
 8. An import written with `.js` (`import x from "./mod.js"`) is looked up by TypeScript as `./mod.ts` first, then `./mod.d.ts`, then `./mod.js` ("file extension substitution"); this holds in every `moduleResolution` mode. So a TypeScript ESM import names the compiled file, and tools that map imports to sources must read `.js` as `.ts`. ✅[^5]
+9. `tsc` with no input files looks for `tsconfig.json` "starting in the current directory and continuing up the parent directory chain" ✅[^6]; tsserver gives a file with no config in its folder or any parent an inferred project ✅[^9]. Tested 2026-10-30 on 6.0.3: a nested `tsconfig.json` without `paths` does not inherit the outer one's aliases (TS2307).
+10. `extends` loads the base first, then the inheriting file overrides it; every relative path in a config is read relative to the file it came from ✅[^2]. Tested on 6.0.3: a base's `"@b/*": ["./lib/*"]` resolves under the base's folder, not the child's.
+11. Since TypeScript 5.0 `extends` takes a list; it works as a chain and "the latter entry wins" ✅[^7]. Tested on 6.0.3: when two entries both set `paths`, only the later one's aliases resolve, so `paths` is replaced whole, not merged key by key.
+12. Since TypeScript 5.5, `${configDir}` in a config path is the folder of the config in use, so a shared base can point into each project ✅[^8]. The release notes name only "certain path fields"; tested on 6.0.3, it works in `paths`.
+13. `baseUrl`, wherever in the chain it is set, takes over as the base for `paths` targets, and is itself read relative to its own file (tested on 6.0.3). TypeScript 6.0 reports it as TS5101, "deprecated and will stop functioning in TypeScript 7.0", unless `"ignoreDeprecations": "6.0"` is set (tested). Prefer `paths` without `baseUrl`.
 
 **Choices compared**
 
@@ -75,6 +80,7 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 | Another package imports `#core/…` from yours | Not resolved | `imports` is private to the declaring package ✅[^1] |
 | Only tsconfig `paths` is set | Type-check passes, runtime fails | `paths` does not affect emit ✅[^2] |
 | `#` in an import versus `#field` in a class | Unrelated | One is a module specifier, the other a private class field |
+| Monorepo package with its own `tsconfig.json` that `extends` a shared base | The package's config gives its files' aliases; the base's `paths` are read from the base's folder unless written with `${configDir}` | How it works 9, 10, 12 (tested on 6.0.3) |
 | One `#/*` key for a whole `src/` tree (`"#/*": { "source": "./src/*.ts", "default": "./dist/*.js" }`) | Works with tsc (`customConditions: ["source"]`), tsx `--conditions=source`, Vitest `ssr.resolve.conditions` and the built `dist/`; tested 2026-10-28 on Node 24.22 in a copy of the typescript-node stack reference | Keys may start with `#/` from Node 24.14; the `source`/`default` conditions pick `.ts` in development and `.js` after the build |
 
 ## Takeaways
@@ -87,19 +93,24 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 | stack idiom | TSN-15 | Source: |
 
 ## Verification status
-- Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-30
+- Verified: 21 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-30
+- Tested 2026-10-30 with `tsc` 6.0.3 (`--traceResolution`, `--showConfig`) on a scratch project: How it works 9–13; the cases are listed in `specs/014-nested-tsconfig-and-shared-names/research.md`.
 
 ## References
 - [Node.js Packages: subpath imports, self-referencing](https://nodejs.org/api/packages.html#subpath-imports) — Node.js project, living. Backs: How it works 1–4, Choices, Edge cases. [^1]
-- [TSConfig reference: paths](https://www.typescriptlang.org/tsconfig/#paths) — TypeScript team, living. Backs: How it works 5, 7. [^2]
+- [TSConfig reference: paths, extends](https://www.typescriptlang.org/tsconfig/#paths) — TypeScript team, living. Backs: How it works 5, 7, 10. [^2]
 - [Node.js: Modules: TypeScript](https://nodejs.org/api/typescript.html) — Node.js project, living. Backs: How it works 6. [^3]
 - [tsconfig-paths README](https://github.com/dividab/tsconfig-paths) — tsconfig-paths maintainers, living. Backs: Choices, runtime hook row. [^4]
 - [TypeScript Handbook: Modules — Reference, "File extension substitution"](https://www.typescriptlang.org/docs/handbook/modules/reference.html) — TypeScript team, living; read 2026-10-30. Backs: How it works 8. [^5]
+- [What is a tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) — TypeScript team, living; read 2026-10-30. Backs: How it works 9. [^6]
+- [TypeScript 5.0 release notes: multiple configuration files in `extends`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html) — TypeScript team, 2023. Backs: How it works 11. [^7]
+- [TypeScript 5.5 release notes: `${configDir}`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html) — TypeScript team, 2024. Backs: How it works 12. [^8]
+- [TypeScript wiki: Standalone Server (tsserver)](https://github.com/microsoft/TypeScript/wiki/Standalone-Server-%28tsserver%29) — TypeScript team, living. Backs: How it works 9 (inferred project). [^9]
 - [tsc-alias](https://github.com/justkey007/tsc-alias) — tsc-alias maintainers, living. The build-time rewrite tool in the tested row.
 - [NestJS: Libraries](https://docs.nestjs.com/cli/libraries) — NestJS, living. NestJS aliases through tsconfig path mapping and resolves them in its build.
 - `copilot/frameworks/agentic-sdlc/foundations/design/import-paths.md` — IMP-1, IMP-2 apply this.
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — TSN-15, TSN-16 and the tested tool config.
-- `copilot/atlas/tools/atlas.mjs` — `--explain` applies How it works 7 and 8 to find which files import a `.ts` file (`specs/013-cross-repo-and-name-references/`).
+- `copilot/atlas/tools/atlas.mjs` — `--explain` applies How it works 7–13 to find which files import a `.ts` file (`specs/013-cross-repo-and-name-references/`, `specs/014-nested-tsconfig-and-shared-names/`).
 
 ## Related
 - `js-runtime/private-fields.md`

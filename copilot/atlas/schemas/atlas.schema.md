@@ -56,8 +56,8 @@ edges:
 
 - `copilot/atlas/atlas.yaml` — the registry this schema defines.
 - `specs/009-navigation-map/` — why the atlas exists, its options and decisions.
-- `specs/012-coordinator-review-fixes/`, `specs/013-cross-repo-and-name-references/` — how `--explain` finds references.
-- [TypeScript: `paths`](https://www.typescriptlang.org/tsconfig/#paths) — the aliases `--explain` reads from a repo's root `tsconfig.json`.
+- `specs/012-coordinator-review-fixes/`, `specs/013-cross-repo-and-name-references/`, `specs/014-nested-tsconfig-and-shared-names/` — how `--explain` finds references.
+- [TypeScript: `paths`, `extends`](https://www.typescriptlang.org/tsconfig/#paths) — the aliases `--explain` reads from the nearest `tsconfig.json` and the configs it extends.
 - [TypeScript: modules reference, `.js` extensions in imports](https://www.typescriptlang.org/docs/handbook/modules/reference.html) — why `./x.js` means `./x.ts`.
 - [git ls-files](https://git-scm.com/docs/git-ls-files) — `--cached --others --exclude-standard`: tracked and untracked files, ignored ones left out.
 - [git ls-tree](https://git-scm.com/docs/git-ls-tree) — `-r --name-only <ref>`: the files of one commit, whatever is checked out.

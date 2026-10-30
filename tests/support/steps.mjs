@@ -217,3 +217,7 @@ Then('the file {string} has no line containing {string}', function (p, text) {
 Then('the output has the line {string}', function (line) {
   assert.ok(this.result.out.split('\n').includes(line), `no output line "${line}" in:\n${this.result.out}`);
 });
+
+Then('the output has no line {string}', function (line) {
+  assert.ok(!this.result.out.split('\n').includes(line), `output line "${line}" in:\n${this.result.out}`);
+});

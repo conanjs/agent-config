@@ -19,6 +19,7 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [010](010-project-validator-bugs/) | Project validator: `Decided by` checked; continuation line read field by field | Done | none |
 | [012](012-coordinator-review-fixes/) | Coordinator review fixes: NAV-Q1 asks "only a lookup?"; `--explain` takes folders, lists every reference and follows declared chains; missing edges declared | Done | none |
 | [013](013-cross-repo-and-name-references/) | `--explain` across repos (web links, installed form, `cites`), names without a path, TypeScript `.js` imports and `paths` aliases; ref-listed repos read at their ref | Done | none |
+| [014](014-nested-tsconfig-and-shared-names/) | `--explain`: nearest `tsconfig.json` with `extends`; shared names go to the nearest file, ties marked; one-word names as Markdown code | Done | none |
 
 ## Open findings, by kind
 

@@ -512,7 +512,25 @@ Feature: Atlas
     When the tool runs with "--explain {root}/docs/notes/CompositionRoot.ts"
     Then the output has the line "    docs/notes/m.md"
 
-  Scenario: --explain does not count a name that several files share, or a one-word name
+  Scenario: --explain lists a shared name under the nearest file that has it
+    Given the file "docs/guides/first-steps.md" contains:
+      """
+      # First steps
+      """
+    And the file "docs/a/first-steps.md" contains:
+      """
+      # Other first steps
+      """
+    And the file "docs/a/n.md" contains:
+      """
+      Do first-steps.
+      """
+    When the tool runs with "--explain {root}/docs/a/first-steps.md"
+    Then the output has the line "    docs/a/n.md"
+    When the tool runs with "--explain {root}/docs/guides/first-steps.md"
+    Then the output has the line "  mentioned by name: —"
+
+  Scenario: --explain lists a shared name under every file tied as nearest, and marks it
     Given the file "docs/guides/first-steps.md" contains:
       """
       # First steps
@@ -523,10 +541,59 @@ Feature: Atlas
       """
     And the file "docs/notes/n.md" contains:
       """
-      Do first-steps, then the setup.
+      Do first-steps.
+      """
+    When the tool runs with "--explain {root}/docs/a/first-steps.md"
+    Then the output has the line "    docs/notes/n.md (one of 2 nearest files with this name)"
+    When the tool runs with "--explain {root}/docs/guides/first-steps.md"
+    Then the output has the line "    docs/notes/n.md (one of 2 nearest files with this name)"
+
+  Scenario: --explain does not count a file that names itself
+    Given the file "docs/guides/first-steps.md" contains:
+      """
+      # first-steps
+      """
+    And the file "docs/a/first-steps.md" contains:
+      """
+      # Other first steps
       """
     When the tool runs with "--explain {root}/docs/a/first-steps.md"
     Then the output has the line "  mentioned by name: —"
+
+  Scenario: --explain counts a one-word name only when Markdown writes it as code
+    Given the file "docs/notes/n.md" contains:
+      """
+      Then the setup.
+      """
+    And the file "docs/notes/m.md" contains:
+      """
+      Read `setup` first.
+      """
+    And the file "docs/notes/c.mjs" contains:
+      """
+      const step = `setup`;
+      """
+    When the tool runs with "--explain {root}/docs/guides/setup.md"
+    Then the output has the line "    docs/notes/m.md"
+    And the output has no line "    docs/notes/n.md"
+    And the output has no line "    docs/notes/c.mjs"
+
+  Scenario: --explain counts a shared one-word name only when one file is nearest
+    Given the file "docs/a/setup.md" contains:
+      """
+      # Setup A
+      """
+    And the file "docs/a/m.md" contains:
+      """
+      Read `setup` first.
+      """
+    And the file "docs/notes/m.md" contains:
+      """
+      Read `setup` first.
+      """
+    When the tool runs with "--explain {root}/docs/a/setup.md"
+    Then the output has the line "    docs/a/m.md"
+    And the output has no line "    docs/notes/m.md (one of 2 nearest files with this name)"
     When the tool runs with "--explain {root}/docs/guides/setup.md"
     Then the output has the line "  mentioned by name: —"
 
@@ -616,6 +683,154 @@ Feature: Atlas
       """
     When the tool runs with "--explain {root}/docs/Widget.ts"
     Then the output has the line "    docs/x.test.ts"
+
+  Scenario: --explain reads each TypeScript file's aliases from the nearest tsconfig.json at or above its folder
+    Given the file "tsconfig.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@/*": ["./docs/notes/*"] } } }
+      """
+    And the file "docs/sub/tsconfig.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@/*": ["../t/*"] } } }
+      """
+    And the file "docs/notes/Widget.ts" contains:
+      """
+      export class Widget {}
+      """
+    And the file "docs/t/helper.ts" contains:
+      """
+      export const helper = 1;
+      """
+    And the file "docs/x.ts" contains:
+      """
+      import { Widget } from "@/Widget.js";
+      """
+    And the file "docs/sub/deep/y.ts" contains:
+      """
+      import { helper } from "@/helper.js";
+      import { Widget } from "@/Widget.js";
+      """
+    When the tool runs with "--explain {root}/docs/t/helper.ts"
+    Then the output has the line "    docs/sub/deep/y.ts"
+    When the tool runs with "--explain {root}/docs/notes/Widget.ts"
+    Then the output has the line "    docs/x.ts"
+    And the output has no line "    docs/sub/deep/y.ts"
+
+  Scenario: --explain reads aliases a tsconfig.json inherits through extends, relative to the file that sets them
+    Given the file "docs/base/tsconfig.base.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@b/*": ["./*"] } } }
+      """
+    And the file "docs/app/tsconfig.json" contains:
+      """
+      // the base, without its extension
+      { "extends": "../base/tsconfig.base", "compilerOptions": { "strict": true }, }
+      """
+    And the file "docs/base/x.ts" contains:
+      """
+      export const x = 1;
+      """
+    And the file "docs/app/main.ts" contains:
+      """
+      import { x } from "@b/x.js";
+      """
+    When the tool runs with "--explain {root}/docs/base/x.ts"
+    Then the output has the line "    docs/app/main.ts"
+
+  Scenario: --explain takes paths from the last config of an extends list, whole
+    Given the file "docs/app/one.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@a/*": ["./a/*"] } } }
+      """
+    And the file "docs/app/two.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@n/*": ["./b/*"] } } }
+      """
+    And the file "docs/app/tsconfig.json" contains:
+      """
+      { "extends": ["./one.json", "./two.json"] }
+      """
+    And the file "docs/app/a/m.ts" contains:
+      """
+      export const a = 1;
+      """
+    And the file "docs/app/b/n.ts" contains:
+      """
+      export const b = 1;
+      """
+    And the file "docs/app/main.ts" contains:
+      """
+      import { a } from "@a/m.js";
+      import { b } from "@n/n.js";
+      """
+    When the tool runs with "--explain {root}/docs/app/b/n.ts"
+    Then the output has the line "    docs/app/main.ts"
+    When the tool runs with "--explain {root}/docs/app/a/m.ts"
+    Then the output has the line "  linked from (direct): —"
+
+  Scenario: --explain reads ${configDir} in inherited paths as the folder of the tsconfig.json in use
+    Given the file "docs/base/tsconfig.base.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@c/*": ["${configDir}/src/*"] } } }
+      """
+    And the file "docs/app/tsconfig.json" contains:
+      """
+      { "extends": "../base/tsconfig.base.json" }
+      """
+    And the file "docs/app/src/y.ts" contains:
+      """
+      export const y = 2;
+      """
+    And the file "docs/app/main.ts" contains:
+      """
+      import { y } from "@c/y.js";
+      """
+    When the tool runs with "--explain {root}/docs/app/src/y.ts"
+    Then the output has the line "    docs/app/main.ts"
+
+  Scenario: --explain reads inherited paths relative to a baseUrl set anywhere in the chain
+    Given the file "docs/base/b.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@q/*": ["./*"] } } }
+      """
+    And the file "docs/app/tsconfig.json" contains:
+      """
+      { "extends": "../base/b.json", "compilerOptions": { "baseUrl": "." } }
+      """
+    And the file "docs/app/w.ts" contains:
+      """
+      export const w = 1;
+      """
+    And the file "docs/app/main.ts" contains:
+      """
+      import { w } from "@q/w.js";
+      """
+    When the tool runs with "--explain {root}/docs/app/w.ts"
+    Then the output has the line "    docs/app/main.ts"
+
+  Scenario: --explain skips an extends that names a package, and stops where extends loop
+    Given the file "docs/app/tsconfig.json" contains:
+      """
+      { "extends": ["./loop.json", "shared/base.json"] }
+      """
+    And the file "docs/app/loop.json" contains:
+      """
+      { "extends": "./tsconfig.json", "compilerOptions": { "paths": { "@/*": ["./src/*"] } } }
+      """
+    And the file "docs/app/shared/base.json" contains:
+      """
+      { "compilerOptions": { "paths": { "@/*": ["./nowhere/*"] } } }
+      """
+    And the file "docs/app/src/w.ts" contains:
+      """
+      export const w = 1;
+      """
+    And the file "docs/app/main.ts" contains:
+      """
+      import { w } from "@/w.js";
+      """
+    When the tool runs with "--explain {root}/docs/app/src/w.ts"
+    Then the output has the line "    docs/app/main.ts"
 
   Scenario: --explain on a file that is not on the map says so
     Given the file "notes/todo.txt" contains:

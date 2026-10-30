@@ -96,6 +96,9 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/013-cross-repo-and-name-references/research.md`](../../../../specs/013-cross-repo-and-name-references/research.md)
 - [`specs/013-cross-repo-and-name-references/spec.md`](../../../../specs/013-cross-repo-and-name-references/spec.md)
 - [`specs/013-cross-repo-and-name-references/tasks.md`](../../../../specs/013-cross-repo-and-name-references/tasks.md)
+- [`specs/014-nested-tsconfig-and-shared-names/research.md`](../../../../specs/014-nested-tsconfig-and-shared-names/research.md)
+- [`specs/014-nested-tsconfig-and-shared-names/spec.md`](../../../../specs/014-nested-tsconfig-and-shared-names/spec.md)
+- [`specs/014-nested-tsconfig-and-shared-names/tasks.md`](../../../../specs/014-nested-tsconfig-and-shared-names/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)
