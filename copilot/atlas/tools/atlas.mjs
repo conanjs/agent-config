@@ -5,8 +5,9 @@
 //   atlas.yaml   default: <this tool>/../atlas.yaml; agent-config's root is two folders above it
 //   --repo       use this folder for a repo instead of its registered root (e.g. a reference repo clone)
 //   --write      regenerate index.md and map/<repo>/<area>.md, then check
-//   --explain    print a file's place in the tree, its kind's facts, the files that name it (direct) and the files that
-//                depend on it through declared edges (chains, nearest first); for a folder, the kinds of its files
+//   --explain    print a file's place in the tree, its kind's facts, the files of any present repo that name it by
+//                path (direct) or by name alone, and the files that depend on it through declared edges (chains,
+//                nearest first); for a folder, the kinds of its files
 //
 // Checks (schemas/atlas.schema.md): AT-1 every file has a kind; AT-2 every kind has a file; AT-3 named paths exist;
 // AT-4 the tree is whole; AT-5 generated pages are current; AT-6 ids, fields and edges; AT-7 absent repos (warn).
@@ -90,6 +91,7 @@ const repoById = new Map(reg.repos.map((r) => [r.id, r]));
 const areaById = new Map(reg.areas.map((a) => [a.id, a]));
 const kindById = new Map(reg.kinds.map((k) => [k.id, k]));
 for (const e of reg.edges) for (const end of ['from', 'to']) if (e[end] && !kindById.has(e[end])) fail('AT-6', `atlas.yaml:${e.line}: edge ${end} "${e[end]}" is not a kind`);
+for (const k of reg.kinds) if (k.cites && k.cites !== NONE && !repoById.has(k.cites)) fail('AT-6', `atlas.yaml:${k.line}: kind ${k.id} cites "${k.cites}", which is not a repo`);
 
 // ---- AT-4: every kind and area reaches its repo by parent links ------------------------------------------
 const chain = (areaId) => { // area ids from this one up to the repo, or null when broken
@@ -264,41 +266,108 @@ if (!fails.length) for (const [p, text] of pages) {
   else if (fs.readFileSync(f, 'utf8') !== text) fail('AT-5', `${p} is out of date; run with --write`);
 }
 
-// ---- references between files of one repo (for --explain) ---------------------------------------------
-// A path in a file's text counts as a reference when it names another file of the same repo, written:
-//   relative to the citing file (`../design/x.md`, a Markdown link), or repo-relative (`copilot/…/x.md`), or in the
-//   installed form (`{{AGENT_HOME}}/…`, `~/.copilot/…`), or relative to a folder above the citing file
-//   (`foundations/design/x.md` in a role file of the same framework): then the nearest file with that ending wins.
+// ---- references between files, across the present repos (for --explain) -------------------------------
+// A path in a file's text counts as a reference when it names a file of a present repo, written:
+//   relative to the citing file (`../design/x.md`, a Markdown link), or repo-relative (`copilot/…/x.md`), or relative
+//   to a folder above the citing file (`foundations/design/x.md` in a role file): then the nearest file with that
+//   ending wins. Repo-relative and ending paths are looked up first in the repo the citing file's kind `cites`, then
+//   in its own repo. The installed form (`{{AGENT_HOME}}/…`, `~/.copilot/…`) is a path in the home repo, from any repo.
+//   A web link `<repo web>/(blob|tree|raw)/<ref>/<path>` is a path in that repo (`web`, or `url` without its ref).
+//   A `.js` path with no such file is read as the `.ts` file a TypeScript ESM import means, and a path that starts
+//   with an alias of the repo's root tsconfig.json `compilerOptions.paths` (`@/…`) as the path it stands for (relative to
+//   `baseUrl` when set).
+// A name without a path is a mention: a hyphenated or PascalCase word equal to the name of exactly one file of the
+// cited or own repo, less its extension (`module-boundaries`, `CompositionRoot`). Mentions are listed apart and
+// make no chain.
 // The generated pages are left out: they list every file, which says nothing about dependencies.
+const TEXT = /\.(md|mjs|js|ts|yaml|yml|json|toml|sh|ps1|feature)$/;
 const PATHLIKE = /[\w{}~.@%\\/-]*[\w@-]+\.(?:md|mjs|js|ts|yaml|yml|json|toml|sh|ps1|feature)(?!\w)/g;
-function references(repoId) {
-  const { root, files } = present.get(repoId);
-  const kindOf = new Map([...placed.get(repoId)].flatMap(([kid, fs_]) => fs_.map((f) => [f, kid])));
-  const set = new Set(files);
-  const byBase = new Map();
-  for (const f of files) { const b = path.posix.basename(f); if (!byBase.has(b)) byBase.set(b, []); byBase.get(b).push(f); }
+const NAME = /(?<![\w./\\-])(?:[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+|[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+)(?![\w\\/-]|\.\w)/g;
+const homeId = [...present].find(([, r]) => path.resolve(r.root) === home)?.[0];
+const webOf = (r) => (r.web && r.web !== NONE ? r.web : r.url && r.url !== NONE ? r.url.replace(/\/(?:blob|tree)\/[^/]+\/?$/, '') : null);
+// The texts of a repo's files: a ref-listed repo is read at its ref (one `git cat-file --batch`), others from disk.
+function textsOf(repoId) {
+  const repo = repoById.get(repoId); const { root, files } = present.get(repoId);
+  const wanted = files.filter((f) => TEXT.test(f) && !(repoId === homeId && generated.has(f)));
+  const out = new Map();
+  if (repo.ref && repo.ref !== NONE) {
+    const buf = execFileSync('git', ['-C', root, 'cat-file', '--batch'], { input: wanted.map((f) => `${repo.ref}:${f}\n`).join(''), maxBuffer: 1 << 30 });
+    let at = 0;
+    for (const f of wanted) {
+      const eol = buf.indexOf(10, at); const head = buf.toString('utf8', at, eol).split(' ');
+      if (head[1] === 'missing') { at = eol + 1; continue; }
+      const size = Number(head[2]);
+      out.set(f, buf.toString('utf8', eol + 1, eol + 1 + size)); at = eol + 1 + size + 1;
+    }
+  } else for (const f of wanted) if (fs.existsSync(path.join(root, f))) out.set(f, fs.readFileSync(path.join(root, f), 'utf8'));
+  return out;
+}
+function references() {
+  const key = (repoId, f) => `${repoId}:${f}`;
+  const idx = new Map(); const kindOf = new Map();
+  for (const [repoId, { files }] of present) {
+    const byBase = new Map(); const byStem = new Map();
+    for (const f of files) {
+      const b = path.posix.basename(f); const stem = b.replace(/\.[^.]+$/, '');
+      if (!byBase.has(b)) byBase.set(b, []); byBase.get(b).push(f);
+      if (!byStem.has(stem)) byStem.set(stem, []); byStem.get(stem).push(f);
+    }
+    idx.set(repoId, { set: new Set(files), byBase, byStem });
+    for (const [kid, fs_] of placed.get(repoId)) for (const f of fs_) kindOf.set(key(repoId, f), kid);
+  }
   const depth = (a, b) => { const x = a.split('/'); const y = b.split('/'); let n = 0; while (n < x.length - 1 && n < y.length - 1 && x[n] === y[n]) n++; return n; };
-  const resolve = (token, citing) => {
-    const t = token.replace(/\\/g, '/').replace(/^\{\{AGENT_HOME\}\}\//, 'copilot/').replace(/^~\/\.copilot\//, 'copilot/').replace(/^%USERPROFILE%\/\.copilot\//, 'copilot/');
-    const rel = posix(path.normalize(path.join(path.dirname(citing), t)));
-    if (set.has(rel)) return rel;
-    if (set.has(t)) return t;
+  const inRepo = (repoId, t, citing) => { // repo-relative, then by ending (nearest to the citing file)
+    const r = idx.get(repoId); if (!r) return null;
+    if (r.set.has(t)) return t;
     const bare = t.replace(/^(\.\.?\/)+/, '');
     if (!bare.includes('/')) return null;
-    const cands = (byBase.get(path.posix.basename(bare)) ?? []).filter((f) => f.endsWith(`/${bare}`));
+    const cands = (r.byBase.get(path.posix.basename(bare)) ?? []).filter((f) => f.endsWith(`/${bare}`));
     return cands.sort((a, b) => depth(b, citing) - depth(a, citing))[0] ?? null;
   };
-  const citedBy = new Map();
-  for (const f of files) {
-    if (generated.has(f) || !/\.(md|mjs|js|ts|yaml|yml|json|toml|sh|ps1|feature)$/.test(f) || !fs.existsSync(path.join(root, f))) continue;
-    for (const m of fs.readFileSync(path.join(root, f), 'utf8').matchAll(PATHLIKE)) {
-      const to = resolve(m[0], f);
-      if (!to || to === f) continue;
-      if (!citedBy.has(to)) citedBy.set(to, new Set());
-      citedBy.get(to).add(f);
+  // TypeScript path aliases from each repo's root tsconfig.json (`"@/*": ["./src/*"]`), longest prefix first.
+  const texts = new Map([...present.keys()].map((id) => [id, textsOf(id)]));
+  const aliases = new Map();
+  for (const [repoId, t] of texts) {
+    let opts = {};
+    try { opts = JSON.parse((t.get('tsconfig.json') ?? '{}').replace(/("(?:[^"\\]|\\.)*")|\/\/[^\n]*|\/\*[\s\S]*?\*\//g, (m, str) => str ?? '').replace(/,(\s*[}\]])/g, '$1')).compilerOptions ?? {}; } catch { /* not JSON: no aliases */ }
+    const dir = (p) => { const d = posix(path.normalize(path.join(opts.baseUrl ?? '.', p))); return d === '.' ? '' : d.endsWith('/') ? d : `${d}/`; };
+    aliases.set(repoId, Object.entries(opts.paths ?? {}).filter(([k, v]) => k.endsWith('/*') && v[0]?.endsWith('*'))
+      .map(([k, v]) => [k.slice(0, -1), dir(v[0].slice(0, -1))]).sort((a, b) => b[0].length - a[0].length));
+  }
+  const resolve = (token, repoId, citing, cites) => {
+    const alias = aliases.get(repoId).find(([from]) => token.startsWith(from));
+    if (alias) { const f = inRepo(repoId, alias[1] + token.slice(alias[0].length), citing) ?? inRepo(repoId, alias[1] + token.slice(alias[0].length).replace(/\.js$/, '.ts').replace(/\.mjs$/, '.mts'), citing); return f ? [repoId, f] : null; }
+    const t0 = token.replace(/\\/g, '/');
+    const t = t0.replace(/^\{\{AGENT_HOME\}\}\//, 'copilot/').replace(/^~\/\.copilot\//, 'copilot/').replace(/^%USERPROFILE%\/\.copilot\//, 'copilot/');
+    if (t !== t0) { const f = inRepo(homeId, t, citing); return f ? [homeId, f] : null; }
+    const rel = posix(path.normalize(path.join(path.dirname(citing), t)));
+    if (idx.get(repoId).set.has(rel)) return [repoId, rel];
+    for (const r of cites ? [cites, repoId] : [repoId]) { const f = inRepo(r, t, citing); if (f) return [r, f]; }
+    // TypeScript ESM imports name the compiled file: `./Widget.js` is `./Widget.ts` (`.mjs` → `.mts`).
+    const ts = token.replace(/\.js$/, '.ts').replace(/\.mjs$/, '.mts');
+    return ts !== token ? resolve(ts, repoId, citing, cites) : null;
+  };
+  const webs = reg.repos.filter((r) => present.has(r.id) && webOf(r)).map((r) => ({ r, re: new RegExp(`${webOf(r).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/(?:blob|tree|raw)/([^/\\s]+)/([^\\s)\\]\`"'<>#?]+)`, 'g') }));
+  const citedBy = new Map(); const named = new Map();
+  const add = (m, to, from) => { if (to === from) return; if (!m.has(to)) m.set(to, new Set()); m.get(to).add(from); };
+  for (const [repoId] of present) {
+    for (const [f, text] of texts.get(repoId)) {
+      const from = key(repoId, f);
+      const k = kindById.get(kindOf.get(from)); const cites = k?.cites && k.cites !== NONE && present.has(k.cites) ? k.cites : null;
+      for (const { r, re } of webs) for (const m of text.matchAll(re)) {
+        const p = m[2].replace(/[.,;:]+$/, '');
+        const target = webs.filter((w) => webOf(w.r) === webOf(r) && idx.get(w.r.id).set.has(p)).sort((a, b) => (b.r.ref === m[1]) - (a.r.ref === m[1]))[0];
+        if (target) add(citedBy, key(target.r.id, p), from);
+      }
+      for (const m of text.matchAll(PATHLIKE)) { const to = resolve(m[0], repoId, f, cites); if (to) add(citedBy, key(...to), from); }
+      for (const m of text.matchAll(NAME)) for (const r of cites ? [cites, repoId] : [repoId]) {
+        const hits = idx.get(r).byStem.get(m[0]);
+        if (hits?.length === 1) { add(named, key(r, hits[0]), from); break; }
+      }
     }
   }
-  return { citedBy, kindOf };
+  for (const [to, froms] of named) for (const f of citedBy.get(to) ?? []) froms.delete(f);
+  return { citedBy, named, kindOf, key };
 }
 
 // ---- --explain ----------------------------------------------------------------------------------------
@@ -327,15 +396,20 @@ if (explain) {
   console.log(`  kind:         ${k.id} — ${k.summary}`);
   for (const [label, f] of [['schema', 'schema'], ['index', 'index'], ['checked by', 'checked-by'], ['scenarios', 'tests'], ['installed to', 'deploy']]) console.log(`  ${(label + ':').padEnd(14)}${cell(k[f])}`);
   console.log(`  listed on:    ${pagePath(areaById.get(k.area))}`);
-  const { citedBy, kindOf } = references(repoId);
-  const direct = [...(citedBy.get(file) ?? [])].sort();
+  const { citedBy, named, kindOf, key } = references();
+  const self = key(repoId, file);
+  const label = (kf) => (kf.startsWith(`${repoId}:`) ? kf.slice(repoId.length + 1) : kf);
+  const direct = [...(citedBy.get(self) ?? [])].sort();
   console.log(`  linked from (direct):${direct.length ? '' : ` ${NONE}`}`);
-  for (const f of direct) console.log(`    ${f}`);
+  for (const f of direct) console.log(`    ${label(f)}`);
+  const byName = [...(named.get(self) ?? [])].sort();
+  console.log(`  mentioned by name:${byName.length ? '' : ` ${NONE}`}`);
+  for (const f of byName) console.log(`    ${label(f)}`);
   // Downstream dependants: follow a referrer only along an edge the registry declares (its kind → this kind), so the
   // chain shows real dependencies (rule → role → wrapper) rather than every mention.
   // Breadth first, so each dependant sits under the nearest file it depends on through a declared edge (4 levels at most).
-  const children = new Map(); const seen = new Set([file]);
-  let level = [file];
+  const children = new Map(); const seen = new Set([self]);
+  let level = [self];
   for (let depth = 0; depth < 4 && level.length; depth++) {
     const next = [];
     for (const node of level) for (const c of [...(citedBy.get(node) ?? [])].sort()) {
@@ -348,8 +422,8 @@ if (explain) {
     level = next;
   }
   const lines = [];
-  const print = (node, depth) => { for (const [c, e] of children.get(node) ?? []) { lines.push(`${'  '.repeat(depth + 2)}← ${c} (${e.from}: ${e.via})`); print(c, depth + 1); } };
-  print(file, 0);
+  const print = (node, depth) => { for (const [c, e] of children.get(node) ?? []) { lines.push(`${'  '.repeat(depth + 2)}← ${label(c)} (${e.from}: ${e.via})`); print(c, depth + 1); } };
+  print(self, 0);
   console.log(`  depends on it (declared chains):${lines.length ? '' : ` ${NONE}`}`);
   for (const l of lines) console.log(l);
   process.exit(0);

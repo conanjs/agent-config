@@ -18,6 +18,7 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [011](011-installer-link-each/) | Installer `link-each` (one link per skill): built, tested, then withdrawn; the whole-folder link stays (V) | Withdrawn | — |
 | [010](010-project-validator-bugs/) | Project validator: `Decided by` checked; continuation line read field by field | Done | none |
 | [012](012-coordinator-review-fixes/) | Coordinator review fixes: NAV-Q1 asks "only a lookup?"; `--explain` takes folders, lists every reference and follows declared chains; missing edges declared | Done | none |
+| [013](013-cross-repo-and-name-references/) | `--explain` across repos (web links, installed form, `cites`), names without a path, TypeScript `.js` imports and `paths` aliases; ref-listed repos read at their ref | Done | none |
 
 ## Open findings, by kind
 

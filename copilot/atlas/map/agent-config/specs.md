@@ -93,6 +93,9 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/012-coordinator-review-fixes/research.md`](../../../../specs/012-coordinator-review-fixes/research.md)
 - [`specs/012-coordinator-review-fixes/spec.md`](../../../../specs/012-coordinator-review-fixes/spec.md)
 - [`specs/012-coordinator-review-fixes/tasks.md`](../../../../specs/012-coordinator-review-fixes/tasks.md)
+- [`specs/013-cross-repo-and-name-references/research.md`](../../../../specs/013-cross-repo-and-name-references/research.md)
+- [`specs/013-cross-repo-and-name-references/spec.md`](../../../../specs/013-cross-repo-and-name-references/spec.md)
+- [`specs/013-cross-repo-and-name-references/tasks.md`](../../../../specs/013-cross-repo-and-name-references/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)

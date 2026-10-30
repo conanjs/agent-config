@@ -1,6 +1,6 @@
 ---
 schema: tree/v2
-last-updated: 2026-10-29
+last-updated: 2026-10-30
 prefix: NAV
 owner: coordinator
 phases: [P0]
@@ -32,7 +32,7 @@ NAV-Q5 Which checks and which role own it?
 ### NAV-Q1 — Is it only a lookup?
 - **Criteria:** The request asks where something is, what it is, what checks it, who owns it or what depends on it, and asks for no change. A named path alone does not make it a lookup: "change validation in atlas.mjs" names a file and asks for a change.
 - **Branches:**
-  - YES → answer from the atlas: `atlas.mjs --explain <path>` for a file or a folder, the area page otherwise; quote "linked from (direct)" and "depends on it (declared chains)" as two separate lists. For "who owns it", also walk NAV-Q5. Then stop.
+  - YES → answer from the atlas: `atlas.mjs --explain <path>` for a file or a folder, the area page otherwise; quote "linked from (direct)", "mentioned by name" and "depends on it (declared chains)" as separate lists. For "who owns it", also walk NAV-Q5. Then stop.
   - NO → run `atlas.mjs --explain` on any named file or folder, to know its kind and checks, then classify the request → NAV-Q2
 - **Default:** NO: a request that may change something is classified, never only answered.
 - **Escalate when:** `--explain` says a file is "not on the map" (AT-1): the file needs a kind first. "no mapped files under this folder" is not a gap in the map: the folder is empty or outside every repo root, so check the path first.

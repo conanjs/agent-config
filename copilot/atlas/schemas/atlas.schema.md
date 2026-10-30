@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-29
+last-updated: 2026-10-30
 ---
 
 # Schema: Atlas registry (`atlas/v1`)
@@ -17,11 +17,11 @@ One flow mapping per line, under four top-level keys, like `mapping.yaml` and th
 
 ```yaml
 repos:
-  - { id: <repo id>, root: <path, relative to agent-config, or {{REFERENCE_REPOS_ROOT}}/…>, ref: <git ref to list, or —>, url: <web base for links, or —>, title: "<name>", summary: "<one line>" }
+  - { id: <repo id>, root: <path, relative to agent-config, or {{REFERENCE_REPOS_ROOT}}/…>, ref: <git ref to list, or —>, url: <web base for links, or —>, web: "<optional: the repo's web home>", title: "<name>", summary: "<one line>" }
 areas:
   - { id: <area id>, repo: <repo id>, parent: <root | area id>, title: "<name>", summary: "<one line>" }
 kinds:
-  - { id: <kind id>, area: <area id>, home: "<glob, relative to the repo root>", title: "<name>", summary: "<one line>", schema: <path | —>, index: <path | —>, checked-by: "<tool and codes | —>", tests: <path | —>, deploy: "<install target | —>" }
+  - { id: <kind id>, area: <area id>, home: "<glob, relative to the repo root>", title: "<name>", summary: "<one line>", schema: <path | —>, index: <path | —>, checked-by: "<tool and codes | —>", tests: <path | —>, deploy: "<install target | —>", cites: <optional: repo id> }
 edges:
   - { from: <kind id>, to: <kind id>, via: "<what links them>", checked-by: "<check | —>" }
 ```
@@ -29,6 +29,8 @@ edges:
 - `ref`: for a repo other than agent-config, the git ref whose files are listed (`git ls-tree`), so the map does not change with what is checked out. agent-config is listed from its working tree (tracked and untracked files, ignored ones left out).
 - `home` globs: `*` (no `/`), `**` (any depth), `{a,b}` (either). A file belongs to the **first** kind, in file order, whose `home` matches, so specific kinds come before general ones.
 - Paths in `schema`, `index`, `tests` are relative to the kind's repo root.
+- `web` (optional): the repo's web home, e.g. `https://github.com/<owner>/<name>`, so a link `<web>/blob/<ref>/<path>` in any file counts as a reference to that file. Without it, `url` less its `/blob/<ref>` is used.
+- `cites` (optional): a repo whose paths this kind's files write without naming it (a pin file that says "all paths are relative to the reference repo's root"). `--explain` looks a repo-relative path or a name up in that repo first. AT-6 checks that it names a repo.
 
 ## Rules
 
@@ -39,7 +41,7 @@ edges:
 | AT-3 | Every path a kind names (`schema`, `index`, `tests`) exists, or is `—` | each one resolves | script |
 | AT-4 | The tree is whole: every kind's `area` is an area of the kind's repo, and every area's `parent` is `root` or an area of the same repo, without cycles | each kind reaches its repo by parent links | script |
 | AT-5 | The generated pages are current: `index.md` and `map/<repo>/<area>.md` equal what `--write` produces | no difference | script |
-| AT-6 | Ids are unique in their list, every entry has its required fields, and every edge names existing kinds | — | script |
+| AT-6 | Ids are unique in their list, every entry has its required fields, every edge names existing kinds, and a kind's `cites` names a repo | — | script |
 | AT-7 | A repo whose root or `ref` is not present is skipped with a warning, and its pages are left as they are | — | script (warn) |
 
 ## Checks
@@ -47,13 +49,16 @@ edges:
 | Check | Tool |
 |---|---|
 | AT-1 … AT-7 | `node copilot/atlas/tools/atlas.mjs` (also run by `scripts/check-docs.sh`: pre-commit, Claude Code hook, CI) |
-| Where is a file or folder, what checks it, what names it, what depends on it | `node copilot/atlas/tools/atlas.mjs --explain <path>` |
+| Where is a file or folder, what checks it, what names it (by path, in any present repo, or by name alone), what depends on it | `node copilot/atlas/tools/atlas.mjs --explain <path>` |
 | Regenerate the pages after editing the registry | `node copilot/atlas/tools/atlas.mjs --write` |
 
 ## References
 
 - `copilot/atlas/atlas.yaml` — the registry this schema defines.
 - `specs/009-navigation-map/` — why the atlas exists, its options and decisions.
+- `specs/012-coordinator-review-fixes/`, `specs/013-cross-repo-and-name-references/` — how `--explain` finds references.
+- [TypeScript: `paths`](https://www.typescriptlang.org/tsconfig/#paths) — the aliases `--explain` reads from a repo's root `tsconfig.json`.
+- [TypeScript: modules reference, `.js` extensions in imports](https://www.typescriptlang.org/docs/handbook/modules/reference.html) — why `./x.js` means `./x.ts`.
 - [git ls-files](https://git-scm.com/docs/git-ls-files) — `--cached --others --exclude-standard`: tracked and untracked files, ignored ones left out.
 - [git ls-tree](https://git-scm.com/docs/git-ls-tree) — `-r --name-only <ref>`: the files of one commit, whatever is checked out.
 

@@ -1,6 +1,6 @@
 ---
 schema: agent-role/v2
-last-updated: 2026-10-29
+last-updated: 2026-10-30
 id: coordinator
 tag: "[Coord]"
 model-tier: Mid
@@ -40,8 +40,9 @@ Knows the map of everything: every repo, area, kind of file and file in the atla
 ### mode: propose
 Walk the navigation tree for the request. A lookup (NAV-Q1 YES) is answered from the atlas and stops there. Any other request is classified through NAV-Q2 to NAV-Q5, even when it names a file, and the answer gives the entry point: the area page, the kind, the procedure or spec workflow to follow, the checks that will run, and the role that owns it. When a file or folder is named, run `atlas.mjs --explain` on it and quote what it prints.
 
-"What depends on it" has two answers, and the reply keeps them apart:
-- **linked from (direct):** every file of the same repo whose text names this file, however the path is written.
+"What depends on it" has three answers, and the reply keeps them apart:
+- **linked from (direct):** every file of any present repo whose text names this file by path, however the path is written (relative, repo-relative, installed form, a web link, a TypeScript import or alias). A file of another repo shows as `<repo>:<path>`.
+- **mentioned by name:** files that name it without a path (`module-boundaries`, `CompositionRoot`). Weaker evidence: the same word can name something else, such as a lint rule; check before relying on it.
 - **depends on it (declared chains):** the files that depend on it through edges declared in `atlas.yaml`, followed up to 4 levels (rule → role → wrapper or skill). A reference with no declared edge for its kinds shows only as direct; when that reference is a real dependency, the fix is a new edge (mode: execute).
 
 ### mode: execute

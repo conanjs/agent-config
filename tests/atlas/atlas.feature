@@ -255,6 +255,7 @@ Feature: Atlas
         listed on:    copilot/atlas/map/home/guides.md
         linked from (direct):
           docs/index.md
+        mentioned by name: —
         depends on it (declared chains):
           ← docs/index.md (doc: the docs index lists each guide)
             ← README.md (readme: the README points at the docs index)
@@ -297,6 +298,7 @@ Feature: Atlas
         linked from (direct):
           docs/index.md
           docs/notes/zz.md
+        mentioned by name: —
         depends on it (declared chains):
           ← docs/index.md (doc: the docs index lists each guide)
             ← README.md (readme: the README points at the docs index)
@@ -369,8 +371,251 @@ Feature: Atlas
         installed to: —
         listed on:    copilot/atlas/map/other/other-root.md
         linked from (direct): —
+        mentioned by name: —
         depends on it (declared chains): —
       """
+
+  Scenario: --explain finds a link to a file of another repo written as that repo's web URL
+    Given the file "elsewhere/x.md" contains:
+      """
+      # X
+      """
+    And in "copilot/atlas/atlas.yaml", `\nareas:` becomes `\n  - { id: other, root: elsewhere, ref: —, url: "https://example.com/other/blob/main", title: "Other", summary: "Another repo" }\nareas:`
+    And in "copilot/atlas/atlas.yaml", `\nkinds:` becomes `\n  - { id: other-root, repo: other, parent: root, title: "Other files", summary: "Everything in other" }\nkinds:`
+    And in "copilot/atlas/atlas.yaml", `\nedges:` becomes `\n  - { id: other-file, area: other-root, home: "**", title: "Other files", summary: "Any file", schema: —, index: —, checked-by: —, tests: —, deploy: — }\nedges:`
+    And in "copilot/atlas/atlas.yaml", `\n  - { from: readme, to: doc,` becomes `\n  - { from: doc, to: other-file, via: "a doc links a file of the other repo", checked-by: — }\n  - { from: readme, to: doc,`
+    And the file "docs/notes/link.md" contains:
+      """
+      See [x](https://example.com/other/blob/0a1b2c3/x.md).
+      """
+    When the tool runs with "--explain {root}/elsewhere/x.md"
+    Then it exits with 0 and prints:
+      """
+      x.md
+        place:        Other › Other files › Other files
+        kind:         other-file — Any file
+        schema:       —
+        index:        —
+        checked by:   —
+        scenarios:    —
+        installed to: —
+        listed on:    copilot/atlas/map/other/other-root.md
+        linked from (direct):
+          home:docs/notes/link.md
+        mentioned by name: —
+        depends on it (declared chains):
+          ← home:docs/notes/link.md (doc: a doc links a file of the other repo)
+      """
+
+  Scenario: --explain reads the installed form {{AGENT_HOME}}/… in another repo's file as a path in the home repo
+    Given the file "elsewhere/x.md" contains:
+      """
+      # X
+      """
+    And in "copilot/atlas/atlas.yaml", `\nareas:` becomes `\n  - { id: other, root: elsewhere, ref: —, url: "https://example.com/other/blob/main", title: "Other", summary: "Another repo" }\nareas:`
+    And in "copilot/atlas/atlas.yaml", `\nkinds:` becomes `\n  - { id: other-root, repo: other, parent: root, title: "Other files", summary: "Everything in other" }\nkinds:`
+    And in "copilot/atlas/atlas.yaml", `\nedges:` becomes `\n  - { id: other-file, area: other-root, home: "**", title: "Other files", summary: "Any file", schema: —, index: —, checked-by: —, tests: —, deploy: — }\nedges:`
+    And the file "elsewhere/y.md" contains:
+      """
+      Read {{AGENT_HOME}}/atlas/atlas.yaml first.
+      """
+    When the tool runs with "--explain {root}/copilot/atlas/atlas.yaml"
+    Then the output has the line "    other:y.md"
+
+  Scenario: --explain finds a link to the home repo written as the URL its web field names
+    Given the file "elsewhere/x.md" contains:
+      """
+      # X
+      """
+    And in "copilot/atlas/atlas.yaml", `\nareas:` becomes `\n  - { id: other, root: elsewhere, ref: —, url: "https://example.com/other/blob/main", title: "Other", summary: "Another repo" }\nareas:`
+    And in "copilot/atlas/atlas.yaml", `\nkinds:` becomes `\n  - { id: other-root, repo: other, parent: root, title: "Other files", summary: "Everything in other" }\nkinds:`
+    And in "copilot/atlas/atlas.yaml", `\nedges:` becomes `\n  - { id: other-file, area: other-root, home: "**", title: "Other files", summary: "Any file", schema: —, index: —, checked-by: —, tests: —, deploy: — }\nedges:`
+    And in "copilot/atlas/atlas.yaml", `{ id: home, root: ., ref: —, url: —,` becomes `{ id: home, root: ., ref: —, url: —, web: "https://example.com/home",`
+    And the file "elsewhere/y.md" contains:
+      """
+      The index: https://example.com/home/tree/main/docs/index.md
+      """
+    When the tool runs with "--explain {root}/docs/index.md"
+    Then the output has the line "    other:y.md"
+
+  Scenario: --explain reads a repo-relative path in a kind that cites another repo as a path in that repo first
+    Given the file "elsewhere/x.md" contains:
+      """
+      # X
+      """
+    And in "copilot/atlas/atlas.yaml", `\nareas:` becomes `\n  - { id: other, root: elsewhere, ref: —, url: "https://example.com/other/blob/main", title: "Other", summary: "Another repo" }\nareas:`
+    And in "copilot/atlas/atlas.yaml", `\nkinds:` becomes `\n  - { id: other-root, repo: other, parent: root, title: "Other files", summary: "Everything in other" }\nkinds:`
+    And in "copilot/atlas/atlas.yaml", `\nedges:` becomes `\n  - { id: other-file, area: other-root, home: "**", title: "Other files", summary: "Any file", schema: —, index: —, checked-by: —, tests: —, deploy: — }\nedges:`
+    And the file "elsewhere/docs/index.md" contains:
+      """
+      # The other repo's docs
+      """
+    And in "copilot/atlas/atlas.yaml", `{ id: doc, area: docs, home: "docs/**",` becomes `{ id: doc, area: docs, home: "docs/**", cites: other,`
+    And the file "docs/notes/ref.md" contains:
+      """
+      Paths here are in the other repo: `docs/index.md`.
+      """
+    When the tool runs with "--explain {root}/elsewhere/docs/index.md"
+    Then the output has the line "    home:docs/notes/ref.md"
+
+  Scenario: AT-6 a kind that cites a repo that does not exist fails
+    Given in "copilot/atlas/atlas.yaml", `{ id: doc, area: docs, home: "docs/**",` becomes `{ id: doc, area: docs, home: "docs/**", cites: nowhere,`
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        AT-6  atlas.yaml:11: kind doc cites "nowhere", which is not a repo
+      """
+
+  Scenario: --explain reads another repo's files at its ref, not from its working tree
+    Given the file "elsewhere/x.md" contains:
+      """
+      # X
+      """
+    And in "copilot/atlas/atlas.yaml", `\nareas:` becomes `\n  - { id: other, root: elsewhere, ref: main, url: "https://example.com/other/blob/main", title: "Other", summary: "Another repo" }\nareas:`
+    And in "copilot/atlas/atlas.yaml", `\nkinds:` becomes `\n  - { id: other-root, repo: other, parent: root, title: "Other files", summary: "Everything in other" }\nkinds:`
+    And in "copilot/atlas/atlas.yaml", `\nedges:` becomes `\n  - { id: other-file, area: other-root, home: "**", title: "Other files", summary: "Any file", schema: —, index: —, checked-by: —, tests: —, deploy: — }\nedges:`
+    And the file "elsewhere/y.md" contains:
+      """
+      Read {{AGENT_HOME}}/atlas/atlas.yaml first.
+      """
+    And "elsewhere" is a git repository with everything committed
+    And the file "elsewhere/y.md" contains:
+      """
+      Changed after the commit.
+      """
+    When the tool runs with "--explain {root}/copilot/atlas/atlas.yaml"
+    Then the output has the line "    other:y.md"
+
+  Scenario: --explain lists a file that names another by its hyphenated name, without a path
+    Given the file "docs/guides/first-steps.md" contains:
+      """
+      # First steps
+      """
+    And the file "docs/notes/n.md" contains:
+      """
+      Before anything else, do first-steps.
+      """
+    When the tool runs with "--explain {root}/docs/guides/first-steps.md"
+    Then the output has the line "  mentioned by name:"
+    And the output has the line "    docs/notes/n.md"
+
+  Scenario: --explain lists a file that names another by its PascalCase name
+    Given the file "docs/notes/CompositionRoot.ts" contains:
+      """
+      export class CompositionRoot {}
+      """
+    And the file "docs/notes/m.md" contains:
+      """
+      The CompositionRoot builds everything.
+      """
+    When the tool runs with "--explain {root}/docs/notes/CompositionRoot.ts"
+    Then the output has the line "    docs/notes/m.md"
+
+  Scenario: --explain does not count a name that several files share, or a one-word name
+    Given the file "docs/guides/first-steps.md" contains:
+      """
+      # First steps
+      """
+    And the file "docs/a/first-steps.md" contains:
+      """
+      # Other first steps
+      """
+    And the file "docs/notes/n.md" contains:
+      """
+      Do first-steps, then the setup.
+      """
+    When the tool runs with "--explain {root}/docs/a/first-steps.md"
+    Then the output has the line "  mentioned by name: —"
+    When the tool runs with "--explain {root}/docs/guides/setup.md"
+    Then the output has the line "  mentioned by name: —"
+
+  Scenario: --explain lists a file that names another by path only under linked from
+    Given the file "docs/guides/first-steps.md" contains:
+      """
+      # First steps
+      """
+    And the file "docs/notes/n.md" contains:
+      """
+      Do first-steps: see guides/first-steps.md.
+      """
+    When the tool runs with "--explain {root}/docs/guides/first-steps.md"
+    Then the output has the line "    docs/notes/n.md"
+    And the output has the line "  mentioned by name: —"
+
+  Scenario: --explain resolves a name in a kind that cites another repo in that repo
+    Given the file "elsewhere/x.md" contains:
+      """
+      # X
+      """
+    And in "copilot/atlas/atlas.yaml", `\nareas:` becomes `\n  - { id: other, root: elsewhere, ref: —, url: "https://example.com/other/blob/main", title: "Other", summary: "Another repo" }\nareas:`
+    And in "copilot/atlas/atlas.yaml", `\nkinds:` becomes `\n  - { id: other-root, repo: other, parent: root, title: "Other files", summary: "Everything in other" }\nkinds:`
+    And in "copilot/atlas/atlas.yaml", `\nedges:` becomes `\n  - { id: other-file, area: other-root, home: "**", title: "Other files", summary: "Any file", schema: —, index: —, checked-by: —, tests: —, deploy: — }\nedges:`
+    And the file "elsewhere/WidgetStore.ts" contains:
+      """
+      export interface WidgetStore {}
+      """
+    And in "copilot/atlas/atlas.yaml", `{ id: doc, area: docs, home: "docs/**",` becomes `{ id: doc, area: docs, home: "docs/**", cites: other,`
+    And the file "docs/notes/w.md" contains:
+      """
+      Every adapter implements WidgetStore.
+      """
+    When the tool runs with "--explain {root}/elsewhere/WidgetStore.ts"
+    Then the output has the line "    home:docs/notes/w.md"
+
+  Scenario: --explain reads a TypeScript import of a .js path as the .ts file it compiles from
+    Given the file "docs/notes/Widget.ts" contains:
+      """
+      export class Widget {}
+      """
+    And the file "docs/notes/main.ts" contains:
+      """
+      import { Widget } from './Widget.js';
+      """
+    When the tool runs with "--explain {root}/docs/notes/Widget.ts"
+    Then the output has the line "    docs/notes/main.ts"
+
+  Scenario: --explain reads a TypeScript path alias from the repo's tsconfig.json
+    Given the file "tsconfig.json" contains:
+      """
+      {
+        // aliases, as TypeScript reads them
+        "compilerOptions": { "paths": { "@/*": ["./docs/notes/*"], "@/test/*": ["./docs/t/*"], } }
+      }
+      """
+    And the file "docs/notes/Widget.ts" contains:
+      """
+      export class Widget {}
+      """
+    And the file "docs/t/helper.ts" contains:
+      """
+      export const helper = 1;
+      """
+    And the file "docs/x.test.ts" contains:
+      """
+      import { Widget } from "@/Widget.js";
+      import { helper } from "@/test/helper.js";
+      """
+    When the tool runs with "--explain {root}/docs/notes/Widget.ts"
+    Then the output has the line "    docs/x.test.ts"
+    When the tool runs with "--explain {root}/docs/t/helper.ts"
+    Then the output has the line "    docs/x.test.ts"
+
+  Scenario: --explain reads TypeScript path aliases relative to baseUrl when tsconfig.json sets one
+    Given the file "tsconfig.json" contains:
+      """
+      { "compilerOptions": { "baseUrl": "docs", "paths": { "~/*": ["*"] } } }
+      """
+    And the file "docs/Widget.ts" contains:
+      """
+      export class Widget {}
+      """
+    And the file "docs/x.test.ts" contains:
+      """
+      import { Widget } from "~/Widget.js";
+      """
+    When the tool runs with "--explain {root}/docs/Widget.ts"
+    Then the output has the line "    docs/x.test.ts"
 
   Scenario: --explain on a file that is not on the map says so
     Given the file "notes/todo.txt" contains:

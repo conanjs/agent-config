@@ -4,8 +4,8 @@ type: concept
 topic: js-runtime
 status: verified
 applies-to: ["Node ≥ 14.6 / 12.19", "TypeScript ≥ 4.7 (node16/nodenext/bundler resolution)"]
-last-verified: 2026-10-25
-last-updated: 2026-10-28
+last-verified: 2026-10-30
+last-updated: 2026-10-30
 tags: [subpath-imports, package-json, imports, aliases, module-resolution]
 ---
 
@@ -44,6 +44,8 @@ import { Role as R } from "core/domain/Role"; // read as package "core" → not 
 4. `imports` applies only inside the package that declares it. The other standard route, self-reference by the package's own name, works only when `package.json` has `exports`, and only for what `exports` allows. ✅[^1]
 5. TypeScript `paths` "does not change how import paths are emitted", so an alias that only `paths` knows type-checks and then fails at runtime. ✅[^2]
 6. With Node's built-in TypeScript type stripping, tsconfig `paths` are not applied either. The documented alternative is subpath imports, which must start with `#`. ✅[^3]
+7. `paths` targets are read relative to `baseUrl` when it is set, otherwise relative to the tsconfig file itself. ✅[^2]
+8. An import written with `.js` (`import x from "./mod.js"`) is looked up by TypeScript as `./mod.ts` first, then `./mod.d.ts`, then `./mod.js` ("file extension substitution"); this holds in every `moduleResolution` mode. So a TypeScript ESM import names the compiled file, and tools that map imports to sources must read `.js` as `.ts`. ✅[^5]
 
 **Choices compared**
 
@@ -85,17 +87,19 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 | stack idiom | TSN-15 | Source: |
 
 ## Verification status
-- Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
+- Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-30
 
 ## References
 - [Node.js Packages: subpath imports, self-referencing](https://nodejs.org/api/packages.html#subpath-imports) — Node.js project, living. Backs: How it works 1–4, Choices, Edge cases. [^1]
-- [TSConfig reference: paths](https://www.typescriptlang.org/tsconfig/#paths) — TypeScript team, living. Backs: How it works 5. [^2]
+- [TSConfig reference: paths](https://www.typescriptlang.org/tsconfig/#paths) — TypeScript team, living. Backs: How it works 5, 7. [^2]
 - [Node.js: Modules: TypeScript](https://nodejs.org/api/typescript.html) — Node.js project, living. Backs: How it works 6. [^3]
 - [tsconfig-paths README](https://github.com/dividab/tsconfig-paths) — tsconfig-paths maintainers, living. Backs: Choices, runtime hook row. [^4]
+- [TypeScript Handbook: Modules — Reference, "File extension substitution"](https://www.typescriptlang.org/docs/handbook/modules/reference.html) — TypeScript team, living; read 2026-10-30. Backs: How it works 8. [^5]
 - [tsc-alias](https://github.com/justkey007/tsc-alias) — tsc-alias maintainers, living. The build-time rewrite tool in the tested row.
 - [NestJS: Libraries](https://docs.nestjs.com/cli/libraries) — NestJS, living. NestJS aliases through tsconfig path mapping and resolves them in its build.
 - `copilot/frameworks/agentic-sdlc/foundations/design/import-paths.md` — IMP-1, IMP-2 apply this.
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — TSN-15, TSN-16 and the tested tool config.
+- `copilot/atlas/tools/atlas.mjs` — `--explain` applies How it works 7 and 8 to find which files import a `.ts` file (`specs/013-cross-repo-and-name-references/`).
 
 ## Related
 - `js-runtime/private-fields.md`
