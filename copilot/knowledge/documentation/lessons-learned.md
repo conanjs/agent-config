@@ -22,6 +22,30 @@ Format per entry: **What went wrong → Why it's wrong → Rule now baked into t
 
 **Rule now baked into the template:** Any external URL added to a References section must be the literal result of a WebSearch/WebFetch call in the same turn, never typed from memory — even for a domain the model is confident about. This is really a restatement of the existing global rule in `personal-defaults.instructions.md`, logged here because it was the concrete failure case that proved the rule needs active enforcement, not just statement.
 
+---
+
+## 2026-10-16 — A "simplification" that isn't behaviorally identical must be asked about first, not applied and reported
+
+**What went wrong:** Code looked up one item, then rejected it if a field was empty:
+
+```ts
+const item = list.find((x) => x.kind === 'A');
+return item?.status ? item : undefined;
+```
+
+The user asked to fold the status check into the loop. It was rewritten as `list.find((x) => x.kind === 'A' && x.status)`, and only afterwards was it mentioned that behavior "changes when there are several items".
+
+**Why it's wrong:** The two forms are not the same. Take `[{ kind: 'A', status: '' }, { kind: 'A', status: 'OK' }]`:
+
+| Form | Result |
+|---|---|
+| Original (first `A`, then check status) | `undefined` (first `A` is rejected) |
+| Rewritten (first `A` that has a status) | the second item |
+
+They agree on every single-item input, which is why the difference is easy to miss. Applying the change first and reporting it after means the user has to catch it in review; if they don't, a different logic ships as a bug. The difference was predictable before touching the code.
+
+**Rule going forward:** Before any change that "should be the same" (moving a condition into a `find`/`filter` predicate, merging branches, reordering checks, replacing a loop with a built-in), find an input where old and new differ. If one exists, do not edit. Say "these differ when `<input>`: old gives X, new gives Y — which do you want?" and wait for the answer. If the user only asked "are they the same?", answer that question with the differing input and stop; no edit until they choose.
+
 ## References
 
 **Local artifacts:**

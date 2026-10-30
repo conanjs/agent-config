@@ -1,3 +1,15 @@
+---
+schema: procedure/v1
+last-updated: 2026-10-27
+depends-on:
+  - tool: GitHub CODEOWNERS
+    verified-against: unverified
+    source: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+  - tool: GitHub branch protection
+    verified-against: unverified
+    source: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/managing-a-branch-protection-rule
+---
+
 # Procedure: Initialize GitHub Repo Governance
 
 Tool-agnostic procedure for adding standard repo-lifecycle/contribution files to a repo that doesn't have them yet. Written once here; tool-specific wrappers should just point here rather than re-describing these steps.

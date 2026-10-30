@@ -1,3 +1,9 @@
+---
+schema: procedure/v1
+last-updated: 2026-10-27
+depends-on: []
+---
+
 # Procedure: Initialize a Repo's KB Entry
 
 Tool-agnostic procedure for bootstrapping a `repo-overview` doc for a repo that has none yet, so a newly-cloned/added repo doesn't sit undocumented. Written once here; tool-specific wrappers (Copilot prompt, future Claude Code Skill, etc.) should just point here rather than re-describing these steps.

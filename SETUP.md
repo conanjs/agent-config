@@ -23,6 +23,10 @@ This file is written to be fed to an AI agent (Claude Code, Copilot CLI, etc.) o
 
 8. **Mention `{{LANGUAGE}}`** (default: English, in `global-variables.md`) to the user in case they want to change it now — don't change it yourself without being asked.
 
+9. **Check `{{REFERENCE_REPOS_ROOT}}`** in `{{AGENT_HOME}}/global-variables.md` (where stack reference repos get cloned; default `~/agentic-sdlc-references`). On a machine set up before 2026-10-27 the row is missing, because `global-variables.md` is seed-once: copy the row from this repo's `global-variables.md`. **Set the path now; clone later.** Each reference is cloned the first time a project needs it: at project bootstrap for a detected stack (`{{AGENT_HOME}}/procedures/bootstrap-agentic-sdlc.procedure.md` step 4), or when a stack is chosen. Ask the user only whether they want to pre-clone now, for stacks they already work in; if yes, follow each `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/<id>/reference.md` "How to fetch".
+
+10. **Enable the doc checks in this clone:** `git config core.hooksPath .githooks`. The pre-commit hook then runs `scripts/check-docs.sh` (knowledge and procedure validators; needs Node.js ≥ 18, found automatically under nvm) whenever a commit touches `copilot/knowledge/`, `copilot/procedures/` or `copilot/frameworks/knowledge/`. Claude Code sessions in this repo run the same check after each edit (`.claude/settings.json`), and CI runs it on every push (`.github/workflows/validate-docs.yml`). Confirm with `git config core.hooksPath` → `.githooks`.
+
 ## What NOT to do
 
 - Don't hand-edit `personal-defaults.instructions.md` to record this machine's repo path — that file is git-tracked and meant to be byte-identical across every machine. The machine-specific value belongs only in the `seed-once`-deployed `global-variables.md`, never in a symlinked/tracked file.

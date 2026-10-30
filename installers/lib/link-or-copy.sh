@@ -38,6 +38,12 @@ backup_existing() {
       BACKUP_ROOT="$HOME/.agent-config-backups/$(date +%Y%m%d%H%M%S)"
     fi
     local dest="$BACKUP_ROOT/$source_rel"
+    # One source can map to several targets (e.g. skills -> ~/.claude/skills
+    # and ~/.agents/skills); never let a second backup land on the first.
+    local n=2
+    while [ -e "$dest" ] || [ -L "$dest" ]; do
+      dest="$BACKUP_ROOT/$source_rel.$n"; n=$((n + 1))
+    done
     mkdir -p "$(dirname "$dest")"
     echo "  existing content at $target -> backing up to $dest"
     mv "$target" "$dest"
