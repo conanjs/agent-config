@@ -53,7 +53,12 @@ A turn often ends with something not done: a merge waiting for approval, a stash
 
 - **FR-001**: `tracker/v1` is defined in `copilot/tracker/tracker.schema.md`, with rules TR-1 … TR-10.
 - **FR-002**: One tool, `copilot/tracker/tracker.mjs`, with no dependencies, checks, briefs and edits the file. A launcher, `tracker-hook.sh`, finds Node for the hooks.
-- **FR-003**: The guide is one bullet in the global instruction (Claude Code, Copilot CLI and Codex all read it). The sensor is a `SessionStart` hook for Claude Code and a `sessionStart` hook for Copilot CLI. Codex has no session-start hook here, so it gets the instruction only.
+- **FR-003**: The guide is one bullet in the global instruction (Claude Code, Copilot CLI and Codex all read it). The sensor is a session-start hook in each tool:
+  - `SessionStart` for Claude Code;
+  - `SessionStart` for Codex, which reads the same JSON (added 2026-10-31, D-7);
+  - `sessionStart` for Copilot CLI.
+
+  ChatGPT, the chat app, has no hooks and no access to local files.
 - **FR-004**: Scenarios first; every rule code is named by a scenario; every rule is caught when sabotaged.
 
 ## Success Criteria *(mandatory)*

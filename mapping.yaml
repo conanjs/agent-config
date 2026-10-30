@@ -29,6 +29,7 @@
 - { source: claude/settings.json,            target: ~/.claude/settings.json,            strategy: seed-once }
 - { source: claude/agents,                   target: ~/.claude/agents,                   strategy: symlink }
 - { source: codex/AGENTS.md,                 target: ~/.codex/AGENTS.md,                 strategy: symlink }
+- { source: codex/hooks.json,                target: ~/.codex/hooks.json,                strategy: symlink }
 - { source: codex/agents,                    target: ~/.codex/agents,                    strategy: symlink }
 # skills/ is tool-neutral (SKILL.md is the same format everywhere): ~/.claude/skills
 # for Claude Code, ~/.agents/skills for both Copilot and Codex.

@@ -31,4 +31,10 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: For each PR-4 warning in check-docs.sh, read the tool's current docs and record version and last-verified
 - from: 2026-10-30 · check-docs.sh warnings
 
+### T-5 Turn on the tracker reminder in Codex
+- status: waiting
+- next: Link codex/hooks.json to ~/.codex/hooks.json (or rerun the installer), trust the hook in Codex /hooks, then start a Codex session in agent-config and check the open items appear
+- waiting-on: V
+- from: 2026-10-31 · specs/015 T010
+
 ## Done

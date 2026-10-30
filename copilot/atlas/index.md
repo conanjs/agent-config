@@ -20,7 +20,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Company knowledge bases](map/agent-config/companies.md) — Facts about one company's systems, one folder per company (20 files)
   - [Procedures](map/agent-config/procedures.md) — Repeatable multi-step tasks, written once in tool-neutral prose (10 files)
   - [Patterns](map/agent-config/patterns.md) — Named, reusable techniques learned from real cases (11 files)
-  - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (52 files)
+  - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (53 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (17 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
   - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (123 files)
@@ -83,7 +83,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Claude Code agents](map/agent-config/agents.md#claude-agent) | Agents, prompts and tool settings | `claude/agents/*.md` | `copilot/frameworks/agentic-sdlc/schemas/role-wrapper.schema.md` | — | validate.mjs WRAP (sdlc-*) | `tests/validate-sdlc/validate-sdlc.feature` | `~/.claude/agents` |
 | [Codex agents](map/agent-config/agents.md#codex-agent) | Agents, prompts and tool settings | `codex/agents/*.toml` | `copilot/frameworks/agentic-sdlc/schemas/role-wrapper.schema.md` | — | validate.mjs WRAP (sdlc-*) | `tests/validate-sdlc/validate-sdlc.feature` | `~/.codex/agents` |
 | [Copilot prompts](map/agent-config/agents.md#prompt) | Agents, prompts and tool settings | `copilot/prompts/*.prompt.md` | — | `README.md` | — | — | `~/.copilot/prompts` |
-| [Tool settings and hooks](map/agent-config/agents.md#tool-settings) | Agents, prompts and tool settings | `{claude/{CLAUDE.md,settings.json,plugins/**},codex/AGENTS.md,copilot/hooks/**}` | — | `README.md` | — | — | `~/.claude, ~/.codex, ~/.copilot/hooks` |
+| [Tool settings and hooks](map/agent-config/agents.md#tool-settings) | Agents, prompts and tool settings | `{claude/{CLAUDE.md,settings.json,plugins/**},codex/{AGENTS.md,hooks.json},copilot/hooks/**}` | — | `README.md` | — | — | `~/.claude, ~/.codex, ~/.copilot/hooks` |
 | [Skills](map/agent-config/skills.md#skill) | Skills | `skills/*/SKILL.md` | `copilot/frameworks/agentic-sdlc/schemas/skill-wrapper.schema.md` | — | validate.mjs SKILL | `tests/validate-sdlc/validate-sdlc.feature` | `~/.claude/skills, ~/.agents/skills` |
 | [Installer scripts](map/agent-config/installers.md#installer) | Installers | `installers/**` | — | `README.md` | — | `tests/installers/installers.feature` | — |
 | [Spec Kit setup](map/agent-config/specs.md#spec-kit) | Specs and decisions | `{.specify/**,.claude/skills/speckit-*/SKILL.md}` | — | `copilot/procedures/spec-driven-development.procedure.md` | — | — | — |

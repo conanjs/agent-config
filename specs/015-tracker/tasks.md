@@ -8,3 +8,5 @@
 - [x] T006 Sabotage: 68 of 68 caught
 - [x] T007 agent-config's own `TRACKER.md`, seeded with the work left on this branch
 - [x] T008 Merge the `SessionStart` hook into this machine's `~/.claude/settings.json` (done by V on 2026-10-31; refused to the agent as self-modification) and confirm the reminder in a new session
+- [x] T009 Codex: `--hook codex` (scenario first), `codex/hooks.json`, `mapping.yaml` → `~/.codex/hooks.json`; D-7 revised
+- [ ] T010 Link `~/.codex/hooks.json` on this machine, trust it in Codex `/hooks`, and confirm the reminder in a Codex session (the user's step; tracked as T-5 in `TRACKER.md`)

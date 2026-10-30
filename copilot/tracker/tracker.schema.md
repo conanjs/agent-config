@@ -5,7 +5,7 @@ last-updated: 2026-10-30
 
 # Schema: Tracker (`tracker/v1`)
 
-**Applies to:** `TRACKER.md` at the root of any repo (or of a folder that is not a repo) · **Written by:** agents at the end of a turn, and people · **Read by:** agents at session start (through the session-start hooks), people, and `tracker.mjs` · **Deployed to:** `~/.copilot/tracker/` (`mapping.yaml`)
+**Applies to:** `TRACKER.md` at the root of any repo (or of a folder that is not a repo) · **Written by:** agents at the end of a turn, and people · **Read by:** agents at session start (through the session-start hooks of Claude Code, Codex and Copilot CLI), people, and `tracker.mjs` · **Deployed to:** `~/.copilot/tracker/` (`mapping.yaml`)
 
 A tracker is the list of work a repo still owes: what is left, its next step, and what it is waiting on. It lives in the repo, so it outlasts any one chat. A hook reads it at the start of every session and shows you what is still open, so nothing depends on anyone remembering.
 
@@ -95,7 +95,7 @@ A new `TRACKER.md` is **local by default**: `--add` lists it in `.git/info/exclu
 |---|---|
 | TR-1 … TR-10 | `node copilot/tracker/tracker.mjs [file or folder]` (this repo's own `TRACKER.md` also in `scripts/check-docs.sh`) |
 | The open items, most urgent first | `node copilot/tracker/tracker.mjs --brief` |
-| Session-start reminder | `tracker-hook.sh --hook claude` (Claude Code `SessionStart`), `--hook copilot` (Copilot CLI `sessionStart`) |
+| Session-start reminder | `tracker-hook.sh --hook claude` (Claude Code `SessionStart`), `--hook codex --stdin` (Codex `SessionStart`, same JSON), `--hook copilot --stdin` (Copilot CLI `sessionStart`) |
 | Add, update, close, drop | `--add "<title>" --next "<step>" […]`, `--update T-<n> […]`, `--close T-<n> [--note <text>]`, `--drop T-<n> --why <text>` |
 
 ## References
@@ -106,6 +106,7 @@ A new `TRACKER.md` is **local by default**: `--add` lists it in `.git/info/exclu
 - [Anthropic: Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — a progress file and a feature list read at the start of every session.
 - [OpenAI: Harness engineering](https://openai.com/index/harness-engineering/) — plans and a tech-debt tracker kept in the repo.
 - [Claude Code: hooks reference](https://code.claude.com/docs/en/hooks) — `SessionStart` output: `additionalContext` reaches the model, `systemMessage` is shown to the user.
+- [Codex: hooks](https://learn.chatgpt.com/docs/hooks) — `SessionStart` reads `hookSpecificOutput.additionalContext` and `systemMessage`; hooks in `~/.codex/hooks.json` run only after the user trusts them in `/hooks`.
 - [Copilot CLI: hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — `sessionStart` consumes only `additionalContext`; user hooks load from `~/.copilot/hooks/`.
 - [git: gitignore](https://git-scm.com/docs/gitignore) — `$GIT_COMMON_DIR/info/exclude` holds patterns for one clone that are not shared; files already tracked are not affected.
 - [git add: `-f`](https://git-scm.com/docs/git-add) — "Allow adding otherwise ignored files."

@@ -5,8 +5,8 @@
 // Usage: node tracker.mjs [file or folder] [mode]
 //   (no mode)          check TR-1 … TR-10
 //   --brief            the open items, most urgent first; nothing when there are none
-//   --hook claude      the brief as Claude Code SessionStart JSON (systemMessage for the user, additionalContext for
-//                      the model); --hook copilot: as Copilot CLI sessionStart JSON (additionalContext)
+//   --hook claude      the brief as SessionStart JSON (systemMessage for the user, additionalContext for the model);
+//                      --hook codex: the same JSON, which Codex reads too; --hook copilot: Copilot CLI's (additionalContext)
 //   --stdin            take the folder from the hook payload's `cwd` on stdin
 //   --add <title> --next <step> [--status open|doing|waiting] [--waiting-on <who>] [--priority high|normal|low]
 //         [--due <date>] [--done-when <check>] [--from <context>] [--note <text>] [--links <text>]
@@ -44,7 +44,7 @@ for (let i = 0; i < argv.length; i++) {
   else if (name !== null) stop(`unknown option ${a}`);
   else positional.push(a);
 }
-if (opts.hook && !['claude', 'copilot'].includes(opts.hook)) stop('--hook takes claude or copilot');
+if (opts.hook && !['claude', 'codex', 'copilot'].includes(opts.hook)) stop('--hook takes claude, codex or copilot');
 if (opts.drop && !opts.why) stop('--drop needs --why <text>');
 
 const pad = (n) => String(n).padStart(2, '0');

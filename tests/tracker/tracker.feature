@@ -427,6 +427,24 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       }
       """
 
+  Scenario: --hook codex prints the same SessionStart JSON as Claude Code, which Codex reads
+    When the tool runs with "--hook codex {root}"
+    Then it exits with 0 and prints:
+      """
+      {
+        "systemMessage": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps",
+        "hookSpecificOutput": {
+          "hookEventName": "SessionStart",
+          "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+        }
+      }
+      """
+    When the tool runs with "--hook chatgpt {root}"
+    Then it exits with 1 and prints:
+      """
+      --hook takes claude, codex or copilot
+      """
+
   Scenario: --hook copilot gives the model the list as additionalContext
     When the tool runs with "--hook copilot {root}"
     Then it exits with 0 and prints:

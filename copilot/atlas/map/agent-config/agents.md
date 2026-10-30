@@ -82,12 +82,13 @@ Where: `copilot/prompts/*.prompt.md` · Schema: — · Index: `README.md` · Che
 
 <a id="tool-settings"></a>Claude Code and Codex entry files, Claude settings and plugin blocklist, Copilot hooks
 
-Where: `{claude/{CLAUDE.md,settings.json,plugins/**},codex/AGENTS.md,copilot/hooks/**}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: `~/.claude, ~/.codex, ~/.copilot/hooks`
+Where: `{claude/{CLAUDE.md,settings.json,plugins/**},codex/{AGENTS.md,hooks.json},copilot/hooks/**}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: `~/.claude, ~/.codex, ~/.copilot/hooks`
 
 - [`claude/CLAUDE.md`](../../../../claude/CLAUDE.md)
 - [`claude/plugins/blocklist.json`](../../../../claude/plugins/blocklist.json)
 - [`claude/settings.json`](../../../../claude/settings.json)
 - [`codex/AGENTS.md`](../../../../codex/AGENTS.md)
+- [`codex/hooks.json`](../../../../codex/hooks.json)
 - [`copilot/hooks/desktop-notify.json`](../../../hooks/desktop-notify.json)
 - [`copilot/hooks/scripts/desktop-notify.js`](../../../hooks/scripts/desktop-notify.js)
 - [`copilot/hooks/scripts/lib/utils.js`](../../../hooks/scripts/lib/utils.js)

@@ -100,6 +100,10 @@ The component list is LangChain's ✅[^lc_anatomy]. Examples and defaults come f
 A hook at session start can put state in front of the model before the first prompt, and show it to the person too:
 - **Claude Code `SessionStart`:** the hook's plain stdout, or `hookSpecificOutput.additionalContext`, is added to the model's context ✅[^cc_hooks_ref]. The top-level `systemMessage` is shown to the user ✅[^cc_hooks_ref].
 - **Copilot CLI `sessionStart`:** only `additionalContext` is used ✅[^copilot_hooks]. User-level hook files load from `~/.copilot/hooks/` ✅[^copilot_hooks].
+- **Codex `SessionStart`:**
+  - plain stdout or `hookSpecificOutput.additionalContext` becomes developer context, and `systemMessage` is shown as a warning ✅[^codex_hooks];
+  - hooks load from `~/.codex/hooks.json` among other places ✅[^codex_hooks];
+  - a non-managed hook runs only after the user reviews and trusts it in `/hooks` ✅[^codex_hooks].
 
 **Tested 2026-10-30** with this repo's tracker (`copilot/tracker/`, `specs/015-tracker/`):
 - **Minimal `PATH`.** A hook may start without the login shell's `PATH`. Its launcher found nvm's Node under `env -i PATH=/usr/bin:/bin`, and both outputs were valid JSON.
@@ -311,6 +315,7 @@ The guide (the schema doc) said the same thing earlier. The sensor made sure it 
 - [Birgitta Böckeler: Harness engineering for coding agent users](https://martinfowler.com/articles/harness-engineering.html) — martinfowler.com, 2026. Backs: §1 guides, sensors, controls, user harness; §2; §3; §5; §9; §10. [^fowler]
 - [Claude Code: Automate actions with hooks](https://code.claude.com/docs/en/hooks-guide) — Anthropic, living. Backs: §1 hook; §4; §7 exit 2 feedback; §8; §9. [^cc_hooks]
 - [Claude Code: Hooks reference](https://code.claude.com/docs/en/hooks) — Anthropic, living; read 2026-10-30. Backs: §4 SessionStart stdout and `additionalContext` reach the model, `systemMessage` is shown to the user. [^cc_hooks_ref]
+- [Codex: hooks](https://learn.chatgpt.com/docs/hooks) — OpenAI, living; read 2026-10-31. Backs: §4 Codex `SessionStart` output, `~/.codex/hooks.json`, trust review. [^codex_hooks]
 - [GitHub Copilot CLI: hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living; read 2026-10-30. Backs: §4 `sessionStart` consumes only `additionalContext`; `~/.copilot/hooks/`. [^copilot_hooks]
 - [Claude Code: How Claude remembers your project](https://code.claude.com/docs/en/memory) — Anthropic, living. Backs: §4 memory; §8 and §9 context vs. enforcement, 200 lines. [^cc_memory]
 - [AGENTS.md](https://agents.md/) — Agentic AI Foundation (Linux Foundation), living. Backs: §4 memory; nearest file in the tree wins. [^agentsmd]
