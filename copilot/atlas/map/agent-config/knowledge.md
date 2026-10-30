@@ -40,11 +40,13 @@ Where: `copilot/knowledge/**/index.md` · Schema: `copilot/frameworks/knowledge/
 Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/schemas/knowledge-doc.schema.md` · Index: `copilot/knowledge/index.md` · Checked by: validate-knowledge.mjs KD, DD, KB · Scenarios: `tests/validate-knowledge/validate-knowledge.feature` · Installed to: `~/.copilot/knowledge`
 
 - [`copilot/knowledge/ai-agents/claude-code-agents-and-skills.md`](../../../knowledge/ai-agents/claude-code-agents-and-skills.md)
+- [`copilot/knowledge/ai-agents/context-engineering-deep-dive.md`](../../../knowledge/ai-agents/context-engineering-deep-dive.md)
 - [`copilot/knowledge/ai-agents/graph-engineering-study-guide.md`](../../../knowledge/ai-agents/graph-engineering-study-guide.md)
 - [`copilot/knowledge/ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md`](../../../knowledge/ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md)
+- [`copilot/knowledge/ai-agents/harness-engineering-deep-dive.md`](../../../knowledge/ai-agents/harness-engineering-deep-dive.md)
 - [`copilot/knowledge/ai-agents/loop-engineering-playbook.md`](../../../knowledge/ai-agents/loop-engineering-playbook.md)
-- [`copilot/knowledge/ai-agents/loop-engineering-simple.md`](../../../knowledge/ai-agents/loop-engineering-simple.md)
 - [`copilot/knowledge/ai-agents/loop-engineering.md`](../../../knowledge/ai-agents/loop-engineering.md)
+- [`copilot/knowledge/ai-agents/prompt-engineering-deep-dive.md`](../../../knowledge/ai-agents/prompt-engineering-deep-dive.md)
 - [`copilot/knowledge/analytics/gtm-ga4-bigquery-reference.md`](../../../knowledge/analytics/gtm-ga4-bigquery-reference.md)
 - [`copilot/knowledge/analytics/part-1-google-tag-manager.md`](../../../knowledge/analytics/part-1-google-tag-manager.md)
 - [`copilot/knowledge/analytics/part-2-google-analytics-4.md`](../../../knowledge/analytics/part-2-google-analytics-4.md)

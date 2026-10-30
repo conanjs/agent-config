@@ -1,7 +1,7 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-10-29
+last-updated: 2026-10-30
 ---
 
 # Global knowledge
@@ -25,7 +25,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [testing/](testing/index.md) | Putting tests around code and tools that have none: characterization tests, Gherkin scenarios, proving coverage by sabotage | topic index |
 | [product-tours/](product-tours/index.md) | In-app onboarding tours with Product Fruits: integration in React/Next.js, per-user state, settings and API catalog | topic index |
 | [windows/](windows/index.md) | Windows specifics: creating symlinks needs admin, Developer Mode or the symlink user right regardless of shell or PowerShell version | 1 |
-| [ai-agents/](ai-agents/index.md) | Graph Engineering study guide, comparison with SDD / AI-DLC / Spec Kit, and existing loop-engineering guides | 2 concepts + 3 legacy |
+| [ai-agents/](ai-agents/index.md) | Prompt, context and harness engineering deep dives, Graph Engineering study guide, comparison with SDD / AI-DLC / Spec Kit, Claude Code agents and skills, and existing loop-engineering guides | 3 deep dives + 2 concepts + 1 reference + 2 legacy |
 | [analytics/](analytics/) | *legacy* — GTM → GA4 → BigQuery → Looker Studio pipeline | 5 |
 | [blink/](blink/) | *legacy* — rollout notes | 1 |
 | [datadog/](datadog/) | *legacy* — error-rate SLOs | 1 |
