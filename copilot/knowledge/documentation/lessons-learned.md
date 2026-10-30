@@ -12,7 +12,7 @@ Format per entry: **What went wrong → Why it's wrong → Rule now baked into t
 
 **Why it's wrong:** A thermostat assumes the reader has used a programmable/smart thermostat, which isn't universal, especially across an international team. It also requires understanding an abstract feedback concept (temperature regulation) rather than a concrete daily action.
 
-**Rule now baked into the template:** [[doc-template-base]]'s writing rules explicitly say "not a domain-specific analogy (e.g. avoid 'thermostat' or 'vending machine')" — prefer something everyone does with their hands (cooking, washing) over something that depends on owning a specific appliance. `loop-engineering-simple.md` uses "tasting soup and adding salt" instead.
+**Rule now baked into the template:** [[doc-template-base]]'s writing rules explicitly say "not a domain-specific analogy (e.g. avoid 'thermostat' or 'vending machine')" — prefer something everyone does with their hands (cooking, washing) over something that depends on owning a specific appliance. The first doc built from the template, a plain-English Loop Engineering guide, used "tasting soup and adding salt" instead (that guide was removed on 2026-10-30 as team-only material; it is in git history as `copilot/knowledge/ai-agents/loop-engineering-simple.md`).
 
 ## 2026-09-14 — Don't cite a URL from memory, even for a well-known organization
 

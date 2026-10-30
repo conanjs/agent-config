@@ -1,6 +1,6 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-28
+last-updated: 2026-10-29
 rule-prefix: MOD
 subject: design
 ---
@@ -23,6 +23,7 @@ How the architecture role defines modules and layers inside one repo, checks dep
 | MOD-8 | Simplifications are recorded. Collapsing a layer or skipping a module boundary is stated in `docs/architecture.md` with the reason. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | MOD-9 | **Feature-first is the default packaging** for every new repo: the first grouping under `src/` is the module, and each module has the same layers inside. Modules live in `src/modules/`: one folder per feature area, plus `src/modules/shared/` with the same four layer folders, created from the start even while empty (MOD-4 governs what may go in). Even a repo with one feature starts as `src/modules/<feature>/{domain,application,infrastructure,interface}/` next to `src/modules/shared/{domain,application,infrastructure,interface}/`, because most applications grow and moving later costs more than one folder level now. The rest of `src/` holds only what is not a module: the composition root, the entry point, and later folders such as jobs, CLI entry points, migrations or generated code. **Layer-first** (`domain/`, `application/`, `infrastructure/`, `interface/` at the top of `src/`) is allowed only when the owner opts in explicitly, the repo serves one bounded context, and it has at most three feature areas. The opt-in is a decision record in `docs/architecture.md`. When an opted-in repo reaches its fourth feature area or second bounded context, it switches to feature-first as a recorded pure move with no behaviour change. | `docs/architecture.md` names the layout; every module is under `src/modules/`; a layer-first repo has an opt-in record and at most three feature areas; the tree matches the record | A new repo starts layer-first with no opt-in record; feature folders directly under `src/` next to `jobs/` and `cli/`; an opted-in layer-first repo with five feature areas spread over four layer folders | llm | — |
 | MOD-10 | **One folder per use case inside each layer** of a module (default). A use case gets a kebab-case folder named after it in every layer it has code in (`application/revise-document/`, `interface/routes/revise-document/`), holding its files and their tests. `domain/` is split by aggregate instead, because every use case shares the entities: one kebab-case folder per aggregate, named after its root entity (`domain/document/Document.ts`), with value objects used only by that aggregate inside it. Depth shows scope: a file in a use-case folder serves that use case only; a file at a layer root (`application/DocumentView.ts`, `application/ports/`, `interface/errors/`, a value object at the `domain/` root) is shared by several use cases or aggregates of the module; `modules/shared/` is shared by several modules. Put each file in the deepest folder that contains all of its users. Inside a layer, code imports only from its own folder or a folder above it, never from a sibling use-case or aggregate folder; the one exception inside a module is its router at the `interface/routes/` root, a wiring file that imports the handler folders below it (EXP-2). A file moves up when a user appears outside its folder. Between layers, the layer rule decides. Full vertical slices across layers, or `commands/`/`queries/` folders, are allowed only with a decision record (see Interpreting) | Every use case has its own folder in each layer it touches, and every aggregate its own folder in `domain/`; nothing in a use-case folder is imported by another use case; files at a layer root have two or more users | `CreateDocumentBody.ts` beside every other handler in `interface/routes/`; `application/revise-document/` importing from `application/create-document/`; a view used by one use case left at the layer root | llm | `knowledge/software-design/architecture-styles/use-case-folders.md` |
+| MOD-11 | **Wire modules with one composition root and one composer per module** (wiring shape W2, default). The composition root is the only place that chooses adapters and passes one module's public objects to another; each module's composer (`<Module>Module` at the module root, outside the layers) receives its adapters and builds that module's use cases and router. One root that builds every use case (W1) is fine while there is one module; a composition root per module (W3: its own container, config and store) needs a decision record. | Only the composition root imports adapters and composers; no composer imports an adapter; no layer imports a composer; lint enforces all three. | A composer that creates its own store; a use case that imports its module's composer; a root that builds every use case of five modules. | lint | knowledge/software-design/oop/dependency-injection.md |
 
 ## Interpreting
 
@@ -103,6 +104,20 @@ Option C and D are explained with full trees, costs and sources in `knowledge/so
 
 **Switching:** write the decision record, then move files without changing behaviour (all tests pass unchanged), then add the module-boundary checks (MOD-3, FF-1). The stack reference shows both layouts: `stacks/<stack>/reference.md` (feature-first on `main`, layer-first on a maintained branch).
 
+**Wiring modules: W2 by default (MOD-11)**
+
+Every option keeps one rule from Mark Seemann's composition root: the adapters are chosen in one place. They differ in who writes the `new` calls for a module's use cases.
+
+| Option | Shape | Use when | Evidence |
+|---|---|---|---|
+| **W2. Root + module composers** (default) | `src/CompositionRoot.ts` chooses the adapters and creates shared instances; `src/modules/<module>/<Module>Module.ts` receives its adapters and the other modules' public objects, and builds its use cases and router | Two or more modules | Stack reference `v4.2.0`: `DocumentsModule.ts`, `CommentsModule.ts`; ASP.NET Core's `Add{Group}` extension methods; NestJS modules |
+| W1. One root builds everything | The root builds every use case and hands each module's use cases to its router | One module; switch to W2 when the second module arrives | Stack reference `v4.1.0` (`src/CompositionRoot.ts`) |
+| W3. A composition root per module | Each module chooses its own adapters, with its own container and config | Modules own separate infrastructure (own store, config or deployment path) or are about to be extracted to services; record it (MOD-8) | Kamil Grzybek, *Modular Monolith with DDD* §3.1 |
+
+**Checks for W2:** two lint zones next to the layer zones: a composer may not import any `infrastructure/` folder, and no `domain/`, `application/`, `infrastructure/` or `interface/` file may import a composer. The module zones (MOD-3) already stop one composer from importing another module's composer.
+
+**Switching W1 → W2** is a pure move: the use-case wiring of each module leaves the root for the module's composer, and every test passes unchanged. The stack reference did it from `v4.1.0` to `v4.2.0` with the same 27 unit and 21 integration tests.
+
 **Application note:** stack profiles define concrete commands and idioms; this foundation defines stack-agnostic intent.
 
 ## Tensions
@@ -112,6 +127,7 @@ Option C and D are explained with full trees, costs and sources in `knowledge/so
 | Simplicity | Explicit boundaries | Add boundaries only where change rate, ownership or risk justifies them. |
 | MOD-1 modules by domain | An opted-in layer-first repo | MOD-9: an opted-in layer-first repo is one module, so layer folders at the top satisfy MOD-1. Technical-role folders that cut across features (`controllers/`, `services/`) still do not. |
 | MOD-9 feature-first by default | YAGNI for a one-feature repo | The default costs two folder levels (`modules/<feature>/`); a later switch costs a repo-wide move. A repo that will truly stay small opts in to layer-first with a record. |
+| MOD-11 W2 composers | YAGNI for one module | W1 is fine while there is one module; the switch is a pure move, so wait for the second module. |
 | MOD-10 one folder per use case | Languages where a folder is a package or module with its own namespace (Go, Rust) | The stack profile states the mapping; where a folder per use case would split one package into many, one file per use case named after it (`revise_document.go`) satisfies the intent. |
 
 ## References
@@ -123,6 +139,10 @@ Option C and D are explained with full trees, costs and sources in `knowledge/so
 
 **External authoritative sources:**
 - David Parnas, "On the Criteria To Be Used in Decomposing Systems into Modules" (CACM, 1972).
+- [Mark Seemann, "Composition Root"](https://blog.ploeh.dk/2011/07/28/CompositionRoot/) (2011) — one place where modules are composed (MOD-11).
+- [Dependency injection in ASP.NET Core: register groups of services with extension methods](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection#register-groups-of-services-with-extension-methods) — Microsoft, living (MOD-11, W2).
+- [NestJS: Modules](https://docs.nestjs.com/modules) — NestJS, living: providers private by default, shared through `exports` (MOD-11, W2).
+- [Kamil Grzybek, Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd) — §3.1, a composition root per module (MOD-11, W3).
 - Robert C. Martin, *Clean Architecture* (2017) — component principles (ADP, SDP, SAP).
 - Simon Brown, "Modular Monoliths" and the C4 model (c4model.com).
 - [Robert C. Martin, "Screaming Architecture"](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) (2011) — the top level should show the use cases, not the framework (MOD-9).

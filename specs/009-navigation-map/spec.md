@@ -1,10 +1,10 @@
 # Feature Specification: A navigation map and coordinator for agent-config
 
-**Feature Branch**: (not started)
+**Feature Branch**: `feat/mod-11-and-coordinator`
 
 **Created**: 2026-10-29
 
-**Status**: Clarified 2026-10-29 — option B, a new coordinator role, and a map of everything (Clarifications); ready for `/speckit-plan`
+**Status**: Implemented 2026-10-29, except User Story 3, which was only partly met; completed by `specs/012-coordinator-review-fixes/`
 
 **Input**: V: "later I will also need a coordinator/controller/orchestrator to know the navigation table, what to do, and so on for hierarchical trees, branches, chains for every thing, so they can link and know. One person onboarding this cannot know everything."
 
@@ -32,6 +32,8 @@ A newcomer or an agent with a task ("add a stack", "change a validator", "write 
 1. **Given** a new file in a folder the map does not register, **When** `scripts/check-docs.sh` runs, **Then** it fails and names the file and the nearest registered kind.
 
 ### User Story 3 - Follow a chain both ways (Priority: P2)
+
+*Correction, 2026-10-29: this story was marked done, but the first `--explain` listed only 6 of the 19 files that name `module-boundaries.md` and did not follow any chain onward. A review found the gap; spec 012 closes it.*
 
 **Acceptance Scenarios**:
 

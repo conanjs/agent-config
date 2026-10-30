@@ -117,8 +117,8 @@ Documented in the wild in LangChain's `AgentExecutor`, LangGraph multi-agent set
 
 ## Related
 
-- [[loop-engineering-simple]] — plain-English (CEFR A1) version of this doc, for sharing with non-technical or non-fluent-English readers.
 - [[loop-engineering-playbook]] — applied playbook: what to actually build (policy-skill template, hook template, autonomous-loop template, decision rule for when it's worth the setup), including a worked example against this repo's dead-code migration.
 - Anthropic's broader "workflows vs. agents" taxonomy (prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer) — worth a follow-up doc if any of these get used deliberately in a project here.
 - `{{AGENT_HOME}}/knowledge/github-copilot/copilot-cli-internals.md` and `copilot-prompts-agents-setup.md` — likely relevant since Copilot CLI is itself an agent-loop implementation; worth cross-checking whether its internals match §2–5 here.
-- Context engineering (referenced in §5/§6 as a loop component but not itself detailed here) — candidate for its own knowledge doc if it keeps coming up.
+- [[context-engineering-deep-dive]] — context engineering (referenced in §5/§6 as a loop component), now its own deep dive.
+- [[prompt-engineering-deep-dive]] and [[harness-engineering-deep-dive]] — the instruction layer and the code around the loop; the harness dive compares all five disciplines.

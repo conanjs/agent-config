@@ -40,7 +40,7 @@
 2. **One-line summary** — "In simple words: ..." — the whole idea in one short sentence.
 3. **Why this matters to you** — tie it to something the reader already does day-to-day.
 4. **The idea, explained with an everyday comparison** — one concrete analogy for the *whole* idea, not an abstract one.
-5. **Components — the concept broken into its working parts** — name each part (typically 2–4), one line defining what it is, plus one concrete real example artifact per part. This is not the same as section 4: section 4 gives one comparison for the whole idea; this section shows what actually gets *built*, part by part, so the reader can tell them apart when they see them for real. Precedent: [[loop-engineering-simple]]'s "Should you use a hook file?" section names the mechanical-check component with a real `.claude/settings.json` example — a complete instance of this section would pair it with a second component (the policy/skill/instruction part) shown the same concrete way, not just described.
+5. **Components — the concept broken into its working parts** — name each part (typically 2–4), one line defining what it is, plus one concrete real example artifact per part. This is not the same as section 4: section 4 gives one comparison for the whole idea; this section shows what actually gets *built*, part by part, so the reader can tell them apart when they see them for real. Precedent: the first doc built from this template (a plain-English Loop Engineering guide, removed 2026-10-30, in git history as `copilot/knowledge/ai-agents/loop-engineering-simple.md`) had a "Should you use a hook file?" section that named the mechanical-check component with a real `.claude/settings.json` example — a complete instance of this section would pair it with a second component (the policy/skill/instruction part) shown the same concrete way, not just described.
 6. **A real example from work** — a full worked case that brings the components in section 5 together end-to-end, something the reader already uses or sees.
 7. **Steps, as a numbered list** — if the concept is a process, show it as steps 1/2/3, not prose.
 8. **Words to know** — a 3–6 line mini glossary, one short definition per line.
@@ -76,7 +76,7 @@ Format-specific checks in each `formats/*.md` file are *additional* to this, not
 **Local artifacts:**
 - `~/.claude/CLAUDE.md` → `~/.copilot/instructions/personal-defaults.instructions.md` — the global rule (added 2026-09-14) that auto-loads this template for team docs in every project, plus the rule requiring References/Related on every knowledge doc.
 - [[lessons-learned]] — running log of past mistakes this template exists to prevent repeating.
-- `{{AGENT_HOME}}/knowledge/ai-agents/loop-engineering-simple.md` — first document built from this template.
+- `copilot/knowledge/ai-agents/loop-engineering-simple.md` (removed 2026-10-30; `git log --all -- <that path>` finds it) — first document built from this template, written for one team.
 
 **External authoritative sources:**
 - [CEFR level descriptions — Council of Europe](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) and [CAN-DO statements PDF (KCL, sourced from Council of Europe)](https://www.kcl.ac.uk/language-centre/assets/can-do-statements-cefr.pdf) — source of the level table above.

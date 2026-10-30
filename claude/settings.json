@@ -4,5 +4,19 @@
   },
   "model": "sonnet",
   "effortLevel": "high",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/tracker/tracker-hook.sh\" --hook claude \"$CLAUDE_PROJECT_DIR\"",
+            "timeout": 15,
+            "statusMessage": "Reading TRACKER.md"
+          }
+        ]
+      }
+    ]
+  }
 }

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "\"$HOME/.copilot/tracker/tracker-hook.sh\" --hook copilot --stdin",
+        "powershell": "node \"$env:USERPROFILE\\.copilot\\tracker\\tracker.mjs\" --hook copilot --stdin",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}

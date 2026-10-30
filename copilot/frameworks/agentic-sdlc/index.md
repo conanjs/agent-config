@@ -32,6 +32,7 @@ The framework keeps rules in Store A, broad references in Store B, company facts
 | qa | [QA] | Testing bar, test depth, consistency | Mid | TD | agents/qa.md |
 | security | [Sec] | Risk tier, threat model, security veto | Top | RT | agents/security.md |
 | devops | [DevOps] | CI/CD, environments, release, rollback, PR | Mid | DT | agents/devops.md |
+| coordinator | [Coord] | The atlas: where every file is, what checks it, where a request starts | Mid | NAV | agents/coordinator.md |
 
 Modes are `propose`, `decide`, `execute`, and `review`; every launch uses exactly one.
 
@@ -81,7 +82,7 @@ Paradigm is independent of stack. A paradigm file states what must hold; a stack
 ## 7. Workflow
 | Phase | Runs when | Main owners | Output | Gate |
 |---|---|---|---|---|
-| P0 Intake | every session | orchestrator | mission type, profile detection, validation notes | — |
+| P0 Intake | every session | orchestrator; the coordinator when the starting point is unclear | mission type, profile detection, validation notes | — |
 | P1 Blueprint | new project/feature/cross-repo | relevant roles | blueprint.md | G0 |
 | P2 Constitution | new project/amendment | architecture, engineering, qa, security | constitution clauses | G1 |
 | P3 Specify | every feature/behaviour fix | product-spec | spec.md | G2 |

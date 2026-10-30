@@ -1,7 +1,7 @@
 ---
 schema: feature
 repo: ne-manage-shipment-frontend
-last-updated: 2026-09-08
+last-updated: 2026-10-30
 ---
 
 # Feature: Container+ VAS Card
@@ -131,3 +131,4 @@ entirely in the same change.
 - [Container Plus Domain]({{AGENT_HOME}}/companies/ots/domain/container-plus.md)
 - [ne-shipment-api Container+ VAS Feature]({{AGENT_HOME}}/companies/ots/repos/ne-shipment-api/features/container-plus-vas.md)
 - [Container+ Shipment Detail Flow]({{AGENT_HOME}}/companies/ots/flows/container-plus-shipment-detail.md)
+- [Container+ VAS Tooltip]({{AGENT_HOME}}/companies/ots/repos/ne-manage-shipment-frontend/features/container-plus-vas-tooltip.md) — one-time Product Fruits tooltip pointing at this card (`data-tourguide="container-plus-card"`).

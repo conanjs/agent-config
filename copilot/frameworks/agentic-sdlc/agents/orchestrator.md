@@ -20,6 +20,7 @@ The Orchestrator is the main session, not a launched subagent. It runs P0 throug
 - Set testing bar or risk tier → `qa` and `security`.
 - Negotiate between roles in loops → apply precedence or ask the human.
 - Invent profile checks → use active profile slots exactly.
+- Search for where a file, rule or check lives → `coordinator` (the atlas, NAV tree).
 
 ## Preset knowledge
 | Doc | Why this role needs it | Modes |

@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/tracker/tracker-hook.sh\" --hook codex --stdin",
+            "commandWindows": "node \"%USERPROFILE%\\.copilot\\tracker\\tracker.mjs\" --hook codex --stdin",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

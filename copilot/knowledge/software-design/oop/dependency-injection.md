@@ -55,8 +55,8 @@ Service locator hides dependencies and can move missing registrations from compi
 
 | Shape | Who builds the use cases | Who picks the adapters | Seen in |
 |---|---|---|---|
-| W1. One composition root builds everything | The root | The root | Seemann's basic form ✅[^2]; the stack reference since v4.1 (one private method per module) |
-| W2. One root, one composer per module | A per-module composer, given its adapters and the other modules' public objects | The root | ASP.NET Core's convention: one `Add{GROUP NAME}` extension method registers all services of a feature ✅[^4]; NestJS modules, which keep their providers private unless exported ✅[^5] |
+| W1. One composition root builds everything | The root | The root | Seemann's basic form ✅[^2]; the stack reference `v4.1.0` (one root builds every use case) |
+| W2. One root, one composer per module | A per-module composer, given its adapters and the other modules' public objects | The root | ASP.NET Core's convention: one `Add{GROUP NAME}` extension method registers all services of a feature ✅[^4]; NestJS modules, which keep their providers private unless exported ✅[^5]; the stack reference since `v4.2.0` (`<Module>Module.ts` composers) |
 | W3. One composition root per module | The module | The module (its own container, config and store) | Grzybek's modular monolith: "Each Module has its own Composition Root" and its own IoC container, for encapsulation and isolation ✅[^6] |
 
 W2 does not break "one composition root": the root still chooses every adapter and creates every shared instance; a composer only groups one module's `new` calls, as an `Add{GROUP NAME}` method groups registrations. W3 is a different decision: each module owns its infrastructure, which pays off when modules may become separate services. *(Classification ours, from the cited sources.)*
@@ -90,13 +90,14 @@ The HTTP adapter parses `{ roleId: "admin", permission: "shipment:approve" }` an
 - Define ports where they are consumed, not where an adapter happens to live. [rule-candidate]
 - Wire object graphs at the composition root and keep containers out of domain and application classes. [rule-candidate]
 - Treat service locator as hidden dependency lookup, not dependency injection. [rule-candidate]
-- In a modular monolith, keep adapter choice in the one composition root; move a module's use-case wiring into a module-root composer once the root becomes a list of per-module blocks, and give each module its own composition root only when modules own separate infrastructure. [rule-candidate]
+- In a modular monolith, keep adapter choice in the one composition root and give each module a composer that builds its use cases from the adapters it is given (W2, the framework default since MOD-11); one root for everything (W1) fits a single module, and a composition root per module (W3) fits only modules that own separate infrastructure.
 
 ## Used by
 | Where | Id / path | How |
 |---|---|---|
 | paradigm rule | PDM-class-modeled-R3 | Source: |
 | paradigm rule | PDM-class-modeled-R9 | Source: |
+| foundation rule | MOD-11 | Source: |
 
 ## Verification status
 - Verified: 20 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
@@ -108,7 +109,7 @@ The HTTP adapter parses `{ roleId: "admin", permission: "shipment:approve" }` an
 - [Dependency injection in ASP.NET Core: Register groups of services with extension methods](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection#register-groups-of-services-with-extension-methods) — Microsoft, living (read 2026-10-29). Backs: How it works (W2, the `Add{GROUP NAME}` convention). [^4]
 - [NestJS: Modules](https://docs.nestjs.com/modules) — NestJS project, living. Backs: How it works (W2, providers encapsulated by default, `exports`). [^5]
 - [Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd) — Kamil Grzybek, living. Backs: How it works and Trade-offs (W3, §3.1 assumption 7 "Each Module has its own Composition Root"). [^6]
-- `conanjs/agentic-sdlc-reference-typescript-node` v4.1 branch — `src/CompositionRoot.ts` (W1 with one private method per module) and `eslint.config.mjs` (layer zones).
+- `conanjs/agentic-sdlc-reference-typescript-node` — `v4.1.0`: `src/CompositionRoot.ts` builds every use case (W1); `v4.2.0`: `src/modules/*/<Module>Module.ts` composers and their two lint zones in `eslint.config.mjs` (W2).
 - `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites this doc as PDM-class-modeled-R3.
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/class-modeled.md` — maps this rule to constructor-injected TypeScript application classes.
 

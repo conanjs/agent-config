@@ -59,6 +59,7 @@ Notes: `pnpm run build` must be defined in `package.json` (e.g. `"build": "tsc -
 | `foundations/delivery/testing-strategy.md` | Unit tests on `domain`/`application` with in-memory fakes; integration tests against real adapters via `cmd.test_integration` |
 | `foundations/delivery/release-pipeline.md` | CI template below; lockfile frozen; build output in `dist/` from `cmd.build` |
 | `foundations/delivery/threat-modeling.md` | `cmd.audit` on every run; validate all input at `interface/` boundary; no secrets in `src/` or logs |
+| `foundations/design/module-boundaries.md` (MOD-11) | W2: `src/modules/<module>/<Module>Module.ts`, a class built from its adapters with a `router()` method; `src/CompositionRoot.ts` creates the adapters and the composers. Two `import-x/no-restricted-paths` zones (idioms.md, Module-boundary lint configuration) keep adapters out of composers and composers out of the layers; stack reference `v4.2.0` |
 
 ## Reference topics
 | Topic | Attach when | Path |

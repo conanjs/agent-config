@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # check-docs.sh — runs the repo's document validators (layer 1 of the doc guards): knowledge, procedures, agentic-sdlc,
-# agent-foundry, then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
+# agent-foundry, the atlas, this repo's TRACKER.md, then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
 # Used by .githooks/pre-commit, the Claude Code hook (.claude/settings.json) and CI (.github/workflows/validate-docs.yml).
 #
 # Usage: scripts/check-docs.sh   (network checks are separate: validate-knowledge.mjs --urls, validate-procedures.mjs --upstream)
@@ -27,5 +27,9 @@ status=0
 "$node_bin" "$root/copilot/procedures/tools/validate-procedures.mjs" || status=1
 "$node_bin" "$root/copilot/frameworks/agentic-sdlc/tools/validate.mjs" || status=1
 "$node_bin" "$root/copilot/frameworks/agent-foundry/tools/validate-foundry.mjs" || status=1
+# The atlas: every file under a kind, the tree whole, the generated map current (after adding files: atlas.mjs --write).
+"$node_bin" "$root/copilot/atlas/tools/atlas.mjs" || status=1
+# This repo's own TRACKER.md (tracker/v1).
+"$node_bin" "$root/copilot/tracker/tracker.mjs" "$root" || status=1
 (cd "$root" && "$node_bin" "$cucumber") || status=1
 exit $status

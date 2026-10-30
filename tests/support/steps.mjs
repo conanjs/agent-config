@@ -94,6 +94,35 @@ Given('{string} is a git repository with everything committed', function (dir) {
   git('commit', '-q', '-m', 'fixture');
 });
 
+// Git history for scenarios that check branches, commits and stashes (tests/tracker).
+const gitIn = (world, dir, ...a) => execFileSync('git', ['-C', world.at(dir), '-c', 'user.name=test', '-c', 'user.email=test@example.com', ...a], { stdio: 'pipe', env: cleanEnv() });
+
+Given('in {string}, the branch {string} has a new commit', function (dir, branch) {
+  const back = gitIn(this, dir, 'branch', '--show-current').toString().trim();
+  gitIn(this, dir, 'checkout', '-q', '-b', branch);
+  gitIn(this, dir, 'commit', '-q', '--allow-empty', '-m', `work on ${branch}`);
+  gitIn(this, dir, 'checkout', '-q', back);
+});
+
+Given('in {string}, the branch {string} is merged into {string}', function (dir, branch, into) {
+  gitIn(this, dir, 'checkout', '-q', into);
+  gitIn(this, dir, 'merge', '-q', '--no-ff', '-m', `merge ${branch}`, branch);
+});
+
+Given('in {string}, a change is stashed as {string}', function (dir, message) {
+  fs.writeFileSync(this.at(path.join(dir, 'stashed-change.txt')), 'draft\n');
+  gitIn(this, dir, 'stash', 'push', '-q', '-u', '-m', message);
+});
+
+Given('in {string}, the branch {string} is only on origin', function (dir, branch) {
+  gitIn(this, dir, 'update-ref', `refs/remotes/origin/${branch}`, branch);
+  gitIn(this, dir, 'branch', '-q', '-D', branch);
+});
+
+Given('in {string}, the stash is dropped', function (dir) {
+  gitIn(this, dir, 'stash', 'drop', '-q');
+});
+
 Given('the repo\'s {string} folder is copied to {string}', function (from, to) {
   fs.cpSync(path.join(repo, from), this.at(to), { recursive: true });
 });
@@ -111,11 +140,11 @@ Given('{string} already links to {string}', function (link, target) {
 
 // ---- When: run the tool ------------------------------------------------------------------------------
 
-function run(world, extra) {
+function run(world, extra, input) {
   const t = getTool(world.toolName);
   const { file, args, env } = t.run(world, extra);
   return new Promise((resolve) => {
-    execFile(file, args, { encoding: 'utf8', env: cleanEnv(env) }, (err, stdout, stderr) => {
+    const child = execFile(file, args, { encoding: 'utf8', env: cleanEnv(env) }, (err, stdout, stderr) => {
       let lines = (stdout + stderr).trimEnd().split('\n');
       // A tool that stops before printing its header (a missing root file, say) is compared in full.
       if (t.header && t.header.test(lines[0])) lines = lines.slice(1);
@@ -125,6 +154,7 @@ function run(world, extra) {
       world.result = { code: err ? err.code : 0, out };
       resolve();
     });
+    if (input !== undefined) child.stdin.end(input);
   });
 }
 
@@ -135,6 +165,16 @@ When('the tool runs', function () {
 // Also used as a precondition ("Given the tool runs with …"); Cucumber matches steps regardless of keyword.
 When('the tool runs with {string}', function (a) {
   return run(this, fill(this, a).split(' '));
+});
+
+// A hook's payload on stdin.
+When('the tool runs with {string} and this on stdin:', function (a, doc) {
+  return run(this, fill(this, a).split(' '), fill(this, doc));
+});
+
+// One argument per line, so an argument may hold spaces.
+When('the tool runs with arguments:', function (doc) {
+  return run(this, fill(this, doc).split('\n'));
 });
 
 // ---- Then: exact exit code and output ---------------------------------------------------------------
@@ -203,3 +243,21 @@ Then('the file {string} contains exactly:', function (p, doc) {
 function isLink(p) {
   try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; }
 }
+
+Then('the file {string} has the line {string}', function (p, line) {
+  const lines = fs.readFileSync(this.at(p), 'utf8').split('\n');
+  assert.ok(lines.includes(line), `${p} has no line "${line}"`);
+});
+
+Then('the file {string} has no line containing {string}', function (p, text) {
+  const hit = fs.readFileSync(this.at(p), 'utf8').split('\n').find((l) => l.includes(text));
+  assert.equal(hit, undefined, `${p} has a line containing "${text}": ${hit}`);
+});
+
+Then('the output has the line {string}', function (line) {
+  assert.ok(this.result.out.split('\n').includes(line), `no output line "${line}" in:\n${this.result.out}`);
+});
+
+Then('the output has no line {string}', function (line) {
+  assert.ok(!this.result.out.split('\n').includes(line), `output line "${line}" in:\n${this.result.out}`);
+});

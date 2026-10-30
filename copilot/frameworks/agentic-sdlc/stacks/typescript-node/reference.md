@@ -3,8 +3,8 @@ schema: stack-reference/v1
 last-updated: 2026-10-29
 stack: typescript-node
 repo: conanjs/agentic-sdlc-reference-typescript-node
-pinned: v4.1.1
-commit: c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784
+pinned: v4.2.0
+commit: bfa17067b076e10f0f980617cd4540b36c63d5c0
 verified: 2026-10-29
 layout: feature-first
 variants:
@@ -21,7 +21,7 @@ The code lives in its own repo, [`conanjs/agentic-sdlc-reference-typescript-node
 
 ## Choices
 
-All paths are relative to the reference repo's root, at the pinned (feature-first) commit. In the layer-first variant, drop the module folders: `src/modules/documents/domain/` is `src/domain/`, and `src/modules/shared/<layer>/` is `src/<layer>/`. The layer-first variant (`v1.5.1`) has the documents module only: the comments module, routers, request log and `/healthz` (`v4.1.x`) are feature-first only so far.
+All paths are relative to the reference repo's root, at the pinned (feature-first) commit. In the layer-first variant, drop the module folders: `src/modules/documents/domain/` is `src/domain/`, and `src/modules/shared/<layer>/` is `src/<layer>/`. The layer-first variant (`v1.5.1`) has the documents module only: the comments module, routers, composers, request log and `/healthz` (`v4.1.0`, `v4.2.0`) are feature-first only so far.
 
 | Concern | Choice | Rule | Where |
 |---|---|---|---|
@@ -35,7 +35,7 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | Create contract | `201 Created`, `Location: /documents/<id>`, the new document as the body; the id comes from a `DocumentIds` port (UUID adapter in production, sequential in tests) | NAM-7, TSN-2 | `src/modules/documents/application/ports/DocumentIds.ts`, `src/modules/documents/interface/routes/create-document/CreateDocumentHandler.ts`, `specs/002-document-lifecycle/research.md` DR-006 |
 | List contract | Cursor pagination: `{ items, nextCursor }`, ascending id, `limit` 1 to 100 (default 20), `nextCursor` `null` on the last page; a bad query is a 400 problem | EXP-7 | `src/modules/documents/application/list-documents/ListDocuments.ts`, `src/modules/documents/interface/routes/list-documents/ListDocumentsQuery.ts`, DR-005 |
 | Queries and commands | One use case and one handler per route; queries (`Get…`, `List…`) change nothing | NAM-4, EXP-1 | `src/modules/documents/application/`, `src/modules/documents/interface/routes/DocumentsRouter.ts` (route table) |
-| Wiring (shape W1) | One composition root builds every use case and hands each module's use cases to that module's router class, which owns its paths, handlers and mapper; routers use full paths and mount at the root, because a prefix mount loses the `:id` param types | EXP-2, MOD-7, MOD-10 | `src/CompositionRoot.ts`, `src/modules/<module>/interface/routes/<Module>Router.ts`, `specs/003-comments-and-operations/research.md` DR-010 |
+| Wiring (shape W2) | The composition root chooses every adapter and hands each module its own to that module's composer at the module root (`<Module>Module.ts`), which builds the module's use cases and router; only the root passes one module's public use case to another. Routers use full paths and mount at the root, because a prefix mount loses the `:id` param types. Two lint zones: a composer imports no adapter, no layer imports a composer. `v4.1.0` keeps the W1 shape (the root builds every use case) | MOD-11, EXP-2, MOD-7, MOD-10 | `src/CompositionRoot.ts`, `src/modules/<module>/<Module>Module.ts`, `src/modules/<module>/interface/routes/<Module>Router.ts`, `eslint.config.mjs`, `specs/005-module-composers/research.md` DR-012 |
 | Cross-module use | Comments call documents only through its public use case `GetDocument`; module edges enforced in lint with a `mayDependOn` map | MOD-3, MOD-4 | `src/modules/comments/application/add-comment/AddComment.ts`, `eslint.config.mjs` (`mayDependOn`), DR-007 |
 | Request id and request log | A plain incoming `X-Request-Id` is kept, anything else replaced by a UUID; one log line per request, `request.aborted` when the client disconnects | TSN-10 | `src/modules/shared/interface/RequestLogMiddleware.ts`, DR-009 |
 | Paradigm | class-modeled@1: entity state in `readonly #fields`, collaborators as `private readonly` parameters | PDM-class-modeled-R1, R7 | `src/modules/documents/domain/document/Document.ts`, `src/modules/documents/application/revise-document/ReviseDocument.ts` |
@@ -75,7 +75,8 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 | `src/modules/documents/interface/errors/HttpErrorMapper.ts` | mapper | Exhaustive refusal-to-problem table |
 | `src/modules/shared/interface/ProblemDetails.ts` | value | The RFC 9457 body and how it is sent |
 | `src/modules/shared/interface/ErrorMiddleware.ts` | middleware | Thrown errors to `about:blank` problems; logs every 500 |
-| `src/CompositionRoot.ts` | composition root | The only importer of adapters; builds every use case and mounts one router per module (W1) |
+| `src/CompositionRoot.ts` | composition root | The only importer of adapters and composers; passes documents' `getDocument` to comments; orders the app (W2) |
+| `src/modules/documents/DocumentsModule.ts`, `src/modules/comments/CommentsModule.ts` | module composers | Each module's use cases and router, built from the adapters it is given (MOD-11) |
 | `src/modules/documents/interface/routes/DocumentsRouter.ts`, `src/modules/comments/interface/routes/CommentsRouter.ts` | routers | Each module's paths, handlers and mapper, from already-built use cases |
 | `src/modules/comments/` | feature module | A second module that depends on documents only through `GetDocument` |
 | `src/modules/shared/interface/RequestLogMiddleware.ts`, `HealthHandler.ts`, `NotFoundHandler.ts` | middleware, handlers | Request id and log, `/healthz`, the `about:blank` 404 |
@@ -93,8 +94,8 @@ All paths are relative to the reference repo's root, at the pinned (feature-firs
 Read-only, at the pinned commit. `{{REFERENCE_REPOS_ROOT}}` is defined in `{{AGENT_HOME}}/global-variables.md`.
 
 1. Once: `git clone https://github.com/conanjs/agentic-sdlc-reference-typescript-node "{{REFERENCE_REPOS_ROOT}}/typescript-node"`.
-2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784` (feature-first, `v4.1.1`), or `… checkout --quiet fca5d5de1f65e36ad6d5d1ad3d02f6d818c6691e` for the layer-first variant (`v1.5.1`).
-3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784/<path>`.
+2. Every time: `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" fetch --tags --quiet` then `git -C "{{REFERENCE_REPOS_ROOT}}/typescript-node" checkout --quiet bfa17067b076e10f0f980617cd4540b36c63d5c0` (feature-first, `v4.2.0`), or `… checkout --quiet fca5d5de1f65e36ad6d5d1ad3d02f6d818c6691e` for the layer-first variant (`v1.5.1`).
+3. To look at one file without cloning: `https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/bfa17067b076e10f0f980617cd4540b36c63d5c0/<path>`.
 
 A role working on another project never edits this clone. A change to the reference is a pull request to its own repo.
 
@@ -106,7 +107,7 @@ In the clone: `pnpm install`, then `pnpm run check` (format, lint, typecheck, do
 
 | Layout | Copy it when | Tag | Commit |
 |---|---|---|---|
-| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v4.1.1` | `c5d8cd8395e7a0210e7e4ba53ddcd66ecfcad784` |
+| Feature-first (`main`) | Always, by default (MOD-9): every new repo, even with one feature | `v4.2.0` | `bfa17067b076e10f0f980617cd4540b36c63d5c0` |
 | Layer-first (`layout/layer-first`) | Only when the owner opted in with a decision record: one bounded context, at most three feature areas | `v1.5.1` | `fca5d5de1f65e36ad6d5d1ad3d02f6d818c6691e` |
 
 Both variants get every rule fix, one pull request each (`{{AGENT_HOME}}/patterns/maintained-variant.pattern.md`).
