@@ -25,6 +25,7 @@ Where: `copilot/companies/**` · Schema: `copilot/frameworks/company-kb/schemas/
 - [`copilot/companies/ots/repos/ne-api-gateway/overview.md`](../../../companies/ots/repos/ne-api-gateway/overview.md)
 - [`copilot/companies/ots/repos/ne-import-shipment-api/features/cargo-release.md`](../../../companies/ots/repos/ne-import-shipment-api/features/cargo-release.md)
 - [`copilot/companies/ots/repos/ne-import-shipment-api/overview.md`](../../../companies/ots/repos/ne-import-shipment-api/overview.md)
+- [`copilot/companies/ots/repos/ne-manage-shipment-frontend/features/container-plus-vas-tooltip.md`](../../../companies/ots/repos/ne-manage-shipment-frontend/features/container-plus-vas-tooltip.md)
 - [`copilot/companies/ots/repos/ne-manage-shipment-frontend/features/container-plus-vas.md`](../../../companies/ots/repos/ne-manage-shipment-frontend/features/container-plus-vas.md)
 - [`copilot/companies/ots/repos/ne-manage-shipment-frontend/overview.md`](../../../companies/ots/repos/ne-manage-shipment-frontend/overview.md)
 - [`copilot/companies/ots/repos/ne-shipment-api/features/container-plus-vas.md`](../../../companies/ots/repos/ne-shipment-api/features/container-plus-vas.md)

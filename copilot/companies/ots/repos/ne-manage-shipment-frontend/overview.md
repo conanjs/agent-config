@@ -49,6 +49,7 @@ src/
 
 - Cargo Release — this repo's own UI-side feature isn't documented as a feature doc yet; see `{{AGENT_HOME}}/companies/ots/repos/ne-import-shipment-api/features/cargo-release.md` for the owning repo's version in the meantime.
 - [Container+ VAS Card](features/container-plus-vas.md)
+- [Container+ VAS Tooltip (Product Fruits tour)](features/container-plus-vas-tooltip.md)
 
 ## External Integrations
 
