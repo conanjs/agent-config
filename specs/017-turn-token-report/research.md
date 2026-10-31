@@ -45,6 +45,7 @@
 - `gpt-5.5` has no row on the Codex pricing page, so it is reported as unpriced.
 - Real logs showed a turn count of 64 where 29 was right: the printed output of a local command (`<local-command-stdout>` after `/compact`) looked like a prompt, and a command with no reply after it counted as a turn. TT-2 now leaves both out (two scenarios added first).
 - The first CI run failed although every local check passed: `.gitignore` ignores `*.jsonl` (session logs must never be committed), so the fixture logs were never committed, and the local run read them from the working tree. `.gitignore` now re-includes `tests/*/fixtures/**/*.jsonl`; the CI run on GitHub is the check that sees what was really committed.
+- `codex exec` waits for more input on stdin when stdin is not a terminal ("Reading additional input from stdin..."): a scripted run needs `< /dev/null`.
 - Editing `~/.claude/settings.json` stays the user's step, as for the tracker (specs/015): the seed `claude/settings.json` carries the hook and the status line for new machines.
 
 ## Verification
@@ -59,3 +60,4 @@
 | Speed | The hook on a 14,899-line transcript | 0.3 s |
 | Launcher | `turn-tokens-hook.sh` with `env -i PATH=/usr/bin:/bin`, and with no Node to be found | Found nvm's Node and printed valid JSON; with no Node it prints `{}` |
 | Status line | The `statusLine` command from the seed on a status-line payload | "5h 12% · week 30% · context 46%", and the hook then showed the limits "from the status line" |
+| Live Codex turn (2026-10-31) | A plain `codex exec` (Codex 0.164.0-alpha in the ChatGPT app) in agent-config, with the `Stop` hook trusted by V in `/hooks` | The hook wrote `~/.codex/turn-tokens/<thread>.jsonl`: 2 calls, new input 19,792, cache read 19,328, output 49, which equals the turn's own `turn.completed` usage (input 39,120 of which cached 19,328); tools `exec`; 5-hour 6% and weekly 5% used; not pending |

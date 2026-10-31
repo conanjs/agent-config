@@ -25,7 +25,7 @@ Work this repo still owes, carried from one session to the next. Format and tool
 
 ### T-8 Build the per-turn token report for Claude Code and Codex
 - status: waiting
-- next: Merge hooks.Stop and statusLine from claude/settings.json into ~/.claude/settings.json (back it up first); trust the new Codex Stop hook in /hooks; confirm a report after one turn in each tool (SETUP.md step 12)
+- next: Both Stop hooks are live (Claude Code and Codex, confirmed 2026-10-31). Left: check whether a new Claude Code session (desktop or terminal) runs the status line, since none ran in the session where it was added, so Claude Code limits show as unknown
 - waiting-on: V
 - from: 2026-10-31
 - updated: 2026-10-31
