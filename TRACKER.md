@@ -25,9 +25,17 @@ Work this repo still owes, carried from one session to the next. Format and tool
 
 ### T-5 Turn on the tracker reminder in Codex
 - status: waiting
-- next: Link codex/hooks.json to ~/.codex/hooks.json (or rerun the installer), trust the hook in Codex /hooks, then start a Codex session in agent-config and check the open items appear
-- waiting-on: V
+- next: Run /Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex in agent-config, type /hooks, review and trust the SessionStart hook; then ask the agent to verify with a plain codex exec
+- waiting-on: V: trust the hook in Codex /hooks
 - from: 2026-10-31 · specs/015 T010
+- updated: 2026-10-31
+- note: ~/.codex/hooks.json linked 2026-10-31; untrusted it is skipped (model got NONE)
+
+### T-6 Fix the 12 Codex agent role files: Codex ignores them as malformed TOML
+- status: open
+- priority: high
+- next: Write %USERPROFILE%\.copilot without an invalid escape (use a ''' literal string), add a scenario that parses every codex/agents/*.toml, then confirm codex exec shows no 'malformed agent role' warning
+- from: 2026-10-31 · codex exec 2026-10-31
 
 ## Done
 

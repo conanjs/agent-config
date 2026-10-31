@@ -104,6 +104,7 @@ A hook at session start can put state in front of the model before the first pro
   - plain stdout or `hookSpecificOutput.additionalContext` becomes developer context, and `systemMessage` is shown as a warning ✅[^codex_hooks];
   - hooks load from `~/.codex/hooks.json` among other places ✅[^codex_hooks];
   - a non-managed hook runs only after the user reviews and trusts it in `/hooks` ✅[^codex_hooks].
+  - **tested 2026-10-31** (Codex CLI 0.164.0-alpha bundled in the ChatGPT desktop app): with the hook linked but not trusted, `codex exec` skipped it without printing any warning, and the model reported no tracker items. Claude Code's auto mode refused the documented one-off flag `--dangerously-bypass-hook-trust` as a safety bypass, so trusting the hook stays the user's review.
 
 **Tested 2026-10-30** with this repo's tracker (`copilot/tracker/`, `specs/015-tracker/`):
 - **Minimal `PATH`.** A hook may start without the login shell's `PATH`. Its launcher found nvm's Node under `env -i PATH=/usr/bin:/bin`, and both outputs were valid JSON.
