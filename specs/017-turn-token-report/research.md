@@ -44,6 +44,7 @@
 - Codex model slugs seen in rollouts: `gpt-6-astra`, `gpt-6.1-sol`, `gpt-5.5`. The other price rows use the display name lowercased with hyphens (`gpt-6.1-terra`), which is not confirmed; an unknown model is named in the report instead of priced.
 - `gpt-5.5` has no row on the Codex pricing page, so it is reported as unpriced.
 - Real logs showed a turn count of 64 where 29 was right: the printed output of a local command (`<local-command-stdout>` after `/compact`) looked like a prompt, and a command with no reply after it counted as a turn. TT-2 now leaves both out (two scenarios added first).
+- The first CI run failed although every local check passed: `.gitignore` ignores `*.jsonl` (session logs must never be committed), so the fixture logs were never committed, and the local run read them from the working tree. `.gitignore` now re-includes `tests/*/fixtures/**/*.jsonl`; the CI run on GitHub is the check that sees what was really committed.
 - Editing `~/.claude/settings.json` stays the user's step, as for the tracker (specs/015): the seed `claude/settings.json` carries the hook and the status line for new machines.
 
 ## Verification

@@ -1,0 +1,6 @@
+{"timestamp":"2026-10-31T09:11:00.000Z","type":"session_meta","payload":{"id":"c1","session_id":"t1","thread_source":"subagent","source":{"subagent":{"thread_spawn":{"parent_thread_id":"t1","depth":1}}}}}
+{"timestamp":"2026-10-31T09:11:00.100Z","type":"turn_context","payload":{"turn_id":"c-turn","model":"gpt-6-luna","effort":"low"}}
+{"timestamp":"2026-10-31T09:11:01.000Z","type":"response_item","payload":{"type":"custom_tool_call","name":"exec","call_id":"d1","input":"grep x"}}
+{"timestamp":"2026-10-31T09:11:05.000Z","type":"token_usage_record","payload":{"thread_id":"c1","turn_id":"c-turn","response_id":"r6","usage":{"input_tokens":4000,"cached_input_tokens":2000,"cache_write_input_tokens":0,"output_tokens":100,"reasoning_output_tokens":0,"total_tokens":4100}}}
+{"timestamp":"2026-10-31T09:11:09.000Z","type":"response_item","payload":{"type":"message","role":"assistant","phase":"final_answer","content":[{"type":"output_text","text":"done"}]}}
+{"timestamp":"2026-10-31T09:11:10.000Z","type":"token_usage_record","payload":{"thread_id":"c1","turn_id":"c-turn","response_id":"r7","usage":{"input_tokens":5000,"cached_input_tokens":4000,"cache_write_input_tokens":0,"output_tokens":60,"reasoning_output_tokens":0,"total_tokens":5060}}}
