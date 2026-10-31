@@ -1,7 +1,7 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-10-30
+last-updated: 2026-10-31
 ---
 
 # Global knowledge
@@ -32,7 +32,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [dead-code/](dead-code/) | *legacy* — dead-code detection rules | 1 |
 | [documentation/](documentation/index.md) | Learning Explanation Framework, team doc conventions, and format guides (Markdown, HTML, Word, PDF, Excel) | 1 how-to + 7 legacy |
 | [gcp/](gcp/) | *legacy* — GKE and GCP notes | 2 |
-| [git/](git/) | *legacy* — multi-account SSH, shallow clones with SonarQube | 2 |
+| [git/](git/index.md) | Merging stacked pull requests; *legacy:* multi-account SSH, shallow clones with SonarQube | 1 how-to + 2 legacy |
 | [github-copilot/](github-copilot/) | *legacy* — Copilot CLI internals and setup | 2 |
 | [grpc/](grpc/) | *legacy* — stale-connection keepalive deep dive (a candidate synthesis source) | 1 |
 | [nodejs/](nodejs/) | *legacy* — nvm, corepack, pnpm and yarn architecture | 1 |
