@@ -4,14 +4,6 @@ Work this repo still owes, carried from one session to the next. Format and tool
 
 ## Open
 
-### T-1 Merge the stacked PRs #1, #2 and #3 into main
-- status: waiting
-- priority: high
-- next: Update PR #3's title and description, then merge #1, #2 and #3 in that order with merge commits, deleting each branch so GitHub retargets the next
-- waiting-on: V's approval
-- done-when: merged feat/mod-11-and-coordinator into main
-- from: 2026-10-30 · PR #3
-
 ### T-2 Decide on the stashed ChatGPT draft (Evidence-backed agent build checks)
 - status: waiting
 - next: Review it with review-docs.procedure.md and commit it, or drop the stash
@@ -38,3 +30,12 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - from: 2026-10-31 · specs/015 T010
 
 ## Done
+
+### T-1 Merge the stacked PRs #1, #2 and #3 into main
+- status: done
+- priority: high
+- next: Update PR #3's title and description, then merge #1, #2 and #3 in that order with merge commits, deleting each branch so GitHub retargets the next
+- waiting-on: V's approval
+- done-when: merged feat/mod-11-and-coordinator into main
+- from: 2026-10-30 · PR #3
+- closed: 2026-10-31 · PRs #1 0c2b6aa, #2 084aad3, #3 051b76b
