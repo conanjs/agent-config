@@ -23,7 +23,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (53 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (17 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
-  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (123 files)
+  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (125 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (90 files)
   - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (13 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)

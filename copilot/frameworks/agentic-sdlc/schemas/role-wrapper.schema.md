@@ -38,6 +38,7 @@ Never launch other agents.
 - `name` = `sdlc-<role-id>`, and `<role-id>` exists in `conventions.md` §1.
 - `description` is one sentence about what the role owns, plus "Launched by the agentic-sdlc Orchestrator, or invoked directly for standalone review/execute."
 - No rule text, no tool names, no paths other than the two above.
+- **Codex (`.toml`): write `developer_instructions` as a `'''` literal string.** In a basic string (`"…"` or `"""…"""`), a backslash starts an escape, and TOML reserves every escape it does not list. So `%USERPROFILE%\.copilot` there makes the file invalid, and Codex ignores it with only a warning. This happened to all 12 Codex wrappers until 2026-10-31. Checked by WRAP for every file in `codex/agents/`, not only the sdlc ones ([TOML 1.0: String](https://github.com/toml-lang/toml/blob/1.0.0/toml.md)).
 - Claude's `skills:` names only the role's preset skill. Stack and paradigm skills are named in the launch prompt, because they vary per task.
 
 ## Example
