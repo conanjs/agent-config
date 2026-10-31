@@ -23,15 +23,16 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: For each PR-4 warning in check-docs.sh, read the tool's current docs and record version and last-verified
 - from: 2026-10-30 · check-docs.sh warnings
 
+## Done
+
 ### T-5 Turn on the tracker reminder in Codex
-- status: waiting
+- status: done
 - next: In Codex /hooks, turn the tracker SessionStart hook on (it is trusted but enabled = false); then ask the agent to verify with a plain codex exec
 - waiting-on: V: switch the hook on in Codex /hooks
 - from: 2026-10-31 · specs/015 T010
 - updated: 2026-10-31
+- closed: 2026-10-31 · codex exec 2026-10-31: hook ran, model listed T-2, T-5, T-3, T-4
 - note: ~/.codex/hooks.json linked 2026-10-31; untrusted it is skipped (model got NONE)
-
-## Done
 
 ### T-6 Fix the 12 Codex agent role files: Codex ignores them as malformed TOML
 - status: done
