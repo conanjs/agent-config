@@ -28,6 +28,8 @@ Where: `tests/*/{*.feature,tool.mjs}` · Schema: — · Index: — · Checked by
 - [`tests/installers/tool.mjs`](../../../../tests/installers/tool.mjs)
 - [`tests/tracker/tool.mjs`](../../../../tests/tracker/tool.mjs)
 - [`tests/tracker/tracker.feature`](../../../../tests/tracker/tracker.feature)
+- [`tests/turn-tokens/tool.mjs`](../../../../tests/turn-tokens/tool.mjs)
+- [`tests/turn-tokens/turn-tokens.feature`](../../../../tests/turn-tokens/turn-tokens.feature)
 - [`tests/validate-foundry/tool.mjs`](../../../../tests/validate-foundry/tool.mjs)
 - [`tests/validate-foundry/validate-foundry.feature`](../../../../tests/validate-foundry/validate-foundry.feature)
 - [`tests/validate-knowledge/tool.mjs`](../../../../tests/validate-knowledge/tool.mjs)

@@ -22,6 +22,7 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [014](014-nested-tsconfig-and-shared-names/) | `--explain`: nearest `tsconfig.json` with `extends`; shared names go to the nearest file, ties marked; one-word names as Markdown code | Done | none |
 | [015](015-tracker/) | The tracker: `TRACKER.md` per repo (`tracker/v1`), `tracker.mjs` (check, brief, add/update/close/drop, done-when checks), session-start hooks for Claude Code and Copilot CLI | Done | none |
 | [016](016-codex-agent-toml/) | Codex agent wrappers parse as TOML (`'''` literal strings); WRAP checks the escapes of every `codex/agents/*.toml` | Done | none |
+| [017](017-turn-token-report/) | The turn token report: `turn-tokens/v1` (TT-1 … TT-12), `turn-tokens.mjs` as the `Stop` hook of Claude Code and Codex, a status-line mode for Claude Code's limits, history in each tool's own folder | Done (the hooks on this machine wait on V: T-8) | none |
 
 ## Open findings, by kind
 

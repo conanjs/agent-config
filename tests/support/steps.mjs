@@ -41,6 +41,12 @@ Given(/^in "([^"]+)", `(.+?)` becomes `(.*)`$/, function (file, from, to) {
   fs.writeFileSync(this.at(file), text.replace(unescape(from), fill(this, unescape(to))));
 });
 
+// A change made while the next tool run is under way, after the given delay (a file another process writes late).
+Given(/^(\d+) ms after the tool starts, in "([^"]+)", `(.+?)` becomes `(.*)`$/, function (ms, file, from, to) {
+  assert.ok(fs.readFileSync(this.at(file), 'utf8').includes(unescape(from)), `"${file}" does not contain \`${from}\``);
+  (this.whileRunning ??= []).push({ ms: Number(ms), file, from: unescape(from), to: fill(this, unescape(to)) });
+});
+
 Given(/^(\d+) lines are appended to "([^"]+)"$/, function (n, file) {
   fs.appendFileSync(this.at(file), 'x\n'.repeat(Number(n)));
 });
@@ -155,6 +161,11 @@ function run(world, extra, input) {
       resolve();
     });
     if (input !== undefined) child.stdin.end(input);
+    // Changes a scenario makes while the tool runs ("<n> ms after the tool starts, …"), e.g. a log line written late.
+    for (const c of world.whileRunning ?? []) {
+      setTimeout(() => fs.writeFileSync(world.at(c.file), fs.readFileSync(world.at(c.file), 'utf8').replace(c.from, c.to)), c.ms);
+    }
+    world.whileRunning = [];
   });
 }
 
@@ -260,4 +271,14 @@ Then('the output has the line {string}', function (line) {
 
 Then('the output has no line {string}', function (line) {
   assert.ok(!this.result.out.split('\n').includes(line), `output line "${line}" in:\n${this.result.out}`);
+});
+
+Then('the first output line ends with {string}', function (end) {
+  const first = this.result.out.split('\n')[0];
+  assert.ok(first.endsWith(end), `the first output line does not end with "${end}":\n${first}`);
+});
+
+Then('the file {string} has a line containing {string}', function (p, text) {
+  const hit = fs.readFileSync(this.at(p), 'utf8').split('\n').find((l) => l.includes(fill(this, text)));
+  assert.ok(hit, `${p} has no line containing "${text}"`);
 });

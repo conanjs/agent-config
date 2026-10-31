@@ -23,7 +23,21 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: For each PR-4 warning in check-docs.sh, read the tool's current docs and record version and last-verified
 - from: 2026-10-30 · check-docs.sh warnings
 
+### T-8 Build the per-turn token report for Claude Code and Codex
+- status: waiting
+- next: Merge hooks.Stop and statusLine from claude/settings.json into ~/.claude/settings.json (back it up first); trust the new Codex Stop hook in /hooks; confirm a report after one turn in each tool (SETUP.md step 12)
+- waiting-on: V
+- from: 2026-10-31
+- updated: 2026-10-31
+
 ## Done
+
+### T-7 Commit the token docs and the No Shorthand In Answers pattern
+- status: done
+- next: Review the diff on docs/agent-token-accounting, then commit: one commit for the five knowledge docs, one for the pattern and instruction lines
+- waiting-on: V
+- from: 2026-10-31
+- closed: 2026-10-31
 
 ### T-5 Turn on the tracker reminder in Codex
 - status: done

@@ -104,6 +104,9 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/015-tracker/tasks.md`](../../../../specs/015-tracker/tasks.md)
 - [`specs/016-codex-agent-toml/spec.md`](../../../../specs/016-codex-agent-toml/spec.md)
 - [`specs/016-codex-agent-toml/tasks.md`](../../../../specs/016-codex-agent-toml/tasks.md)
+- [`specs/017-turn-token-report/research.md`](../../../../specs/017-turn-token-report/research.md)
+- [`specs/017-turn-token-report/spec.md`](../../../../specs/017-turn-token-report/spec.md)
+- [`specs/017-turn-token-report/tasks.md`](../../../../specs/017-turn-token-report/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)

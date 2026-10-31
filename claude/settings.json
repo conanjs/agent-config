@@ -17,6 +17,21 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/hooks/turn-tokens/turn-tokens-hook.sh\" --hook claude",
+            "timeout": 15
+          }
+        ]
+      }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "\"$HOME/.copilot/hooks/turn-tokens/turn-tokens-hook.sh\" --statusline"
   }
 }

@@ -12,6 +12,18 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/hooks/turn-tokens/turn-tokens-hook.sh\" --hook codex",
+            "commandWindows": "node \"%USERPROFILE%\\.copilot\\hooks\\turn-tokens\\turn-tokens.mjs\" --hook codex",
+            "timeout": 15
+          }
+        ]
+      }
     ]
   }
 }
