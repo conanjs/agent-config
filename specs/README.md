@@ -21,6 +21,7 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [013](013-cross-repo-and-name-references/) | `--explain` across repos (web links, installed form, `cites`), names without a path, TypeScript `.js` imports and `paths` aliases; ref-listed repos read at their ref | Done | none |
 | [014](014-nested-tsconfig-and-shared-names/) | `--explain`: nearest `tsconfig.json` with `extends`; shared names go to the nearest file, ties marked; one-word names as Markdown code | Done | none |
 | [015](015-tracker/) | The tracker: `TRACKER.md` per repo (`tracker/v1`), `tracker.mjs` (check, brief, add/update/close/drop, done-when checks), session-start hooks for Claude Code and Copilot CLI | Done | none |
+| [016](016-codex-agent-toml/) | Codex agent wrappers parse as TOML (`'''` literal strings); WRAP checks the escapes of every `codex/agents/*.toml` | Done | none |
 
 ## Open findings, by kind
 

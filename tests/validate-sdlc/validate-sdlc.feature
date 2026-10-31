@@ -1054,6 +1054,54 @@ Feature: Agentic SDLC framework validator
         WRAP  missing wrapper codex/agents/sdlc-engineering.toml
       """
 
+  Scenario: WRAP a Codex wrapper with an invalid TOML escape fails, because Codex then ignores the file
+    Given in "repo/codex/agents/sdlc-engineering.toml", `engineering.md and follow it.` becomes `engineering.md (on Windows ~/.copilot is %USERPROFILE%\.copilot) and follow it.`
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        WRAP  codex/agents/sdlc-engineering.toml: line 4: "\." is not a TOML escape, so Codex ignores this file (put Windows paths in a '''…''' string)
+      """
+
+  Scenario: WRAP checks the TOML of every Codex wrapper, not only the sdlc ones
+    Given the file "repo/codex/agents/foundry-helper.toml" contains:
+      ```
+      name = "foundry-helper"
+      description = "A helper."
+      developer_instructions = """
+      See C:\Users\me\notes.
+      """
+      ```
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        WRAP  codex/agents/foundry-helper.toml: line 4: "\U" is not a TOML escape, so Codex ignores this file (put Windows paths in a '''…''' string)
+      """
+
+  Scenario: WRAP a Windows path in a literal string, and valid escapes in a basic string, pass
+    Given the file "repo/codex/agents/sdlc-engineering.toml" contains:
+      ```
+      name = "sdlc-engineering"
+      description = "Engineering role."
+      developer_instructions = '''
+      Read ~/.copilot/frameworks/agentic-sdlc/agents/engineering.md (on Windows ~/.copilot is "%USERPROFILE%\.copilot") and follow it.
+      Otherwise you were invoked directly: follow the role's "Standalone use" section.
+      Never launch other agents.
+      '''
+      ```
+    And the file "repo/codex/agents/foundry-helper.toml" contains:
+      ```
+      name = "foundry-helper"
+      description = "Tab\there, a quote \" and a backslash \\ and \u00e9, \U0001F600, \x41 and \e."
+      developer_instructions = """
+      One line \
+        continued, then C:\\Users\\me.
+      """
+      ```
+    When the tool runs
+    Then it passes with no warnings
+
   Scenario: WRAP a wrapper with another name fails
     Given in "repo/copilot/agents/sdlc-engineering.agent.md", `name: sdlc-engineering` becomes `name: engineering`
     When the tool runs

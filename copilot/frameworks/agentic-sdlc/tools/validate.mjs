@@ -512,6 +512,13 @@ if (repo) {
     const want = presets.get(r.id) || [];
     if (listed.join('\n') !== want.join('\n')) fail('SKILL', `skills/sdlc-${r.id}-preset: list [${listed.join(', ')}] ≠ agents/${r.id}.md Preset [${want.join(', ')}]`);
   }
+  // Every Codex wrapper must parse as TOML, or Codex silently ignores it: in a basic string ("…" or """…"""), a
+  // backslash starts an escape, so `%USERPROFILE%\.copilot` there is an error. Literal strings ('…', '''…''') are left alone.
+  const codexDir = path.join(repo, 'codex', 'agents');
+  if (exists(codexDir)) for (const f of fs.readdirSync(codexDir).filter((x) => x.endsWith('.toml')).sort()) {
+    const bad = tomlEscapeError(read(path.join(codexDir, f)));
+    if (bad) fail('WRAP', `codex/agents/${f}: line ${bad.line}: "\\${bad.char}" is not a TOML escape, so Codex ignores this file (put Windows paths in a '''…''' string)`);
+  }
   for (const s of stackIds) if (!exists(path.join(repo, 'skills', `sdlc-stack-${s}`, 'SKILL.md'))) fail('SKILL', `missing skills/sdlc-stack-${s}/SKILL.md`);
   for (const p of paradigmIds) if (!exists(path.join(repo, 'skills', `sdlc-paradigm-${p}`, 'SKILL.md'))) fail('SKILL', `missing skills/sdlc-paradigm-${p}/SKILL.md`);
   for (const d of fs.readdirSync(path.join(repo, 'skills'))) {
@@ -520,6 +527,25 @@ if (repo) {
     if (/^sdlc-binding-|^sdlc-engineering-principles$/.test(d)) fail('SKILL', `skills/${d} is a v1 skill; remove it`);
   }
 } else warn('WRAP', 'agent-config repo not found; wrapper and skill checks skipped (pass --repo <path>)');
+
+// The first invalid escape in a TOML document's basic strings (TOML 1.0 escapes plus 1.1's \e and \xHH; in a
+// multi-line string also a backslash that ends the line), or null.
+function tomlEscapeError(text) {
+  const strings = /'''[\s\S]*?'''|'[^'\n]*'|"""([\s\S]*?)"""|"((?:[^"\\\n]|\\.)*)"/g;
+  for (const m of text.matchAll(strings)) {
+    const body = m[1] ?? m[2]; if (body === undefined) continue;
+    const at = m.index + m[0].indexOf(body);
+    for (let i = 0; i < body.length; i++) {
+      if (body[i] !== '\\') continue;
+      const c = body[i + 1] ?? ''; const hex = (n) => new RegExp(`^[0-9A-Fa-f]{${n}}$`).test(body.slice(i + 2, i + 2 + n));
+      const lineEnd = m[1] !== undefined && /^[ \t]*\r?\n/.test(body.slice(i + 1));
+      if ('btnfr"\\e'.includes(c) && c !== '') { i++; continue; }
+      if ((c === 'u' && hex(4)) || (c === 'U' && hex(8)) || (c === 'x' && hex(2)) || lineEnd) { i++; continue; }
+      return { line: text.slice(0, at + i).split('\n').length, char: c };
+    }
+  }
+  return null;
+}
 
 // ---- reference pins vs upstream (--upstream) ----------------------------------------------------
 if (upstream) {
