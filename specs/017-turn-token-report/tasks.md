@@ -7,4 +7,4 @@
 - [x] T005 `turn-tokens-hook.sh`; `Stop` hook in `codex/hooks.json`; `Stop` hook and `statusLine` in the seed `claude/settings.json`; atlas area and kinds; `SETUP.md`; `README.md`; `measure-agent-tokens.md`
 - [x] T006 Sabotage: break each TT rule and see a scenario fail (46 of 46 caught)
 - [x] T007 Run on this machine's real logs and compare with each tool's own counter (SC-003)
-- [ ] T008 V: merge the `Stop` hook and `statusLine` into `~/.claude/settings.json`; trust the Codex `Stop` hook in `/hooks`; confirm a report after a turn in each tool
+- [ ] T008 V: merge the `Stop` hook and `statusLine` into `~/.claude/settings.json`; trust the Codex `Stop` hook in `/hooks`; confirm a report after a turn in each tool (Claude Code `Stop` and Codex `Stop` confirmed 2026-10-31; the Claude Code status line not seen running yet)
