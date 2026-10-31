@@ -19,6 +19,7 @@ Where: `copilot/patterns/*.md` Â· Schema: `copilot/patterns/pattern.schema.md` Â
 - [`copilot/patterns/index.md`](../../../patterns/index.md)
 - [`copilot/patterns/layered-guards.pattern.md`](../../../patterns/layered-guards.pattern.md)
 - [`copilot/patterns/maintained-variant.pattern.md`](../../../patterns/maintained-variant.pattern.md)
+- [`copilot/patterns/no-shorthand-answers.pattern.md`](../../../patterns/no-shorthand-answers.pattern.md)
 - [`copilot/patterns/pattern.schema.md`](../../../patterns/pattern.schema.md)
 - [`copilot/patterns/pin-before-you-change.pattern.md`](../../../patterns/pin-before-you-change.pattern.md)
 - [`copilot/patterns/revise-without-erasing.pattern.md`](../../../patterns/revise-without-erasing.pattern.md)

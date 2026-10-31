@@ -82,7 +82,7 @@ Where: `copilot/prompts/*.prompt.md` · Schema: — · Index: `README.md` · Che
 
 <a id="tool-settings"></a>Claude Code and Codex entry files, Claude settings and plugin blocklist, Copilot hooks
 
-Where: `{claude/{CLAUDE.md,settings.json,plugins/**},codex/{AGENTS.md,hooks.json},copilot/hooks/**}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: `~/.claude, ~/.codex, ~/.copilot/hooks`
+Where: `{claude/{CLAUDE.md,settings.json,plugins/**},codex/{AGENTS.md,hooks.json},copilot/hooks/{*.json,scripts/**}}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: `~/.claude, ~/.codex, ~/.copilot/hooks`
 
 - [`claude/CLAUDE.md`](../../../../claude/CLAUDE.md)
 - [`claude/plugins/blocklist.json`](../../../../claude/plugins/blocklist.json)
