@@ -145,6 +145,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - `/usage`, the status line and OpenTelemetry costs are client-side estimates at list price unless `modelPricing` is set; the Claude Console or the org analytics page is the bill ✅[^1].
 - The transcript format is not documented and changes between versions; read token totals from `cost-state`, `/usage` or OpenTelemetry when they must match Claude Code, and use the transcript for per-request detail (see `measure-agent-tokens.md`).
 - On subscriptions, `rate_limits` in the status line appears only after the first response, and each window can be absent ✅[^3].
+- The Claude desktop app (Code tab, Claude Code 2.1.308) does not run the `statusLine` command: in a new desktop session started with `statusLine` already in `~/.claude/settings.json`, the command never ran, while the `Stop` hook in the same file did. So status-line data, `rate_limits` included, comes only from a terminal session; in the desktop app, `/usage` shows the plan limits ✅[^16].
 
 ## Takeaways
 - For a team dashboard, use OpenTelemetry (`claude_code.token.usage`, `claude_code.api_request`); for one session, `/usage`; for a script, `--output-format json` with `--max-budget-usd`.
@@ -155,7 +156,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 78 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-31
+- Verified: 79 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-31
 
 ## References
 - [Manage costs effectively](https://code.claude.com/docs/en/costs) — Anthropic, living. Backs: `/usage`, `/insights`, levers, background usage, agent team costs, `modelPricing`. [^1]
@@ -173,6 +174,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - [Environment variables](https://code.claude.com/docs/en/env-vars) — Anthropic, living. Backs: `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`. [^13]
 - [Hooks reference](https://code.claude.com/docs/en/hooks) — Anthropic, living. Backs: `Stop`, `SubagentStop`, `systemMessage`, and the timing warning. [^15]
 - `~/.claude/projects/*/*.jsonl` — local test, 2026-10-30, Claude Code 2.1.278 and 2.1.308: transcript layout, `cost-state`, `compact_boundary`, placeholder outputs; `claude --version` on `PATH` printed 2.1.129. [^14]
+- `~/.claude/turn-tokens/` — local test, 2026-10-31, Claude desktop app with Claude Code 2.1.308: a new session wrote its `Stop`-hook report there but no status-line file. [^16]
 
 ## Related
 - `ai-agents/agent-token-accounting.md`

@@ -74,6 +74,7 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 
 - The report is a lower bound for Claude Code: compaction summaries, session titles and prompt suggestions are model calls that never reach the transcript (`copilot/knowledge/ai-agents/agent-token-accounting.md`, Edge cases).
 - Prices change. `prices.mjs` names the pages and the date it was read; update both together.
+- Claude Code's limits reach the report only from a terminal session: the Claude desktop app does not run the `statusLine` command (tested 2026-10-31, Claude Code 2.1.308), so a desktop report says the limits are unknown; `/usage` shows them there.
 
 ## Checks
 
