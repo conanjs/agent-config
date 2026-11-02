@@ -93,3 +93,4 @@ Where: `{claude/{CLAUDE.md,settings.json,plugins/**},codex/{AGENTS.md,hooks.json
 - [`copilot/hooks/scripts/desktop-notify.js`](../../../hooks/scripts/desktop-notify.js)
 - [`copilot/hooks/scripts/lib/utils.js`](../../../hooks/scripts/lib/utils.js)
 - [`copilot/hooks/tracker.json`](../../../hooks/tracker.json)
+- [`copilot/hooks/turn-tokens.json`](../../../hooks/turn-tokens.json)

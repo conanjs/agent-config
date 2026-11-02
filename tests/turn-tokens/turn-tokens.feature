@@ -303,6 +303,103 @@ Feature: The turn token report shows what each turn used and the running total (
       """
     Then the file "codex-home/turn-tokens/t1.jsonl" has a line containing "\"tool\":\"codex\",\"session\":\"t1\",\"turn\":2,\"pending\":false,\"unit\":\"credits\",\"contextWindow\":258400"
 
+  # ---- GitHub Copilot (specs/018) ---------------------------------------------------------------------
+
+  Scenario: TT-13 TT-14 TT-15 TT-16 a Copilot turn: its usage records, its tools, AI credits and the monthly allowance
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then it exits with 0 and prints:
+      """
+      Turn 2 · 3 calls · peak context 15,000 of 968,000 (2%) · new input 30 · cache write 4,970 · cache read 36,000 · output 900 · ≈ 6.73 AI credits ($0.067)
+        tools: bash ×2, view
+      Session · 4 calls · new input 40 · cache write 14,960 · cache read 36,000 · output 1,000 · ≈ 11.73 AI credits ($0.117)
+      Limits · monthly 3% used (1,920 of 60,000), resets 1 Dec 00:00
+      """
+
+  Scenario: TT-1 the Copilot report is progress lines for the timeline, then an empty decision
+    When the tool runs with "--hook copilot" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then it exits with 0 and prints:
+      """
+      {"type":"progress","message":"Turn 2 · 3 calls · peak context 15,000 of 968,000 (2%) · new input 30 · cache write 4,970 · cache read 36,000 · output 900 · ≈ 6.73 AI credits ($0.067)"}
+      {"type":"progress","message":"  tools: bash ×2, view"}
+      {"type":"progress","message":"Session · 4 calls · new input 40 · cache write 14,960 · cache read 36,000 · output 1,000 · ≈ 11.73 AI credits ($0.117)"}
+      {"type":"progress","message":"Limits · monthly 3% used (1,920 of 60,000), resets 1 Dec 00:00"}
+      {}
+      """
+
+  Scenario: TT-13 the VS Code payload names (session_id, transcript_path) work too
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"hook_event_name":"Stop","session_id":"g1","transcript_path":"{root}/copilot-home/session-state/g1/events.jsonl","stop_reason":"end_turn"}
+      """
+    Then the output has the line "Turn 2 · 3 calls · peak context 15,000 of 968,000 (2%) · new input 30 · cache write 4,970 · cache read 36,000 · output 900 · ≈ 6.73 AI credits ($0.067)"
+
+  Scenario: TT-13 the hook's transcriptPath is read even when the session id has no folder of its own
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"elsewhere","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl"}
+      """
+    Then the output has the line "Turn 2 · 3 calls · peak context 15,000 of 968,000 (2%) · new input 30 · cache write 4,970 · cache read 36,000 · output 900 · ≈ 6.73 AI credits ($0.067)"
+
+  Scenario: TT-14 tools of an earlier turn are not this turn's tools
+    Given in "copilot-home/session-state/g1/events.jsonl", `{"type":"assistant.turn_end","data":{},"timestamp":"2026-11-02T09:00:05.200Z"}` becomes `{"type":"tool.execution_start","data":{"toolCallId":"c9","toolName":"grep"},"timestamp":"2026-11-02T09:00:05.150Z"}\n{"type":"assistant.turn_end","data":{},"timestamp":"2026-11-02T09:00:05.200Z"}`
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl"}
+      """
+    Then the output has the line "  tools: bash ×2, view"
+
+  Scenario: TT-13 without a transcript path the log is found by session id in Copilot's folder
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1"}
+      """
+    Then the output has the line "Turn 2 · 3 calls · peak context 15,000 of 968,000 (2%) · new input 30 · cache write 4,970 · cache read 36,000 · output 900 · ≈ 6.73 AI credits ($0.067)"
+
+  Scenario: TT-4 a Copilot turn whose last message still asks for tools waits, then notes the gap
+    Given in "copilot-home/session-state/g1/events.jsonl", `"toolRequests":[]},"timestamp":"2026-11-02T09:10:20.100Z"` becomes `"toolRequests":[{"toolCallId":"c3","name":"bash"}]},"timestamp":"2026-11-02T09:10:20.100Z"`
+    When the tool runs with "--hook copilot --text --wait-ms 200" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then the output has the line "  note: the final reply was not in the log yet; the session total will include it in the next report"
+
+  Scenario: TT-15 a call without Copilot's own cost names its model as unpriced
+    Given in "copilot-home/session-state/g1/events.jsonl", `,"copilotUsage":{"tokenDetails":[],"totalNanoAiu":3000000000}` becomes ``
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then the first output line ends with "≈ 3.73 AI credits ($0.037) + unpriced: claude-opus-5.5"
+
+  Scenario: TT-16 an unlimited allowance is said so
+    Given in "copilot-home/session-state/g1/events.jsonl", `"isUnlimitedEntitlement":false` becomes `"isUnlimitedEntitlement":true`
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then the output has the line "Limits · monthly allowance unlimited"
+
+  Scenario: TT-16 without an allowance in the log the limits are unknown
+    Given in "copilot-home/session-state/g1/events.jsonl", `"quotaSnapshots"` becomes `"otherSnapshots"`
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then the output has the line "Limits · unknown: none in this session's log yet"
+
+  Scenario: TT-11 every Copilot report is appended to its history file in the Copilot folder
+    When the tool runs with "--hook copilot" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then the file "copilot-home/turn-tokens/g1.jsonl" has a line containing "\"tool\":\"copilot\",\"session\":\"g1\",\"turn\":2,\"pending\":false,\"unit\":\"ai-credits\",\"contextWindow\":968000"
+
   # ---- traceability -----------------------------------------------------------------------------------
 
   Scenario: Every TT rule is named by a scenario and is a row in the schema

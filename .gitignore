@@ -15,6 +15,7 @@ logs/
 *.jsonl
 # Except the made-up logs that tool scenarios read (specs/017: tests/turn-tokens/fixtures).
 !tests/*/fixtures/**/*.jsonl
+!tests/*/fixtures/**/session-state/
 
 # Install-time backups now live entirely outside the repo, at
 # ~/.agent-config-backups/ — nothing to ignore here for that anymore.

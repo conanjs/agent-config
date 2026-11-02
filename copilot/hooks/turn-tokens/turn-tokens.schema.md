@@ -1,11 +1,11 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-31
+last-updated: 2026-11-02
 ---
 
 # Schema: Turn token report (`turn-tokens/v1`)
 
-**Applies to:** the report `turn-tokens.mjs` shows after every turn of Claude Code or Codex, and the history file it appends to · **Written by:** the `Stop` hook of each tool · **Read by:** the person working, and anyone comparing runs
+**Applies to:** the report `turn-tokens.mjs` shows after every turn of Claude Code, Codex or GitHub Copilot (the CLI and the Copilot agent in VS Code), and the history file it appends to · **Written by:** the `Stop` hook of each tool · **Read by:** the person working, and anyone comparing runs
 
 After every turn, the report says what the turn used, what the session has used so far, and how much of the plan's 5-hour and weekly limits is gone. It reads the tool's own log file, so it needs no network and no account access.
 
@@ -35,6 +35,15 @@ Session · 5 calls · new input 14,000 · cache read 78,000 · output 1,160 · �
 Limits · 5-hour 15% used, resets 31 Oct 14:00 · weekly 2% used, resets 3 Nov 09:00
 ```
 
+GitHub Copilot (`--hook copilot`, added by specs/018):
+
+```text
+Turn 2 · 3 calls · peak context 15,000 of 968,000 (2%) · new input 30 · cache write 4,970 · cache read 36,000 · output 900 · ≈ 6.73 AI credits ($0.067)
+  tools: bash ×2, view
+Session · 4 calls · new input 40 · cache write 14,960 · cache read 36,000 · output 1,000 · ≈ 11.73 AI credits ($0.117)
+Limits · monthly 3% used (1,920 of 60,000), resets 1 Dec 00:00
+```
+
 | Word | Meaning |
 |---|---|
 | call | One request to the model and its reply |
@@ -44,10 +53,11 @@ Limits · 5-hour 15% used, resets 31 Oct 14:00 · weekly 2% used, resets 3 Nov 0
 | output | Text, tool calls and thinking or reasoning the model wrote |
 | at least | Some replies in the sum still carry a placeholder count, so the true number is higher |
 | ≈ $ / credits | An estimate from the price table, `prices.mjs`; not a bill |
+| AI credits | Copilot's own per-call cost (`copilotUsage.totalNanoAiu` ÷ 10⁹); 1 AI credit = $0.01 |
 
 ## The history record
 
-One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the tool's own folder (`$CLAUDE_CONFIG_DIR` or `~/.claude`; `$CODEX_HOME` or `~/.codex`):
+One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the tool's own folder (`$CLAUDE_CONFIG_DIR` or `~/.claude`; `$CODEX_HOME` or `~/.codex`; `$COPILOT_HOME` or `~/.copilot`):
 
 ```json
 {"schema":"turn-tokens/v1","at":"2026-10-31T09:20:00.000Z","tool":"claude","session":"s1","turn":2,"pending":false,"unit":"usd","contextWindow":null,"thisTurn":{"calls":3,"peakContext":23502,"newInput":10,"cacheWrite":3500,"cacheRead":65000,"output":1200,"outputAtLeast":false,"cost":0.03677,"unpriced":[],"tools":{"Bash":2,"Read":1}},"thisTurnSubagents":{…},"sessionTotal":{…},"sessionSubagents":{…},"limits":null}
@@ -57,18 +67,22 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 
 | Id | Rule | Holds when | Enforced by |
 |---|---|---|---|
-| TT-1 | Hook mode reads the hook's JSON from stdin, prints one JSON object `{"systemMessage": "<report>"}` (or the report as text with `--text`) and exits 0 every time; a payload that is not JSON, or a log that cannot be read, gives a one-line message instead of a report | the turn never fails because of the report | scenarios |
+| TT-1 | Hook mode reads the hook's JSON from stdin, prints one JSON object `{"systemMessage": "<report>"}` (for Copilot, whose `agentStop` output has no message field: one `{"type":"progress","message":…}` line per report line, then `{}`; or the report as text with `--text`) and exits 0 every time; a payload that is not JSON, or a log that cannot be read, gives a one-line message instead of a report | the turn never fails because of the report | scenarios |
 | TT-2 | A Claude Code turn is the main-transcript replies after the last prompt line (a `user` line that is not a tool result, not `isMeta`, not a compaction summary); each reply counts once (`message.id` + `requestId`); `<synthetic>` stubs are skipped. The printed output of a local command (`<local-command-…>`) is not a prompt. The turn number counts the prompt lines a reply follows, plus the last one | the turn matches what was asked | scenarios |
 | TT-3 | A Codex turn is the `token_usage_record` lines with the hook's `turn_id` (the last turn when none is given); its tools and model come from the lines after that turn's `turn_context`. The turn number is the count of distinct turns so far | — | scenarios |
-| TT-4 | When the turn's final reply is not yet in the log (Claude Code: the last reply has no final `stop_reason`; Codex: no `token_usage_record` after the turn's last assistant message), the tool reads again every 250 ms for up to 3 s (`TURN_TOKENS_WAIT_MS`); if it is still missing, the report adds a note | — | scenarios |
+| TT-4 | When the turn's final reply is not yet in the log (Claude Code: the last reply has no final `stop_reason`; Codex: no `token_usage_record` after the turn's last assistant message; Copilot: the turn's last `assistant.message` still has `toolRequests`, or there is none), the tool reads again every 250 ms for up to 3 s (`TURN_TOKENS_WAIT_MS`); if it is still missing, the report adds a note | — | scenarios |
 | TT-5 | Per call: Claude Code new input = `input_tokens`, cache write = `cache_creation_input_tokens`, cache read = `cache_read_input_tokens`, context = their sum; Codex new input = `input_tokens − cached_input_tokens`, cache read = `cached_input_tokens`, context = `input_tokens`. Output is `output_tokens` for both. Peak context is the largest context of the turn | sums match each tool's own counter | scenarios |
 | TT-6 | A Claude Code reply with no `stop_reason` carries a placeholder output; a sum that includes one is shown as "output at least N" | — | scenarios |
 | TT-7 | Subagents are counted apart from the main agent. Claude Code: replies in `<session>/subagents/*.jsonl`; Codex: child rollouts whose `session_meta.session_id` is the thread and `thread_source` is `subagent`. Those from the turn's start until the next turn's start count for the turn; all count for the session | — | scenarios |
 | TT-8 | Tools are the distinct tool-call names of the turn in order of first use, `×N` when used more than once. Claude Code: `tool_use` and `server_tool_use` blocks; Codex: `custom_tool_call` and `function_call` items, as `namespace.name` when there is a namespace | — | scenarios |
 | TT-9 | Claude Code cost is dollars at list price from `prices.mjs`: 5-minute and 1-hour cache writes priced apart, fast speed at fast prices with the cache multipliers on top, the Haiku 5.5 tier over 100,000 prompt tokens, and 1.1× for `inference_geo: "us"` where the model has it. Codex cost is credits at Standard rates, 2× when the service tier is `fast` or `priority`. A model without a price row is named after the amount ("+ unpriced: <model>"), or alone when no call has a price ("price unknown: <model>") | — | scenarios |
 | TT-10 | Limits: Codex from the latest `rate_limits` in the rollout (a 300-minute window is "5-hour", 10080 is "weekly", other windows "N-minute"); Claude Code from the status-line file of the session, else the newest one, with the time it was saved; without either, "unknown" | — | scenarios |
-| TT-11 | Every report is appended as one `turn-tokens/v1` JSON line to `turn-tokens/<session id>.jsonl` in the tool's own folder; the folder is created when missing | — | scenarios |
+| TT-11 | Every report is appended as one `turn-tokens/v1` JSON line to `turn-tokens/<session id>.jsonl` in the tool's own folder (`~/.claude`, `~/.codex`, `~/.copilot`); the folder is created when missing | — | scenarios |
 | TT-12 | `--statusline` reads Claude Code's status-line JSON from stdin, saves `rate_limits`, `context_window.context_window_size` and the time to `turn-tokens/statusline-<session id>.json`, and prints one line: the limits and the context use it has | — | scenarios |
+| TT-13 | A Copilot turn is the `session.usage_record` events after the last `user.message` of `events.jsonl` (the hook's `transcriptPath`/`transcript_path`, else `session-state/<session id>/events.jsonl` in Copilot's folder). Per call: context = `inputTokens`, cache read = `cacheReadTokens`, cache write = `cacheWriteTokens`, new input = the rest of `inputTokens`, output = `outputTokens`; the window is `maxPromptTokens`. The turn number is the count of `user.message` events | — | scenarios |
+| TT-14 | Copilot tools are the `toolName` of the turn's `tool.execution_start` events, in order of first use, `×N` when used more than once | — | scenarios |
+| TT-15 | Copilot cost is the sum of each call's `copilotUsage.totalNanoAiu` ÷ 10⁹, shown as AI credits with their dollar value (1 AI credit = $0.01); a call without `copilotUsage` names its model as unpriced | sums match Copilot's own `session.usage_checkpoint` | scenarios |
+| TT-16 | Copilot limits come from the latest `quotaSnapshots.premium_interactions` in the log: "monthly P% used (used of entitlement), resets <date>", "monthly allowance unlimited" when unlimited, "unknown" without one | — | scenarios |
 
 ## Lookup notes
 
@@ -80,7 +94,7 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 
 | Check | Tool |
 |---|---|
-| TT-1 … TT-12 | `tests/turn-tokens/turn-tokens.feature`, run by `scripts/check-docs.sh` |
+| TT-1 … TT-16 | `tests/turn-tokens/turn-tokens.feature`, run by `scripts/check-docs.sh` |
 
 ## References
 
@@ -91,6 +105,8 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 
 **External authoritative sources:**
 - [Hooks reference](https://code.claude.com/docs/en/hooks) and [Hooks](https://learn.chatgpt.com/docs/hooks) — the `Stop` hook input and output of each tool.
+- [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — `agentStop` input (`transcriptPath`), its output fields, and progress lines.
+- [Usage-based billing for individuals](https://docs.github.com/copilot/concepts/billing/usage-based-billing-for-individuals) — 1 AI credit = $0.01.
 - [Customize your status line](https://code.claude.com/docs/en/statusline) — the status-line fields TT-12 saves.
 - [Pricing](https://platform.claude.com/docs/en/about-claude/pricing) and [Pricing (Codex)](https://learn.chatgpt.com/docs/pricing) — the rates in `prices.mjs`.
 

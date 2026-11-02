@@ -23,6 +23,12 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: For each PR-4 warning in check-docs.sh, read the tool's current docs and record version and last-verified
 - from: 2026-10-30 · check-docs.sh warnings
 
+### T-9 Reload VS Code and confirm the Copilot token report there
+- status: waiting
+- next: Run Developer: Reload Window in VS Code, then end one Copilot turn: see whether the report's progress lines show in the chat, and that ~/.copilot/turn-tokens/ gets the session; record the answer in copilot-usage-reference.md
+- waiting-on: V
+- from: 2026-11-02
+
 ## Done
 
 ### T-8 Build the per-turn token report for Claude Code and Codex
