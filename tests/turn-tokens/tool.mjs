@@ -17,6 +17,7 @@ registerTool('turn-tokens', {
       TURN_TOKENS_NOW: '2026-10-31T09:20:00.000Z',
       CLAUDE_CONFIG_DIR: world.at('claude-home'),
       CODEX_HOME: world.at('codex-home'),
+      COPILOT_HOME: world.at('copilot-home'),
     },
   }),
   quietPass: '',

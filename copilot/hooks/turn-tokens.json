@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": "\"$HOME/.copilot/hooks/turn-tokens/turn-tokens-hook.sh\" --hook copilot",
+        "powershell": "node \"$env:USERPROFILE\\.copilot\\hooks\\turn-tokens\\turn-tokens.mjs\" --hook copilot",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}

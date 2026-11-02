@@ -2,7 +2,7 @@
 // turn-tokens.mjs — the turn token report (turn-tokens/v1: turn-tokens.schema.md, specs/017).
 //
 // Usage:
-//   turn-tokens.mjs --hook claude|codex [--text] [--wait-ms <n>]   the Stop hook: hook JSON on stdin, report out
+//   turn-tokens.mjs --hook claude|codex|copilot [--text] [--wait-ms <n>]   the end-of-turn hook: hook JSON on stdin, report out
 //   turn-tokens.mjs --statusline                                   Claude Code's status line: saves the limits
 //
 // After every turn it reads the tool's own log (the Claude Code transcript or the Codex rollout file), prints one
@@ -21,6 +21,7 @@ const waitMs = Number(opt('--wait-ms') ?? process.env.TURN_TOKENS_WAIT_MS ?? 300
 const home = {
   claude: process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude'),
   codex: process.env.CODEX_HOME || path.join(os.homedir(), '.codex'),
+  copilot: process.env.COPILOT_HOME || path.join(os.homedir(), '.copilot'),
 };
 const POLL_MS = 250;
 const NOTE = '  note: the final reply was not in the log yet; the session total will include it in the next report';
@@ -269,6 +270,50 @@ function analyzeCodex(file, turnId) {
   };
 }
 
+// ---- GitHub Copilot (TT-13 … TT-16, specs/018) -------------------------------------------------------------
+
+function analyzeCopilot(file) {
+  const lines = readJsonLines(file);
+  const prompts = lines.map((e, i) => (e.type === 'user.message' ? i : -1)).filter((i) => i >= 0);
+  const start = prompts.length ? prompts[prompts.length - 1] : -1;
+  const calls = [];
+  let contextWindow = null;
+  let quota = null;
+  lines.forEach((e, idx) => {
+    const d = e.data ?? {};
+    if (e.type === 'session.usage_record') { // TT-13, TT-15
+      const u = d.usage ?? {};
+      const input = u.inputTokens ?? 0;
+      const cacheRead = u.cacheReadTokens ?? 0;
+      const cacheWrite = u.cacheWriteTokens ?? 0;
+      if (u.maxPromptTokens) contextWindow = u.maxPromptTokens;
+      const nano = u.copilotUsage?.totalNanoAiu;
+      calls.push({ idx, model: u.model, tools: [], newInput: Math.max(input - cacheRead - cacheWrite, 0), cacheWrite, cacheRead, context: input, output: u.outputTokens ?? 0, placeholder: false, price: typeof nano === 'number' ? nano : null });
+    }
+    const q = findKey(d, 'quotaSnapshots');
+    if (q?.premium_interactions) quota = q.premium_interactions; // TT-16
+  });
+  const turn = sumOf(calls.filter((c) => c.idx > start));
+  for (let i = start + 1; i < lines.length; i++) { // TT-14
+    const name = lines[i].type === 'tool.execution_start' ? lines[i].data?.toolName : null;
+    if (name) turn.tools[name] = (turn.tools[name] ?? 0) + 1;
+  }
+  const answers = lines.filter((e, i) => i > start && e.type === 'assistant.message');
+  const lastAnswer = answers[answers.length - 1];
+  const final = Boolean(lastAnswer && !(lastAnswer.data?.toolRequests ?? []).length); // TT-4
+  return {
+    turnNo: Math.max(prompts.length, 1), final, contextWindow, turn, turnSubs: newSum(), session: sumOf(calls), sessionSubs: newSum(),
+    limits: quota ? { source: 'log', monthly: quota } : null,
+  };
+}
+
+function findKey(o, key, depth = 0) {
+  if (!o || typeof o !== 'object' || depth > 6) return undefined;
+  if (Object.prototype.hasOwnProperty.call(o, key)) return o[key];
+  for (const v of Object.values(o)) { const r = findKey(v, key, depth + 1); if (r !== undefined) return r; }
+  return undefined;
+}
+
 function codexWindows(rl) {
   return ['primary', 'secondary'].filter((k) => rl[k]).map((k) => {
     const m = rl[k].window_minutes;
@@ -286,11 +331,14 @@ const when = (epoch) => { const d = new Date(epoch * 1000); return `${d.getDate(
 const callsText = (c) => `${n(c)} call${c === 1 ? '' : 's'}`;
 const toolsText = (tools) => Object.entries(tools).map(([k, v]) => (v > 1 ? `${k} ×${v}` : k)).join(', ');
 const cost = (sum, unit) => Math.round((sum.num / (unit === 'usd' ? 1e12 : 1e9)) * 1e6) / 1e6;
+const dollars = (c) => `$${c < 1 ? c.toFixed(3) : c.toFixed(2)}`;
+const UNIT = { claude: 'usd', codex: 'credits', copilot: 'ai-credits' };
 
-function money(sum, unit, suffix = '') { // TT-9
+function money(sum, unit, suffix = '') { // TT-9, TT-15
   if (sum.pricedCalls === 0 && sum.unpriced.length) return `price unknown: ${sum.unpriced.join(', ')}`;
   const c = cost(sum, unit);
-  const amount = unit === 'usd' ? `≈ $${c < 1 ? c.toFixed(3) : c.toFixed(2)}` : `≈ ${c.toFixed(2)} credits`;
+  const amount = unit === 'usd' ? `≈ ${dollars(c)}`
+    : unit === 'ai-credits' ? `≈ ${c.toFixed(2)} AI credits (${dollars(c / 100)})` : `≈ ${c.toFixed(2)} credits`;
   return amount + suffix + (sum.unpriced.length ? ` + unpriced: ${sum.unpriced.join(', ')}` : '');
 }
 
@@ -300,9 +348,9 @@ function tokens(sum, withCacheWrite) {
 }
 
 function render(tool, a) {
-  const usd = tool === 'claude' ? 'usd' : 'credits';
+  const usd = UNIT[tool];
   const win = a.contextWindow ? ` of ${n(a.contextWindow)} (${Math.round((a.turn.peakContext / a.contextWindow) * 100)}%)` : '';
-  const cw = tool === 'claude';
+  const cw = tool !== 'codex';
   const out = [`Turn ${a.turnNo} · ${callsText(a.turn.calls)} · peak context ${n(a.turn.peakContext)}${win} · ${tokens(a.turn, cw)} · ${money(a.turn, usd)}`];
   if (Object.keys(a.turn.tools).length) out.push(`  tools: ${toolsText(a.turn.tools)}`);
   if (a.turnSubs.calls) {
@@ -310,7 +358,7 @@ function render(tool, a) {
     out.push(`  subagents: ${callsText(a.turnSubs.calls)} · output ${a.turnSubs.outputAtLeast ? 'at least ' : ''}${n(a.turnSubs.output)} · ${money(a.turnSubs, usd)}${t}`);
   }
   if (!a.final) out.push(NOTE);
-  out.push(`Session · ${callsText(a.session.calls)} · ${tokens(a.session, cw)} · ${money(a.session, usd, cw ? ' at list price' : '')}`);
+  out.push(`Session · ${callsText(a.session.calls)} · ${tokens(a.session, cw)} · ${money(a.session, usd, tool === 'claude' ? ' at list price' : '')}`);
   if (a.sessionSubs.calls) {
     out.push(`  subagents: ${callsText(a.sessionSubs.calls)} · output ${a.sessionSubs.outputAtLeast ? 'at least ' : ''}${n(a.sessionSubs.output)} · ${money(a.sessionSubs, usd)}`);
   }
@@ -318,7 +366,15 @@ function render(tool, a) {
   return out.join('\n');
 }
 
-function limitsLine(tool, limits) { // TT-10
+function limitsLine(tool, limits) { // TT-10, TT-16
+  if (tool === 'copilot') {
+    const m = limits?.monthly;
+    if (!m) return "Limits · unknown: none in this session's log yet";
+    if (m.isUnlimitedEntitlement) return 'Limits · monthly allowance unlimited';
+    const used = Math.round(100 - (m.remainingPercentage ?? 100));
+    const reset = m.resetDate ? `, resets ${when(Date.parse(m.resetDate) / 1000)}` : '';
+    return `Limits · monthly ${used}% used (${n(m.usedRequests ?? 0)} of ${n(m.entitlementRequests ?? 0)})${reset}`;
+  }
   if (!limits || !limits.windows.length) {
     return tool === 'claude'
       ? 'Limits · unknown: Claude Code shares them only with its status line (turn-tokens --statusline)'
@@ -330,7 +386,7 @@ function limitsLine(tool, limits) { // TT-10
 }
 
 function record(tool, session, a) { // TT-11
-  const unit = tool === 'claude' ? 'usd' : 'credits';
+  const unit = UNIT[tool];
   const plain = (s) => ({ calls: s.calls, peakContext: s.peakContext, newInput: s.newInput, cacheWrite: s.cacheWrite, cacheRead: s.cacheRead, output: s.output, outputAtLeast: s.outputAtLeast, cost: cost(s, unit), unpriced: s.unpriced, tools: s.tools });
   return {
     schema: 'turn-tokens/v1', at: now().toISOString(), tool, session, turn: a.turnNo, pending: !a.final, unit, contextWindow: a.contextWindow ?? null,
@@ -354,10 +410,12 @@ function codexRollout(threadId) {
 async function hook(tool) { // TT-1
   let payload;
   try { payload = JSON.parse(fs.readFileSync(0, 'utf8')); } catch { throw new Unavailable('the hook input is not JSON'); }
-  const session = payload.session_id ?? 'unknown';
-  const file = payload.transcript_path || (tool === 'codex' ? codexRollout(session) : undefined);
+  const session = payload.session_id ?? payload.sessionId ?? 'unknown';
+  const file = payload.transcript_path || payload.transcriptPath
+    || (tool === 'codex' ? codexRollout(session) : undefined)
+    || (tool === 'copilot' ? path.join(home.copilot, 'session-state', safeName(session), 'events.jsonl') : undefined);
   if (!file) throw new Unavailable('the hook input has no transcript_path');
-  const analyze = () => (tool === 'claude' ? analyzeClaude(file) : analyzeCodex(file, payload.turn_id));
+  const analyze = () => (tool === 'claude' ? analyzeClaude(file) : tool === 'codex' ? analyzeCodex(file, payload.turn_id) : analyzeCopilot(file));
   let a = analyze();
   for (let waited = 0; !a.final && waited < waitMs; waited += POLL_MS) { // TT-4
     await sleep(Math.min(POLL_MS, waitMs - waited));
@@ -389,12 +447,16 @@ function statusline() { // TT-12
 const tool = opt('--hook');
 if (args.includes('--statusline')) {
   process.stdout.write(statusline() + '\n');
-} else if (tool === 'claude' || tool === 'codex') {
+} else if (tool === 'claude' || tool === 'codex' || tool === 'copilot') {
   let text;
   try { text = await hook(tool); } catch (e) { text = `Token report: ${e instanceof Unavailable ? e.message : `failed (${e?.message ?? e})`}`; }
-  process.stdout.write((args.includes('--text') ? text : JSON.stringify({ systemMessage: text })) + '\n');
+  // Copilot's agentStop output has no message field; its timeline shows {"type":"progress"} lines instead (TT-1).
+  const out = args.includes('--text') ? text
+    : tool === 'copilot' ? [...text.split('\n').map((line) => JSON.stringify({ type: 'progress', message: line })), '{}'].join('\n')
+    : JSON.stringify({ systemMessage: text });
+  process.stdout.write(out + '\n');
   process.exitCode = 0;
 } else {
-  process.stderr.write('usage: turn-tokens.mjs --hook claude|codex [--text] [--wait-ms <n>] | --statusline\n');
+  process.stderr.write('usage: turn-tokens.mjs --hook claude|codex|copilot [--text] [--wait-ms <n>] | --statusline\n');
   process.exitCode = 2;
 }

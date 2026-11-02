@@ -69,6 +69,7 @@ Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · 
 - [`tests/turn-tokens/fixtures/base/codex-home/sessions/2026/10/31/rollout-2026-10-31T09-00-00-t1.jsonl`](../../../../tests/turn-tokens/fixtures/base/codex-home/sessions/2026/10/31/rollout-2026-10-31T09-00-00-t1.jsonl)
 - [`tests/turn-tokens/fixtures/base/codex-home/sessions/2026/10/31/rollout-2026-10-31T09-11-00-c1.jsonl`](../../../../tests/turn-tokens/fixtures/base/codex-home/sessions/2026/10/31/rollout-2026-10-31T09-11-00-c1.jsonl)
 - [`tests/turn-tokens/fixtures/base/codex-home/sessions/2026/10/31/rollout-2026-10-31T09-30-00-t2.jsonl`](../../../../tests/turn-tokens/fixtures/base/codex-home/sessions/2026/10/31/rollout-2026-10-31T09-30-00-t2.jsonl)
+- [`tests/turn-tokens/fixtures/base/copilot-home/session-state/g1/events.jsonl`](../../../../tests/turn-tokens/fixtures/base/copilot-home/session-state/g1/events.jsonl)
 - [`tests/validate-foundry/fixtures/base/foundry/charters/reviewer.charter.md`](../../../../tests/validate-foundry/fixtures/base/foundry/charters/reviewer.charter.md)
 - [`tests/validate-foundry/fixtures/base/foundry/floors.md`](../../../../tests/validate-foundry/fixtures/base/foundry/floors.md)
 - [`tests/validate-foundry/fixtures/base/foundry/lens/lessons/LS-1.md`](../../../../tests/validate-foundry/fixtures/base/foundry/lens/lessons/LS-1.md)

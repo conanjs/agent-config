@@ -107,6 +107,9 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/017-turn-token-report/research.md`](../../../../specs/017-turn-token-report/research.md)
 - [`specs/017-turn-token-report/spec.md`](../../../../specs/017-turn-token-report/spec.md)
 - [`specs/017-turn-token-report/tasks.md`](../../../../specs/017-turn-token-report/tasks.md)
+- [`specs/018-turn-tokens-copilot/research.md`](../../../../specs/018-turn-tokens-copilot/research.md)
+- [`specs/018-turn-tokens-copilot/spec.md`](../../../../specs/018-turn-tokens-copilot/spec.md)
+- [`specs/018-turn-tokens-copilot/tasks.md`](../../../../specs/018-turn-tokens-copilot/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)
