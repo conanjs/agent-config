@@ -40,6 +40,12 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-03
 
+### T-15 Review and merge PR #11 (spec 019, workflow graph phase 1)
+- status: waiting
+- next: V reviews https://github.com/conanjs/agent-config/pull/11 and says when to merge (merge commit, then pull main)
+- waiting-on: V
+- from: 2026-11-03
+
 ## Done
 
 ### T-13 Decide the Codex launch guard
