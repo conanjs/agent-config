@@ -43,6 +43,16 @@
     },
     "P1": {
       "kind": "phase",
+      "launches": [
+        {
+          "role": "product-spec",
+          "mode": "propose"
+        },
+        {
+          "role": "architecture",
+          "mode": "propose"
+        }
+      ],
       "title": "Blueprint",
       "owner": [],
       "gate": "G0",
@@ -54,6 +64,12 @@
     },
     "P2": {
       "kind": "phase",
+      "launches": [
+        {
+          "role": "architecture",
+          "mode": "execute"
+        }
+      ],
       "title": "Constitution",
       "owner": [
         "architecture",
@@ -70,6 +86,12 @@
     },
     "P3": {
       "kind": "phase",
+      "launches": [
+        {
+          "role": "product-spec",
+          "mode": "execute"
+        }
+      ],
       "title": "Specify",
       "owner": [
         "product-spec"
@@ -83,6 +105,24 @@
     },
     "P4": {
       "kind": "phase",
+      "launches": [
+        {
+          "role": "tech-stack",
+          "mode": "decide"
+        },
+        {
+          "role": "architecture",
+          "mode": "execute"
+        },
+        {
+          "role": "security",
+          "mode": "decide"
+        },
+        {
+          "role": "qa",
+          "mode": "decide"
+        }
+      ],
       "title": "Plan",
       "owner": [
         "tech-stack",
@@ -102,6 +142,12 @@
     },
     "P5": {
       "kind": "phase",
+      "launches": [
+        {
+          "role": "qa",
+          "mode": "execute"
+        }
+      ],
       "title": "Tasks",
       "owner": [
         "orchestrator",
@@ -127,6 +173,16 @@
     },
     "P7": {
       "kind": "phase",
+      "launches": [
+        {
+          "role": "architecture",
+          "mode": "execute"
+        },
+        {
+          "role": "devops",
+          "mode": "execute"
+        }
+      ],
       "title": "Close-out",
       "owner": [
         "architecture",

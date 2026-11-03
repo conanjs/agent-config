@@ -76,6 +76,13 @@ Required: `seq`, `prev`, `hash`, `at`, `run`, `node`, `result`, `actor` (`orches
 | WG-28 | Approvals come from the human's own message | A prompt containing `approve G<n> <run>` or `changes G<n> <run>` for that run's open gate appends a human line quoting the prompt; any other prompt writes nothing; the hook never blocks the prompt | script |
 | WG-29 | Each agent gets its own output form | Deny and no-decision outputs match `specs/019-workflow-graph/contracts/hooks.md` for Claude Code, Copilot CLI and Codex | script |
 | WG-30 | Approvals are verified against the session log | `verify-approvals` finds each human line's quote as a user message in that agent's session log | script |
+| WG-31 | A phase's launches are real roles and modes | Every `launches` entry of a node names a role of `conventions.md` §1 and a mode `propose`, `decide`, `execute` or `review` (specs/020) | script |
+| WG-32 | The runner records each step it drives | `run start` records P0 (path, feature) and, for each phase it reaches, launches the phase's `launches` headless in the run worktree and records the phase result with `actor: runner`; the ledger passes `check-run` (specs/020) | script |
+| WG-33 | A role reply decides the graph result | A `message/v2` reply of type `artifact`, `decision` or `proposal` is `done`; `review-pass` is `pass`; `review-fail` is `review-fail` or, with `reason: spec-or-plan-wrong`, `spec-or-plan-wrong`; anything else (`question`, `veto`, no reply) is `blocked`, which the graph sends to `escalate` | script |
+| WG-34 | The runner stops at a gate and continues after a person's decision | At an open gate the run stops and prints how to approve; after an approval in the ledger (chat approval hook or `run approve`), `run resume` continues to the next gate or end | script |
+| WG-35 | P6 tasks run one at a time in their own worktree | Each task, in order and after the tasks it `requires:`, runs in `<project>.runs/<run>-<task>` on branch `run/<run>-<task>`; after review `pass` it is merged into `run/<run>` and its worktree removed; failed checks repeat within the graph's budget, then escalate | script |
+| WG-36 | A launch with no recorded end is never repeated blindly | A launch journalled as started but not finished stops the run for a person instead of launching again | script |
+| WG-37 | Only a person at a terminal approves through the runner | `run approve` reads the confirmation from the controlling terminal (`/dev/tty`); without one it records nothing | script |
 
 ## References
 

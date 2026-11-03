@@ -1,4 +1,4 @@
-import { err, ok, type Result } from '#src/modules/shared/domain/Result.ts';
+import { err, ok, type Result } from "#src/modules/shared/domain/Result.ts";
 
 const PATTERN = /^R-\d{3,}$/;
 
@@ -11,6 +11,8 @@ export class RunId {
   }
 
   /**
+   * Accepts `R-` followed by at least three digits, such as `R-007`.
+   *
    * @param text - text such as `R-007`
    * @returns the id, or the text that is not a run id
    */
@@ -18,7 +20,11 @@ export class RunId {
     return PATTERN.test(text) ? ok(new RunId(text)) : err(text);
   }
 
-  /** @returns the id as written, for file names and messages */
+  /**
+   * Returns the id as written, for file names and messages.
+   *
+   * @returns the id as written, for file names and messages
+   */
   public toString(): string {
     return this.#value;
   }

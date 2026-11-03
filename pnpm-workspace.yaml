@@ -1,6 +1,5 @@
 packages:
   - copilot/frameworks/agentic-sdlc/tools/workflow-graph
-minimumReleaseAgeExclude:
-  - '@vitest/mocker@5.1.0'
-  - '@vitest/spy@5.1.0'
-  - vitest@5.1.0
+# Only better-sqlite3 (the LangGraph checkpoint store of the workflow runner, specs/020) may run its install script.
+allowBuilds:
+  better-sqlite3: true

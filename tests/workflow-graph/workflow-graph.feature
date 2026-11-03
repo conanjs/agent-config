@@ -12,7 +12,7 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
 
   # ---- the graph (US1) ----------------------------------------------------------------------------------
 
-  Scenario: WG-1 WG-2 WG-3 WG-4 WG-5 WG-6 WG-7 WG-8 WG-9 WG-10 WG-11 WG-12 WG-13 WG-14 the real graph passes every graph rule
+  Scenario: WG-1 WG-2 WG-3 WG-4 WG-5 WG-6 WG-7 WG-8 WG-9 WG-10 WG-11 WG-12 WG-13 WG-14 WG-31 the real graph passes every graph rule
     When the tool runs with "check-graph"
     Then it passes with no warnings
 
@@ -125,6 +125,13 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
     And the tool runs with "check-graph"
     Then it passes with no warnings
     And the file "framework/conventions.md" has the line "| Re-execute after failed script check | 3 | Escalate with failing output |"
+
+  Scenario: WG-31 a phase that launches an unknown role is rejected
+    Given in "framework/workflow.graph.yaml", `launches: [{ role: product-spec, mode: execute }]` becomes `launches: [{ role: spec-writer, mode: write }]`
+    When the tool runs with "check-graph"
+    Then it exits with 1
+    And the output has the line "  WG-31  workflow.graph.yaml: node \"P3\": launch role \"spec-writer\" is not a role in conventions.md §1"
+    And the output has the line "  WG-31  workflow.graph.yaml: node \"P3\": launch mode \"write\" is not propose, decide, execute or review"
 
   # ---- the run ledger (US2) ----------------------------------------------------------------------------
   # "run … has reached …" drives the tool itself through the happy path of a new-feature run (tool.mjs):
@@ -483,6 +490,175 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
         WG-30  R-001 line 5: the quote of G2 is not a message typed in session s1
       FAIL (1)
       """
+
+  # ---- the headless runner (specs/020) --------------------------------------------------------------------
+  # The agents are scripted (replies.json, FakeHeadlessLauncher): each key `<phase or task>:<role>:<mode>` answers with
+  # the listed reply types in turn, `*` for any other launch. An execute launch writes `<role>-<what>.txt`.
+
+  Scenario: WG-32 WG-33 run start records P0, runs P1's roles in the run worktree and stops at G0
+    Given "project" is a git repository with everything committed
+    And the file "replies.json" contains:
+      """
+      {"*":["artifact"]}
+      """
+    When the tool runs with "run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --project {root}/project"
+    Then it exits with 0 and prints:
+      """
+      Run R-001 stopped at G0. To approve: workflow-graph run approve R-001 G0 "<your words>" (or type "approve G0 R-001" in a chat session, then: workflow-graph run resume R-001)
+      """
+    And the file "project/.specify/runs/R-001.jsonl" has a line containing "\"node\":\"P1\",\"result\":\"done\",\"actor\":\"runner\""
+    And the file "project/.specify/runs/R-001.launches.jsonl" has a line containing "\"key\":\"P1@1#1:architecture:propose\",\"event\":\"finished\",\"result\":\"done\""
+
+  Scenario: WG-33 a role that asks a question stops the run for a person
+    Given "project" is a git repository with everything committed
+    And the file "replies.json" contains:
+      """
+      {"*":["question"]}
+      """
+    When the tool runs with "run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --project {root}/project"
+    Then it exits with 1 and prints:
+      """
+      Run R-001 stopped at escalate: it needs a person (workflow-graph status R-001).
+      """
+    And the file "project/.specify/runs/R-001.jsonl" has a line containing "\"node\":\"P1\",\"result\":\"blocked\",\"actor\":\"runner\""
+
+  Scenario: WG-34 after an approval typed in chat, run resume continues to the next gate
+    Given "project" is a git repository with everything committed
+    And the file "replies.json" contains:
+      """
+      {"*":["artifact"]}
+      """
+    And the tool runs with "run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G0 R-001"}
+      """
+    When the tool runs with "run resume R-001 --project {root}/project"
+    Then it exits with 0 and prints:
+      """
+      Run R-001 stopped at G2. To approve: workflow-graph run approve R-001 G2 "<your words>" (or type "approve G2 R-001" in a chat session, then: workflow-graph run resume R-001)
+      """
+
+  Scenario: WG-34 resuming a run whose gate is still open stops at the same gate
+    Given "project" is a git repository with everything committed
+    And the file "replies.json" contains:
+      """
+      {"*":["artifact"]}
+      """
+    And the tool runs with "run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --project {root}/project"
+    When the tool runs with "run resume R-001 --project {root}/project"
+    Then it exits with 0 and prints:
+      """
+      Run R-001 stopped at G0. To approve: workflow-graph run approve R-001 G0 "<your words>" (or type "approve G0 R-001" in a chat session, then: workflow-graph run resume R-001)
+      """
+
+  Scenario: WG-35 P6 runs each task in its own worktree and merges it after review
+    Given "project" is a git repository with everything committed
+    And the file "replies.json" contains:
+      """
+      {"*":["artifact"],"T001:engineering:review":["review-pass"],"T002:engineering:review":["review-pass"]}
+      """
+    And the tool runs with "run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G0 R-001"}
+      """
+    And the tool runs with "run resume R-001 --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G2 R-001"}
+      """
+    And the tool runs with "run resume R-001 --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G3 R-001"}
+      """
+    And the tool runs with "run resume R-001 --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G4 R-001"}
+      """
+    When the tool runs with "run resume R-001 --project {root}/project"
+    Then it exits with 0 and prints:
+      """
+      Run R-001 stopped at G5. To approve: workflow-graph run approve R-001 G5 "<your words>" (or type "approve G5 R-001" in a chat session, then: workflow-graph run resume R-001)
+      """
+    And "project.runs/R-001/engineering-T001.txt" is a real file or folder, not a symlink
+    And "project.runs/R-001/engineering-T002.txt" is a real file or folder, not a symlink
+    And "project.runs/R-001-T001" does not exist
+    And "project/engineering-T001.txt" does not exist
+
+  Scenario: WG-35 a task whose checks keep failing stops at its budget before another agent starts
+    Given "project" is a git repository with everything committed
+    And the file "replies.json" contains:
+      """
+      {"*":["artifact"]}
+      """
+    And the tool runs with "run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --check false --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G0 R-001"}
+      """
+    And the tool runs with "run resume R-001 --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G2 R-001"}
+      """
+    And the tool runs with "run resume R-001 --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G3 R-001"}
+      """
+    And the tool runs with "run resume R-001 --project {root}/project"
+    And the tool runs with "hook approve --agent claude-code" and this on stdin:
+      """
+      {"session_id":"s1","cwd":"{root}/project","prompt":"approve G4 R-001"}
+      """
+    When the tool runs with "run resume R-001 --project {root}/project"
+    Then it exits with 1 and prints:
+      """
+      Run R-001 needs attention: task T001 has used its 2 "re-execute-after-check" retries; escalate to the human
+      """
+
+  Scenario: WG-36 a launch that started but never ended is not repeated
+    Given "project" is a git repository with everything committed
+    And the tool runs with "record R-001 --node P0 --result new-feature --feature specs/023-cart --project {root}/project"
+    And the file "project/.specify/runs/R-001.run.json" contains:
+      """
+      {"run":"R-001","path":"new-feature","feature":"specs/023-cart","agent":"claude-code","overrides":{},"checks":[],"maxUsdPerLaunch":2,"timeoutMinutes":30}
+      """
+    And the file "project/.specify/runs/R-001.launches.jsonl" contains:
+      """
+      {"key":"P1@1#0:product-spec:propose","event":"started"}
+      """
+    When the tool runs with "run resume R-001 --project {root}/project"
+    Then it exits with 1 and prints:
+      """
+      Run R-001 needs attention: launch P1@1#0:product-spec:propose started but has no recorded end; check {root}/project.runs/R-001, then remove its line from R-001.launches.jsonl to launch it again
+      """
+
+  Scenario: WG-37 run approve without a terminal records nothing
+    Given "project" is a git repository with everything committed
+    And the file "replies.json" contains:
+      """
+      {"*":["artifact"]}
+      """
+    And the tool runs with "run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --project {root}/project"
+    When the tool runs with arguments:
+      """
+      run
+      approve
+      R-001
+      G0
+      looks good
+      --project
+      {root}/project
+      """
+    Then it exits with 1 and prints:
+      """
+      no terminal: a gate decision must be typed by a person at a terminal (or as "approve G<n> <run>" in a chat session)
+      """
+    And the file "project/.specify/runs/R-001.jsonl" has no line containing "\"node\":\"G0\""
 
   # ---- traceability ---------------------------------------------------------------------------------------
 
