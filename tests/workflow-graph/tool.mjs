@@ -20,8 +20,12 @@ registerTool('workflow-graph', {
       WORKFLOW_GRAPH_FRAMEWORK: world.at('framework'),
       COPILOT_HOME: world.at('copilot-home'),
       AGENTIC_SDLC_GUARD: world.guardOff ? 'off' : '',
+      // The runner's agents are scripted when the scenario wrote replies.json (FakeHeadlessLauncher, specs/020).
+      WORKFLOW_GRAPH_FAKE_REPLIES: fs.existsSync(world.at('replies.json')) ? world.at('replies.json') : '',
     },
   }),
+  // No controlling terminal: `run approve` must find none, even when the tests run from a person's terminal.
+  detached: true,
   header: /^workflow-graph /,
   quietPass: 'PASS (0 warning(s))',
   codes: () => [...fs.readFileSync(path.join(repo, schema), 'utf8').matchAll(/^\| (WG-\d+) \|/gm)].map((m) => m[1]),

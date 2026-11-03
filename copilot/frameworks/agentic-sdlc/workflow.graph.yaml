@@ -2,6 +2,8 @@
 # This file is the source. `workflow.graph.json` and the marked tables in conventions.md §5 and §9 are generated
 # from it by `node tools/workflow-graph/src/main.ts compile-graph`; never edit those by hand.
 # Edit this file only through a spec and a pull request: it is the rulebook every run is checked against.
+# `launches` (specs/020): the roles and modes the headless runner starts for a phase, in order. P0 is the runner itself;
+# P6 launches each task's owning role (execute, then review). First defaults, to be reviewed by V (020 research D28).
 schema: workflow-graph/v1
 name: agentic-sdlc
 version: 2.0.0
@@ -25,6 +27,7 @@ nodes:
     gate-text: "—"
   P1:
     kind: phase
+    launches: [{ role: product-spec, mode: propose }, { role: architecture, mode: propose }]
     title: Blueprint
     owner: []
     gate: G0
@@ -35,6 +38,7 @@ nodes:
     gate-text: G0 direction
   P2:
     kind: phase
+    launches: [{ role: architecture, mode: execute }]
     title: Constitution
     owner: [architecture, engineering, qa, security]
     gate: G1
@@ -45,6 +49,7 @@ nodes:
     gate-text: G1 principles
   P3:
     kind: phase
+    launches: [{ role: product-spec, mode: execute }]
     title: Specify
     owner: [product-spec]
     gate: G2
@@ -55,6 +60,7 @@ nodes:
     gate-text: G2 spec
   P4:
     kind: phase
+    launches: [{ role: tech-stack, mode: decide }, { role: architecture, mode: execute }, { role: security, mode: decide }, { role: qa, mode: decide }]
     title: Plan
     owner: [tech-stack, architecture, engineering, security, qa, devops, system-architecture]
     gate: G3
@@ -65,6 +71,7 @@ nodes:
     gate-text: G3 plan
   P5:
     kind: phase
+    launches: [{ role: qa, mode: execute }]
     title: Tasks
     owner: [orchestrator, qa]
     gate: G4
@@ -85,6 +92,7 @@ nodes:
     gate-text: automatic; escalate on budget
   P7:
     kind: phase
+    launches: [{ role: architecture, mode: execute }, { role: devops, mode: execute }]
     title: Close-out
     owner: [architecture, system-architecture, security, devops]
     gate: G5

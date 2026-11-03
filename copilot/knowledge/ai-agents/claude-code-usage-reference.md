@@ -88,6 +88,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 | `PreToolUse` deny in `claude -p` | A project hook (`--setting-sources project`) with matcher `Agent` denied the launch in a non-interactive run; the agent received the reason verbatim; the input held `tool_name: "Agent"`, `tool_input` {`description`, `prompt`, `subagent_type`} | ✅[^17] |
 | `UserPromptSubmit` | Input adds `prompt` (the typed text; a `/command` arrives as typed) and `session_title`; it can block the prompt (`decision: "block"` or exit 2) or add context | ✅[^15] |
 | `claude -p --agent <name>` | Runs the prompt as that custom agent (tested with `sdlc-qa`) | ✅[^17] |
+| Headless role runs | `claude -p "<launch prompt>" --agent sdlc-<role> --output-format json` returned a `message/v2` reply in `result`; with `--permission-mode acceptEdits --allowedTools "Read Write Edit Glob Grep Bash"` in a git worktree it wrote only there (agentic-sdlc workflow runner, live, 2026-11-03) | ✅[^17] |
 | `UserPromptSubmit` in `claude -p` | Runs for the prompt of a non-interactive run too: a project hook recorded the typed text of `claude -p "approve G2 R-001 …"` (agentic-sdlc workflow guard, live test) | ✅[^17] |
 
 ### Settings and environment variables that change token use
@@ -163,7 +164,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 86 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
+- Verified: 87 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
 ## References
 - [Manage costs effectively](https://code.claude.com/docs/en/costs) — Anthropic, living. Backs: `/usage`, `/insights`, levers, background usage, agent team costs, `modelPricing`. [^1]

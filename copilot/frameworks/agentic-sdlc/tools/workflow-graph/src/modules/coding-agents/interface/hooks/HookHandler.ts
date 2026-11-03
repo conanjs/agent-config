@@ -1,9 +1,12 @@
-import type { GuardLedgerEdit } from '#src/modules/workflow/application/guard-ledger-edit/GuardLedgerEdit.ts';
-import type { GuardRoleLaunch } from '#src/modules/workflow/application/guard-role-launch/GuardRoleLaunch.ts';
-import type { RecordApproval } from '#src/modules/workflow/application/record-approval/RecordApproval.ts';
-import type { AgentId } from '#src/modules/coding-agents/domain/AgentId.ts';
-import type { GuardDecision, HookDialect } from '#src/modules/coding-agents/domain/ports/HookDialect.ts';
-import type { CodingAgentRegistry } from '#src/modules/coding-agents/application/CodingAgentRegistry.ts';
+import type { GuardLedgerEdit } from "#src/modules/workflow/application/guard-ledger-edit/GuardLedgerEdit.ts";
+import type { GuardRoleLaunch } from "#src/modules/workflow/application/guard-role-launch/GuardRoleLaunch.ts";
+import type { RecordApproval } from "#src/modules/workflow/application/record-approval/RecordApproval.ts";
+import type { AgentId } from "#src/modules/coding-agents/domain/AgentId.ts";
+import type {
+  GuardDecision,
+  HookDialect,
+} from "#src/modules/coding-agents/domain/ports/HookDialect.ts";
+import type { CodingAgentRegistry } from "#src/modules/coding-agents/application/CodingAgentRegistry.ts";
 
 /** Turns one hook call into a use-case call and back: stdin through the agent's dialect, the decision back in the agent's own format. */
 export class HookHandler {
@@ -13,12 +16,19 @@ export class HookHandler {
   readonly #approvals: RecordApproval;
 
   /**
+   * Keeps the given collaborators for every later call; nothing runs at construction.
+   *
    * @param registry - the agents' adapters
    * @param launches - decides subagent launches
    * @param edits - protects the ledgers
    * @param approvals - records gate decisions
    */
-  public constructor(registry: CodingAgentRegistry, launches: GuardRoleLaunch, edits: GuardLedgerEdit, approvals: RecordApproval) {
+  public constructor(
+    registry: CodingAgentRegistry,
+    launches: GuardRoleLaunch,
+    edits: GuardLedgerEdit,
+    approvals: RecordApproval,
+  ) {
     this.#registry = registry;
     this.#launches = launches;
     this.#edits = edits;
@@ -36,7 +46,10 @@ export class HookHandler {
     try {
       return dialect.renderDecision(await this.#decide(dialect, raw));
     } catch (e) {
-      return dialect.renderDecision({ kind: 'deny', reason: `the workflow guard failed: ${e instanceof Error ? e.message : String(e)}` });
+      return dialect.renderDecision({
+        kind: "deny",
+        reason: `the workflow guard failed: ${e instanceof Error ? e.message : String(e)}`,
+      });
     }
   }
 
@@ -51,7 +64,11 @@ export class HookHandler {
     const prompt = dialect.readSubmittedPrompt(raw);
     if (prompt.ok) {
       const p = prompt.value;
-      const from = { source: `${String(agent)}:${p.event}`, session: p.session, ...(p.log === undefined ? {} : { log: p.log }) };
+      const from = {
+        source: `${String(agent)}:${p.event}`,
+        session: p.session,
+        ...(p.log === undefined ? {} : { log: p.log }),
+      };
       await this.#approvals.run(p.cwd, p.text, from).catch(() => []);
     }
     return dialect.renderPromptAcknowledgement();
@@ -59,11 +76,11 @@ export class HookHandler {
 
   async #decide(dialect: HookDialect, raw: string): Promise<GuardDecision> {
     const call = dialect.readToolCall(raw);
-    if (!call.ok) return { kind: 'deny', reason: `unreadable hook input: ${call.error}` };
+    if (!call.ok) return { kind: "deny", reason: `unreadable hook input: ${call.error}` };
     const c = call.value;
-    if (c.kind === 'subagent-launch') return this.#launches.run(c.cwd, c.prompt);
-    if (c.kind === 'file-write') return this.#edits.run(c.paths);
-    return { kind: 'no-decision' };
+    if (c.kind === "subagent-launch") return this.#launches.run(c.cwd, c.prompt);
+    if (c.kind === "file-write") return this.#edits.run(c.paths);
+    return { kind: "no-decision" };
   }
 
   #dialect(agent: AgentId): HookDialect {

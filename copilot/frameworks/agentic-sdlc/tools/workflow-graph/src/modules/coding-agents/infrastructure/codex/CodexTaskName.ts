@@ -13,18 +13,28 @@ export class CodexTaskName {
   }
 
   /**
+   * Returns the convention as launch-prompt lines, or undefined when the name follows no run convention.
+   *
    * @param taskName - the spawn's `task_name`
    * @returns the convention as launch-prompt lines, or undefined when the name follows no run convention
    */
   public static read(taskName: string): CodexTaskName | undefined {
     const m = CONVENTION.exec(taskName);
     if (m === null) return undefined;
-    const lines = [`run: R-${String(m[1])}`, `phase: P${String(m[2])}`, `role: ${String(m[3]).replace(/_/g, '-')}`];
+    const lines = [
+      `run: R-${String(m[1])}`,
+      `phase: P${String(m[2])}`,
+      `role: ${String(m[3]).replace(/_/g, "-")}`,
+    ];
     if (m[4] !== undefined) lines.push(`task: T${m[4]}`, `mode: ${String(m[5])}`);
-    return new CodexTaskName(lines.join('\n'));
+    return new CodexTaskName(lines.join("\n"));
   }
 
-  /** @returns the keys as `launch-prompt/v1` lines the guard reads */
+  /**
+   * Returns the keys as `launch-prompt/v1` lines the guard reads.
+   *
+   * @returns the keys as `launch-prompt/v1` lines the guard reads
+   */
   public toLaunchPrompt(): string {
     return this.#lines;
   }

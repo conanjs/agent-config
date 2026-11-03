@@ -150,7 +150,8 @@ function run(world, extra, input) {
   const t = getTool(world.toolName);
   const { file, args, env } = t.run(world, extra);
   return new Promise((resolve) => {
-    const child = execFile(file, args, { encoding: 'utf8', env: cleanEnv(env) }, (err, stdout, stderr) => {
+    // detached: a new session with no controlling terminal, for tools that must not reach /dev/tty in a test.
+    const child = execFile(file, args, { encoding: 'utf8', env: cleanEnv(env), detached: t.detached === true }, (err, stdout, stderr) => {
       let lines = (stdout + stderr).trimEnd().split('\n');
       // A tool that stops before printing its header (a missing root file, say) is compared in full.
       if (t.header && t.header.test(lines[0])) lines = lines.slice(1);

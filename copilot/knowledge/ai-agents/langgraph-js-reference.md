@@ -46,6 +46,9 @@ The JavaScript LangGraph packages listed in `applies-to`, from the official docs
 | Resume | `graph.invoke(new Command({ resume: x }), config)` with the same `thread_id`; `x` becomes `interrupt()`'s return value; the node re-runs from its start, so code before `interrupt()` runs again | ✅[^2] |
 | Across processes | Process 1 stopped at the gate and exited; process 2, with the same SQLite file and `thread_id`, resumed and finished | ✅[^5] |
 | Resuming a finished thread | Re-ran nothing and returned the final state | ✅[^5] |
+| State kept across invocations | A thread keeps its state between `invoke` calls: a new `invoke({})` on the same `thread_id` starts at `START` with the previous values still in the state, so a router that reads a leftover value can end the pass at once (the call then returns an empty object). Pass the fields to reset (`invoke({ outcome: null })`) | ✅[^6] |
+| Telling a gate pause from other leftovers | `(await app.getState(config)).tasks` lists pending tasks; only those with `interrupts` are paused at `interrupt()`; resume those with `Command({ resume })` and start others fresh | ✅[^6] |
+| Installing the SQLite saver with pnpm 12 | `better-sqlite3` runs an install script; pnpm 12 skips it (`ERR_PNPM_IGNORED_BUILDS`) unless `pnpm-workspace.yaml` has `allowBuilds: { better-sqlite3: true }`; its `minimumReleaseAge` policy also rejects a lockfile with packages published under a day earlier (`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`; fix: older pins, then `pnpm clean --lockfile` and install) | ✅[^6] |
 
 ## Lookup notes
 - Code before `interrupt()` in a node runs again on resume: keep side effects (launching an agent, writing a ledger line) after the interrupt or in a separate node.
@@ -60,13 +63,14 @@ The JavaScript LangGraph packages listed in `applies-to`, from the official docs
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
+- Verified: 19 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
 ## References
 - [Graph API (JavaScript)](https://docs.langchain.com/oss/javascript/langgraph/graph-api) — LangChain, living. Backs: nodes, conditional edges, `Send`, reducers, recursion limit. [^1]
 - [Interrupts (JavaScript)](https://docs.langchain.com/oss/javascript/langgraph/interrupts) — LangChain, living. Backs: `interrupt()`, checkpointer and `thread_id` requirement, `Command({ resume })`, node re-run on resume. [^2]
 - [Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) — LangChain, living. Backs: per-thread checkpoints and what they enable. [^3]
 - [@langchain/langgraph-checkpoint-sqlite](https://npmjs.com/package/@langchain/langgraph-checkpoint-sqlite) — npm registry, read 2026-11-03 (1.1.0, depends on `better-sqlite3` ^12.10.0). Backs: `SqliteSaver`, the native dependency; the Postgres and Redis saver versions (`npm view`, same day). [^4]
+- The workflow runner of agent-config (`specs/020-workflow-runner/`), built and run on 2026-11-03 with pnpm 12.15.0: the leftover-state and pause findings from its first scripted end-to-end run, the install findings from adding the packages. [^6]
 - Spike in agent-config's session scratch folder — local test, 2026-11-03, Node 24.22.1, the package versions in `applies-to`: fan-out, child-process nodes, join, budgeted loop, gate paused in one process and resumed in another, the name clash, no-checkpointer and `MemorySaver` behaviour; recorded in `specs/019-workflow-graph/research.md` (capability spikes). [^5]
 
 ## Related
