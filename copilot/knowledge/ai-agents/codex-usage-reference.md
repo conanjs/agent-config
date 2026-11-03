@@ -4,8 +4,8 @@ type: reference
 topic: ai-agents
 status: verified
 applies-to: ["Codex CLI 0.164.0-alpha.11.1 (bundled with the ChatGPT desktop app)", "Codex docs read 2026-10-30"]
-last-verified: 2026-10-31
-last-updated: 2026-10-31
+last-verified: 2026-11-03
+last-updated: 2026-11-03
 tags: [codex, openai, tokens, usage, rate-limits, prompt-caching, compaction, opentelemetry, subagents]
 ---
 
@@ -80,6 +80,17 @@ The Codex harness (CLI, IDE extension and the Codex part of the ChatGPT desktop 
 | Events during a turn | `PreToolUse`, `PermissionRequest`, `PostToolUse`, `PreCompact`, `PostCompact`, `UserPromptSubmit`, `SubagentStop`, `Stop` | ✅[^11] |
 | Common input | `session_id` (subagent hooks get the parent's), `transcript_path`, `cwd`, `hook_event_name`, `model`; turn hooks add `turn_id` | ✅[^11] |
 | `Stop` input and output | Adds `turn_id`, `stop_hook_active`, `last_assistant_message`. On exit 0 it must print JSON (plain text is invalid); `systemMessage` is shown as a warning in the UI | ✅[^11] |
+| `PreToolUse` | Fires for shell, `apply_patch`, MCP and local function tools, including `spawn_agent` (the subagent launch, also matched as `Agent`); not for hosted tools such as web search. Input adds `turn_id`, `tool_name`, `tool_use_id`, `tool_input`. Denies with `hookSpecificOutput.permissionDecision: "deny"` and a reason, legacy `{"decision": "block"}`, or exit code 2 | ✅[^11] |
+| `SubagentStart`, `SubagentStop` | Run when a subagent starts and stops; the matcher applies to `agent_type` | ✅[^11] |
+| `PreToolUse` in `codex exec` (0.164.0-alpha.11.1) | Ran for `apply_patch` and its deny stopped the patch; did **not** run for `spawn_agent` (logged as `namespace: "collaboration"`) with the matcher `Agent\|apply_patch\|Edit\|Write`, although the docs say `spawn_agent` matches `Agent` (live test, 2026-11-03) | ✅[^12] |
+| `UserPromptSubmit` in `codex exec` | Runs for the exec prompt; input keys `cwd`, `hook_event_name`, `model`, `permission_mode`, `prompt`, `session_id`, `transcript_path` (the rollout file), `turn_id` | ✅[^12] |
+| User message in a rollout | A `response_item` line whose payload is `{"type":"message","role":"user","content":[{"type":"input_text","text":…}]}` | ✅[^12] |
+| `spawn_agent` arguments in a rollout | `task_name` and `message`; the `message` text is stored encrypted (`gAAAAA…`) | ✅[^12] |
+| Why `Agent` did not match | The `Agent` matcher alias is attached only when `spawn_agent` is in the default or `multi_agent_v1` namespace; any other namespace gives the hook the namespace glued to the name with no alias, here `collaborationspawn_agent` (`function_hook_tool_name`, `flat_tool_name`, same code at tag `rust-v0.164.0-alpha.11` and on `main`) | ✅[^13] |
+| `collaboration` spawn arguments | Collaboration tools can carry `encrypted_function_args`; the client, and so a hook, sees the `message` as ciphertext; `task_name` is plaintext ("lowercase letters, digits, and underscores") | ✅[^13][^12] |
+| `codex features list` (0.164.0-alpha.11.1) | `multi_agent` stable true, `multi_agent_v2` stable false, `hooks` stable true; yet the spawn tool was in the `collaboration` namespace, and `-c features.multi_agent_v2=false` did not change it | ✅[^12] |
+| A launch guard in Codex | Works with a `PreToolUse` matcher `*` and the run read from the plaintext `task_name` (`r004_p4_architecture`): live, the spawn was refused at an unapproved gate and allowed after approval (0.164.0-alpha.11.1). The alias rule is the same at tag `rust-v0.166.0`, so a newer Codex does not change it | ✅[^12][^13] |
+| `--dangerously-bypass-hook-trust` | Runs hooks without persisted trust for one invocation; refused by Claude Code's safety classifier when an agent passes it, so a changed hook needs the human to trust it in `/hooks` | ✅[^12] |
 | Transcript format | "isn't a stable interface for hooks and may change over time" | ✅[^11] |
 | `notify = ["python3", "/path/to/notify.py"]` | Runs a program on `agent-turn-complete` with one JSON argument: `type`, `thread-id`, `turn-id`, `cwd`, `input-messages`, `last-assistant-message` (no token counts) | ✅[^6] |
 
@@ -145,7 +156,7 @@ The Codex harness (CLI, IDE extension and the Codex part of the ChatGPT desktop 
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 70 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-31
+- Verified: 81 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
 ## References
 - [Unrolling the Codex agent loop](https://openai.com/index/unrolling-the-codex-agent-loop/) — OpenAI (Michael Bolin), 2026. Backs: shared harness, cache-miss causes, appended config messages, `/responses/compact`. [^1]
@@ -158,7 +169,9 @@ The Codex harness (CLI, IDE extension and the Codex part of the ChatGPT desktop 
 - [Speed](https://learn.chatgpt.com/docs/agent-configuration/speed) — OpenAI, living. Backs: Fast and Ultrafast rates, API-key billing. [^8]
 - `~/.codex/sessions/2026/10/*/rollout-*.jsonl`, `~/.codex/state_5.sqlite` (read from a copy), `/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex --version` — local test, 2026-10-30, Codex CLI 0.164.0-alpha.11.1: record types, fields, rate-limit windows, `tokens_used` = input + output, per-response sums = thread totals in 4 threads; docs URL redirect checked with `curl`. [^9]
 - [Subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) — OpenAI, living. Backs: built-in agents, TOML fields, `[agents]` keys, inheritance, token warning. [^10]
-- [Hooks](https://learn.chatgpt.com/docs/hooks) — OpenAI, living. Backs: hook locations, trust, events, input and output fields, transcript stability warning. [^11]
+- [Hooks](https://learn.chatgpt.com/docs/hooks) — OpenAI, living. Backs: hook locations, trust, events, input and output fields, `PreToolUse` on `spawn_agent` and its deny forms, transcript stability warning. [^11]
+- [codex-rs/core/src/tools/registry.rs at rust-v0.164.0-alpha.11](https://github.com/openai/codex/blob/rust-v0.164.0-alpha.11/codex-rs/core/src/tools/registry.rs), [hook_names.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/hook_names.rs), [tools/mod.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/mod.rs), [tools/router.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/router.rs), [multi_agents_spec.rs](https://github.com/openai/codex/blob/rust-v0.164.0-alpha.11/codex-rs/core/src/tools/handlers/multi_agents_spec.rs) — OpenAI, read 2026-11-03 (also `registry.rs` at [rust-v0.166.0](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/core/src/tools/registry.rs)). Backs: hook tool names and aliases, flat names, encrypted collaboration arguments, `task_name` rules. [^13]
+- `codex exec` runs (codex-cli 0.164.0-alpha.11.1) with the agentic-sdlc workflow guard's trusted hooks, a logging wrapper on the hook's stdin, and the session's rollout file — local test, 2026-11-03 (agent-config `specs/019-workflow-graph/`). [^12]
 
 ## Related
 - `ai-agents/agent-token-accounting.md`

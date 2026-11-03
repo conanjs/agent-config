@@ -28,6 +28,29 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Agent|Task|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh\" hook guard --agent claude-code",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh\" hook approve --agent claude-code",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

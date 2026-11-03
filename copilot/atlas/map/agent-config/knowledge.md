@@ -49,6 +49,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/ai-agents/graph-engineering-study-guide.md`](../../../knowledge/ai-agents/graph-engineering-study-guide.md)
 - [`copilot/knowledge/ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md`](../../../knowledge/ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md)
 - [`copilot/knowledge/ai-agents/harness-engineering-deep-dive.md`](../../../knowledge/ai-agents/harness-engineering-deep-dive.md)
+- [`copilot/knowledge/ai-agents/langgraph-js-reference.md`](../../../knowledge/ai-agents/langgraph-js-reference.md)
 - [`copilot/knowledge/ai-agents/loop-engineering-playbook.md`](../../../knowledge/ai-agents/loop-engineering-playbook.md)
 - [`copilot/knowledge/ai-agents/loop-engineering.md`](../../../knowledge/ai-agents/loop-engineering.md)
 - [`copilot/knowledge/ai-agents/measure-agent-tokens.md`](../../../knowledge/ai-agents/measure-agent-tokens.md)

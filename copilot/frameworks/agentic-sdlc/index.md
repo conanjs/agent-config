@@ -1,6 +1,6 @@
 ---
 schema: framework-index/v1
-last-updated: 2026-10-28
+last-updated: 2026-11-03
 framework-version: 2.0.0
 status: active
 ---
@@ -187,7 +187,7 @@ Open design item: at P7, the framework should collect lessons from repeated revi
 ## 15. Status & decisions
 Version 2.0.0 is live and active. Phase 1 migration completed 2026-10-04 for the live framework files in this scope.
 
-Decisions: D1 stack naming; D2 paradigm as its own dimension; D3 paradigm inferred or asked at G0 and locked at G3; D4 design approved before migration; D5 routing via Preset plus profiles plus state; D6 no Preset cap; D7 `touches:` and `refs:` copied from task lines; D8 system context in Company KB; D9 legacy knowledge docs are not retrofitted; D10 deep dives synthesize into structured knowledge docs; D11 (2026-10-27) stack procedures are bounded task scopes assigned on task lines (`procedure:`) and checked by `validate-project.mjs --task` (`{{AGENT_CONFIG_REPO}}/proposals/agentic-sdlc-reference-repos-and-procedures.md` Part B); D12 (2026-10-27) each stack reference lives in its own repo, pinned by tag and full commit SHA in `stacks/<id>/reference.md` (same proposal, Part A).
+Decisions: D1 stack naming; D2 paradigm as its own dimension; D3 paradigm inferred or asked at G0 and locked at G3; D4 design approved before migration; D5 routing via Preset plus profiles plus state; D6 no Preset cap; D7 `touches:` and `refs:` copied from task lines; D8 system context in Company KB; D9 legacy knowledge docs are not retrofitted; D10 deep dives synthesize into structured knowledge docs; D11 (2026-10-27) stack procedures are bounded task scopes assigned on task lines (`procedure:`) and checked by `validate-project.mjs --task` (`{{AGENT_CONFIG_REPO}}/proposals/agentic-sdlc-reference-repos-and-procedures.md` Part B); D12 (2026-10-27) each stack reference lives in its own repo, pinned by tag and full commit SHA in `stacks/<id>/reference.md` (same proposal, Part A). D13 (2026-11-03) the workflow is an enforced graph: `workflow.graph.yaml` is the source of the phase, path and budget tables in conventions.md; every run keeps a hash-chained ledger in `.specify/runs/`; guard and approval hooks in Claude Code, Copilot CLI and Codex refuse launches the run does not allow and take gate approvals only from the human's own message (`schemas/workflow-graph.schema.md`; agent-config `specs/019-workflow-graph/`).
 
 Completed 2026-10-04 after phase 1: `validate-project.mjs`; the knowledge framework deployed with `validate-knowledge.mjs`; 23 verified knowledge docs seeded (OOP, DDD, functional modeling, JS runtime, concurrency, error handling, operations, web APIs), so every paradigm and stack runtime rule has a `Source`; rbac-demo piloted on the v2 store D schemas (paradigm `functional-pipeline@1`, kept under PDM-Q1); OTS Company KB `system/` created.
 

@@ -197,6 +197,16 @@ function expectOutput(world, code, expected) {
   }
 }
 
+// The exit code alone, when the output is checked line by line ("the output has the line …").
+Then('it exits with {int}', function (code) {
+  assert.equal(this.result.code, code, `output:\n${this.result.out}`);
+});
+
+// A hook that leaves the call alone prints nothing at all.
+Then('it exits with {int} and prints nothing', function (code) {
+  expectOutput(this, code, '');
+});
+
 Then('it passes with no warnings', function () {
   expectOutput(this, 0, getTool(this.toolName).quietPass);
 });

@@ -4,8 +4,8 @@ type: reference
 topic: ai-agents
 status: verified
 applies-to: ["Claude Code 2.1.278–2.1.308 (local tests)", "Claude Code docs read 2026-10-30 (features up to v2.1.307)"]
-last-verified: 2026-10-31
-last-updated: 2026-10-31
+last-verified: 2026-11-03
+last-updated: 2026-11-03
 tags: [claude-code, tokens, usage, cost, prompt-caching, compaction, opentelemetry, subagents, agent-teams, workflows]
 ---
 
@@ -73,7 +73,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 | OpenTelemetry events | `claude_code.api_request` (`input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_creation_tokens`, `cost_usd`, `duration_ms`), `claude_code.tool_result` (sizes, duration), `api_error`, `user_prompt` (redacted by default) | ✅[^4] |
 | Enable OpenTelemetry | `CLAUDE_CODE_ENABLE_TELEMETRY=1`, `OTEL_METRICS_EXPORTER`, `OTEL_LOGS_EXPORTER`, `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_EXPORTER_OTLP_ENDPOINT`; metrics every 60 s, logs every 5 s by default; temporality `delta` by default | ✅[^4] |
 
-### Hooks for per-turn reporting
+### Hooks for per-turn reporting and for guarding subagent launches
 
 | Hook or field | Behaviour | Status |
 |---|---|---|
@@ -83,6 +83,12 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 | `SubagentStop` | Runs when a subagent finishes; input adds `agent_id`, `agent_type`, `agent_transcript_path` (the subagent's own file) | ✅[^15] |
 | `systemMessage` (JSON output) | A message shown to the user; hook strings and plain output are capped at 10,000 characters | ✅[^15] |
 | Where hooks are set | The `hooks` key of `settings.json`, by event and matcher | ✅[^1] |
+| `PreToolUse` on `Agent` | The subagent tool is `Agent` (`tool_input`: `prompt`, `description`, `subagent_type`, optional `model`); a hook with matcher `Agent` can refuse the launch with `hookSpecificOutput.permissionDecision: "deny"` and a reason, or with exit code 2 (stderr becomes the error) | ✅[^15] |
+| `SubagentStart` | Runs when a subagent starts (`agent_id`, `agent_type`); it can add context but cannot block the subagent | ✅[^15] |
+| `PreToolUse` deny in `claude -p` | A project hook (`--setting-sources project`) with matcher `Agent` denied the launch in a non-interactive run; the agent received the reason verbatim; the input held `tool_name: "Agent"`, `tool_input` {`description`, `prompt`, `subagent_type`} | ✅[^17] |
+| `UserPromptSubmit` | Input adds `prompt` (the typed text; a `/command` arrives as typed) and `session_title`; it can block the prompt (`decision: "block"` or exit 2) or add context | ✅[^15] |
+| `claude -p --agent <name>` | Runs the prompt as that custom agent (tested with `sdlc-qa`) | ✅[^17] |
+| `UserPromptSubmit` in `claude -p` | Runs for the prompt of a non-interactive run too: a project hook recorded the typed text of `claude -p "approve G2 R-001 …"` (agentic-sdlc workflow guard, live test) | ✅[^17] |
 
 ### Settings and environment variables that change token use
 
@@ -123,6 +129,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 | Background subagents | Subagents that run while you keep working | Same cost; runs in parallel | ✅[^8] |
 | Agent teams (experimental) | A lead plus peer sessions with a shared task list and messages | Each teammate is a full instance: about 7× tokens when teammates run in plan mode | ✅[^1][^9] |
 | Dynamic workflows | A script Claude writes that runs dozens to hundreds of agents | Intermediate results stay in script variables, not in a context; fan-outs wait up to 5 s so agents share the first one's cache | ✅[^10][^2] |
+| Dynamic workflows: control | JavaScript with `agent()`, `pipeline()`, `parallel()`, `phase()`; no mid-run user input (a sign-off between stages needs one workflow per stage); a relaunch in the same session replays saved results; up to 16 concurrent agents by default, 1,000 per run | The script, not Claude, decides what runs next; Claude Code only | ✅[^10] |
 | Parallel sessions in the same directory | Separate conversations | Same prefix, so they can share cache; other directories do not | ✅[^2] |
 | Fast mode | Same Opus model, faster output | Opus 5.5 at $8 / $40 per million input / output tokens; on subscriptions only through usage credits | ✅[^11] |
 
@@ -156,7 +163,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 79 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-31
+- Verified: 86 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
 ## References
 - [Manage costs effectively](https://code.claude.com/docs/en/costs) — Anthropic, living. Backs: `/usage`, `/insights`, levers, background usage, agent team costs, `modelPricing`. [^1]
@@ -168,13 +175,14 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - [Explore the context window](https://code.claude.com/docs/en/context-window) — Anthropic, living. Backs: what survives compaction, `/rewind` summarize. [^7]
 - [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — Anthropic, living. Backs: subagent models, Explore/Plan, forks, background, concurrency limit. [^8]
 - [Orchestrate teams of Claude Code sessions](https://code.claude.com/docs/en/agent-teams) — Anthropic, living. Backs: experimental flag, teammates as full instances. [^9]
-- [Orchestrate subagents at scale with dynamic workflows](https://code.claude.com/docs/en/workflows) — Anthropic, living. Backs: script-held orchestration, scale. [^10]
+- [Orchestrate subagents at scale with dynamic workflows](https://code.claude.com/docs/en/workflows) — Anthropic, living. Backs: script-held orchestration, scale, script functions, no mid-run input, resume by replay, limits. [^10]
 - [Speed up responses with fast mode](https://code.claude.com/docs/en/fast-mode) — Anthropic, living. Backs: 2.5× speed, Opus 5.5 pricing, usage-credits only. [^11]
 - [Track cost and usage (Agent SDK)](https://code.claude.com/docs/en/agent-sdk/cost-tracking) — Anthropic, living. Backs: deduplicate by message ID, placeholder output. [^12]
 - [Environment variables](https://code.claude.com/docs/en/env-vars) — Anthropic, living. Backs: `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`. [^13]
-- [Hooks reference](https://code.claude.com/docs/en/hooks) — Anthropic, living. Backs: `Stop`, `SubagentStop`, `systemMessage`, and the timing warning. [^15]
+- [Hooks reference](https://code.claude.com/docs/en/hooks) — Anthropic, living. Backs: `Stop`, `SubagentStop`, `SubagentStart`, `PreToolUse` on `Agent` and its deny output, `systemMessage`, and the timing warning. [^15]
 - `~/.claude/projects/*/*.jsonl` — local test, 2026-10-30, Claude Code 2.1.278 and 2.1.308: transcript layout, `cost-state`, `compact_boundary`, placeholder outputs; `claude --version` on `PATH` printed 2.1.129. [^14]
 - `~/.claude/turn-tokens/` — local test, 2026-10-31, Claude desktop app with Claude Code 2.1.308: a new session wrote its `Stop`-hook report there but no status-line file. [^16]
+- `claude -p` runs (Claude Code 2.1.129 on PATH), local test, 2026-11-03: a `PreToolUse` hook denying `Agent`, the recorded hook input, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check (a denied `Agent` launch, an approval recorded by `UserPromptSubmit` in `-p`, the launch then allowed). [^17]
 
 ## Related
 - `ai-agents/agent-token-accounting.md`

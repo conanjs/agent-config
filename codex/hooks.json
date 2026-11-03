@@ -24,6 +24,31 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh\" hook guard --agent codex",
+            "commandWindows": "node \"%USERPROFILE%\\.copilot\\frameworks\\agentic-sdlc\\tools\\workflow-graph\\src\\main.ts\" hook guard --agent codex",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh\" hook approve --agent codex",
+            "commandWindows": "node \"%USERPROFILE%\\.copilot\\frameworks\\agentic-sdlc\\tools\\workflow-graph\\src\\main.ts\" hook approve --agent codex",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

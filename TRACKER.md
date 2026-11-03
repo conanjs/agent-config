@@ -29,7 +29,47 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-02
 
+### T-11 Split the Graph Engineering study guide below ~400 lines (KD-6)
+- status: open
+- next: Move the runnable simulation and its trace, or the survey views, into their own knowledge-doc/v1 doc; keep a pointer
+- from: 2026-11-02
+
+### T-14 Explain the Codex launch-guard cause in detail
+- status: waiting
+- next: V asks; explain from zero: what a hook matcher is (the pattern Agent|apply_patch|Edit|Write), tool names and namespaces, why collaborationspawn_agent did not match, why the message arrives encrypted, and the task_name convention (specs/019 research.md D20, codex-usage-reference.md)
+- waiting-on: V
+- from: 2026-11-03
+
+### T-15 Review and merge PR #11 (spec 019, workflow graph phase 1)
+- status: waiting
+- next: V reviews https://github.com/conanjs/agent-config/pull/11 and says when to merge (merge commit, then pull main)
+- waiting-on: V
+- from: 2026-11-03
+
 ## Done
+
+### T-13 Decide the Codex launch guard
+- status: done
+- next: V re-trusts the Codex PreToolUse hook (matcher now *) in /hooks; then the agent re-runs the live Codex launch check (spawn with task_name r…_p4_architecture at an unapproved G2 must be refused)
+- waiting-on: V
+- from: 2026-11-03
+- updated: 2026-11-03
+- closed: 2026-11-03
+
+### T-12 Finish the workflow guard setup for Codex and Claude Code
+- status: done
+- next: Codex: trust the PreToolUse and UserPromptSubmit hooks in /hooks, then repeat specs/019 quickstart §4; Claude Code: merge hooks.PreToolUse and hooks.UserPromptSubmit from claude/settings.json into ~/.claude/settings.json
+- waiting-on: V
+- from: 2026-11-03
+- closed: 2026-11-03
+
+### T-10 Decide whether to turn agentic-sdlc's written workflow into an enforced graph
+- status: done
+- next: Location decided (agent-config, written new: D18, D19). V approves the design; then /speckit-tasks and build phase 1 test-first
+- waiting-on: V
+- from: 2026-11-02
+- updated: 2026-11-03
+- closed: 2026-11-03
 
 ### T-8 Build the per-turn token report for Claude Code and Codex
 - status: done

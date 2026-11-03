@@ -1,0 +1,1 @@
+{"hook_event_name":"PreToolUse","session_id":"x1","turn_id":"t1","cwd":"/Users/example/project","model":"gpt","permission_mode":"default","tool_name":"spawn_agent","tool_use_id":"u1","tool_input":{"message":"say hi"}}

@@ -12,21 +12,21 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Atlas](map/agent-config/atlas.md) — This map: the registry, its schema, its tool and the generated pages (33 files)
   - [Tracker](map/agent-config/tracker.md) — Open work carried across sessions: the TRACKER.md format, its tool and the session-start hooks (4 files)
   - [Turn token report](map/agent-config/turn-tokens.md) — What each Claude Code or Codex turn used and the running total: the report's rules, its tool and the Stop hooks (4 files)
-  - [Frameworks](map/agent-config/frameworks.md) — Rule sets with schemas and validators: agentic-sdlc, knowledge, company-kb, agent-foundry (125 files)
-    - [Agentic SDLC framework](map/agent-config/agentic-sdlc.md) — Roles, foundations, decision trees, stacks and paradigms for spec-driven, multi-agent delivery (83 files)
+  - [Frameworks](map/agent-config/frameworks.md) — Rule sets with schemas and validators: agentic-sdlc, knowledge, company-kb, agent-foundry (198 files)
+    - [Agentic SDLC framework](map/agent-config/agentic-sdlc.md) — Roles, foundations, decision trees, stacks and paradigms for spec-driven, multi-agent delivery (156 files)
     - [Knowledge framework](map/agent-config/knowledge-framework.md) — Schemas and validator for the global knowledge base (6 files)
     - [Company KB framework](map/agent-config/company-kb-framework.md) — Schemas for per-company knowledge bases (11 files)
     - [Agent Foundry](map/agent-config/agent-foundry.md) — Charters, floors, trees and lenses for standalone review and triage agents (25 files)
-  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (123 files)
+  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (124 files)
   - [Company knowledge bases](map/agent-config/companies.md) — Facts about one company's systems, one folder per company (20 files)
   - [Procedures](map/agent-config/procedures.md) — Repeatable multi-step tasks, written once in tool-neutral prose (10 files)
   - [Patterns](map/agent-config/patterns.md) — Named, reusable techniques learned from real cases (12 files)
-  - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (54 files)
+  - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (55 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (17 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
-  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (131 files)
-  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (99 files)
-  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (13 files)
+  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (140 files)
+  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (107 files)
+  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (14 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
   - [Source](map/reference-typescript-node/ref-src.md) — The composition root, module composers and the four layers of each module
@@ -63,6 +63,8 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Stack profiles](map/agent-config/agentic-sdlc.md#sdlc-stack) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/stacks/**/*.md` | `copilot/frameworks/agentic-sdlc/schemas/stack.schema.md` | `copilot/frameworks/agentic-sdlc/index.md` | validate.mjs STACK, IDIOM, FW, PDM | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Paradigms](map/agent-config/agentic-sdlc.md#sdlc-paradigm) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/paradigms/*.md` | `copilot/frameworks/agentic-sdlc/schemas/paradigm.schema.md` | `copilot/frameworks/agentic-sdlc/index.md` | validate.mjs PDM | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Schemas](map/agent-config/agentic-sdlc.md#sdlc-schema) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/schemas/*.md` | `copilot/frameworks/agentic-sdlc/schemas/_system.md` | `copilot/frameworks/agentic-sdlc/schemas/_system.md` | validate.mjs SCHEMA | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
+| [Workflow graph](map/agent-config/agentic-sdlc.md#wg-graph) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/workflow.graph.{yaml,json}` | `copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md` | `copilot/frameworks/agentic-sdlc/conventions.md` | workflow-graph check-graph | `tests/workflow-graph/workflow-graph.feature` | `~/.copilot/frameworks` |
+| [Workflow graph tool](map/agent-config/agentic-sdlc.md#wg-tool) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/tools/workflow-graph/**` | `copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md` | `specs/019-workflow-graph/plan.md` | scenarios, tsc, eslint, vitest | `tests/workflow-graph/workflow-graph.feature` | `~/.copilot/frameworks` |
 | [Validators](map/agent-config/agentic-sdlc.md#sdlc-tool) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/tools/*.mjs` | — | `copilot/frameworks/agentic-sdlc/index.md` | scenarios | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Knowledge schemas](map/agent-config/knowledge-framework.md#kf-schema) | Knowledge framework | `copilot/frameworks/knowledge/schemas/*.md` | `copilot/frameworks/knowledge/schemas/_system.md` | `copilot/frameworks/knowledge/index.md` | — | `tests/validate-knowledge/validate-knowledge.feature` | `~/.copilot/frameworks` |
 | [Knowledge validator](map/agent-config/knowledge-framework.md#kf-tool) | Knowledge framework | `copilot/frameworks/knowledge/tools/*.mjs` | — | `copilot/frameworks/knowledge/index.md` | scenarios | `tests/validate-knowledge/validate-knowledge.feature` | `~/.copilot/frameworks` |
@@ -96,7 +98,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Features](map/agent-config/tests.md#test-feature) | Tool tests | `tests/*/{*.feature,tool.mjs}` | — | — | cucumber-js | — | — |
 | [Fixtures](map/agent-config/tests.md#test-fixture) | Tool tests | `tests/*/fixtures/**` | — | — | — | — | — |
 | [Checks, hooks and CI](map/agent-config/tooling.md#repo-check) | Repo tooling | `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` | — | `README.md` | — | — | — |
-| [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,cucumber.mjs,.nvmrc,.gitignore}` | — | `README.md` | — | — | — |
+| [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,.nvmrc,.gitignore}` | — | `README.md` | — | — | — |
 | [GitHub repo templates](map/agent-config/templates.md#template) | Templates | `templates/**` | — | `copilot/procedures/init-github-governance.procedure.md` | — | — | — |
 | [Composition root and entry point](map/reference-typescript-node/ref-src.md#ref-composition) | Source | `src/{CompositionRoot,main}.ts` | — | `docs/architecture.md` | lint (MOD-11 zones) | `test/integration/documents.int.test.ts` | — |
 | [Module composers](map/reference-typescript-node/ref-src.md#ref-composer) | Source | `src/modules/*/*Module.ts` | — | `docs/architecture.md` | lint (MOD-11 zones) | — | — |

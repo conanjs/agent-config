@@ -558,6 +558,35 @@ function componentFor(taskPath) {
 const taskProcedures = new Map(); // Tnnn -> { label, line, procedure, meta, component }
 
 // Tasks ---------------------------------------------------------------------
+// requires: (task-line/v1, specs/019 US4): known ids, no cycle, and [P] tasks that can really run together.
+function checkTaskDependencies(label, tasks) {
+  for (const [id, t] of tasks) for (const r of t.requires) {
+    if (!tasks.has(r)) fail('TASK', `${label}:${t.line + 1}: requires ${r}, which is not a task in this file`);
+    else if (t.parallel && tasks.get(r).parallel) fail('TASK', `${label}:${t.line + 1}: [P] task ${id} requires ${r}, which is also [P]; they cannot run at the same time`);
+  }
+  const cycle = findCycle(tasks);
+  if (cycle) fail('TASK', `${label}: tasks require each other in a cycle: ${cycle.join(' → ')}`);
+  const byPath = new Map();
+  for (const [id, t] of tasks) if (t.parallel && t.path) {
+    const other = byPath.get(t.path);
+    if (other) fail('TASK', `${label}:${t.line}: [P] tasks ${other} and ${id} both write ${t.path}`);
+    else byPath.set(t.path, id);
+  }
+}
+function findCycle(tasks) {
+  const state = new Map();
+  const visit = (id, stack) => {
+    state.set(id, 'open');
+    for (const r of tasks.get(id)?.requires ?? []) {
+      if (state.get(r) === 'open') return [...stack.slice(stack.indexOf(r)), r];
+      if (!state.has(r) && tasks.has(r)) { const c = visit(r, [...stack, r]); if (c) return c; }
+    }
+    state.set(id, 'done');
+    return null;
+  };
+  for (const id of tasks.keys()) if (!state.has(id)) { const c = visit(id, [id]); if (c) return c; }
+  return null;
+}
 function resolveRef(ref) {
   const r = stripTicks(ref);
   if (!r || r === 'none') return null;
@@ -569,9 +598,20 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
   const text = read(p);
   const lines = text.split(/\r?\n/);
   const label = relProject(p);
+  const fileTasks = new Map(); // Tnnn -> { line, parallel, path, requires } for the requires: checks (specs/019 US4)
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (!/^- \[[ xX]\]\s+T\d+/.test(line)) continue;
+    {
+      const cont = /^\s+[\w-]+:/.test(lines[i + 1] ?? '') ? lines[i + 1] : '';
+      const req = cont.split('·').map((f) => f.trim().match(/^requires:\s*(.*)$/)).find(Boolean)?.[1] ?? 'none';
+      fileTasks.set(line.match(/^- \[[ xX]\]\s+(T\d+)/)[1], {
+        line: i + 1,
+        parallel: /\[P\]/.test(line),
+        path: line.match(/\(([^()]+)\)\s*(?:\[|$)/)?.[1]?.trim(),
+        requires: req === 'none' ? [] : req.split(',').map((t) => t.trim()).filter(Boolean),
+      });
+    }
     const tags = [...line.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1]);
     const dept = [...tags].reverse().find((t) => roleTags.has(t));
     const exec = [...tags].reverse().find((t) => ['llm', 'script'].includes(t));
@@ -624,6 +664,7 @@ for (const p of walk(path.join(projectRoot, 'specs')).filter((f) => f.endsWith(`
       if (inputsLine && (!proc || proc === 'none')) fail('TASK', `${label}:${i + 3}: inputs: given but the task has no procedure`);
     }
   }
+  checkTaskDependencies(label, fileTasks);
   checkTreeCitations(label, text);
   checkRuleCitations(label, text);
   for (const m of text.matchAll(/\b((?:DR-\d{3})|(?:PDM-[a-z0-9-]+(?:-\d+)?))\b/g)) {
