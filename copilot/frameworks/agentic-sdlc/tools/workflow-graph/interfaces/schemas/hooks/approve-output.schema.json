@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/approve-output.schema.json",
+  "title": "hook approve stdout, any agent",
+  "description": "Copilot CLI gets {}; Claude Code and Codex get nothing.",
+  "$ref": "copilot-cli.schema.json#/$defs/approveOutput"
+}

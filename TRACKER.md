@@ -46,7 +46,31 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-03
 
+### T-16 Finish the workflow runner (spec 020, phase 2)
+- status: open
+- next: Built; doc comments now follow the stack reference (D35); progress lines (D36). Left: V decides cleanup of the R-007 test run in agent-config (.specify/runs/R-007.*, ../agent-config.runs/R-007, branch run/R-007), commit + stacked PR, and the live P6 check (T011b)
+- from: 2026-11-03
+- updated: 2026-11-03
+
+### T-18 Run usage lint on the workflow-graph CLI spec
+- status: waiting
+- next: Install the usage CLI (brew install usage), run: usage lint -W copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/workflow-graph.usage.kdl; fix findings; record the result in usage-spec-deep-dive.md (specs/021 T013)
+- waiting-on: V
+- from: 2026-11-03
+
+### T-19 Describe the repo's other programs in the interface catalog
+- status: open
+- next: One spec per program listed as 'not yet described' in INTERFACES.md (validators, atlas, tracker, turn-tokens, installers, check-docs): usage spec, JSON Schemas, a drift check (CON-15, CON-16)
+- from: 2026-11-03
+
 ## Done
+
+### T-17 Give every repo a published interface catalog (start with workflow-graph)
+- status: done
+- next: V approves the design: CON-15/CON-16 in contract-design.md + new format rows; then INTERFACES.md, catalog-info.yaml, an OpenCLI file, JSON Schemas for files and hook payloads, --help/--version, and a drift test for the workflow-graph tool
+- waiting-on: V
+- from: 2026-11-03
+- closed: 2026-11-03
 
 ### T-13 Decide the Codex launch guard
 - status: done

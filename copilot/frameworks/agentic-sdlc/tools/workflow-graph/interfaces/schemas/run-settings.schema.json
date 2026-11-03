@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/run-settings.schema.json",
+  "title": "Runner settings of a run",
+  "description": ".specify/runs/<run>/run.json, written by `run start` and read by `run resume` and `run approve`. Internal: may change without notice.",
+  "type": "object",
+  "required": [
+    "run",
+    "path",
+    "feature",
+    "agent",
+    "overrides",
+    "checks",
+    "maxUsdPerLaunch",
+    "timeoutMinutes"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "run": {
+      "type": "string",
+      "pattern": "^R-\\d{3,}$",
+      "description": "Run id, e.g. R-007"
+    },
+    "path": {
+      "type": "string",
+      "description": "Path id from the graph"
+    },
+    "feature": {
+      "type": "string"
+    },
+    "agent": {
+      "enum": [
+        "claude-code",
+        "copilot-cli",
+        "codex"
+      ]
+    },
+    "overrides": {
+      "type": "object",
+      "additionalProperties": {
+        "enum": [
+          "claude-code",
+          "copilot-cli",
+          "codex"
+        ]
+      },
+      "description": "Role → agent, from --role-agent"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Script checks run after each P6 execute, from --check"
+    },
+    "maxUsdPerLaunch": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "timeoutMinutes": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "mission": {
+      "type": "string"
+    }
+  }
+}

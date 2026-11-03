@@ -1,13 +1,13 @@
 ---
 schema: foundation/v2
-last-updated: 2026-10-04
+last-updated: 2026-11-03
 rule-prefix: CON
 subject: design
 ---
 
 # Contract Design
 
-How to design, version, evolve, and retire the contracts between services and between a service and its clients — contract first, compatibility by default. Reviews cite `CON-n`.
+How to design, version, evolve, and retire the contracts between services and between a service and its clients — contract first, compatibility by default — and how a repo publishes every interface it exposes (commands, files, payloads, environment variables, APIs, events, libraries) so people and programs can use it without its code. Reviews cite `CON-n`.
 
 ## Rules
 
@@ -27,6 +27,8 @@ How to design, version, evolve, and retire the contracts between services and be
 | CON-12 | Deprecate before removal. Mark deprecated in the contract, announce a sunset date, emit deprecation signals (e.g. `Deprecation`/`Sunset` headers), and measure remaining usage. Remove only when usage is zero or the sunset has passed with consumer sign-off. | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CON-13 | Compatibility is checked automatically on every change by diffing against the last released contract (`../review/fitness-functions.md`, FF-6). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm | — |
 | CON-14 | Consumer-driven expectations run in the provider's pipeline; a provider change that breaks a recorded consumer expectation fails the build (run via `cmd.test_integration`). | The affected artifact demonstrably satisfies the rule. | The artifact violates this rule in the affected surface. | llm (fallback) | — |
+| CON-15 | Publish an interface catalog. A repo lists every interface another program or person may use: commands and flags, exit codes, files it reads or writes, stdin/stdout payloads, environment variables, HTTP APIs, events and libraries. The list lives in `INTERFACES.md` (people) and a Backstage-format `catalog-info.yaml` (programs); each entry gives kind, direction (provides or consumes), visibility (public or internal), lifecycle and a link to its machine-readable description in the format the Formats table names. | A reader can learn every interface from the catalog and its links without opening the code; every public interface has a description file | A CLI documented only by its `--help`; a JSON file other tools read with no schema; an environment variable found only by reading the source | llm | `knowledge/documentation/interface-description-standards.md` |
+| CON-16 | Descriptions are checked against the code. Each interface has one source; its other forms (help text, docs, types) are generated from it or tested against it, and a difference fails the build. A breaking change to a public interface is found by diffing against the last release (CON-13). | A check fails when a flag, command, field or variable exists on one side only; that check is proven to catch a planted fault | A hand-written spec folder that lists commands the tool no longer has; help text and docs that disagree | script (fallback llm) | `knowledge/documentation/interface-description-standards.md` |
 
 ## Interpreting
 
@@ -37,6 +39,12 @@ How to design, version, evolve, and retire the contracts between services and be
 | Synchronous request/response over HTTP | OpenAPI 3.x | `contracts/<service>/<name>.openapi.yaml` |
 | Asynchronous events / messages | AsyncAPI 2.x/3.x (+ JSON Schema payloads) | `contracts/<service>/<name>.asyncapi.yaml` |
 | Binary RPC / high-throughput internal calls | protobuf (proto3) | `contracts/<service>/<package>/*.proto` |
+| JSON-RPC 2.0 calls | OpenRPC 1.4.x | `contracts/<service>/<name>.openrpc.json` |
+| Command-line program (commands, flags, arguments, exit codes, outputs) | usage spec (KDL); OpenCLI (opencli.org) when the framework exports it, e.g. Spectre.Console | `<tool>/interfaces/<tool>.usage.kdl` |
+| JSON files, JSON Lines records, stdin/stdout payloads, config files | JSON Schema 2020-12 | `<tool>/interfaces/schemas/*.schema.json` |
+| Environment variables | A table in the catalog, generated from the code's declaration list | `INTERFACES.md` |
+| TypeScript library | API Extractor report, committed | `etc/<package>.api.md` |
+| The catalog of all of the above (CON-15) | `INTERFACES.md` + Backstage `catalog-info.yaml` (`kind: API`, `spec.definition`) | repo or tool root |
 
 One format per interaction style per system; the choice is a decision record. The system repo owns cross-service contracts; a repo owns only its internal ones.
 
@@ -48,6 +56,9 @@ One format per interaction style per system; the choice is a decision record. Th
 4. **Review with every known consumer**; capture each consumer's expectations as contract tests (below).
 5. **Freeze at G3**; implementation tasks reference the contract file.
 6. **Generate or validate** server stubs and client types from the contract where the stack profile supports it, so code cannot drift from it.
+7. **List it in the catalog** (CON-15) and add the check that compares it with the code (CON-16).
+
+**Worked example (CON-15, CON-16):** agent-config's workflow-graph tool. `INTERFACES.md` lists 14 interfaces; the CLI is described in `interfaces/workflow-graph.usage.kdl`, from which `--help` and the catalog's command section are generated; the ledger and hook payloads have JSON Schemas that unit tests validate real output against; `workflow-graph interfaces` fails when a handler parses a flag the spec does not describe (specs/021 in agent-config).
 
 **Design rules**
 
@@ -74,9 +85,11 @@ One format per interaction style per system; the choice is a decision record. Th
 - `copilot/frameworks/agentic-sdlc/schemas/foundation.schema.md`: schema and required structure for this foundation.
 - `copilot/frameworks/agentic-sdlc/schemas/_system.md`: shared rule-table, id, path and references rules.
 - `foundations/design/contract-design.md`: this foundation file.
+- `knowledge/documentation/interface-description-standards.md`: which format describes which kind of interface (CON-15, CON-16), with its deep dives on OpenCLI, usage and the other CLI formats.
 
 **External authoritative sources:**
 - OpenAPI Specification 3.1 — spec.openapis.org; AsyncAPI Specification — asyncapi.com; Protocol Buffers Language Guide (proto3) — protobuf.dev.
+- usage spec — usage.jdx.dev/spec; OpenCLI — opencli.org; JSON Schema 2020-12 — json-schema.org/specification; OpenRPC — spec.open-rpc.org; Backstage descriptor format — backstage.io/docs/features/software-catalog/descriptor-format; API Extractor — api-extractor.com.
 - Martin Fowler, "TolerantReader" (2011); Ian Robinson, "Consumer-Driven Contracts: A Service Evolution Pattern" (2006).
 - RFC 8594, *The Sunset HTTP Header Field*; RFC 9745, *The Deprecation HTTP Response Header Field*.
 - RFC 9457, *Problem Details for HTTP APIs*.

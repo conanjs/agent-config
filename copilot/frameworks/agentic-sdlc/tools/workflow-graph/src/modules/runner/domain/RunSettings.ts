@@ -1,7 +1,7 @@
 import { err, ok, type Result } from "#src/modules/shared/domain/Result.ts";
 import { AgentAssignment } from "./AgentAssignment.ts";
 
-/** The stored form of a run's settings (`.specify/runs/<run>.run.json`). */
+/** The stored form of a run's settings (`.specify/runs/<run>/run.json`). */
 export type RunSettingsData = {
   /** Run id, the ledger and worktree name. */
   readonly run: string;

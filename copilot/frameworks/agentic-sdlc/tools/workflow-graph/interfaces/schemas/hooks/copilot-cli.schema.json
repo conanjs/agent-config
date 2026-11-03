@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/copilot-cli.schema.json",
+  "title": "Copilot CLI hook JSON read and written by workflow-graph",
+  "description": "Only the fields the tool reads; GitHub owns the full format (tolerant reader, CON-10). Verified in copilot/knowledge/ai-agents/copilot-usage-reference.md. Copilot may send toolArgs as a JSON-encoded string.",
+  "$defs": {
+    "guardInput": {
+      "description": "preToolUse hook input",
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "toolName"
+          ]
+        },
+        {
+          "required": [
+            "tool_name"
+          ]
+        }
+      ],
+      "properties": {
+        "toolName": {
+          "type": "string",
+          "description": "task = a sub-agent launch; edit, create, write, str_replace_editor = a file write"
+        },
+        "tool_name": {
+          "type": "string"
+        },
+        "toolArgs": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "prompt": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "file_path": {
+                  "type": "string"
+                },
+                "filePath": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "string",
+              "description": "The same object, JSON-encoded"
+            }
+          ]
+        },
+        "tool_input": {
+          "type": "object"
+        },
+        "cwd": {
+          "type": "string"
+        }
+      }
+    },
+    "approveInput": {
+      "description": "userPromptSubmitted hook input",
+      "type": "object",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Session folder under $COPILOT_HOME/session-state/"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string"
+        }
+      }
+    },
+    "guardOutput": {
+      "description": "{} allows (or is not the tool's business); a deny names the reason",
+      "oneOf": [
+        {
+          "type": "object",
+          "maxProperties": 0
+        },
+        {
+          "type": "object",
+          "required": [
+            "permissionDecision",
+            "permissionDecisionReason"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "permissionDecision": {
+              "const": "deny"
+            },
+            "permissionDecisionReason": {
+              "type": "string",
+              "description": "Why the launch or edit is refused; shown to the agent"
+            }
+          }
+        }
+      ]
+    },
+    "approveOutput": {
+      "type": "object",
+      "maxProperties": 0,
+      "description": "Always {}"
+    }
+  }
+}

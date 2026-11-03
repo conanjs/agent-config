@@ -1,10 +1,10 @@
 import type { Result } from "#src/modules/shared/domain/Result.ts";
 import type { RunSettingsData } from "#src/modules/runner/domain/RunSettings.ts";
 
-/** Keeps a run's settings (`<run>.run.json`) and reads the files the runner needs from the project. */
+/** Keeps a run's settings (`<run>/run.json`) and reads the files the runner needs from the project. */
 export interface RunSettingsStore {
   /**
-   * Saves the settings as `.specify/runs/<run>.run.json` in the main checkout, replacing an earlier copy.
+   * Saves the settings as `.specify/runs/<run>/run.json` in the main checkout, replacing an earlier copy.
    *
    * @param project - main checkout
    * @param data - the settings to keep

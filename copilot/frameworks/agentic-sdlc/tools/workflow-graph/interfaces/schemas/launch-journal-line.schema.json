@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/launch-journal-line.schema.json",
+  "title": "Launch journal line",
+  "description": "One line of .specify/runs/<run>/launches.jsonl: the runner writes started before launching a role and finished after, so a crash never repeats a launch. Internal: may change without notice.",
+  "type": "object",
+  "required": [
+    "key",
+    "event"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "<phase or task>@<visit>#<index>:<role>:<mode>, e.g. P1@1#0:product-spec:propose"
+    },
+    "event": {
+      "enum": [
+        "started",
+        "finished"
+      ]
+    },
+    "result": {
+      "type": "string",
+      "description": "The role's result, on finished lines"
+    }
+  },
+  "if": {
+    "properties": {
+      "event": {
+        "const": "finished"
+      }
+    }
+  },
+  "then": {
+    "required": [
+      "result"
+    ]
+  }
+}

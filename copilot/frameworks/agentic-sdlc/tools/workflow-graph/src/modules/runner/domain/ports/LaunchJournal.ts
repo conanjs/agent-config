@@ -4,7 +4,7 @@ export type LaunchState =
   | { readonly kind: "started" }
   | { readonly kind: "finished"; readonly result: string };
 
-/** Records each launch's start and end (`<run>.launches.jsonl`), so a crash never repeats a launch blindly (US2.3). */
+/** Records each launch's start and end (`<run>/launches.jsonl`), so a crash never repeats a launch blindly (US2.3). */
 export interface LaunchJournal {
   /**
    * Returns what is recorded for it.

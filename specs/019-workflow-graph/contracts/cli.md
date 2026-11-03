@@ -1,5 +1,7 @@
 # Contract: `workflow-graph`
 
+> **Replaced (2026-11-03, specs/021):** this was the design-time contract. The living description is the tool's interface catalog, `copilot/frameworks/agentic-sdlc/tools/workflow-graph/INTERFACES.md`, checked against the code by `workflow-graph interfaces`. Kept as the record of what spec 019 decided.
+
 `node copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/main.ts <command> [options]`
 
 Installed form: `~/.copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/main.ts`. Node.js ≥ 24, no dependencies except `--write`, which needs the repo's `pnpm install` for `yaml`.

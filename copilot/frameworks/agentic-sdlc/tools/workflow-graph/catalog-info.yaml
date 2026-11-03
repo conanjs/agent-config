@@ -1,0 +1,92 @@
+# The workflow-graph tool's interfaces for programs (Backstage descriptor format,
+# https://backstage.io/docs/features/software-catalog/descriptor-format/). People read INTERFACES.md, which lists
+# the same entries; `workflow-graph interfaces` checks the two agree and that every definition file exists (IF-7).
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: workflow-graph
+  description: Keeps agentic-sdlc runs on the workflow graph; guards role launches; runs roles headless
+spec:
+  type: tool
+  lifecycle: experimental
+  owner: user:vinh-doq
+  providesApis:
+    - workflow-graph-cli
+    - workflow-graph-ledger
+    - workflow-graph-hooks-claude-code
+    - workflow-graph-hooks-copilot-cli
+    - workflow-graph-hooks-codex
+  consumesApis:
+    - workflow-graph-file
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: workflow-graph-cli
+  description: Every command, flag, argument and exit code
+spec:
+  type: usage
+  lifecycle: experimental
+  owner: user:vinh-doq
+  definition:
+    $text: ./interfaces/workflow-graph.usage.kdl
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: workflow-graph-ledger
+  description: One JSON object per line in .specify/runs/<run>/ledger.jsonl, hash-chained
+spec:
+  type: jsonschema
+  lifecycle: experimental
+  owner: user:vinh-doq
+  definition:
+    $text: ./interfaces/schemas/ledger-line.schema.json
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: workflow-graph-file
+  description: The shape of workflow.graph.yaml and the generated workflow.graph.json
+spec:
+  type: jsonschema
+  lifecycle: production
+  owner: user:vinh-doq
+  definition:
+    $text: ./interfaces/schemas/workflow-graph.schema.json
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: workflow-graph-hooks-claude-code
+  description: Claude Code PreToolUse and UserPromptSubmit hook JSON the tool reads, and its replies
+spec:
+  type: jsonschema
+  lifecycle: experimental
+  owner: user:vinh-doq
+  definition:
+    $text: ./interfaces/schemas/hooks/claude-code.schema.json
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: workflow-graph-hooks-copilot-cli
+  description: Copilot CLI preToolUse and userPromptSubmitted hook JSON the tool reads, and its replies
+spec:
+  type: jsonschema
+  lifecycle: experimental
+  owner: user:vinh-doq
+  definition:
+    $text: ./interfaces/schemas/hooks/copilot-cli.schema.json
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: workflow-graph-hooks-codex
+  description: Codex PreToolUse and UserPromptSubmit hook JSON the tool reads, and its replies
+spec:
+  type: jsonschema
+  lifecycle: experimental
+  owner: user:vinh-doq
+  definition:
+    $text: ./interfaces/schemas/hooks/codex.schema.json

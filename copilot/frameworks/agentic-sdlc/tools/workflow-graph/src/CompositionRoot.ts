@@ -3,6 +3,8 @@ import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { CommandOutput } from "#src/modules/shared/domain/CommandOutput.ts";
+import type { OptionTable } from "#src/modules/shared/domain/OptionTable.ts";
+import type { EnvironmentVariable } from "#src/modules/catalog/domain/EnvironmentVariable.ts";
 import { AgentCapabilities } from "#src/modules/coding-agents/domain/AgentCapabilities.ts";
 import {
   CodingAgentRegistry,
@@ -17,6 +19,7 @@ import { CopilotCliHookDialect } from "#src/modules/coding-agents/infrastructure
 import { CopilotCliSessionLog } from "#src/modules/coding-agents/infrastructure/copilot-cli/CopilotCliSessionLog.ts";
 import { JsonlLog } from "#src/modules/coding-agents/infrastructure/JsonlLog.ts";
 import { CommandRunner } from "#src/modules/shared/infrastructure/CommandRunner.ts";
+import { RunFolderLayout } from "#src/modules/shared/infrastructure/RunFolderLayout.ts";
 import { ClaudeCodeHeadlessLauncher } from "#src/modules/coding-agents/infrastructure/claude-code/ClaudeCodeHeadlessLauncher.ts";
 import { CopilotCliHeadlessLauncher } from "#src/modules/coding-agents/infrastructure/copilot-cli/CopilotCliHeadlessLauncher.ts";
 import { CodexHeadlessLauncher } from "#src/modules/coding-agents/infrastructure/codex/CodexHeadlessLauncher.ts";
@@ -42,6 +45,65 @@ import { JsonlRunRepository } from "#src/modules/workflow/infrastructure/JsonlRu
 import { SystemClock } from "#src/modules/workflow/infrastructure/SystemClock.ts";
 import { RunStatusPresenter } from "#src/modules/workflow/interface/cli/RunStatusPresenter.ts";
 import { WorkflowCliHandler } from "#src/modules/workflow/interface/cli/WorkflowCliHandler.ts";
+import { RunCliHandler } from "#src/modules/runner/interface/cli/RunCliHandler.ts";
+
+/**
+ * Every environment variable this program reads, for the interface catalog (spec 021). `workflow-graph interfaces`
+ * fails when `readConfig` reads a name not listed here (IF-5), and INTERFACES.md's table is generated from it.
+ */
+export const ENVIRONMENT: readonly EnvironmentVariable[] = Object.freeze([
+  {
+    name: "WORKFLOW_GRAPH_FRAMEWORK",
+    whenUnset: "the framework folder this tool sits in",
+    audience: "user",
+    meaning: "Folder holding `workflow.graph.yaml`, `workflow.graph.json` and `conventions.md`",
+  },
+  {
+    name: "AGENTIC_SDLC_GUARD",
+    whenUnset: "the guard is on",
+    audience: "human only",
+    meaning:
+      "`off` lets every role launch through; each is written to the named run's ledger as `guard-off` and reported by `check-run`",
+  },
+  {
+    name: "COPILOT_HOME",
+    whenUnset: "`~/.copilot`",
+    audience: "user",
+    meaning:
+      "Copilot CLI's folder, where `verify-approvals` and the approval hook find its session logs",
+  },
+  {
+    name: "WORKFLOW_GRAPH_CLAUDE",
+    whenUnset: "`claude` on `PATH`",
+    audience: "user",
+    meaning: "The Claude Code executable the runner starts",
+  },
+  {
+    name: "WORKFLOW_GRAPH_COPILOT",
+    whenUnset: "`copilot` on `PATH`",
+    audience: "user",
+    meaning: "The Copilot CLI executable the runner starts",
+  },
+  {
+    name: "WORKFLOW_GRAPH_CODEX",
+    whenUnset: "`codex` on `PATH`",
+    audience: "user",
+    meaning: "The Codex executable the runner starts",
+  },
+  {
+    name: "WORKFLOW_GRAPH_NOW",
+    whenUnset: "the system clock",
+    audience: "test only",
+    meaning: "A fixed ISO time written on every ledger line",
+  },
+  {
+    name: "WORKFLOW_GRAPH_FAKE_REPLIES",
+    whenUnset: "real agents are started",
+    audience: "test only",
+    meaning:
+      "A `replies.json` file; every agent launch answers from it instead of starting an agent",
+  },
+]);
 
 /** Settings read once from the environment at startup (idiom.config). */
 export type Config = {
@@ -102,7 +164,7 @@ export function compose(
   config: Config,
 ): Map<string, (args: readonly string[], stdin: () => Promise<string>) => Promise<CommandOutput>> {
   const files = new FrameworkGraphFiles(config.framework);
-  const runs = new JsonlRunRepository();
+  const runs = new JsonlRunRepository(new RunFolderLayout());
   const clock = new SystemClock(config.now);
   const loader = new RunLoader(files, runs, new ConstitutionBudgets());
   const tables = new ConventionsTablesPresenter();
@@ -141,6 +203,22 @@ export function compose(
   for (const name of workflow.names()) handlers.set(name, (args) => workflow.run(name, args));
   for (const name of agentCli.names())
     handlers.set(name, (args, stdin) => agentCli.run(name, args, stdin));
+  const catalog = (command: "help" | "interfaces") => async (args: readonly string[]) => {
+    const { runCatalog } = await import("#src/CatalogRoot.ts");
+    const options = new Map<string, OptionTable>([
+      ...WorkflowCliHandler.options,
+      ...AgentCliHandler.options,
+      ...RunCliHandler.options,
+    ]);
+    const toolRoot = resolve(fileURLToPath(new URL(".", import.meta.url)), "..");
+    return runCatalog(
+      { options, environment: ENVIRONMENT, toolRoot, code: fileURLToPath(import.meta.url) },
+      command,
+      args,
+    );
+  };
+  handlers.set("help", catalog("help"));
+  handlers.set("interfaces", catalog("interfaces"));
   const approvals = new RecordApproval(loader, runs, clock);
   handlers.set("run", async (args) => {
     const { runRunner } = await import("#src/RunnerRoot.ts");

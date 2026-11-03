@@ -158,7 +158,8 @@ function run(world, extra, input) {
       let out = lines.join('\n').replaceAll(world.root, '{root}');
       if (world.server) out = out.replaceAll(world.server.url, '{server}');
       for (const [re, to] of t.normalize ?? []) out = out.replace(re, to);
-      world.result = { code: err ? err.code : 0, out };
+      const clean = (text) => text.trimEnd().replaceAll(world.root, '{root}');
+      world.result = { code: err ? err.code : 0, out, stdout: clean(stdout), stderr: clean(stderr) };
       resolve();
     });
     if (input !== undefined) child.stdin.end(input);
@@ -254,6 +255,10 @@ Then('{string} is a real file or folder, not a symlink', function (p) {
   assert.ok(!fs.lstatSync(this.at(p)).isSymbolicLink(), `${p} is a symlink`);
 });
 
+Then('{string} exists', function (p) {
+  assert.ok(fs.existsSync(this.at(p)), `${p} does not exist`);
+});
+
 Then('{string} does not exist', function (p) {
   assert.ok(!fs.existsSync(this.at(p)) && !isLink(this.at(p)), `${p} exists`);
 });
@@ -274,6 +279,19 @@ Then('the file {string} has the line {string}', function (p, line) {
 Then('the file {string} has no line containing {string}', function (p, text) {
   const hit = fs.readFileSync(this.at(p), 'utf8').split('\n').find((l) => l.includes(text));
   assert.equal(hit, undefined, `${p} has a line containing "${text}": ${hit}`);
+});
+
+// Which stream a line went to: data on stdout, messages on stderr (clig.dev).
+Then('stdout is {string}', function (text) {
+  assert.equal(this.result.stdout, text);
+});
+
+Then('stdout is empty', function () {
+  assert.equal(this.result.stdout, '');
+});
+
+Then('stderr is {string}', function (text) {
+  assert.equal(this.result.stderr, text);
 });
 
 Then('the output has the line {string}', function (line) {

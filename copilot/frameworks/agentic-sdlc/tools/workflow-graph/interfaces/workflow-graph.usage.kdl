@@ -1,0 +1,113 @@
+// The workflow-graph tool's command-line interface (spec 021). This file is the source:
+// `--help` is rendered from it, INTERFACES.md's command section is generated from it, and
+// `workflow-graph interfaces` fails when a handler's options and this file disagree.
+// Format: usage spec (https://usage.jdx.dev/spec/), KDL 2.0.
+name "Workflow graph"
+bin "workflow-graph"
+version "0.1.0"
+about "Checks and records agentic-sdlc runs against the workflow graph, guards role launches, and runs roles headless"
+
+exit_code 0 "success"
+exit_code 1 "a check failed or the step was refused; nothing was written"
+exit_code 2 "usage error: unknown command or flag, or a required value is missing (message on stderr)"
+
+cmd "check-graph" effect="read" help="Check workflow.graph.yaml, its generated JSON and the conventions.md tables" {
+  example "workflow-graph check-graph"
+}
+
+cmd "compile-graph" effect="write" help="Write workflow.graph.json and the conventions.md tables from workflow.graph.yaml" {
+  example "workflow-graph compile-graph"
+}
+
+cmd "record" effect="write" help="Append one step to a run's ledger after checking it against the graph" {
+  arg "<run>" help="Run id, e.g. R-001"
+  flag "--node <id>" required=#true help="Graph node id, e.g. P3 or P6.execute"
+  flag "--result <result>" required=#true help="The node's result: a path id at P0, done, pass, fail …"
+  flag "--task <task>" help="Task id from tasks.md, for P6 steps"
+  flag "--feature <folder>" help="The feature folder, e.g. specs/023-cart (first line of a run)"
+  flag "--evidence <paths>" help="Comma-separated paths the step produced or checked"
+  flag "--role <role>" help="The role that did the step"
+  flag "--project <dir>" help="Project folder; default the working folder"
+  example "workflow-graph record R-001 --node P0 --result new-feature --feature specs/023-cart"
+}
+
+cmd "check-run" effect="read" help="Check that a run's ledger follows the graph and its hash chain is intact" {
+  arg "<run>" help="Run id"
+  flag "--project <dir>" help="Project folder; default the working folder"
+  example "workflow-graph check-run R-001"
+}
+
+cmd "status" effect="read" help="Show where runs stand: last step, open gate, next allowed, tasks and retries left" {
+  arg "[run]" help="Run id; every run when left out"
+  flag "--project <dir>" help="Project folder; default the working folder"
+  example "workflow-graph status R-001"
+}
+
+cmd "hook" subcommand_required=#true help="Called by coding agents' hooks, not by people" {
+  cmd "guard" effect="write" help="Allow or deny a role launch or a ledger edit; reads the agent's pre-tool-use hook JSON on stdin" {
+    flag "--agent <agent>" required=#true help="The coding agent that calls the hook" {
+      choices "claude-code" "copilot-cli" "codex"
+    }
+    output "json" media_type="application/json" framing="json" default=#true help="The agent's hook reply; empty when the call is not the tool's business" {
+      schema file="schemas/hooks/guard-output.schema.json"
+    }
+    exit_code 0 "always; a failure becomes a deny in the reply"
+  }
+  cmd "approve" effect="write" help="Record a gate approval typed in chat; reads the agent's prompt-submit hook JSON on stdin" {
+    flag "--agent <agent>" required=#true help="The coding agent that calls the hook" {
+      choices "claude-code" "copilot-cli" "codex"
+    }
+    output "json" media_type="application/json" framing="json" default=#true help="Nothing for Claude Code and Codex; {} for Copilot CLI" {
+      schema file="schemas/hooks/approve-output.schema.json"
+    }
+    exit_code 0 "always"
+  }
+}
+
+cmd "verify-approvals" effect="read" help="Check that every gate approval in a run is a message a person typed in that session" {
+  arg "<run>" help="Run id"
+  flag "--project <dir>" help="Project folder; default the working folder"
+  example "workflow-graph verify-approvals R-001"
+}
+
+cmd "run" subcommand_required=#true help="The headless runner: drives a run through the graph with coding agents" {
+  cmd "start" effect="write" help="Record P0, then launch each phase's roles until a gate, an end, or something needing a person" {
+    arg "<run>" help="New run id, e.g. R-001"
+    flag "--path <path>" required=#true help="Path id from the graph: new-project, new-feature, fix-changes-behaviour, fast-path, multi-service"
+    flag "--feature <folder>" required=#true help="The feature folder, e.g. specs/023-cart"
+    flag "--agent <agent>" required=#true help="The coding agent for every role" {
+      choices "claude-code" "copilot-cli" "codex"
+    }
+    flag "--mission <text>" help="What to build; given to every role in its launch prompt"
+    flag "--role-agent <role=agent>" var=#true help="Use another agent for one role, e.g. qa=copilot-cli"
+    flag "--check <command>" var=#true help="A script check run after each P6 execute, e.g. \"pnpm test\""
+    flag "--max-usd <n>" default="2" help="Spending limit per launch, in US dollars"
+    flag "--timeout-minutes <n>" default="30" help="Time limit per launch"
+    flag "--project <dir>" help="Project folder; default the working folder"
+    example "workflow-graph run start R-001 --path new-feature --feature specs/023-cart --agent claude-code --mission \"Add a cart\""
+  }
+  cmd "approve" effect="write" help="Approve an open gate (or send it back with --changes), confirmed on the terminal, then continue the run" {
+    arg "<run>" help="Run id"
+    arg "<gate>" help="The open gate, G0 … G5"
+    arg "[words]..." help="Your words, kept in the ledger"
+    flag "--changes" help="Request changes instead of approving"
+    flag "--project <dir>" help="Project folder; default the working folder"
+    example "workflow-graph run approve R-001 G0 \"looks right\""
+  }
+  cmd "resume" effect="write" help="Continue a run after a gate was approved in chat or a problem was fixed" {
+    arg "<run>" help="Run id"
+    flag "--project <dir>" help="Project folder; default the working folder"
+    example "workflow-graph run resume R-001"
+  }
+}
+
+cmd "interfaces" effect="read" help="Check that this description, the code and INTERFACES.md agree; --write regenerates INTERFACES.md's generated sections" {
+  flag "--write" effect="write" help="Regenerate the generated sections of INTERFACES.md"
+  flag "--root <dir>" help="Folder holding INTERFACES.md, catalog-info.yaml and interfaces/; default the tool folder"
+  example "workflow-graph interfaces"
+}
+
+cmd "help" effect="read" help="Show help for the tool or for one command" {
+  arg "[command]..." help="Command words, e.g. run start"
+  example "workflow-graph help run start"
+}

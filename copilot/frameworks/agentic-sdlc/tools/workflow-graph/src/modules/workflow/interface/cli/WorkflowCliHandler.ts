@@ -1,5 +1,6 @@
 import { parseArgs } from "node:util";
 import type { CommandOutput } from "#src/modules/shared/domain/CommandOutput.ts";
+import type { OptionTable } from "#src/modules/shared/domain/OptionTable.ts";
 import type { CheckGraph } from "#src/modules/workflow/application/check-graph/CheckGraph.ts";
 import type { CheckRun } from "#src/modules/workflow/application/check-run/CheckRun.ts";
 import type { CompileGraph } from "#src/modules/workflow/application/compile-graph/CompileGraph.ts";
@@ -24,6 +25,26 @@ export type WorkflowCommands = {
 
 /** The command line of the workflow module: check-graph, compile-graph, record, check-run, status (specs/019 contracts/cli.md). */
 export class WorkflowCliHandler {
+  /** The flags each command parses; `workflow-graph interfaces` compares them with the usage spec (IF-3). */
+  public static readonly options: ReadonlyMap<string, OptionTable> = new Map<string, OptionTable>([
+    ["check-graph", {}],
+    ["compile-graph", {}],
+    [
+      "record",
+      {
+        project: { type: "string" },
+        node: { type: "string" },
+        result: { type: "string" },
+        task: { type: "string" },
+        feature: { type: "string" },
+        evidence: { type: "string" },
+        role: { type: "string" },
+      },
+    ],
+    ["check-run", { project: { type: "string" } }],
+    ["status", { project: { type: "string" } }],
+  ]);
+
   readonly #commands: WorkflowCommands;
   readonly #report: FindingsReport;
   readonly #status: RunStatusPresenter;
@@ -66,28 +87,18 @@ export class WorkflowCliHandler {
    * @returns what to print and the exit code
    */
   public async run(command: string, args: readonly string[]): Promise<CommandOutput> {
-    if (command === "check-graph") return this.#checkGraph();
-    if (command === "compile-graph") return this.#compileGraph();
     const { values, positionals } = parseArgs({
       args: [...args],
       allowPositionals: true,
-      options: WorkflowCliHandler.#options,
-    });
-    const project = values.project ?? this.#cwd;
+      options: WorkflowCliHandler.options.get(command) ?? {},
+    }) as { values: Record<string, string | undefined>; positionals: string[] };
+    if (command === "check-graph") return this.#checkGraph();
+    if (command === "compile-graph") return this.#compileGraph();
+    const project = values["project"] ?? this.#cwd;
     if (command === "record") return this.#record(project, positionals[0] ?? "", values);
     if (command === "check-run") return this.#checkRun(project, positionals[0] ?? "");
     return this.#runStatus(project, positionals[0]);
   }
-
-  static readonly #options = {
-    project: { type: "string" },
-    node: { type: "string" },
-    result: { type: "string" },
-    task: { type: "string" },
-    feature: { type: "string" },
-    evidence: { type: "string" },
-    role: { type: "string" },
-  } as const;
 
   async #checkGraph(): Promise<CommandOutput> {
     const checked = await this.#commands.checkGraph.run();

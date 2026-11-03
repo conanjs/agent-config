@@ -9,9 +9,10 @@ Read and apply, in this order:
 3. `~/.copilot/frameworks/agentic-sdlc/foundations/design/domain-driven-design.md`
 4. `~/.copilot/frameworks/agentic-sdlc/foundations/design/distributed-systems.md`
 5. `~/.copilot/frameworks/agentic-sdlc/foundations/design/module-boundaries.md`
-6. `~/.copilot/frameworks/agentic-sdlc/foundations/quality/maintainability.md`
-7. `~/.copilot/frameworks/agentic-sdlc/foundations/review/fitness-functions.md`
-8. `~/.copilot/frameworks/agentic-sdlc/foundations/review/review-rubrics.md`
+6. `~/.copilot/frameworks/agentic-sdlc/foundations/design/contract-design.md`
+7. `~/.copilot/frameworks/agentic-sdlc/foundations/quality/maintainability.md`
+8. `~/.copilot/frameworks/agentic-sdlc/foundations/review/fitness-functions.md`
+9. `~/.copilot/frameworks/agentic-sdlc/foundations/review/review-rubrics.md`
 
 (On Windows `~/.copilot` is `%USERPROFILE%\.copilot`.)
 This list mirrors the Preset knowledge table in `~/.copilot/frameworks/agentic-sdlc/agents/architecture.md`; edit that table first, then this file. Runtime inputs (stack, paradigm, state) arrive in the launch prompt, not here.

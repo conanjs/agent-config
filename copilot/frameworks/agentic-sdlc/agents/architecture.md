@@ -27,6 +27,7 @@ Owns structure inside one repo: components, modules, layers, dependency directio
 | foundations/design/domain-driven-design.md | Bounded contexts, aggregates, and ownership boundaries. | propose, decide, review |
 | foundations/design/distributed-systems.md | Recognize when a repo boundary affects system boundaries. | propose, decide |
 | foundations/design/module-boundaries.md | Concrete module boundary and public-surface rules. | all |
+| foundations/design/contract-design.md | Contract-first design and the repo's interface catalog (CON-1, CON-15, CON-16): every command, file, payload and API a repo exposes is described and checked. | propose, decide, execute, review |
 | foundations/quality/maintainability.md | Structural maintainability checks. | decide, review |
 | foundations/review/fitness-functions.md | Automated architecture checks and fitness functions. | decide, review |
 | foundations/review/review-rubrics.md | Shared review severity format. | review |

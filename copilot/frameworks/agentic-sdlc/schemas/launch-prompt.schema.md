@@ -16,7 +16,7 @@ schema: launch-prompt/v1
 mode: propose | decide | execute | review        # required
 role: <role-id>                                   # required
 phase: P0..P7 | standalone                        # required
-run: R-<nnn>                                      # required for P0..P7: the run's ledger .specify/runs/<run>.jsonl (workflow-graph/v1)
+run: R-<nnn>                                      # required for P0..P7: the run's ledger .specify/runs/<run>/ledger.jsonl (workflow-graph/v1)
 task: "<the task line verbatim>"                  # required for execute/review
 profiles:                                         # one key per dimension in conventions §4 that applies
   stack: <id>

@@ -155,19 +155,45 @@ Where: `copilot/frameworks/agentic-sdlc/workflow.graph.{yaml,json}` · Schema: `
 
 ## Workflow graph tool
 
-<a id="wg-tool"></a>TypeScript (class-modeled, run by Node type stripping): graph checks, the run ledger, and the guard and approval hooks for Claude Code, Copilot CLI and Codex
+<a id="wg-tool"></a>TypeScript (class-modeled, run by Node type stripping): graph checks, the run ledger, the guard and approval hooks for Claude Code, Copilot CLI and Codex, the headless runner, and its interface catalog
 
-Where: `copilot/frameworks/agentic-sdlc/tools/workflow-graph/**` · Schema: `copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md` · Index: `specs/019-workflow-graph/plan.md` · Checked by: scenarios, tsc, eslint, vitest · Scenarios: `tests/workflow-graph/workflow-graph.feature` · Installed to: `~/.copilot/frameworks`
+Where: `copilot/frameworks/agentic-sdlc/tools/workflow-graph/**` · Schema: `copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md` · Index: `copilot/frameworks/agentic-sdlc/tools/workflow-graph/INTERFACES.md` · Checked by: scenarios, tsc, eslint, vitest · Scenarios: `tests/workflow-graph/workflow-graph.feature` · Installed to: `~/.copilot/frameworks`
 
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/.prettierignore`](../../../frameworks/agentic-sdlc/tools/workflow-graph/.prettierignore)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/.prettierrc.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/.prettierrc.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/INTERFACES.md`](../../../frameworks/agentic-sdlc/tools/workflow-graph/INTERFACES.md)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/catalog-info.yaml`](../../../frameworks/agentic-sdlc/tools/workflow-graph/catalog-info.yaml)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/eslint.config.mjs`](../../../frameworks/agentic-sdlc/tools/workflow-graph/eslint.config.mjs)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/eslint/local-docs.mjs`](../../../frameworks/agentic-sdlc/tools/workflow-graph/eslint/local-docs.mjs)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/approve-output.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/approve-output.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/claude-code.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/claude-code.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/codex.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/codex.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/copilot-cli.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/copilot-cli.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/guard-output.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/guard-output.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/launch-journal-line.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/launch-journal-line.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/ledger-line.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/ledger-line.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/run-settings.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/run-settings.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/workflow-graph.schema.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/workflow-graph.schema.json)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/workflow-graph.usage.kdl`](../../../frameworks/agentic-sdlc/tools/workflow-graph/interfaces/workflow-graph.usage.kdl)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/package.json`](../../../frameworks/agentic-sdlc/tools/workflow-graph/package.json)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/scripts/check-doc-links.mjs`](../../../frameworks/agentic-sdlc/tools/workflow-graph/scripts/check-doc-links.mjs)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/CatalogRoot.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/CatalogRoot.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/CompositionRoot.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/CompositionRoot.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/RunnerRoot.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/RunnerRoot.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/main.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/main.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/application/CatalogMarkdown.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/application/CatalogMarkdown.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/application/check-interfaces/CheckInterfaces.test.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/application/check-interfaces/CheckInterfaces.test.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/application/check-interfaces/CheckInterfaces.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/application/check-interfaces/CheckInterfaces.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/CatalogEntity.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/CatalogEntity.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/CliDescription.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/CliDescription.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/EnvironmentVariable.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/EnvironmentVariable.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/ports/CatalogFiles.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/ports/CatalogFiles.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/ports/CliDescriptionSource.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/domain/ports/CliDescriptionSource.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/infrastructure/FsCatalogFiles.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/infrastructure/FsCatalogFiles.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/infrastructure/InterfaceSchemas.contract.test.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/infrastructure/InterfaceSchemas.contract.test.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/infrastructure/UsageSpecFile.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/infrastructure/UsageSpecFile.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/interface/cli/CatalogCliHandler.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/interface/cli/CatalogCliHandler.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/interface/cli/HelpPresenter.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/catalog/interface/cli/HelpPresenter.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/coding-agents/application/CodingAgentRegistry.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/coding-agents/application/CodingAgentRegistry.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/coding-agents/application/verify-approvals/VerifyApprovals.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/coding-agents/application/verify-approvals/VerifyApprovals.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/coding-agents/domain/AgentCapabilities.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/coding-agents/domain/AgentCapabilities.ts)
@@ -221,8 +247,10 @@ Where: `copilot/frameworks/agentic-sdlc/tools/workflow-graph/**` · Schema: `cop
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/runner/infrastructure/TtyHumanConsole.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/runner/infrastructure/TtyHumanConsole.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/runner/interface/cli/RunCliHandler.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/runner/interface/cli/RunCliHandler.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/domain/CommandOutput.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/domain/CommandOutput.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/domain/OptionTable.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/domain/OptionTable.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/domain/Result.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/domain/Result.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/infrastructure/CommandRunner.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/infrastructure/CommandRunner.ts)
+- [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/infrastructure/RunFolderLayout.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/shared/infrastructure/RunFolderLayout.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/workflow/application/check-graph/CheckGraph.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/workflow/application/check-graph/CheckGraph.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/workflow/application/check-run/CheckRun.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/workflow/application/check-run/CheckRun.ts)
 - [`copilot/frameworks/agentic-sdlc/tools/workflow-graph/src/modules/workflow/application/compile-graph/CompileGraph.ts`](../../../frameworks/agentic-sdlc/tools/workflow-graph/src/modules/workflow/application/compile-graph/CompileGraph.ts)

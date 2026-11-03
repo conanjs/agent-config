@@ -1,5 +1,6 @@
 import { parseArgs } from "node:util";
 import type { CommandOutput } from "#src/modules/shared/domain/CommandOutput.ts";
+import type { OptionTable } from "#src/modules/shared/domain/OptionTable.ts";
 import type { ApproveGate } from "#src/modules/runner/application/approve-gate/ApproveGate.ts";
 import type { ResumeRun } from "#src/modules/runner/application/resume-run/ResumeRun.ts";
 import type { StartRun } from "#src/modules/runner/application/start-run/StartRun.ts";
@@ -23,6 +24,26 @@ const USAGE = [
 
 /** `run start | approve | resume`: the headless runner's command line (specs/020 FR-003). */
 export class RunCliHandler {
+  /** The flags each sub-command parses; `workflow-graph interfaces` compares them with the usage spec (IF-3). */
+  public static readonly options: ReadonlyMap<string, OptionTable> = new Map<string, OptionTable>([
+    [
+      "run start",
+      {
+        project: { type: "string" },
+        path: { type: "string" },
+        feature: { type: "string" },
+        agent: { type: "string" },
+        "role-agent": { type: "string", multiple: true },
+        check: { type: "string", multiple: true },
+        "max-usd": { type: "string" },
+        "timeout-minutes": { type: "string" },
+        mission: { type: "string" },
+      },
+    ],
+    ["run approve", { project: { type: "string" }, changes: { type: "boolean" } }],
+    ["run resume", { project: { type: "string" } }],
+  ]);
+
   readonly #commands: RunCommands;
   readonly #cwd: string;
 
@@ -44,51 +65,40 @@ export class RunCliHandler {
    * @returns what to print and the exit code
    */
   public async run(args: readonly string[]): Promise<CommandOutput> {
-    const { values, positionals } = parseArgs({
-      args: [...args],
-      allowPositionals: true,
-      options: RunCliHandler.#options,
-    });
-    const [sub, run = "", ...rest] = positionals;
-    const project = values.project ?? this.#cwd;
+    const [sub = "", ...after] = args;
+    const options = RunCliHandler.options.get(`run ${sub}`);
+    if (options === undefined) return { code: 2, out: USAGE };
+    const parsed = parseArgs({ args: after, allowPositionals: true, options });
+    const values = parsed.values as Record<string, string | string[] | boolean | undefined>;
+    const [run = "", ...rest] = parsed.positionals;
+    const text = (name: string): string | undefined =>
+      typeof values[name] === "string" ? values[name] : undefined;
+    const project = text("project") ?? this.#cwd;
     if (sub === "resume") return this.#show(run, await this.#commands.resume.run(project, run));
-    if (sub === "approve") return this.#approve(project, run, rest, values.changes === true);
-    if (
-      sub !== "start" ||
-      values.path === undefined ||
-      values.feature === undefined ||
-      values.agent === undefined
-    )
+    if (sub === "approve") return this.#approve(project, run, rest, values["changes"] === true);
+    const path = text("path");
+    const feature = text("feature");
+    const agent = text("agent");
+    if (path === undefined || feature === undefined || agent === undefined)
       return { code: 2, out: USAGE };
+    const list = (name: string): string[] => (Array.isArray(values[name]) ? values[name] : []);
     const overrides = Object.fromEntries(
-      (values["role-agent"] ?? []).map((pair) => pair.split("=") as [string, string]),
+      list("role-agent").map((pair) => pair.split("=") as [string, string]),
     );
+    const mission = text("mission");
     const started = await this.#commands.start.run(project, {
       run,
-      path: values.path,
-      feature: values.feature,
-      agent: values.agent,
+      path,
+      feature,
+      agent,
       overrides,
-      checks: values.check ?? [],
-      maxUsdPerLaunch: Number(values["max-usd"] ?? "2"),
-      timeoutMinutes: Number(values["timeout-minutes"] ?? "30"),
-      ...(values.mission === undefined ? {} : { mission: values.mission }),
+      checks: list("check"),
+      maxUsdPerLaunch: Number(text("max-usd") ?? "2"),
+      timeoutMinutes: Number(text("timeout-minutes") ?? "30"),
+      ...(mission === undefined ? {} : { mission }),
     });
     return started.ok ? this.#show(run, started.value) : { code: 1, out: started.error };
   }
-
-  static readonly #options = {
-    project: { type: "string" },
-    path: { type: "string" },
-    feature: { type: "string" },
-    agent: { type: "string" },
-    "role-agent": { type: "string", multiple: true },
-    check: { type: "string", multiple: true },
-    "max-usd": { type: "string" },
-    "timeout-minutes": { type: "string" },
-    changes: { type: "boolean" },
-    mission: { type: "string" },
-  } as const;
 
   async #approve(
     project: string,
