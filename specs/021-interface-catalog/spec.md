@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-03
 
-**Status**: Implemented 2026-11-03. V approved the design with usage as the CLI format, and one folder per run (D49). Not yet run: the `usage` CLI's own lint (not installed, D45)
+**Status**: Implemented 2026-11-03. V approved the design with usage as the CLI format, and one folder per run (D49). `usage lint -W` passes (2026-11-04, D55); the breaking-change diff waits for a release tag (T014)
 
 **Input**: V, 2026-11-03: "You don't provide the interface of this program for me or others to read and understand, like openapi to doc every API endpoint or catalog of supported API … each repo should have its own exposed interface so the outer/external programs/persons can read and understand, how to communicate." Then: "Design the interface catalog design for the workflow-graph tool."
 

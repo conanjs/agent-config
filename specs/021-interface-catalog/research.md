@@ -35,6 +35,8 @@ Decision numbers continue from spec 020 (D21–D36): D37–D49 are the design, D
 | D53 | All `record`, `check-run` and `status` shared one option table, so `status --node P3` was accepted silently; `verify-approvals --project X R-001` took `X` as the run id (hand parsing) | One option table per command, exposed as `static options`; `AgentCliHandler` uses `parseArgs`; both pinned by scenarios |
 | D54 | `--help` routing: a usage error is now printed on stderr (exit 2), and parse errors from `node:util` become one line without a stack trace | `main.ts`; scenarios check stdout and stderr apart |
 
+| D55 | Does the real `usage` tool accept the spec? (T013, 2026-11-04) | — | `usage` 7.1.5 from Homebrew: `usage lint -W` "No issues found"; `--sorted` reports 6 order-only warnings (off by default, not adopted); `usage generate json` reads every `effect`, the merged exit codes and each `output`, inlining its JSON Schema file | The tool's own KDL parser (`@bgotink/kdl`) and the official one agree on this spec |
+
 ## Evidence: the inventory, 2026-11-03
 
 | Probe | Result |

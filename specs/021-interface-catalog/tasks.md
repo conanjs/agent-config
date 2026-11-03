@@ -12,4 +12,5 @@
 - [x] T010 `check-docs.sh` runs `workflow-graph interfaces`, and `usage lint` when installed
 - [x] T011 Framework: CON-15, CON-16 and format rows in `contract-design.md`; the architecture role loads it (D50); the ledger's `log` field in `workflow-graph.schema.md` (D52)
 - [x] T012 Root `INTERFACES.md` and `catalog-info.yaml` (Location) listing every program; spec 019's `contracts/cli.md` and `hooks.md` marked replaced
-- [ ] T013 Run `usage lint` on the spec once the `usage` CLI is installed (`brew install usage`); add `usage diff --breaking` to CI once the tool has a release tag
+- [x] T013 Run `usage lint` on the spec: `usage` 7.1.5 installed with Homebrew (2026-11-04); `usage lint -W` finds no issues (D55)
+- [ ] T014 Add `usage diff --breaking` to the checks once the tool has a release tag, and install `usage` in CI so its lint runs there too (today it runs only where it is installed)

@@ -40,30 +40,39 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-03
 
-### T-15 Review and merge PR #11 (spec 019, workflow graph phase 1)
-- status: waiting
-- next: V reviews https://github.com/conanjs/agent-config/pull/11 and says when to merge (merge commit, then pull main)
-- waiting-on: V
-- from: 2026-11-03
-
-### T-16 Finish the workflow runner (spec 020, phase 2)
-- status: open
-- next: Built; doc comments now follow the stack reference (D35); progress lines (D36). Left: V decides cleanup of the R-007 test run in agent-config (.specify/runs/R-007.*, ../agent-config.runs/R-007, branch run/R-007), commit + stacked PR, and the live P6 check (T011b)
-- from: 2026-11-03
-- updated: 2026-11-03
-
-### T-18 Run usage lint on the workflow-graph CLI spec
-- status: waiting
-- next: Install the usage CLI (brew install usage), run: usage lint -W copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/workflow-graph.usage.kdl; fix findings; record the result in usage-spec-deep-dive.md (specs/021 T013)
-- waiting-on: V
-- from: 2026-11-03
-
 ### T-19 Describe the repo's other programs in the interface catalog
 - status: open
 - next: One spec per program listed as 'not yet described' in INTERFACES.md (validators, atlas, tracker, turn-tokens, installers, check-docs): usage spec, JSON Schemas, a drift check (CON-15, CON-16)
 - from: 2026-11-03
 
+### T-20 Live P6 check of the workflow runner (spec 020 T011b)
+- status: waiting
+- next: Run a real run through P6 with one coding agent in a scratch repo (paid): run start, approve each gate, confirm the task worktree, checks, review and merge; record the result in specs/020 and close
+- waiting-on: V
+- from: 2026-11-04
+
 ## Done
+
+### T-16 Finish the workflow runner (spec 020, phase 2)
+- status: done
+- next: Built; doc comments now follow the stack reference (D35); progress lines (D36). Left: V decides cleanup of the R-007 test run in agent-config (.specify/runs/R-007.*, ../agent-config.runs/R-007, branch run/R-007), commit + stacked PR, and the live P6 check (T011b)
+- from: 2026-11-03
+- updated: 2026-11-03
+- closed: 2026-11-04
+
+### T-15 Review and merge PR #11 (spec 019, workflow graph phase 1)
+- status: done
+- next: V reviews https://github.com/conanjs/agent-config/pull/11 and says when to merge (merge commit, then pull main)
+- waiting-on: V
+- from: 2026-11-03
+- closed: 2026-11-04
+
+### T-18 Run usage lint on the workflow-graph CLI spec
+- status: done
+- next: Install the usage CLI (brew install usage), run: usage lint -W copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/workflow-graph.usage.kdl; fix findings; record the result in usage-spec-deep-dive.md (specs/021 T013)
+- waiting-on: V
+- from: 2026-11-03
+- closed: 2026-11-04
 
 ### T-17 Give every repo a published interface catalog (start with workflow-graph)
 - status: done
