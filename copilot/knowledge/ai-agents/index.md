@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: ai-agents
-last-updated: 2026-10-31
+last-updated: 2026-11-02
 ---
 
 # Ai Agents
@@ -13,7 +13,7 @@ Agent and workflow coordination: prompt, context and harness engineering, feedba
 
 | Doc | Type | Summary | Status |
 | --- | --- | --- | --- |
-| [Graph Engineering study guide](graph-engineering-study-guide.md) | concept | Introductory study guide: nodes, state, routing, feedback, operational controls, and a runnable simulation | draft |
+| [Graph Engineering study guide](graph-engineering-study-guide.md) | concept | Introductory study guide: where the term stands (2026), the survey's three views, nodes, state, routing, feedback, five implementation steps, operational controls, and a runnable simulation | draft |
 | [Graph Engineering, SDD, AI-DLC, and Spec Kit](graph-engineering-vs-sdd-ai-dlc-spec-kit.md) | concept | Concept comparison and illustrative integration with dependencies, ownership, and acceptance evidence | draft |
 | [Prompt engineering, end to end](prompt-engineering-deep-dive.md) | deep-dive | Prompt parts, message roles, techniques with evidence, reasoning models, evals, prompt injection, failure matrix | verified |
 | [Context engineering, end to end](context-engineering-deep-dive.md) | deep-dive | Why long contexts fail; write/select/compress/isolate; caching, memory, compaction, sub-agents; interaction and failure matrices | verified |
@@ -24,6 +24,7 @@ Agent and workflow coordination: prompt, context and harness engineering, feedba
 | [Codex usage, context and multi-agent controls](codex-usage-reference.md) | reference | Rollout and SQLite records, usage fields, `/status` and `/usage`, `exec --json`, OTel, config keys, cache breakers, subagents, fast modes, credits | verified |
 | [Measure tokens in a Claude Code or Codex session](measure-agent-tokens.md) | how-to | Two tested Python scripts and jq/SQL one-liners that report requests, peak context, output, cache hits and the tool's own totals | verified |
 | [GitHub Copilot usage, AI credits and hooks](copilot-usage-reference.md) | reference | Session logs with per-call tokens and exact AI-credit cost, the monthly allowance, the shared CLI/VS Code hooks (`agentStop`, progress lines), and VS Code's stale instruction copy | draft |
+| [LangGraph.js: graph runtime facts](langgraph-js-reference.md) | reference | Nodes as functions, conditional edges, `Send` fan-out, reducers and joins, SQLite checkpoints, `interrupt()` gates resumed from another process (tested) | verified |
 | [Tools and techniques that cut agent tokens](token-saving-tools.md) | reference | Third-party tools (ccusage, RTK, Serena, code-review-graph, Context7, Repomix, TOON, claude-mem, routers) and vendor techniques, with activity and evidence | draft |
 | [Loop Engineering](loop-engineering.md) | legacy | Existing explanation of agent feedback loops | — |
 | [Loop Engineering playbook](loop-engineering-playbook.md) | legacy | Existing implementation-oriented playbook | — |

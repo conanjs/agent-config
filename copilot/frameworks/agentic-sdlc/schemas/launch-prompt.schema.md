@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-28
+last-updated: 2026-11-03
 ---
 
 # Schema: Launch Prompt (`launch-prompt/v1`)
@@ -16,6 +16,7 @@ schema: launch-prompt/v1
 mode: propose | decide | execute | review        # required
 role: <role-id>                                   # required
 phase: P0..P7 | standalone                        # required
+run: R-<nnn>                                      # required for P0..P7: the run's ledger .specify/runs/<run>.jsonl (workflow-graph/v1)
 task: "<the task line verbatim>"                  # required for execute/review
 profiles:                                         # one key per dimension in conventions §4 that applies
   stack: <id>
@@ -54,6 +55,7 @@ output: schemas/message.schema.md
 - **With `state.procedure`, the role follows that procedure's Steps in order, changes nothing outside its `allowed-paths`, and reports each step's result in the message.** If a step cannot be done as written, the role stops and escalates instead of improvising.
 - An absent optional state key is left out, not given an empty value. `integrations: []` and `references: []` are allowed, and mean the planner checked and found none.
 - **Standalone use:** `phase: standalone`. `profiles` are resolved in this order: the request, then `docs/architecture.md`, then manifest detection, then asking the user. Spec-dependent checks are reported as N/A.
+- `run:` names the run whose ledger the guard hook checks before the launch (`schemas/workflow-graph.schema.md`, WG-24). A prompt without `run:` is not guarded; one written before 2026-11-03 still parses. In Codex the spawn's `task_name` carries the same keys (`r004_p4_architecture`, `r004_p6_engineering_t001_execute`), because Codex encrypts the message it passes to hooks.
 - Never include secrets or file contents. Paths only.
 
 ## Example

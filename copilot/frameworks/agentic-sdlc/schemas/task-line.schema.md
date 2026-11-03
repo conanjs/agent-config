@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-28
+last-updated: 2026-11-03
 ---
 
 # Schema: Task Line Suffix (`task-line/v1`)
@@ -13,7 +13,7 @@ Spec Kit owns the task line's start (`- [ ] T020 [P] [US2] <description>`). The 
 
 ```
 - [ ] <Tnnn> [P]? [US<n>]? <description> (<path>)  [<Dept>] [<Exec>]
-      touches: <none | integration:<svc>[, integration:<svc>]>  ·  refs: <none | <knowledge path>[, …]>  ·  procedure: <none | <stack>/<slug>>  ·  hot-path: <yes|no>
+      touches: <none | integration:<svc>[, integration:<svc>]>  ·  refs: <none | <knowledge path>[, …]>  ·  procedure: <none | <stack>/<slug>>  ·  hot-path: <yes|no>  ·  requires: <none | Tnnn[, …]>
       inputs: <name>=<value>; <name>=<value>                  ← only when the procedure declares inputs
 ```
 
@@ -26,6 +26,7 @@ Spec Kit owns the task line's start (`- [ ] T020 [P] [US2] <description>`). The 
 | `procedure:` | yes for `[llm]` when the component's stack has a procedure catalog (`{{AGENT_HOME}}/procedures/<stack>/index.md`); otherwise optional | `none`, or `<stack>/<slug>` naming `{{AGENT_HOME}}/procedures/<stack>/<slug>.procedure.md` for the task path's stack | the planner checks the task against the catalog's "Use when" column |
 | `inputs:` | yes when the procedure's front-matter lists `inputs` | one `name=value` per declared input, separated by `;`; an optional input (declared `name?`) may be left out, for example `module-path` in a layer-first repo | the planner, from the spec and plan |
 | `hot-path:` | no | `yes` · `no` | the plan (performance-sensitive work) |
+| `requires:` | no | `none`, or task ids of the same file (`T002, T003`) that must be done first | the planner; checked by `validate-project.mjs`: ids exist, no cycle, a `[P]` task never requires another `[P]` task, two `[P]` tasks never write the same path; the run's P6 join (`workflow-graph/v1` WG-20) waits for every task (specs/019) |
 
 ## Rules
 

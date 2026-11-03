@@ -4,8 +4,8 @@ type: concept
 topic: js-runtime
 status: verified
 applies-to: ["ES2022+", "TypeScript ≥ 3.8", "V8 ≥ 9.7 (Node ≥ 18)"]
-last-verified: 2026-10-25
-last-updated: 2026-10-25
+last-verified: 2026-11-03
+last-updated: 2026-11-03
 tags: [private-fields, encapsulation, typescript, serialization, performance, v8]
 ---
 
@@ -66,6 +66,8 @@ The speed difference is within run-to-run noise. A first attempt that ran both c
 | Object wrapped in a `Proxy` (some mocking and reactivity libraries) | `#` access does not go through the proxy | Private elements cannot be proxied ✅[^2] |
 | Target ES2021 or lower | `#` becomes `WeakMap` lookups | TypeScript downlevels it ✅[^1] |
 | `private` constructor parameter under Node's built-in type stripping | Rejected: `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` (also TS1294 with `erasableSyntaxOnly`) | Parameter properties emit code, so they cannot simply be stripped. Reproduced on Node 24.22 |
+| Working around it with `--experimental-transform-types` | Runs on Node 24.22 with an `ExperimentalWarning` (re-tested 2026-11-03); the flag is **removed in Node 26.0.0** | So code meant to run unbuilt keeps injected collaborators as `readonly #field`s assigned in the constructor ✅[^4] |
+| Type stripping itself | Stable (stability 2) since Node 24.12.0 and 25.2.0; no warning since 24.3.0; Node ignores `tsconfig.json` and needs `.ts` extensions in relative imports | Node only deletes types ✅[^4] |
 | Tests need to read a `#` field | Not possible from outside | Test through public behavior instead |
 
 ## Trade-offs
@@ -82,12 +84,13 @@ The speed difference is within run-to-run noise. A first attempt that ran both c
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 8 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
+- Verified: 10 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
 ## References
 - [TypeScript Handbook: Classes, member visibility caveats](https://www.typescriptlang.org/docs/handbook/2/classes.html) — TypeScript team, living. Backs: How it works 1–3, Edge cases. [^1]
 - [Private elements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_elements) — MDN, living. Backs: How it works 4–5, Edge cases. [^2]
 - [Faster initialization of instances with new class features](https://v8.dev/blog/faster-class-features) — V8 team, 2022. Backs: How it works 6. [^3]
+- [Modules: TypeScript](https://nodejs.org/api/typescript.html) — Node.js, living (read 2026-11-03). Backs: stability and version history of type stripping, unsupported syntax, removal of `--experimental-transform-types` in 26.0.0, tsconfig ignored, `.ts` extensions; the 24.22.1 behaviour re-tested the same day. [^4]
 - `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/class-modeled.md` — the State row that applies this.
 
 ## Related

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "\"$HOME/.copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh\" hook guard --agent copilot-cli",
+        "powershell": "node \"$env:USERPROFILE\\.copilot\\frameworks\\agentic-sdlc\\tools\\workflow-graph\\src\\main.ts\" hook guard --agent copilot-cli",
+        "timeoutSec": 10
+      }
+    ],
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "\"$HOME/.copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh\" hook approve --agent copilot-cli",
+        "powershell": "node \"$env:USERPROFILE\\.copilot\\frameworks\\agentic-sdlc\\tools\\workflow-graph\\src\\main.ts\" hook approve --agent copilot-cli",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

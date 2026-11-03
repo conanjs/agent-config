@@ -4,8 +4,8 @@ type: concept
 topic: ai-agents
 status: draft
 applies-to: ["AI workflow and task orchestration; Python 3 simulation"]
-last-verified: 2026-10-27
-last-updated: 2026-10-27
+last-verified: 2026-11-02
+last-updated: 2026-11-02
 tags: [ai-agents, orchestration, study-guide]
 ---
 
@@ -33,6 +33,16 @@ A capable single agent can be enough. When coordination needs explicit control, 
 Its foundations include **directed graphs, workflow orchestration, state machines, and distributed systems**. No LLM or multi-agent setup is required to implement the underlying pattern.
 
 **Scope and evidence boundary:** _Graph Engineering_ is not a single universally standardized term or certified methodology. It can also refer to designing knowledge graphs or graph-based data systems. This guide focuses on **AI agent/task orchestration graphs** and distinguishes them from knowledge graphs below. The DataCamp tutorial is supplementary reading. Technical explanations here are grounded in the official LangGraph documentation and the other primary sources in References; those sources establish the mechanisms, not universal adoption of this label.
+
+### Where the term stands (checked 2026-11-02)
+
+| Fact | Status |
+|---|---|
+| The label spread in July 2026. TrueFoundry traces it to an ExplainX.ai article of 18 July 2026, names nobody as its coiner, and calls its origins unsettled | ✅ [TrueFoundry](https://www.truefoundry.com/blog/graph-engineering-enterprise-guide) |
+| A 35-author survey (arXiv 2608.21156, first version 21 August 2026) defines it as building "explicit, dynamic, evolving graph structures representing tasks, agents, and system states". It ranks it after prompt, context, harness and loop engineering: those shape one agent, while graph engineering shapes the system of agents | ✅ [arXiv 2608.21156](https://arxiv.org/abs/2608.21156) |
+| The practice is older than the label: dataflow, DAG (directed acyclic graph) orchestration, actor models and contract-net protocols | ✅ [TrueFoundry](https://www.truefoundry.com/blog/graph-engineering-enterprise-guide) |
+
+Treat it as a name for a practice, not a standard: no standards body defines it, and vendors use it to frame their own products.
 
 ### Workflow versus agent: who chooses the next step?
 
@@ -69,6 +79,19 @@ Suppose you are implementing an e-commerce shopping cart:
 - **Context Engineering:** Give it repository files, business rules, API contracts, and conventions.
 - **Loop Engineering:** Make it code → run tests → inspect errors → fix issues.
 - **Graph Engineering:** Coordinate frontend, backend, database, integration QA, and approval, including dependencies and failure paths.
+
+#### The survey's three views of one system
+
+✅ The arXiv survey splits graph engineering into three coupled views plus evolution over time ([arXiv 2608.21156](https://arxiv.org/html/2608.21156), sections 4.1–4.5). Analogy: a restaurant kitchen has a recipe (what to do), a staff rota (who does it) and the order tickets on the rail (where each order stands).
+
+| View | Question | What the graph holds | Mechanisms the survey groups under it |
+|---|---|---|---|
+| Task organization | What to do? | Subgoals and their dependencies, then the concrete operators (model calls, agents, tools, verifiers) | Goal decomposition, workflow optimization |
+| Agent coordination | Who works? | Agents, skills and resources; edges for ownership, delegation, supervision, verification | Chains, routing to specialists, fan-out then fan-in, teams that reshape themselves |
+| Runtime state management | Where does the run stand, and is it still valid? | A record of every state change with its evidence and version | State recording, fault localization (finding the step that went wrong), failure recovery (rollback, replay, compensation for irreversible actions) |
+| System evolution | How does the graph improve across runs? | Changes to the three views, validated before they persist | Task, coordination and state evolution |
+
+The survey also separates **static** graphs (designed or optimized before the run), **dynamic** graphs (revised during a run from intermediate results) and **evolving** graphs (changed across runs), and notes that lasting evolution is still rare in practice. Its own caution: a better end result does not prove the graph helped, since a stronger model or more compute may explain it; ablations and trace analysis are needed.
 
 **Boundary:** These approaches overlap but are _not substitutes_. A graph node may contain an agent with its own prompt, context, and internal retry loop. "Loop Engineering" here is a descriptive label, not a universally fixed discipline.
 
@@ -225,6 +248,20 @@ flowchart TD
 
 **Essence:** You define the execution paths and the conditions selecting them, rather than leaving the entire workflow implicit in an agent’s reasoning.
 
+### Implementing one, step by step
+
+✅ TrueFoundry's guide gives five steps, and advises starting with a single-agent loop or a straight workflow, adding graph structure only when branching, parallel work or coordination needs it ([TrueFoundry](https://www.truefoundry.com/blog/graph-engineering-enterprise-guide)):
+
+| Step | What you write down | Example for the coding workflow above |
+|---|---|---|
+| 1. Nodes | One narrow, testable job per node: agent, function, router, join, tool or human checkpoint | `implement`, `test`, `escalate` |
+| 2. Edges and routing | Every allowed transition and the condition that picks it, including the unexpected result | `test` → `done` on pass; → `implement` while repairs remain; → `escalate` otherwise or on an unknown result |
+| 3. State | What each node reads and writes, and how two writes to the same field combine | `attempts`, `repairs`, `passed`; only `test` writes `passed` |
+| 4. Failure handling | Retry limits, timeouts, validation, fallbacks, escalation to a person | two repairs, then escalate |
+| 5. Tracing | A graph id, run id and node id on every record, with status, time and model/tool cost | one row per node run |
+
+✅ A runtime adds durability: LangGraph's checkpointer saves the graph state per thread (one run, named by a `thread_id`), which lets a run pause for a person, resume after a crash and go back to an earlier state ([LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)). Without a runtime, the same steps can be followed by hand or by an agent reading a written process; then nothing enforces the edges, which is the difference between a graph-shaped process and graph-engineered orchestration.
+
 ## Worked example
 
 One end-to-end run with real values: the starter workflow below, then a runnable simulation of it, traced step by step. The learning roadmap that follows says where to go next.
@@ -377,9 +414,9 @@ This makes complex AI systems more **inspectable, testable, and controllable**. 
 
 ## Verification status
 
-- Verified: 3 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
+- Verified: 9 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-02
 
-The three marked claim groups were checked against primary sources. The named terminology is context-specific. Diagrams, design controls, invoice scenario, and Python simulation are illustrative engineering material, not vendor guarantees. The Python block was executed and its documented output and zero-repair cases checked; Mermaid blocks were checked as source, not visually rendered. Framework-specific deployment, checkpoint recovery, concurrency semantics, and performance require a dedicated investigation. The diagrams use Mermaid code blocks. Markdown tools with Mermaid support render them as flowcharts; otherwise the text remains readable.
+The three original claim groups were checked against primary sources on 2026-10-27; the term's status, the survey's views, the five implementation steps and the checkpointer were checked on 2026-11-02 against the survey, the TrueFoundry guide (a vendor blog: its product claims were not used) and the LangGraph docs. The named terminology is context-specific. Diagrams, design controls, invoice scenario, and Python simulation are illustrative engineering material, not vendor guarantees. The Python block was executed and its documented output and zero-repair cases checked; Mermaid blocks were checked as source, not visually rendered. Framework-specific deployment, checkpoint recovery, concurrency semantics, and performance require a dedicated investigation. The diagrams use Mermaid code blocks. Markdown tools with Mermaid support render them as flowcharts; otherwise the text remains readable.
 
 ## References
 
@@ -389,6 +426,9 @@ The three marked claim groups were checked against primary sources. The named te
 - [Graph database concepts](https://neo4j.com/docs/getting-started/graph-database/) — Neo4j, living. Backs: graph databases model entities and relationships.
 - [GraphRAG](https://microsoft.github.io/graphrag/) — Microsoft, living. Backs: graph-based indexing and retrieval, distinct from agent execution.
 - [What is Graph Engineering? A Hands-On Guide to Multi-Agent Orchestration With LangGraph](https://www.datacamp.com/tutorial/graph-engineering-guide) — Josep Ferrer, DataCamp, 2026. Supplementary terminology/tutorial reading; not the primary evidence for runtime behavior.
+- [Graph Engineering in the Era of LLM Agents: From Individual Intelligence to System Intelligence](https://arxiv.org/abs/2608.21156) — Feng, Xiang et al. (35 authors), arXiv, 21 August 2026 (v2 26 August). Backs: the definition, the ordering after prompt/context/harness/loop engineering, the three views plus evolution, static/dynamic/evolving graphs, and the evaluation caution.
+- [Graph Engineering for Multi-Agent Systems: Architecture, Governance, and Observability](https://www.truefoundry.com/blog/graph-engineering-enterprise-guide) — TrueFoundry, 20 July 2026 (updated 29 October 2026). Backs: the term's July 2026 spread and unsettled origin, its older roots, the five implementation steps and "start simple". A vendor blog.
+- [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence) — LangChain, living. Backs: checkpoints per thread enabling human-in-the-loop pauses, crash recovery and going back to earlier state.
 - `graph-engineering-vs-sdd-ai-dlc-spec-kit.md` — companion concept comparison and integration example.
 - `../documentation/learning-explanation-framework.md` — reusable method for studying and explaining technical concepts.
 

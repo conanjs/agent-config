@@ -23,6 +23,7 @@ One folder per change, made with Spec Kit (`copilot/procedures/spec-driven-devel
 | [015](015-tracker/) | The tracker: `TRACKER.md` per repo (`tracker/v1`), `tracker.mjs` (check, brief, add/update/close/drop, done-when checks), session-start hooks for Claude Code and Copilot CLI | Done | none |
 | [016](016-codex-agent-toml/) | Codex agent wrappers parse as TOML (`'''` literal strings); WRAP checks the escapes of every `codex/agents/*.toml` | Done | none |
 | [018](018-turn-tokens-copilot/) | The turn token report for GitHub Copilot: TT-13 … TT-16, `--hook copilot` on `agentStop` (CLI and VS Code), AI credits from Copilot's own per-call cost, the monthly allowance | Done (VS Code display waits on V: tracker) | none |
+| [019](019-workflow-graph/) | The agentic-sdlc workflow as an enforced graph, phase 1: `workflow.graph.yaml`, run ledger, a hook that blocks a role launch whose gate is not approved, task `requires:`; TypeScript, class-modeled, run by Node type stripping | Done (phase 1; Codex live check and the Claude Code settings merge wait on V) | none |
 | [017](017-turn-token-report/) | The turn token report: `turn-tokens/v1` (TT-1 … TT-12), `turn-tokens.mjs` as the `Stop` hook of Claude Code and Codex, a status-line mode for Claude Code's limits, history in each tool's own folder | Done | none |
 
 ## Open findings, by kind

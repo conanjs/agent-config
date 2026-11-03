@@ -619,6 +619,50 @@ Feature: Project validator
     When the tool runs
     Then it passes with no warnings
 
+  # requires: (task-line/v1, specs/019 US4): what a task needs first, so parallel work and the P6 join are checkable.
+
+  Scenario: TASK requires naming a task that does not exist fails
+    Given in "project/specs/001-demo/tasks.md", `procedure: demo/add-entity` becomes `procedure: demo/add-entity · requires: T099`
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        TASK  specs/001-demo/tasks.md:4: requires T099, which is not a task in this file
+      """
+
+  Scenario: TASK tasks that require each other in a cycle fail
+    Given in "project/specs/001-demo/tasks.md", `procedure: demo/add-entity` becomes `procedure: demo/add-entity · requires: T003`
+    And in "project/specs/001-demo/tasks.md", `- [ ] T002 Run the formatter [Eng] [script]` becomes `- [ ] T002 Run the formatter [Eng] [script]\n- [ ] T003 Add the order route (src/modules/orders/interface/route.ts) [Eng] [llm]\n  touches: none · refs: none · procedure: none · requires: T001`
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        TASK  specs/001-demo/tasks.md: tasks require each other in a cycle: T001 → T003 → T001
+      """
+
+  Scenario: TASK two parallel tasks that write the same file fail
+    Given in "project/specs/001-demo/tasks.md", `- [ ] T002 Run the formatter [Eng] [script]` becomes `- [ ] T002 Run the formatter [Eng] [script]\n- [ ] T003 [P] Add the order route (src/modules/orders/interface/route.ts) [Eng] [llm]\n  touches: none · refs: none · procedure: none\n- [ ] T004 [P] Add the order query (src/modules/orders/interface/route.ts) [Eng] [llm]\n  touches: none · refs: none · procedure: none`
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        TASK  specs/001-demo/tasks.md:9: [P] tasks T003 and T004 both write src/modules/orders/interface/route.ts
+      """
+
+  Scenario: TASK a parallel task that requires another parallel task fails
+    Given in "project/specs/001-demo/tasks.md", `- [ ] T002 Run the formatter [Eng] [script]` becomes `- [ ] T002 Run the formatter [Eng] [script]\n- [ ] T003 [P] Add the order route (src/modules/orders/interface/route.ts) [Eng] [llm]\n  touches: none · refs: none · procedure: none\n- [ ] T004 [P] Add the order query (src/modules/orders/interface/query.ts) [Eng] [llm]\n  touches: none · refs: none · procedure: none · requires: T003`
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        TASK  specs/001-demo/tasks.md:10: [P] task T004 requires T003, which is also [P]; they cannot run at the same time
+      """
+
+  Scenario: TASK requires naming an earlier task passes
+    Given in "project/specs/001-demo/tasks.md", `- [ ] T002 Run the formatter [Eng] [script]` becomes `- [ ] T002 Run the formatter [Eng] [script]\n- [ ] T003 Add the order route (src/modules/orders/interface/route.ts) [Eng] [llm]\n  touches: none · refs: none · procedure: none · requires: T001, T002`
+    When the tool runs
+    Then it passes with no warnings
+
   Scenario: TASK a task without a department tag fails
     Given in "project/specs/001-demo/tasks.md", `[Eng] [script]` becomes `[script]`
     When the tool runs

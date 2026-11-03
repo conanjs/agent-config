@@ -1,0 +1,171 @@
+# The agentic-sdlc workflow as a graph (schemas/workflow-graph.schema.md, specs/019 in agent-config).
+# This file is the source. `workflow.graph.json` and the marked tables in conventions.md §5 and §9 are generated
+# from it by `node tools/workflow-graph/src/main.ts compile-graph`; never edit those by hand.
+# Edit this file only through a spec and a pull request: it is the rulebook every run is checked against.
+schema: workflow-graph/v1
+name: agentic-sdlc
+version: 2.0.0
+start: P0
+
+budgets:
+  re-execute-after-check: { default: 2, loop: "Re-execute after failed script check", exhausted: "Escalate with failing output" }
+  re-execute-after-review: { default: 2, loop: "Re-execute after review-fail", exhausted: "Escalate with review feedback" }
+  rework-per-feature: { default: 1, loop: "Automatic rework to P3/P4 per feature", exhausted: "More rework only on explicit human request" }
+  parallel-tasks: { default: 4, loop: "Parallel `[P]` tasks in flight", exhausted: "Queue" }
+
+nodes:
+  P0:
+    kind: phase
+    title: Intake
+    owner: [orchestrator, security, devops, coordinator]
+    runs-when: Every session
+    owners-text: "Orchestrator, with security/devops for fast-path checks; the coordinator when the starting point is unclear (NAV)"
+    speckit: "—"
+    output: "Mission type, profile-detection report, validation notes"
+    gate-text: "—"
+  P1:
+    kind: phase
+    title: Blueprint
+    owner: []
+    gate: G0
+    runs-when: "New project, feature, or cross-repo mission"
+    owners-text: Relevant roles in propose mode
+    speckit: "—"
+    output: blueprint.md
+    gate-text: G0 direction
+  P2:
+    kind: phase
+    title: Constitution
+    owner: [architecture, engineering, qa, security]
+    gate: G1
+    runs-when: New project or amendment
+    owners-text: "architecture, engineering, qa, security"
+    speckit: constitution command
+    output: constitution sections
+    gate-text: G1 principles
+  P3:
+    kind: phase
+    title: Specify
+    owner: [product-spec]
+    gate: G2
+    runs-when: Every feature or behaviour-changing fix
+    owners-text: product-spec
+    speckit: specify/clarify commands
+    output: spec.md
+    gate-text: G2 spec
+  P4:
+    kind: phase
+    title: Plan
+    owner: [tech-stack, architecture, engineering, security, qa, devops, system-architecture]
+    gate: G3
+    runs-when: Every feature
+    owners-text: "tech-stack, architecture, engineering, security, qa, devops, system-architecture when contracts change"
+    speckit: plan command
+    output: "plan.md, research.md, data model, contracts"
+    gate-text: G3 plan
+  P5:
+    kind: phase
+    title: Tasks
+    owner: [orchestrator, qa]
+    gate: G4
+    runs-when: Every feature
+    owners-text: "Orchestrator, then qa"
+    speckit: tasks/analyze commands
+    output: "tasks.md with tags, touches, refs"
+    gate-text: G4 tasks
+  P6:
+    kind: phase
+    title: Implement
+    owner: []
+    join: all-tasks
+    runs-when: Per task
+    owners-text: "owning role execute, script checks, owning role review"
+    speckit: implement semantics
+    output: code/config/docs plus task marked complete
+    gate-text: automatic; escalate on budget
+  P7:
+    kind: phase
+    title: Close-out
+    owner: [architecture, system-architecture, security, devops]
+    gate: G5
+    runs-when: Per feature
+    owners-text: "architecture, system-architecture when cross-repo, security for high risk, devops"
+    speckit: "—"
+    output: "updated architecture/system docs, PR"
+    gate-text: G5 merge
+  G0: { kind: gate }
+  G1: { kind: gate }
+  G2: { kind: gate }
+  G3: { kind: gate }
+  G4: { kind: gate }
+  G5: { kind: gate }
+  P6.execute: { kind: step, of: P6, mode: execute }
+  P6.checks: { kind: step, of: P6, executor: script }
+  P6.review: { kind: step, of: P6, mode: review }
+  task-done: { kind: end }
+  done: { kind: end }
+  escalate: { kind: end }
+
+edges:
+  # P0 classification: the P0 line's result is the path id.
+  - { from: P0, to: P1, on: multi-service }
+  - { from: P0, to: P1, on: new-project }
+  - { from: P0, to: P1, on: new-feature }
+  - { from: P0, to: P3, on: fix-changes-behaviour }
+  - { from: P0, to: P6, on: fast-path }
+  - { from: P0, to: escalate, on: otherwise }
+  - { from: P1, to: G0, on: done }
+  - { from: P1, to: escalate, on: otherwise }
+  - { from: G0, to: P2, on: approved, paths: [new-project] }
+  - { from: G0, to: P3, on: approved, paths: [multi-service, new-feature] }
+  - { from: G0, to: P1, on: changes-requested }
+  - { from: G0, to: escalate, on: otherwise }
+  - { from: P2, to: G1, on: done }
+  - { from: P2, to: escalate, on: otherwise }
+  - { from: G1, to: P3, on: approved }
+  - { from: G1, to: P2, on: changes-requested }
+  - { from: G1, to: escalate, on: otherwise }
+  - { from: P3, to: G2, on: done }
+  - { from: P3, to: escalate, on: otherwise }
+  - { from: G2, to: P4, on: approved }
+  - { from: G2, to: P3, on: changes-requested }
+  - { from: G2, to: escalate, on: otherwise }
+  - { from: P4, to: G3, on: done }
+  - { from: P4, to: escalate, on: otherwise }
+  - { from: G3, to: P5, on: approved }
+  - { from: G3, to: P4, on: changes-requested }
+  - { from: G3, to: escalate, on: otherwise }
+  - { from: P5, to: G4, on: done }
+  - { from: P5, to: escalate, on: otherwise }
+  - { from: G4, to: P6, on: approved, paths: [new-project, new-feature, fix-changes-behaviour] }
+  - { from: G4, to: done, on: approved, paths: [multi-service] }
+  - { from: G4, to: P5, on: changes-requested }
+  - { from: G4, to: escalate, on: otherwise }
+  # P6: each task enters at P6.execute; the P6 `done` line is the join (every task passed review).
+  - { from: P6, to: P6.execute, on: task }
+  - { from: P6, to: P7, on: done }
+  - { from: P6, to: escalate, on: otherwise }
+  - { from: P6.execute, to: P6.checks, on: done }
+  - { from: P6.execute, to: escalate, on: otherwise }
+  - { from: P6.checks, to: P6.review, on: pass }
+  - { from: P6.checks, to: P6.execute, on: fail, budget: re-execute-after-check }
+  - { from: P6.checks, to: escalate, on: otherwise }
+  - { from: P6.review, to: task-done, on: pass }
+  - { from: P6.review, to: P6.execute, on: review-fail, budget: re-execute-after-review }
+  - { from: P6.review, to: P3, on: spec-or-plan-wrong, budget: rework-per-feature }
+  - { from: P6.review, to: escalate, on: otherwise }
+  - { from: P7, to: G5, on: done }
+  - { from: P7, to: escalate, on: otherwise }
+  - { from: G5, to: done, on: approved }
+  - { from: G5, to: P7, on: changes-requested }
+  - { from: G5, to: escalate, on: otherwise }
+
+paths:
+  - id: multi-service
+    when: Company KB system catalog shows more than one service touched
+    run: [P1, P3, P4, P5]
+    path-text: "Run system-level P1/P3/P4/P5 in Company KB `system/features/`; each slice then runs in its repo"
+  - { id: new-project, when: "No `.specify/` yet or new project", run: [P1, P2, P3, P4, P5, P6, P7] }
+  - { id: new-feature, when: New feature, run: [P1, P3, P4, P5, P6, P7] }
+  - { id: fix-changes-behaviour, when: Fix changes specified behaviour, run: [P3, P4, P5, P6, P7] }
+  - { id: fast-path, when: Fix passes fast-path check, run: [P6, P7] }

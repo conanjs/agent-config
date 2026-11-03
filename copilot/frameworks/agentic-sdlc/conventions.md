@@ -47,6 +47,9 @@ profile_dimensions:
 ```
 
 ## 5. Workflow
+**Where these rules live.** The phase table and the P0 path table below, and the budget table in §9, are generated from `workflow.graph.yaml` (the rulebook the guard hook enforces) by `tools/workflow-graph` `compile-graph`. `check-graph` compares them on every commit and fails if they differ. Read the tables; to change a rule, edit the YAML and run `compile-graph`, never the tables. If you ever see the two disagree, the YAML is what the guard enforces: stop and report it.
+
+<!-- generated: workflow-graph phases (from workflow.graph.yaml by compile-graph; edit the YAML, not this table) -->
 | Phase | Runs when | Owner(s) | Spec Kit command | Output | Gate |
 |---|---|---|---|---|---|
 | P0 Intake | Every session | Orchestrator, with security/devops for fast-path checks; the coordinator when the starting point is unclear (NAV) | — | Mission type, profile-detection report, validation notes | — |
@@ -57,9 +60,11 @@ profile_dimensions:
 | P5 Tasks | Every feature | Orchestrator, then qa | tasks/analyze commands | tasks.md with tags, touches, refs | G4 tasks |
 | P6 Implement | Per task | owning role execute, script checks, owning role review | implement semantics | code/config/docs plus task marked complete | automatic; escalate on budget |
 | P7 Close-out | Per feature | architecture, system-architecture when cross-repo, security for high risk, devops | — | updated architecture/system docs, PR | G5 merge |
+<!-- /generated: workflow-graph phases -->
 
 P0 classification, first match wins:
 
+<!-- generated: workflow-graph paths (from workflow.graph.yaml by compile-graph; edit the YAML, not this table) -->
 | Condition | Path |
 |---|---|
 | Company KB system catalog shows more than one service touched | Run system-level P1/P3/P4/P5 in Company KB `system/features/`; each slice then runs in its repo |
@@ -67,10 +72,11 @@ P0 classification, first match wins:
 | New feature | P1 → P3 → P4 → P5 → P6 → P7 |
 | Fix changes specified behaviour | P3 → P4 → P5 → P6 → P7 |
 | Fix passes fast-path check | P6 → P7 |
+<!-- /generated: workflow-graph paths -->
 
 P0 also checks architecture freshness, known stack manifests against docs/architecture.md components, and whether paradigm is missing where PDM reaches PDM-Q4 without a project default. That paradigm case becomes a G0 open question.
 
-Gate format: one message with (1) produced paths, (2) blueprint deltas, (3) top open questions, max 3, (4) spend so far and budget notes, (5) exact approval reply. Nothing after a gate starts before approval.
+Gate format: one message with (1) produced paths, (2) blueprint deltas, (3) top open questions, max 3, (4) spend so far and budget notes, (5) exact approval reply, `approve G<n> <run>` (or `changes G<n> <run>`). Nothing after a gate starts before approval: the approval hook records the human's reply in the run's ledger and the guard hook refuses launches past an unapproved gate (`schemas/workflow-graph.schema.md`).
 
 P6 loop per task:
 1. Launch owning role in execute mode.
@@ -105,12 +111,14 @@ Default inference, confirmed at G4: test-only work → `[QA]`; delivery files �
 Eligible only if all hold: no acceptance-criterion change, no API/event/contract shape change, risk tier LOW, no new dependency, and DT-Q1 is NO. Flow: P0 → one `[Eng] [llm]` task → P6 → P7. Minimum record: regression test or reason none applies, fast-path restoration note, root cause, and a line under the feature fix log. If review finds behaviour changes, reroute to P3.
 
 ## 9. Budgets and model tiers
+<!-- generated: workflow-graph budgets (from workflow.graph.yaml by compile-graph; edit the YAML, not this table) -->
 | Loop | Default budget | When exhausted |
 |---|---|---|
 | Re-execute after failed script check | 2 | Escalate with failing output |
 | Re-execute after review-fail | 2 | Escalate with review feedback |
 | Automatic rework to P3/P4 per feature | 1 | More rework only on explicit human request |
 | Parallel `[P]` tasks in flight | 4 | Queue |
+<!-- /generated: workflow-graph budgets -->
 
 Project overrides live in the constitution under `## Agentic SDLC budgets`. Token/cost budgets are soft; the Orchestrator reports spend at every gate and escalates when exceeded.
 

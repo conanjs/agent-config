@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # check-docs.sh — runs the repo's document validators (layer 1 of the doc guards): knowledge, procedures, agentic-sdlc,
-# agent-foundry, the atlas, this repo's TRACKER.md, then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
+# agent-foundry, the atlas, this repo's TRACKER.md, the workflow graph tool (specs/019), then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
 # Used by .githooks/pre-commit, the Claude Code hook (.claude/settings.json) and CI (.github/workflows/validate-docs.yml).
 #
 # Usage: scripts/check-docs.sh   (network checks are separate: validate-knowledge.mjs --urls, validate-procedures.mjs --upstream)
@@ -31,5 +31,11 @@ status=0
 "$node_bin" "$root/copilot/atlas/tools/atlas.mjs" || status=1
 # This repo's own TRACKER.md (tracker/v1).
 "$node_bin" "$root/copilot/tracker/tracker.mjs" "$root" || status=1
+# The workflow graph (specs/019): the graph and its generated JSON and tables, then the tool's type check, lint
+# (the class-modeled paradigm rules) and unit tests. Its development tools are a pnpm workspace package.
+wg="$root/copilot/frameworks/agentic-sdlc/tools/workflow-graph"
+"$node_bin" "$wg/src/main.ts" check-graph || status=1
+[ -f "$wg/node_modules/typescript/bin/tsc" ] || { echo "check-docs: workflow-graph dependencies missing; run: pnpm install" >&2; exit 4; }
+(cd "$wg" && "$node_bin" node_modules/typescript/bin/tsc --noEmit -p tsconfig.json && "$node_bin" node_modules/eslint/bin/eslint.js . --max-warnings 0 && "$node_bin" node_modules/vitest/vitest.mjs run --silent) || status=1
 (cd "$root" && "$node_bin" "$cucumber") || status=1
 exit $status

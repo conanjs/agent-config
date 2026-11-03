@@ -4,8 +4,8 @@ type: reference
 topic: ai-agents
 status: draft
 applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02"]
-last-verified: 2026-11-02
-last-updated: 2026-11-02
+last-verified: 2026-11-03
+last-updated: 2026-11-03
 tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructions]
 ---
 
@@ -58,6 +58,14 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | `agentStop` input | camelCase: `sessionId`, `timestamp`, `cwd`, `transcriptPath`, `stopReason`, `stop_hook_active`; the VS Code-style name `Stop` gives the same in snake_case | ✅[^1] |
 | `agentStop` output | Only `decision` / `reason` (to make the agent go on); no message field for the user | ✅[^1] |
 | Progress lines | A hook may print `{"type": "progress", "message": "…"}` lines; the CLI shows each one in its output (seen as "● …" lines) | ✅[^1][^5] |
+| `preToolUse` | camelCase input `toolName`, `toolArgs`; denies with `{"permissionDecision": "deny", "permissionDecisionReason": …}` (the reason is required); the PascalCase `PreToolUse` form uses `tool_name`, `tool_input` | ✅[^1] |
+| Subagent launch | The tool is `task` ("Run subagent tasks"), matched as `Agent` in the PascalCase form; `subagentStart` can only add context, `subagentStop` can block; the built-in `general-purpose` agent emits neither | ✅[^1] |
+| `task` arguments seen by `preToolUse` | `toolArgs`: `name`, `prompt`, `agent_type`, `description`, `mode` (`sync`) | ✅[^6] |
+| A denied `task` call | The CLI prints "Denied by preToolUse hook: <reason>" and the agent receives the reason | ✅[^6] |
+| Repository hooks and folder trust | `.github/hooks/*.json` did **not** run in a folder outside the trusted folders (`trustedFolders` in `~/.copilot/config.json`); the same file ran in a trusted folder. User hooks in `~/.copilot/hooks/` ran in both | ✅[^6] |
+| `userPromptSubmitted` | Input `sessionId`, `timestamp`, `cwd`, `prompt`; a config-file hook's output is dropped (only SDK hooks may return `modifiedPrompt`) | ✅[^1] |
+| `copilot -p --agent <name>` | Runs the prompt as that custom agent (tested with `sdlc-qa`) | ✅[^6] |
+| `userPromptSubmitted` in `copilot -p` | A user-level hook (`~/.copilot/hooks/*.json`) received the prompt of a non-interactive run, with `sessionId` and `cwd`; a user-level `preToolUse` hook denied `task` and then allowed it (agentic-sdlc workflow guard, live test) | ✅[^6] |
 | Progress lines in VS Code | Not documented and not yet seen | ⚠️ unverified |
 | Order at the end of a turn | The last `session.usage_record`, then the final `assistant.message` (no `toolRequests`), then `assistant.turn_end`, then the `agentStop` hook | ✅[^5] |
 
@@ -83,14 +91,15 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 22 claims (✅) · Unverified: 2 claims (⚠️) · Last verified: 2026-11-02
+- Verified: 30 claims (✅) · Unverified: 2 claims (⚠️) · Last verified: 2026-11-03
 
 ## References
-- [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines. [^1]
+- [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines, `preToolUse` deny, the `task` subagent tool and subagent events. [^1]
 - [Hooks (VS Code)](https://code.visualstudio.com/docs/copilot/customization/hooks) — Microsoft, living. Backs: one hook format across VS Code, the Copilot app and the CLI. [^2]
 - [Custom instructions (VS Code)](https://code.visualstudio.com/docs/copilot/customization/custom-instructions) — Microsoft, living. Backs: `~/.copilot/instructions`, `applyTo`, `description`. [^3]
 - [Usage-based billing for individuals](https://docs.github.com/copilot/concepts/billing/usage-based-billing-for-individuals) — GitHub, living. Backs: 1 AI credit = $0.01, monthly allowances. [^4]
 - `~/.copilot/session-state/*/events.jsonl`, `copilot -p` with Copilot CLI 1.0.105, and the VS Code process start time — local test, 2026-11-02: event types and fields, per-call credits summing exactly to the checkpoint (182.21 AI credits), the quota snapshot, the CLI showing progress lines and a 9.22-credit turn that matches its own footer, and the stale instruction copy in a VS Code session. [^5]
+- `copilot -p` runs (Copilot CLI 1.0.105), local test, 2026-11-03: a `preToolUse` hook denying `task` in a folder outside and inside the trusted folders, the recorded `toolArgs`, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check the same day (user-level `preToolUse` deny then allow, `userPromptSubmitted` in `-p`). [^6]
 - `copilot/hooks/turn-tokens/turn-tokens.schema.md`, `specs/018-turn-tokens-copilot/` in agent-config — the report built on these facts.
 
 ## Related

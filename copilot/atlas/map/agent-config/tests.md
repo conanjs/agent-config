@@ -40,6 +40,8 @@ Where: `tests/*/{*.feature,tool.mjs}` · Schema: — · Index: — · Checked by
 - [`tests/validate-project/validate-project.feature`](../../../../tests/validate-project/validate-project.feature)
 - [`tests/validate-sdlc/tool.mjs`](../../../../tests/validate-sdlc/tool.mjs)
 - [`tests/validate-sdlc/validate-sdlc.feature`](../../../../tests/validate-sdlc/validate-sdlc.feature)
+- [`tests/workflow-graph/tool.mjs`](../../../../tests/workflow-graph/tool.mjs)
+- [`tests/workflow-graph/workflow-graph.feature`](../../../../tests/workflow-graph/workflow-graph.feature)
 
 ## Fixtures
 
@@ -125,3 +127,9 @@ Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · 
 - [`tests/validate-sdlc/fixtures/base/repo/skills/sdlc-engineering-preset/SKILL.md`](../../../../tests/validate-sdlc/fixtures/base/repo/skills/sdlc-engineering-preset/SKILL.md)
 - [`tests/validate-sdlc/fixtures/base/repo/skills/sdlc-paradigm-demo-paradigm/SKILL.md`](../../../../tests/validate-sdlc/fixtures/base/repo/skills/sdlc-paradigm-demo-paradigm/SKILL.md)
 - [`tests/validate-sdlc/fixtures/base/repo/skills/sdlc-stack-demo/SKILL.md`](../../../../tests/validate-sdlc/fixtures/base/repo/skills/sdlc-stack-demo/SKILL.md)
+- [`tests/workflow-graph/fixtures/base/project/.specify/runs/.gitkeep`](../../../../tests/workflow-graph/fixtures/base/project/.specify/runs/.gitkeep)
+- [`tests/workflow-graph/fixtures/base/project/specs/023-cart/tasks.md`](../../../../tests/workflow-graph/fixtures/base/project/specs/023-cart/tasks.md)
+- [`tests/workflow-graph/fixtures/payloads/README.md`](../../../../tests/workflow-graph/fixtures/payloads/README.md)
+- [`tests/workflow-graph/fixtures/payloads/claude-code/launch.json`](../../../../tests/workflow-graph/fixtures/payloads/claude-code/launch.json)
+- [`tests/workflow-graph/fixtures/payloads/codex/launch.json`](../../../../tests/workflow-graph/fixtures/payloads/codex/launch.json)
+- [`tests/workflow-graph/fixtures/payloads/copilot-cli/launch.json`](../../../../tests/workflow-graph/fixtures/payloads/copilot-cli/launch.json)
