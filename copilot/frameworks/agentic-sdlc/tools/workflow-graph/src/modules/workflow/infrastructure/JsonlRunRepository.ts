@@ -1,14 +1,26 @@
 import { existsSync } from "node:fs";
 import { appendFile, mkdir, readdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import type { RunFolderLayout } from "#src/modules/shared/infrastructure/RunFolderLayout.ts";
 import type { RunRepository } from "#src/modules/workflow/domain/ports/RunRepository.ts";
 
 const TASK = /^\s*- \[[ xX]\] (T\d{3,})\b/gm;
 
-/** Run ledgers as JSON Lines files under `<project>/.specify/runs/`, appended to and never rewritten. */
+/** Run ledgers as JSON Lines files, `<project>/.specify/runs/<run>/ledger.jsonl`, appended to and never rewritten. */
 export class JsonlRunRepository implements RunRepository {
+  readonly #layout: RunFolderLayout;
+
   /**
-   * {@link RunRepository.read}: reads `.specify/runs/<run>.jsonl`.
+   * Keeps the folder layout that names every run file.
+   *
+   * @param layout - where each run's files live under `.specify/runs/<run>/`
+   */
+  public constructor(layout: RunFolderLayout) {
+    this.#layout = layout;
+  }
+
+  /**
+   * {@link RunRepository.read}: reads `.specify/runs/<run>/ledger.jsonl`.
    */
   public async read(project: string, run: string): Promise<string[] | undefined> {
     const file = this.#file(project, run);
@@ -20,19 +32,19 @@ export class JsonlRunRepository implements RunRepository {
    * {@link RunRepository.append}: appends one line, creating the folder for a new run.
    */
   public async append(project: string, run: string, line: string): Promise<void> {
-    await mkdir(join(project, ".specify", "runs"), { recursive: true });
-    await appendFile(this.#file(project, run), `${line}\n`);
+    const file = this.#file(project, run);
+    await mkdir(dirname(file), { recursive: true });
+    await appendFile(file, `${line}\n`);
   }
 
   /**
    * {@link RunRepository.list}: lists the runs with a ledger.
    */
   public async list(project: string): Promise<string[]> {
-    const folder = join(project, ".specify", "runs");
+    const folder = this.#layout.root(project);
     if (!existsSync(folder)) return [];
     return (await readdir(folder))
-      .filter((f) => /^R-\d{3,}\.jsonl$/.test(f))
-      .map((f) => f.replace(/\.jsonl$/, ""))
+      .filter((name) => this.#layout.isRunId(name) && existsSync(this.#file(project, name)))
       .sort();
   }
 
@@ -46,6 +58,6 @@ export class JsonlRunRepository implements RunRepository {
   }
 
   #file(project: string, run: string): string {
-    return join(project, ".specify", "runs", `${run}.jsonl`);
+    return this.#layout.ledger(project, run);
   }
 }

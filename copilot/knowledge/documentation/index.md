@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: documentation
-last-updated: 2026-10-26
+last-updated: 2026-11-03
 ---
 
 # Documentation
@@ -14,6 +14,10 @@ Technical explanation design, learning prompts, and team-document conventions. A
 | Doc | Type | Summary | Status |
 | --- | --- | --- | --- |
 | [Learning Explanation Framework](learning-explanation-framework.md) | how-to | Scale and draft an explanation; prompts, worked example, evidence checks, and recall notes | draft |
+| [Interface description standards](interface-description-standards.md) | reference | Which machine-readable format describes each kind of interface (HTTP, events, JSON-RPC, CLI, JSON data, TypeScript library) and how a repo catalogs them | verified |
+| [OpenCLI: the two specifications that share one name](opencli-deep-dive.md) | deep-dive | opencli.org (draft 0.1, Spectre.Console, .NET) versus opencli.dev (alpha, `ocli`): every object, one command in both, edge-case matrix | verified |
+| [usage (jdx): a CLI described once, checked and generated](usage-spec-deep-dive.md) | deep-dive | KDL nodes, `effect`, outputs with JSON Schema, exit codes, env and config; lint, diff, generators, exporters; CI flow, edge cases | verified |
+| [Describing a command-line program: every format compared](cli-description-formats-deep-dive.md) | deep-dive | docopt, Fig/Amazon Q, carapace-spec, argc, .NET `--cli-schema`, POSIX and clig.dev; feature matrix, decision guide, failure modes | verified |
 | [Doc template base](doc-template-base.md) | legacy | Existing team-facing language and structure conventions | — |
 | [Lessons learned](lessons-learned.md) | legacy | Existing lessons from preparing team documents | — |
 

@@ -1,4 +1,4 @@
-/** Where run ledgers live: `<project>/.specify/runs/<run>.jsonl`, append-only. */
+/** Where run ledgers live: `<project>/.specify/runs/<run>/ledger.jsonl`, append-only. */
 export interface RunRepository {
   /**
    * Returns the ledger's non-empty lines, or undefined when the run has no ledger.
@@ -9,7 +9,7 @@ export interface RunRepository {
    */
   read(project: string, run: string): Promise<string[] | undefined>;
   /**
-   * Appends one line at the end of `<run>.jsonl`, creating the folder for a new run; earlier lines are never rewritten.
+   * Appends one line at the end of the run's ledger, creating the folder for a new run; earlier lines are never rewritten.
    *
    * @param project - the project folder
    * @param run - the run id

@@ -18,6 +18,15 @@ Where: `{README,SETUP,CONTRIBUTING,CODE_OF_CONDUCT,SECURITY}.md` · Schema: — 
 - [`SECURITY.md`](../../../../SECURITY.md)
 - [`SETUP.md`](../../../../SETUP.md)
 
+## Interface catalog
+
+<a id="interface-catalog"></a>Every program the repo exposes, whether its interface is described yet, and where (INTERFACES.md for people, a Backstage catalog-info.yaml for programs)
+
+Where: `{INTERFACES.md,catalog-info.yaml}` · Schema: `copilot/frameworks/agentic-sdlc/foundations/design/contract-design.md` · Index: `INTERFACES.md` · Checked by: workflow-graph interfaces (described tools) · Scenarios: `tests/workflow-graph/workflow-graph.feature` · Installed to: —
+
+- [`INTERFACES.md`](../../../../INTERFACES.md)
+- [`catalog-info.yaml`](../../../../catalog-info.yaml)
+
 ## Install map and variables
 
 <a id="install-config"></a>What gets installed where (mapping.yaml), the path variables, and code owners

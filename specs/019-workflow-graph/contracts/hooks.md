@@ -1,5 +1,7 @@
 # Contract: hook input and output per tool
 
+> **Replaced (2026-11-03, specs/021):** this was the design-time contract. The living description is the tool's interface catalog, `copilot/frameworks/agentic-sdlc/tools/workflow-graph/INTERFACES.md`, checked against the code by `workflow-graph interfaces`. Kept as the record of what spec 019 decided.
+
 ✅ = recorded from a live run on 2026-11-03 (the payload is kept as a test fixture); 📄 = from the tool's docs read the same day; ⚠️ = not verified yet.
 
 ## Guard: pre-tool-use on the subagent tool

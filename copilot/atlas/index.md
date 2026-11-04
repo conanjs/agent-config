@@ -7,24 +7,24 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 ## Tree
 
 - **agent-config** (`agent-config`) — Agent instructions, frameworks, knowledge, procedures, wrappers, skills and their installers
-  - [Start here](map/agent-config/start.md) — What the repo is, how to set it up, how to contribute, and what gets installed where (8 files)
+  - [Start here](map/agent-config/start.md) — What the repo is, how to set it up, how to contribute, and what gets installed where (10 files)
   - [Instructions](map/agent-config/instructions.md) — Always-on instructions every agent loads (3 files)
   - [Atlas](map/agent-config/atlas.md) — This map: the registry, its schema, its tool and the generated pages (33 files)
   - [Tracker](map/agent-config/tracker.md) — Open work carried across sessions: the TRACKER.md format, its tool and the session-start hooks (4 files)
   - [Turn token report](map/agent-config/turn-tokens.md) — What each Claude Code or Codex turn used and the running total: the report's rules, its tool and the Stop hooks (4 files)
-  - [Frameworks](map/agent-config/frameworks.md) — Rule sets with schemas and validators: agentic-sdlc, knowledge, company-kb, agent-foundry (236 files)
-    - [Agentic SDLC framework](map/agent-config/agentic-sdlc.md) — Roles, foundations, decision trees, stacks and paradigms for spec-driven, multi-agent delivery (194 files)
+  - [Frameworks](map/agent-config/frameworks.md) — Rule sets with schemas and validators: agentic-sdlc, knowledge, company-kb, agent-foundry (264 files)
+    - [Agentic SDLC framework](map/agent-config/agentic-sdlc.md) — Roles, foundations, decision trees, stacks and paradigms for spec-driven, multi-agent delivery (222 files)
     - [Knowledge framework](map/agent-config/knowledge-framework.md) — Schemas and validator for the global knowledge base (6 files)
     - [Company KB framework](map/agent-config/company-kb-framework.md) — Schemas for per-company knowledge bases (11 files)
     - [Agent Foundry](map/agent-config/agent-foundry.md) — Charters, floors, trees and lenses for standalone review and triage agents (25 files)
-  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (124 files)
+  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (128 files)
   - [Company knowledge bases](map/agent-config/companies.md) — Facts about one company's systems, one folder per company (20 files)
   - [Procedures](map/agent-config/procedures.md) — Repeatable multi-step tasks, written once in tool-neutral prose (10 files)
   - [Patterns](map/agent-config/patterns.md) — Named, reusable techniques learned from real cases (12 files)
   - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (55 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (17 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
-  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (144 files)
+  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (148 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (107 files)
   - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (14 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
@@ -44,6 +44,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | Kind | Area | Where | Schema | Index | Checked by | Scenarios | Installed to |
 |---|---|---|---|---|---|---|---|
 | [Repo guides](map/agent-config/start.md#repo-guide) | Start here | `{README,SETUP,CONTRIBUTING,CODE_OF_CONDUCT,SECURITY}.md` | — | `README.md` | — | — | — |
+| [Interface catalog](map/agent-config/start.md#interface-catalog) | Start here | `{INTERFACES.md,catalog-info.yaml}` | `copilot/frameworks/agentic-sdlc/foundations/design/contract-design.md` | `INTERFACES.md` | workflow-graph interfaces (described tools) | `tests/workflow-graph/workflow-graph.feature` | — |
 | [Install map and variables](map/agent-config/start.md#install-config) | Start here | `{mapping.yaml,global-variables.md,CODEOWNERS}` | — | `README.md` | — | `tests/installers/installers.feature` | `global-variables.md → ~/.copilot (seed-once)` |
 | [Instruction files](map/agent-config/instructions.md#instruction) | Instructions | `copilot/instructions/*.instructions.md` | — | — | — | — | `~/.copilot/instructions` |
 | [Registry](map/agent-config/atlas.md#atlas-registry) | Atlas | `copilot/atlas/atlas.yaml` | `copilot/atlas/schemas/atlas.schema.md` | `copilot/atlas/index.md` | atlas.mjs AT-1 … AT-7 | `tests/atlas/atlas.feature` | `~/.copilot/atlas` |
@@ -64,7 +65,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Paradigms](map/agent-config/agentic-sdlc.md#sdlc-paradigm) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/paradigms/*.md` | `copilot/frameworks/agentic-sdlc/schemas/paradigm.schema.md` | `copilot/frameworks/agentic-sdlc/index.md` | validate.mjs PDM | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Schemas](map/agent-config/agentic-sdlc.md#sdlc-schema) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/schemas/*.md` | `copilot/frameworks/agentic-sdlc/schemas/_system.md` | `copilot/frameworks/agentic-sdlc/schemas/_system.md` | validate.mjs SCHEMA | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Workflow graph](map/agent-config/agentic-sdlc.md#wg-graph) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/workflow.graph.{yaml,json}` | `copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md` | `copilot/frameworks/agentic-sdlc/conventions.md` | workflow-graph check-graph | `tests/workflow-graph/workflow-graph.feature` | `~/.copilot/frameworks` |
-| [Workflow graph tool](map/agent-config/agentic-sdlc.md#wg-tool) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/tools/workflow-graph/**` | `copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md` | `specs/019-workflow-graph/plan.md` | scenarios, tsc, eslint, vitest | `tests/workflow-graph/workflow-graph.feature` | `~/.copilot/frameworks` |
+| [Workflow graph tool](map/agent-config/agentic-sdlc.md#wg-tool) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/tools/workflow-graph/**` | `copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md` | `copilot/frameworks/agentic-sdlc/tools/workflow-graph/INTERFACES.md` | scenarios, tsc, eslint, vitest | `tests/workflow-graph/workflow-graph.feature` | `~/.copilot/frameworks` |
 | [Validators](map/agent-config/agentic-sdlc.md#sdlc-tool) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/tools/*.mjs` | — | `copilot/frameworks/agentic-sdlc/index.md` | scenarios | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Knowledge schemas](map/agent-config/knowledge-framework.md#kf-schema) | Knowledge framework | `copilot/frameworks/knowledge/schemas/*.md` | `copilot/frameworks/knowledge/schemas/_system.md` | `copilot/frameworks/knowledge/index.md` | — | `tests/validate-knowledge/validate-knowledge.feature` | `~/.copilot/frameworks` |
 | [Knowledge validator](map/agent-config/knowledge-framework.md#kf-tool) | Knowledge framework | `copilot/frameworks/knowledge/tools/*.mjs` | — | `copilot/frameworks/knowledge/index.md` | scenarios | `tests/validate-knowledge/validate-knowledge.feature` | `~/.copilot/frameworks` |

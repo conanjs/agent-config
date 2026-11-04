@@ -40,6 +40,15 @@ Given('the real workflow graph is copied to {string}', function (to) {
   }
 });
 
+// The tool's interface catalog without its code (specs/021), so a scenario can plant a fault in a copy.
+Given('the tool\'s interface catalog is copied to {string}', function (to) {
+  const tool = path.join(repo, framework, 'tools/workflow-graph');
+  fs.mkdirSync(this.at(to), { recursive: true });
+  for (const f of ['INTERFACES.md', 'catalog-info.yaml', 'package.json', 'interfaces']) {
+    fs.cpSync(path.join(tool, f), this.at(`${to}/${f}`), { recursive: true });
+  }
+});
+
 Given('the guard is switched off', function () {
   this.guardOff = true;
 });

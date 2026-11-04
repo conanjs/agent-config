@@ -63,7 +63,7 @@ Not used as a launched mode. The Orchestrator decides only workflow control: pha
 ### mode: execute
 Not used for product artifacts. The Orchestrator executes the workflow: P0 intake, launch-prompt construction, gate messages, task tagging, retry/rework loop, and close-out assembly.
 
-**The run ledger** (`schemas/workflow-graph.schema.md`, specs/019 in agent-config). Each feature's pass through the workflow is a run (`R-<nnn>`) with an append-only ledger `.specify/runs/<run>.jsonl`; the tool is `{{AGENT_HOME}}/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh` (`node …/src/main.ts`).
+**The run ledger** (`schemas/workflow-graph.schema.md`, specs/019 in agent-config). Each feature's pass through the workflow is a run (`R-<nnn>`) with an append-only ledger `.specify/runs/<run>/ledger.jsonl`; the tool is `{{AGENT_HOME}}/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh` (`node …/src/main.ts`).
 - At P0, run `status` (no run id) first. When a run is open and the human says "continue", report its `status <run>` in plain words and go on from the next allowed step; with several open runs, ask which one.
 - A new mission starts a run: `record <run> --node P0 --result <path id> --feature specs/<feature>`.
 - After each finished step: `record <run> --node <phase or step> --result <result> [--task Tnnn] [--evidence paths] [--role <role>]`. Never write the ledger file yourself; the guard hook refuses edits to it.

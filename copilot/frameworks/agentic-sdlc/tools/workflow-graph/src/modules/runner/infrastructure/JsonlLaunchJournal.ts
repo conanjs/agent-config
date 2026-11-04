@@ -1,12 +1,24 @@
 import { existsSync } from "node:fs";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname } from "node:path";
+import type { RunFolderLayout } from "#src/modules/shared/infrastructure/RunFolderLayout.ts";
 import type { LaunchJournal, LaunchState } from "#src/modules/runner/domain/ports/LaunchJournal.ts";
 
-/** `<project>/.specify/runs/<run>.launches.jsonl`: one `started` and one `finished` line per launch key. */
+/** `<project>/.specify/runs/<run>/launches.jsonl`: one `started` and one `finished` line per launch key. */
 export class JsonlLaunchJournal implements LaunchJournal {
+  readonly #layout: RunFolderLayout;
+
   /**
-   * {@link LaunchJournal.state}: reads the whole `<run>.launches.jsonl`; a finished line wins over a started one.
+   * Keeps the folder layout that names every run file.
+   *
+   * @param layout - where each run's files live under `.specify/runs/<run>/`
+   */
+  public constructor(layout: RunFolderLayout) {
+    this.#layout = layout;
+  }
+
+  /**
+   * {@link LaunchJournal.state}: reads the whole `<run>/launches.jsonl`; a finished line wins over a started one.
    */
   public async state(project: string, run: string, key: string): Promise<LaunchState> {
     const file = this.#file(project, run);
@@ -22,7 +34,7 @@ export class JsonlLaunchJournal implements LaunchJournal {
   }
 
   /**
-   * {@link LaunchJournal.started}: appends a `started` line, creating `.specify/runs/` when missing.
+   * {@link LaunchJournal.started}: appends a `started` line, creating the run folder when missing.
    */
   public async started(project: string, run: string, key: string): Promise<void> {
     await this.#append(project, run, { key, event: "started" });
@@ -36,11 +48,12 @@ export class JsonlLaunchJournal implements LaunchJournal {
   }
 
   async #append(project: string, run: string, line: Record<string, string>): Promise<void> {
-    await mkdir(join(project, ".specify", "runs"), { recursive: true });
-    await appendFile(this.#file(project, run), `${JSON.stringify(line)}\n`);
+    const file = this.#file(project, run);
+    await mkdir(dirname(file), { recursive: true });
+    await appendFile(file, `${JSON.stringify(line)}\n`);
   }
 
   #file(project: string, run: string): string {
-    return join(project, ".specify", "runs", `${run}.launches.jsonl`);
+    return this.#layout.launches(project, run);
   }
 }

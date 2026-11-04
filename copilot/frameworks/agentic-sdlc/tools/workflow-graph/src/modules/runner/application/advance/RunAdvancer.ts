@@ -210,7 +210,7 @@ export class RunAdvancer {
     if (known.kind === "started")
       return {
         kind: "attention",
-        reason: `launch ${key} started but has no recorded end; check ${folder}, then remove its line from ${ctx.run}.launches.jsonl to launch it again`,
+        reason: `launch ${key} started but has no recorded end; check ${folder}, then remove its line from .specify/runs/${ctx.run}/launches.jsonl to launch it again`,
       };
     const adapters = this.#p.registry.resolve(ctx.settings.agents.agentFor(what.role));
     if (!adapters.ok) return { kind: "attention", reason: `no adapters for ${adapters.error}` };

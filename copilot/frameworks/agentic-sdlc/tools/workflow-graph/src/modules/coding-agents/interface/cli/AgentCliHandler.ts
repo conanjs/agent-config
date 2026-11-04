@@ -1,4 +1,6 @@
+import { parseArgs } from "node:util";
 import type { CommandOutput } from "#src/modules/shared/domain/CommandOutput.ts";
+import type { OptionTable } from "#src/modules/shared/domain/OptionTable.ts";
 import type { FindingsReport } from "#src/modules/workflow/application/report/FindingsReport.ts";
 import { AgentId } from "#src/modules/coding-agents/domain/AgentId.ts";
 import type { CodingAgentRegistry } from "#src/modules/coding-agents/application/CodingAgentRegistry.ts";
@@ -7,6 +9,13 @@ import type { HookHandler } from "#src/modules/coding-agents/interface/hooks/Hoo
 
 /** The command line of the coding-agents module: `hook guard|approve --agent <id>` (stdin in, the agent's format out) and `verify-approvals <run>`. */
 export class AgentCliHandler {
+  /** The flags each command parses; `workflow-graph interfaces` compares them with the usage spec (IF-3). */
+  public static readonly options: ReadonlyMap<string, OptionTable> = new Map<string, OptionTable>([
+    ["hook guard", { agent: { type: "string" } }],
+    ["hook approve", { agent: { type: "string" } }],
+    ["verify-approvals", { project: { type: "string" } }],
+  ]);
+
   readonly #hooks: HookHandler;
   readonly #verify: VerifyApprovals;
   readonly #registry: CodingAgentRegistry;
@@ -59,9 +68,12 @@ export class AgentCliHandler {
     stdin: () => Promise<string>,
   ): Promise<CommandOutput> {
     if (command === "verify-approvals") return this.#verifyRun(args);
-    const kind = args[0];
-    const agentText = args[args.indexOf("--agent") + 1] ?? "";
-    const agent = AgentId.parse(args.includes("--agent") ? agentText : "");
+    const [kind = "", ...after] = args;
+    const options = AgentCliHandler.options.get(`hook ${kind}`) ?? {};
+    const { values } = parseArgs({ args: after, options }) as {
+      values: Record<string, string | undefined>;
+    };
+    const agent = AgentId.parse(values["agent"] ?? "");
     if ((kind !== "guard" && kind !== "approve") || !agent.ok) {
       return {
         code: 2,
@@ -79,10 +91,13 @@ export class AgentCliHandler {
   }
 
   async #verifyRun(args: readonly string[]): Promise<CommandOutput> {
-    const run = args.find((a) => !a.startsWith("--")) ?? "";
-    const project = args.includes("--project")
-      ? (args[args.indexOf("--project") + 1] ?? this.#cwd)
-      : this.#cwd;
+    const { values, positionals } = parseArgs({
+      args: [...args],
+      allowPositionals: true,
+      options: AgentCliHandler.options.get("verify-approvals") ?? {},
+    }) as { values: Record<string, string | undefined>; positionals: string[] };
+    const run = positionals[0] ?? "";
+    const project = values["project"] ?? this.#cwd;
     const verified = await this.#verify.run(project, run);
     if (!verified.ok) return { code: 1, out: `  WG-30  ${run}: ${verified.error}\nFAIL (1)` };
     return this.#report.render(`workflow-graph verify-approvals: ${run}`, verified.value);

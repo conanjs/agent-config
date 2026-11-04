@@ -123,6 +123,10 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/020-workflow-runner/research.md`](../../../../specs/020-workflow-runner/research.md)
 - [`specs/020-workflow-runner/spec.md`](../../../../specs/020-workflow-runner/spec.md)
 - [`specs/020-workflow-runner/tasks.md`](../../../../specs/020-workflow-runner/tasks.md)
+- [`specs/021-interface-catalog/plan.md`](../../../../specs/021-interface-catalog/plan.md)
+- [`specs/021-interface-catalog/research.md`](../../../../specs/021-interface-catalog/research.md)
+- [`specs/021-interface-catalog/spec.md`](../../../../specs/021-interface-catalog/spec.md)
+- [`specs/021-interface-catalog/tasks.md`](../../../../specs/021-interface-catalog/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)

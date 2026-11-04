@@ -3,6 +3,7 @@
 import type { CommandOutput } from "#src/modules/shared/domain/CommandOutput.ts";
 import type { CodingAgentRegistry } from "#src/modules/coding-agents/application/CodingAgentRegistry.ts";
 import { CommandRunner } from "#src/modules/shared/infrastructure/CommandRunner.ts";
+import { RunFolderLayout } from "#src/modules/shared/infrastructure/RunFolderLayout.ts";
 import type { RecordApproval } from "#src/modules/workflow/application/record-approval/RecordApproval.ts";
 import type { RecordStep } from "#src/modules/workflow/application/record-step/RecordStep.ts";
 import type { RunLoader } from "#src/modules/workflow/application/run-loader/RunLoader.ts";
@@ -57,18 +58,19 @@ export async function runRunner(
       out: `the workflow graph cannot be used: ${graph.error.map((f) => f.message).join("; ")}`,
     };
   const shell = new CommandRunner();
-  const settings = new FileRunSettingsStore();
+  const layout = new RunFolderLayout();
+  const settings = new FileRunSettingsStore(layout);
   const advancer = new RunAdvancer({
     loader: parts.loader,
     record: parts.record,
     registry: parts.registry,
     settings,
-    journal: new JsonlLaunchJournal(),
+    journal: new JsonlLaunchJournal(layout),
     worktrees: new GitWorktrees(shell),
     checks: new ShellCheckCommands(shell),
     progress: new TerminalProgressReporter(),
   });
-  const engine = new LangGraphRunEngine(graph.value, advancer);
+  const engine = new LangGraphRunEngine(graph.value, advancer, layout);
   const resume = new ResumeRun(engine);
   const cli = new RunCliHandler(
     {

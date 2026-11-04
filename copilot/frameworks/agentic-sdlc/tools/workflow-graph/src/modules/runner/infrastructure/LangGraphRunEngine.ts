@@ -1,5 +1,5 @@
 import { mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname } from "node:path";
 import { Annotation, Command, END, interrupt, START, StateGraph } from "@langchain/langgraph";
 import { SqliteSaver } from "@langchain/langgraph-checkpoint-sqlite";
 import type { WorkflowGraph } from "#src/modules/workflow/domain/graph/WorkflowGraph.ts";
@@ -8,6 +8,7 @@ import type {
   RunAdvancer,
 } from "#src/modules/runner/application/advance/RunAdvancer.ts";
 import type { EngineOutcome, RunEngine } from "#src/modules/runner/domain/ports/RunEngine.ts";
+import type { RunFolderLayout } from "#src/modules/shared/infrastructure/RunFolderLayout.ts";
 
 const State = Annotation.Root({
   outcome: Annotation<AdvanceOutcome | null>({
@@ -18,32 +19,35 @@ const State = Annotation.Root({
 
 /**
  * LangGraph.js as the run's engine (specs/020): one LangGraph node per workflow node, routed by what the ledger says
- * is open now; a gate pauses with `interrupt()` and the checkpoint (`<run>.checkpoints.db`, `thread_id` = run id) lets
+ * is open now; a gate pauses with `interrupt()` and the checkpoint (`<run>/checkpoints.db`, `thread_id` = run id) lets
  * a later `run approve` or `run resume` continue. Loaded only by the `run` commands.
  */
 export class LangGraphRunEngine implements RunEngine {
   readonly #graph: WorkflowGraph;
   readonly #advancer: RunAdvancer;
+  readonly #layout: RunFolderLayout;
 
   /**
    * Keeps the given collaborators for every later call; nothing runs at construction.
    *
    * @param graph - the workflow graph whose nodes become LangGraph nodes
    * @param advancer - does the work of whichever node is current
+   * @param layout - where the run's checkpoint database lives
    */
-  public constructor(graph: WorkflowGraph, advancer: RunAdvancer) {
+  public constructor(graph: WorkflowGraph, advancer: RunAdvancer, layout: RunFolderLayout) {
     this.#graph = graph;
     this.#advancer = advancer;
+    this.#layout = layout;
   }
 
   /**
    * {@link RunEngine.drive}: runs until a gate, an end, or something needing a person.
    */
   public async drive(project: string, run: string): Promise<EngineOutcome> {
-    const folder = join(project, ".specify", "runs");
-    mkdirSync(folder, { recursive: true });
+    const database = this.#layout.checkpoints(project, run);
+    mkdirSync(dirname(database), { recursive: true });
     const app = this.#build(project, run).compile({
-      checkpointer: SqliteSaver.fromConnString(join(folder, `${run}.checkpoints.db`)),
+      checkpointer: SqliteSaver.fromConnString(database),
     });
     const config = { configurable: { thread_id: run }, recursionLimit: 1000 };
     // Resume only a real gate pause; anything else starts a fresh pass, which routes to whatever the ledger says is current (D26).

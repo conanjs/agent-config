@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/ledger-line.schema.json",
+  "title": "Run ledger line",
+  "description": "One line of .specify/runs/<run>/ledger.jsonl: one step of a run, appended by `record`, the approval hook, the guard (guard-off) or the runner, never rewritten. Each line is chained to the one before by a SHA-256 hash (rules WG-15, WG-16 in schemas/workflow-graph.schema.md). Public, experimental.",
+  "type": "object",
+  "required": [
+    "seq",
+    "prev",
+    "hash",
+    "at",
+    "run",
+    "node",
+    "result",
+    "actor",
+    "gen_ai.workflow.name"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "seq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1, 2, 3 … with no gaps"
+    },
+    "prev": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "The previous line's hash; on line 1, the SHA-256 of the run id"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of prev followed by this line's JSON without hash"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC time the line was written"
+    },
+    "run": {
+      "type": "string",
+      "pattern": "^R-\\d{3,}$",
+      "description": "Run id, e.g. R-007"
+    },
+    "node": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Graph node id, e.g. P0, G2, P6.execute"
+    },
+    "result": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What happened: a path id at P0, done, pass, fail, approved, changes-requested, guard-off …"
+    },
+    "actor": {
+      "enum": [
+        "orchestrator",
+        "script",
+        "human",
+        "runner"
+      ],
+      "description": "Who wrote the step; human only for approvals"
+    },
+    "task": {
+      "type": "string",
+      "pattern": "^T\\d{3,}$",
+      "description": "Task id, for P6 steps"
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1-based try number, for P6.execute"
+    },
+    "feature": {
+      "type": "string",
+      "description": "The feature folder, e.g. specs/023-cart"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Paths produced or checked; never contents"
+    },
+    "quote": {
+      "type": "string",
+      "description": "The person's exact words, for gate approvals"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the approval came from, e.g. UserPromptSubmit, userPromptSubmitted, terminal"
+    },
+    "session": {
+      "type": "string",
+      "description": "The coding agent's session id the approval was typed in"
+    },
+    "log": {
+      "type": "string",
+      "description": "The session log that holds the quote, checked by verify-approvals"
+    },
+    "gen_ai.workflow.name": {
+      "type": "string",
+      "description": "The graph's name (OpenTelemetry GenAI attribute), e.g. agentic-sdlc"
+    },
+    "gen_ai.agent.name": {
+      "type": "string",
+      "description": "The role agent that did the step, when known"
+    },
+    "usage": {
+      "type": "object",
+      "description": "Tokens and cost of the step, from the turn token report; left out when unknown",
+      "properties": {
+        "input_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost": {
+          "type": "object",
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unit": {
+              "const": "usd"
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "seq": 1,
+      "prev": "12b37ae1bdcb1d4bf570c1b400ba557d583918ff18bc685a56249b04caf25b18",
+      "hash": "ad07a1166e6352e5ddcce4c69ec1b79d85ab31488be9af64b34f2633b9c93076",
+      "at": "2026-11-03T15:03:29.201Z",
+      "run": "R-007",
+      "node": "P0",
+      "result": "new-feature",
+      "actor": "runner",
+      "feature": "specs/023-cart",
+      "gen_ai.workflow.name": "agentic-sdlc"
+    }
+  ]
+}

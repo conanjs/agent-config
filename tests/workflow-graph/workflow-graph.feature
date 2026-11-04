@@ -241,7 +241,7 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
 
   Scenario: WG-15 a ledger line that is not JSON is reported
     Given run "R-001" has reached "G0 open"
-    And 1 lines are appended to "project/.specify/runs/R-001.jsonl"
+    And 1 lines are appended to "project/.specify/runs/R-001/ledger.jsonl"
     When the tool runs with "check-run R-001 --project {root}/project"
     Then it exits with 1 and prints:
       """
@@ -251,7 +251,7 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
 
   Scenario: WG-16 an edited ledger line breaks the hash chain
     Given run "R-001" has reached "G0 open"
-    And in "project/.specify/runs/R-001.jsonl", `"result":"done"` becomes `"result":"blocked"`
+    And in "project/.specify/runs/R-001/ledger.jsonl", `"result":"done"` becomes `"result":"blocked"`
     When the tool runs with "check-run R-001 --project {root}/project"
     Then it exits with 1 and prints:
       """
@@ -424,21 +424,21 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
   Scenario: WG-27 an agent may not write a ledger with its edit tools
     When the tool runs with "hook guard --agent claude-code" and this on stdin:
       """
-      {"hook_event_name":"PreToolUse","tool_name":"Write","cwd":"{root}/project","tool_input":{"file_path":"{root}/project/.specify/runs/R-001.jsonl","content":"{}"}}
+      {"hook_event_name":"PreToolUse","tool_name":"Write","cwd":"{root}/project","tool_input":{"file_path":"{root}/project/.specify/runs/R-001/ledger.jsonl","content":"{}"}}
       """
     Then it exits with 0 and prints:
       """
-      {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"{root}/project/.specify/runs/R-001.jsonl is a run ledger; it is written only by the workflow-graph tool (record, approval hook)"}}
+      {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"{root}/project/.specify/runs/R-001/ledger.jsonl is a run ledger; it is written only by the workflow-graph tool (record, approval hook)"}}
       """
 
   Scenario: WG-27 Codex may not patch a ledger
     When the tool runs with "hook guard --agent codex" and this on stdin:
       """
-      {"hook_event_name":"PreToolUse","cwd":"{root}/project","tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Update File: .specify/runs/R-001.jsonl\n@@\n-x\n+y\n*** End Patch"}}
+      {"hook_event_name":"PreToolUse","cwd":"{root}/project","tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Update File: .specify/runs/R-001/ledger.jsonl\n@@\n-x\n+y\n*** End Patch"}}
       """
     Then it exits with 0 and prints:
       """
-      {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":".specify/runs/R-001.jsonl is a run ledger; it is written only by the workflow-graph tool (record, approval hook)"}}
+      {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":".specify/runs/R-001/ledger.jsonl is a run ledger; it is written only by the workflow-graph tool (record, approval hook)"}}
       """
 
   Scenario: WG-28 the human's own approval is recorded with their words
@@ -448,7 +448,7 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
       {"session_id":"s1","transcript_path":"{root}/claude/session.jsonl","cwd":"{root}/project","hook_event_name":"UserPromptSubmit","prompt":"approve G2 R-001 looks right"}
       """
     Then it exits with 0 and prints nothing
-    And the file "project/.specify/runs/R-001.jsonl" has a line containing "\"node\":\"G2\",\"result\":\"approved\",\"actor\":\"human\",\"quote\":\"approve G2 R-001 looks right\",\"source\":\"claude-code:UserPromptSubmit\",\"session\":\"s1\""
+    And the file "project/.specify/runs/R-001/ledger.jsonl" has a line containing "\"node\":\"G2\",\"result\":\"approved\",\"actor\":\"human\",\"quote\":\"approve G2 R-001 looks right\",\"source\":\"claude-code:UserPromptSubmit\",\"session\":\"s1\""
 
   Scenario: WG-28 a Copilot approval records the session log it can be checked against
     Given run "R-001" has reached "G2 open"
@@ -460,7 +460,7 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
       """
       {}
       """
-    And the file "project/.specify/runs/R-001.jsonl" has a line containing "\"result\":\"changes-requested\",\"actor\":\"human\",\"quote\":\"changes G2 R-001: the cart total is wrong\",\"source\":\"copilot-cli:userPromptSubmitted\",\"session\":\"c1\",\"log\":\"{root}/copilot-home/session-state/c1/events.jsonl\""
+    And the file "project/.specify/runs/R-001/ledger.jsonl" has a line containing "\"result\":\"changes-requested\",\"actor\":\"human\",\"quote\":\"changes G2 R-001: the cart total is wrong\",\"source\":\"copilot-cli:userPromptSubmitted\",\"session\":\"c1\",\"log\":\"{root}/copilot-home/session-state/c1/events.jsonl\""
 
   Scenario: WG-28 a message without an approval, or for a gate that is not open, writes nothing
     Given run "R-001" has reached "G2 open"
@@ -473,8 +473,8 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
       {"session_id":"s1","cwd":"{root}/project","prompt":"approve G3 R-001"}
       """
     Then it exits with 0 and prints nothing
-    And the file "project/.specify/runs/R-001.jsonl" has no line containing "\"actor\":\"human\",\"quote\":\"looks good"
-    And the file "project/.specify/runs/R-001.jsonl" has no line containing "\"node\":\"G3\""
+    And the file "project/.specify/runs/R-001/ledger.jsonl" has no line containing "\"actor\":\"human\",\"quote\":\"looks good"
+    And the file "project/.specify/runs/R-001/ledger.jsonl" has no line containing "\"node\":\"G3\""
 
   Scenario: WG-30 every approval is found in the session where it was typed
     Given run "R-001" has reached "G5 open"
@@ -506,8 +506,15 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
       """
       Run R-001 stopped at G0. To approve: workflow-graph run approve R-001 G0 "<your words>" (or type "approve G0 R-001" in a chat session, then: workflow-graph run resume R-001)
       """
-    And the file "project/.specify/runs/R-001.jsonl" has a line containing "\"node\":\"P1\",\"result\":\"done\",\"actor\":\"runner\""
-    And the file "project/.specify/runs/R-001.launches.jsonl" has a line containing "\"key\":\"P1@1#1:architecture:propose\",\"event\":\"finished\",\"result\":\"done\""
+    And the file "project/.specify/runs/R-001/ledger.jsonl" has a line containing "\"node\":\"P1\",\"result\":\"done\",\"actor\":\"runner\""
+    And the file "project/.specify/runs/R-001/launches.jsonl" has a line containing "\"key\":\"P1@1#1:architecture:propose\",\"event\":\"finished\",\"result\":\"done\""
+    And the file "project/.specify/runs/R-001/run.json" has a line containing "\"run\": \"R-001\""
+    And "project/.specify/runs/R-001/checkpoints.db" exists
+    And the file "project/.specify/runs/.gitignore" contains exactly:
+      """
+      */checkpoints.db*
+      """
+    And "project/.specify/runs/R-001.jsonl" does not exist
 
   Scenario: WG-33 a role that asks a question stops the run for a person
     Given "project" is a git repository with everything committed
@@ -520,7 +527,7 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
       """
       Run R-001 stopped at escalate: it needs a person (workflow-graph status R-001).
       """
-    And the file "project/.specify/runs/R-001.jsonl" has a line containing "\"node\":\"P1\",\"result\":\"blocked\",\"actor\":\"runner\""
+    And the file "project/.specify/runs/R-001/ledger.jsonl" has a line containing "\"node\":\"P1\",\"result\":\"blocked\",\"actor\":\"runner\""
 
   Scenario: WG-34 after an approval typed in chat, run resume continues to the next gate
     Given "project" is a git repository with everything committed
@@ -623,18 +630,18 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
   Scenario: WG-36 a launch that started but never ended is not repeated
     Given "project" is a git repository with everything committed
     And the tool runs with "record R-001 --node P0 --result new-feature --feature specs/023-cart --project {root}/project"
-    And the file "project/.specify/runs/R-001.run.json" contains:
+    And the file "project/.specify/runs/R-001/run.json" contains:
       """
       {"run":"R-001","path":"new-feature","feature":"specs/023-cart","agent":"claude-code","overrides":{},"checks":[],"maxUsdPerLaunch":2,"timeoutMinutes":30}
       """
-    And the file "project/.specify/runs/R-001.launches.jsonl" contains:
+    And the file "project/.specify/runs/R-001/launches.jsonl" contains:
       """
       {"key":"P1@1#0:product-spec:propose","event":"started"}
       """
     When the tool runs with "run resume R-001 --project {root}/project"
     Then it exits with 1 and prints:
       """
-      Run R-001 needs attention: launch P1@1#0:product-spec:propose started but has no recorded end; check {root}/project.runs/R-001, then remove its line from R-001.launches.jsonl to launch it again
+      Run R-001 needs attention: launch P1@1#0:product-spec:propose started but has no recorded end; check {root}/project.runs/R-001, then remove its line from .specify/runs/R-001/launches.jsonl to launch it again
       """
 
   Scenario: WG-37 run approve without a terminal records nothing
@@ -658,7 +665,7 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
       """
       no terminal: a gate decision must be typed by a person at a terminal (or as "approve G<n> <run>" in a chat session)
       """
-    And the file "project/.specify/runs/R-001.jsonl" has no line containing "\"node\":\"G0\""
+    And the file "project/.specify/runs/R-001/ledger.jsonl" has no line containing "\"node\":\"G0\""
 
   # ---- traceability ---------------------------------------------------------------------------------------
 
@@ -666,3 +673,71 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
     When the tool runs with "check-graph"
     Then every rule code the tool prints is named by a scenario in this feature
     And every rule code the tool prints is a rule row in its schemas
+
+  # ---- the interface catalog (specs/021) -------------------------------------------------------------------
+  # `--help` is rendered from interfaces/workflow-graph.usage.kdl; `interfaces` checks the catalog against the code.
+
+  Scenario: --help lists every command and exits 0
+    When the tool runs with "--help"
+    Then it exits with 0
+    And the output has the line "Usage: workflow-graph <command> [options]"
+    And the output has the line "  run approve       Approve an open gate (or send it back with --changes), confirmed on the terminal, then continue the run"
+
+  Scenario: a command's --help shows its own options instead of failing
+    When the tool runs with "status --help"
+    Then it exits with 0
+    And the output has the line "Usage: workflow-graph status [run] [options]"
+    And the output has the line "  --project <dir>  Project folder; default the working folder"
+
+  Scenario: help names a nested command
+    When the tool runs with "help run resume"
+    Then it exits with 0
+    And the output has the line "Usage: workflow-graph run resume <run> [options]"
+
+  Scenario: --version prints the package version on stdout
+    When the tool runs with "--version"
+    Then it exits with 0
+    And stdout is "workflow-graph 0.1.0"
+
+  Scenario: an unknown flag is a usage error on stderr, with no stack trace
+    When the tool runs with "record R-001 --bogus x"
+    Then it exits with 2
+    And stdout is empty
+    And stderr is "Unknown option '--bogus'; run: workflow-graph help record"
+
+  Scenario: an unknown command is a usage error on stderr
+    When the tool runs with "purge R-001"
+    Then it exits with 2
+    And stdout is empty
+    And stderr is "unknown command \"purge\"; run: workflow-graph help"
+
+  Scenario: a flag of another command is refused
+    When the tool runs with "status R-001 --node P3"
+    Then it exits with 2
+    And stderr is "Unknown option '--node'; run: workflow-graph help status"
+
+  Scenario: the real interface catalog agrees with the code
+    When the tool runs with "interfaces"
+    Then it passes with no warnings
+
+  Scenario: IF-3 a flag renamed in the description only is caught
+    Given the tool's interface catalog is copied to "catalog"
+    And in "catalog/interfaces/workflow-graph.usage.kdl", `flag "--role <role>"` becomes `flag "--actor <role>"`
+    When the tool runs with "interfaces --root {root}/catalog"
+    Then it exits with 1 and prints:
+      """
+        IF-3  interfaces/workflow-graph.usage.kdl (record): --role is parsed by the code but not described
+        IF-3  interfaces/workflow-graph.usage.kdl (record): --actor is described but the code does not parse it
+        IF-6  INTERFACES.md: the "commands" section is not what its source generates; run: workflow-graph interfaces --write
+      FAIL (3)
+      """
+
+  Scenario: IF-7 IF-8 a schema file removed from the catalog is caught
+    Given the tool's interface catalog is copied to "catalog"
+    And the file "catalog/interfaces/schemas/ledger-line.schema.json" is removed
+    When the tool runs with "interfaces --root {root}/catalog"
+    Then it exits with 1 and prints:
+      """
+        IF-7  catalog-info.yaml: API workflow-graph-ledger: definition interfaces/schemas/ledger-line.schema.json does not exist
+      FAIL (1)
+      """

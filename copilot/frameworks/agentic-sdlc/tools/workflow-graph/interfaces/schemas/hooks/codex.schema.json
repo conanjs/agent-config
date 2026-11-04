@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/codex.schema.json",
+  "title": "Codex hook JSON read and written by workflow-graph",
+  "description": "Only the fields the tool reads; OpenAI owns the full format (tolerant reader, CON-10). Verified in copilot/knowledge/ai-agents/codex-usage-reference.md and specs/019 research D20. Codex sends a collaboration spawn's message encrypted, so the run is read from task_name (r004_p4_architecture).",
+  "$defs": {
+    "guardInput": {
+      "description": "PreToolUse hook input, matcher *",
+      "type": "object",
+      "required": [
+        "tool_name"
+      ],
+      "properties": {
+        "hook_event_name": {
+          "const": "PreToolUse"
+        },
+        "tool_name": {
+          "type": "string",
+          "description": "Agent or any name ending in spawn_agent (e.g. collaborationspawn_agent) = a launch; apply_patch, Edit, Write = a file write"
+        },
+        "tool_input": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "prompt": {
+              "type": "string"
+            },
+            "task_name": {
+              "type": "string",
+              "pattern": "^[a-z0-9_]*$",
+              "description": "Run convention r<nnn>_<phase>_<role>[_<task>_<mode>]"
+            },
+            "command": {
+              "type": "string",
+              "description": "An apply_patch body; *** Add/Update/Delete File: lines name the paths"
+            },
+            "file_path": {
+              "type": "string"
+            }
+          }
+        },
+        "cwd": {
+          "type": "string"
+        }
+      }
+    },
+    "approveInput": {
+      "description": "UserPromptSubmit hook input",
+      "type": "object",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "transcript_path": {
+          "type": "string"
+        }
+      }
+    },
+    "guardOutput": {
+      "$ref": "claude-code.schema.json#/$defs/guardOutput"
+    },
+    "approveOutput": {
+      "description": "Nothing is printed",
+      "not": {}
+    }
+  }
+}

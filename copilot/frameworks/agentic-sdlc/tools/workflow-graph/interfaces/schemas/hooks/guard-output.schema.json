@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/guard-output.schema.json",
+  "title": "hook guard stdout, any agent",
+  "description": "The JSON `hook guard --agent <agent>` prints, which depends on the agent. Claude Code and Codex print nothing unless they deny.",
+  "oneOf": [
+    {
+      "$ref": "claude-code.schema.json#/$defs/guardOutput"
+    },
+    {
+      "$ref": "copilot-cli.schema.json#/$defs/guardOutput"
+    }
+  ]
+}

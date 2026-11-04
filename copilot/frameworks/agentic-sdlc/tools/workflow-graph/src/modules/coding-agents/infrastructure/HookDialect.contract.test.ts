@@ -27,7 +27,7 @@ const agents: Array<{
     write: {
       tool_name: "Write",
       cwd: "/p",
-      tool_input: { file_path: "/p/.specify/runs/R-001.jsonl" },
+      tool_input: { file_path: "/p/.specify/runs/R-001/ledger.jsonl" },
     },
     noDecision: "",
     deny: (r) =>
@@ -42,7 +42,11 @@ const agents: Array<{
   {
     id: "copilot-cli",
     dialect: new CopilotCliHookDialect("/home/.copilot"),
-    write: { toolName: "edit", cwd: "/p", toolArgs: { path: "/p/.specify/runs/R-001.jsonl" } },
+    write: {
+      toolName: "edit",
+      cwd: "/p",
+      toolArgs: { path: "/p/.specify/runs/R-001/ledger.jsonl" },
+    },
     noDecision: "{}",
     deny: (r) => JSON.stringify({ permissionDecision: "deny", permissionDecisionReason: r }),
   },
@@ -53,7 +57,8 @@ const agents: Array<{
       tool_name: "apply_patch",
       cwd: "/p",
       tool_input: {
-        command: "*** Begin Patch\n*** Update File: /p/.specify/runs/R-001.jsonl\n*** End Patch",
+        command:
+          "*** Begin Patch\n*** Update File: /p/.specify/runs/R-001/ledger.jsonl\n*** End Patch",
       },
     },
     noDecision: "",
@@ -93,7 +98,7 @@ describe.each(agents)("$id hook dialect", ({ id, dialect, write, noDecision, den
   it("sees a write to a ledger file", () => {
     const call = dialect.readToolCall(JSON.stringify(write));
     expect(call.ok && call.value.kind === "file-write" && call.value.paths).toContain(
-      "/p/.specify/runs/R-001.jsonl",
+      "/p/.specify/runs/R-001/ledger.jsonl",
     );
   });
 

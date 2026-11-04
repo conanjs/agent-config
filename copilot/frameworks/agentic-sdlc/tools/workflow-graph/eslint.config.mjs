@@ -38,6 +38,7 @@ const tierB = [
   "src/main.ts",
   "src/CompositionRoot.ts",
   "src/RunnerRoot.ts",
+  "src/CatalogRoot.ts",
   "src/modules/shared/domain/Result.ts",
 ];
 
@@ -103,8 +104,13 @@ const layerZones = [
   { target: "./src/modules/*/infrastructure/**", from: ["./src/modules/*/interface/**"] },
   { target: "./src/modules/*/interface/**", from: ["./src/modules/*/infrastructure/**"] },
   {
-    target: ["./src/!(CompositionRoot|RunnerRoot|main).ts", "./src/modules/**"],
-    from: ["./src/CompositionRoot.ts", "./src/RunnerRoot.ts", "./src/main.ts"],
+    target: ["./src/!(CompositionRoot|RunnerRoot|CatalogRoot|main).ts", "./src/modules/**"],
+    from: [
+      "./src/CompositionRoot.ts",
+      "./src/RunnerRoot.ts",
+      "./src/CatalogRoot.ts",
+      "./src/main.ts",
+    ],
   },
 ];
 

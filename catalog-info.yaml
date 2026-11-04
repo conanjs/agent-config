@@ -1,0 +1,11 @@
+# agent-config's interface catalog for programs (Backstage descriptor format,
+# https://backstage.io/docs/features/software-catalog/descriptor-format/). People read INTERFACES.md.
+# Each described program has its own catalog-info.yaml; this Location points at them (CON-15).
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: agent-config
+  description: Every described program in the agent-config repo
+spec:
+  targets:
+    - ./copilot/frameworks/agentic-sdlc/tools/workflow-graph/catalog-info.yaml

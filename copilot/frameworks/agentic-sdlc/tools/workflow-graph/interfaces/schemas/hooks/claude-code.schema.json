@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/blob/main/copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/schemas/hooks/claude-code.schema.json",
+  "title": "Claude Code hook JSON read and written by workflow-graph",
+  "description": "Only the fields the tool reads; Anthropic owns the full format and may add fields (tolerant reader, CON-10). Verified in copilot/knowledge/ai-agents/claude-code-usage-reference.md.",
+  "$defs": {
+    "guardInput": {
+      "description": "PreToolUse hook input, matcher Agent|Edit|Write|MultiEdit|NotebookEdit",
+      "type": "object",
+      "required": [
+        "tool_name"
+      ],
+      "properties": {
+        "hook_event_name": {
+          "const": "PreToolUse"
+        },
+        "tool_name": {
+          "type": "string",
+          "description": "Agent or Task = a sub-agent launch; Edit, Write, MultiEdit, NotebookEdit = a file write; anything else is ignored"
+        },
+        "tool_input": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "description": "The launch prompt; a run: line makes it the guard's business"
+            },
+            "file_path": {
+              "type": "string"
+            },
+            "notebook_path": {
+              "type": "string"
+            }
+          }
+        },
+        "cwd": {
+          "type": "string"
+        }
+      }
+    },
+    "approveInput": {
+      "description": "UserPromptSubmit hook input",
+      "type": "object",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "What the person typed, e.g. approve G2 R-001"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "transcript_path": {
+          "type": "string"
+        }
+      }
+    },
+    "guardOutput": {
+      "description": "Printed only to deny; nothing is printed when the call is allowed or not the tool's business",
+      "type": "object",
+      "required": [
+        "hookSpecificOutput"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "hookSpecificOutput": {
+          "type": "object",
+          "required": [
+            "hookEventName",
+            "permissionDecision",
+            "permissionDecisionReason"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "hookEventName": {
+              "const": "PreToolUse"
+            },
+            "permissionDecision": {
+              "const": "deny"
+            },
+            "permissionDecisionReason": {
+              "type": "string",
+              "description": "Why the launch or edit is refused; shown to the agent"
+            }
+          }
+        }
+      }
+    },
+    "approveOutput": {
+      "description": "Nothing is printed",
+      "not": {}
+    }
+  }
+}

@@ -5,7 +5,7 @@ last-updated: 2026-11-03
 
 # Schema: Workflow Graph and Run Ledger (`workflow-graph/v1`)
 
-**Applies to:** `workflow.graph.yaml` and its generated `workflow.graph.json` (framework root), each run's ledger `<project>/.specify/runs/<run>.jsonl`, and the guard and approval hooks · **Store:** A (graph) and D (ledgers) · **Written by:** the framework maintainer (graph, through a spec and a PR); the Orchestrator with `record`, and the approval hook (ledgers) · **Read by:** `tools/workflow-graph` (`check-graph`, `compile-graph`, `record`, `check-run`, `status`, `hook`, `verify-approvals`) · **Loaded as:** ③-adjacent (the Orchestrator runs `status` at P0)
+**Applies to:** `workflow.graph.yaml` and its generated `workflow.graph.json` (framework root), each run's ledger `<project>/.specify/runs/<run>/ledger.jsonl`, and the guard and approval hooks · **Store:** A (graph) and D (ledgers) · **Written by:** the framework maintainer (graph, through a spec and a PR); the Orchestrator with `record`, and the approval hook (ledgers) · **Read by:** `tools/workflow-graph` (`check-graph`, `compile-graph`, `record`, `check-run`, `status`, `hook`, `verify-approvals`) · **Loaded as:** ③-adjacent (the Orchestrator runs `status` at P0)
 
 The **graph** is the rulebook: which phases, gates and per-task steps exist, which move may follow which result, and how often a loop may repeat. The **ledger** is the score sheet of one run: one JSON line per step, append-only and hash-chained. Analogy: the rules of a board game versus the score sheet of one game. Design: `specs/019-workflow-graph/` in agent-config.
 
@@ -40,7 +40,7 @@ paths:                              # P0 classification, first match wins
 {"seq":3,"prev":"<sha256 of line 2's hash>","hash":"<sha256(prev + this line without hash)>","at":"2026-11-03T09:12:44.000Z","run":"R-007","node":"G2","result":"approved","actor":"human","quote":"approve G2 R-007 looks good","source":"UserPromptSubmit","session":"…","gen_ai.workflow.name":"agentic-sdlc"}
 ```
 
-Required: `seq`, `prev`, `hash`, `at`, `run`, `node`, `result`, `actor` (`orchestrator` · `script` · `human` · `runner`), `gen_ai.workflow.name`. Optional: `task`, `attempt`, `evidence` (paths), `feature` (on the first line: the feature folder whose `tasks.md` the join reads), `gen_ai.agent.name`, `usage`, `quote`, `source`, `session`. Line 1's `prev` is the SHA-256 of the run id.
+Required: `seq`, `prev`, `hash`, `at`, `run`, `node`, `result`, `actor` (`orchestrator` · `script` · `human` · `runner`), `gen_ai.workflow.name`. Optional: `task`, `attempt`, `evidence` (paths), `feature` (on the first line: the feature folder whose `tasks.md` the join reads), `gen_ai.agent.name`, `usage`, `quote`, `source`, `session`, `log` (the session log that holds the quote). Line 1's `prev` is the SHA-256 of the run id. The machine-readable form of this line is `tools/workflow-graph/interfaces/schemas/ledger-line.schema.json` (specs/021), which the tool's tests validate real lines against.
 
 ## Rules
 
