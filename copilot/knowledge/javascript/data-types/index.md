@@ -16,6 +16,7 @@ Methods of primitives, numbers, strings, arrays and their methods, the iteration
 | [arrays-and-iterables.md](arrays-and-iterables.md) | reference | Lookup tables for array basics, mutating versus copying methods, search and transform methods, and the `Symbol.iterator` protocol | verified |
 | [maps-sets-and-weak-collections.md](maps-sets-and-weak-collections.md) | concept | `Map` and `Set` versus plain objects, `Object.entries`/`fromEntries`, and `WeakMap`/`WeakSet` for leak-free object-keyed caches | verified |
 | [destructuring-dates-and-json.md](destructuring-dates-and-json.md) | reference | Lookup tables for destructuring patterns, `Date` (0-based months, overflow, timestamps) and JSON (what `stringify` drops, replacers, revivers) | verified |
+| [types-and-coercion-deep-dive.md](types-and-coercion-deep-dive.md) | deep-dive | Abstract conversion operations as tables, the `+` operator, four equality algorithms with the loose-equality steps, relational comparison, `==` vs `===` reconciled, grammar traps | verified |
 
 ## References
 - [The Modern JavaScript Tutorial, Part 1: The JavaScript language](https://javascript.info/js) — javascript.info, living. Backs: subtopic scope (one subtopic per chapter).

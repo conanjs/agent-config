@@ -7,7 +7,7 @@ last-updated: 2026-11-04
 
 # JavaScript, the language
 
-The JavaScript language as taught in Part 1 of javascript.info ("The JavaScript language"), consolidated into 24 docs written in our own words, one subtopic per chapter, from the basics (types, operators, functions) through objects, data types, closures, prototypes, classes, errors, promises and `async`/`await`, generators, modules and advanced features (Proxy, BigInt, Unicode, WeakRef). Every behaviour was run in Node.js 24.22.1. Start with `learning-path.md`, which also maps all 94 lessons to their doc. Not covered: browser APIs (javascript.info Parts 2 and 3), regular expressions, engine and Node.js runtime internals (see `js-runtime/`).
+The JavaScript language as taught in Part 1 of javascript.info ("The JavaScript language"), consolidated into 24 docs written in our own words, one subtopic per chapter, from the basics (types, operators, functions) through objects, data types, closures, prototypes, classes, errors, promises and `async`/`await`, generators, modules and advanced features (Proxy, BigInt, Unicode, WeakRef). Seven deep dives go further: four built on You Don't Know JS (scope and closures; objects, `this` and delegation; types and coercion; async and performance) and two on Eloquent JavaScript (regular expressions; building a small language). Every behaviour was run in Node.js 24.22.1. Start with `learning-path.md`, which also maps all 94 lessons to their doc. Not covered: browser APIs (javascript.info Parts 2 and 3), engine and Node.js runtime internals (see `js-runtime/`).
 
 ## Docs
 | Doc | Type | Summary | Status |
@@ -30,7 +30,8 @@ The JavaScript language as taught in Part 1 of javascript.info ("The JavaScript 
 | [async/](async/index.md) | Callbacks, promises, combinators, promisification, microtasks, `async`/`await` |
 | [generators-iterators/](generators-iterators/index.md) | Generators, `yield*`, async iteration and async generators |
 | [modules/](modules/index.md) | ES modules, export/import forms, live bindings, dynamic `import()` |
-| [misc/](misc/index.md) | Proxy and Reflect, `eval`, currying, Reference Type, BigInt, Unicode, WeakRef |
+| [misc/](misc/index.md) | Proxy and Reflect, `eval`, currying, Reference Type, BigInt, Unicode, WeakRef; building a small language (deep dive) |
+| [regular-expressions/](regular-expressions/index.md) | Flags, Unicode, groups, lookaround, backtracking and ReDoS, methods and `lastIndex` (deep dive) |
 
 ## References
 - [The Modern JavaScript Tutorial, Part 1: The JavaScript language](https://javascript.info/js) — javascript.info, living. Backs: topic scope and structure.
