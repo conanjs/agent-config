@@ -54,6 +54,8 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 |---|---|---|
 | Shared runtime | VS Code, the GitHub Copilot app and the Copilot CLI share the hook format | ✅[^2] |
 | VS Code status | Hooks are in Preview in VS Code. The Copilot harness reads the same user files (`~/.copilot/hooks/`, or `$COPILOT_HOME/hooks/`); the setting `chat.useHooks` controls only the older Local harness, not the shared Copilot runtime. A `preToolUse` deny is `{"permissionDecision":"deny","permissionDecisionReason":"…"}` and `{}` means no decision, as in the CLI (read 2026-11-04) | ✅[^2] |
+| `preToolUse` in an interactive session log | In an interactive Copilot CLI 1.0.105 session (2026-11-04, 75 calls), every `hook.start` event for `preToolUse` logs its input as `{sessionId, cwd, toolCalls: [{id, name, args}]}`, and 9 of the 75 invocations covered two or more tool calls at once (for example two parallel `task` launches). The command hook's stdin in `copilot -p` was per call, `{toolName, toolArgs}` (2026-11-03) | ✅[^6] |
+| Batched stdin in interactive runs | Whether a config-file command hook receives the batched `toolCalls` shape in an interactive session, rather than one `{toolName, toolArgs}` per call, is not tested. A hook that reads only `toolName` would see nothing to check in a batched payload | ⚠️ unverified |
 | Sub-agent tool name in VS Code | The VS Code page does not name the tool a `preToolUse` hook sees when the agent launches a sub-agent (the CLI's is `task`, ✅[^6]); whether VS Code's Copilot harness also sends `task` is not tested | ⚠️ unverified |
 | Locations | `~/.copilot/hooks/*.json` (user), `.github/hooks/*.json` (repository), a `hooks` block in `~/.copilot/settings.json` or `.github/copilot/settings.json`, plugins | ✅[^1] |
 | Format | `{"version": 1, "hooks": {"<event>": [{"type": "command", "bash": …, "powershell": …, "timeoutSec": …}]}}` | ✅[^1] |
@@ -93,7 +95,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 32 claims (✅) · Unverified: 3 claims (⚠️) · Last verified: 2026-11-04
+- Verified: 33 claims (✅) · Unverified: 4 claims (⚠️) · Last verified: 2026-11-04
 
 ## References
 - [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines, `preToolUse` deny, the `task` subagent tool and subagent events. [^1]
@@ -101,7 +103,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - [Custom instructions (VS Code)](https://code.visualstudio.com/docs/copilot/customization/custom-instructions) — Microsoft, living. Backs: `~/.copilot/instructions`, `applyTo`, `description`. [^3]
 - [Usage-based billing for individuals](https://docs.github.com/copilot/concepts/billing/usage-based-billing-for-individuals) — GitHub, living. Backs: 1 AI credit = $0.01, monthly allowances. [^4]
 - `~/.copilot/session-state/*/events.jsonl`, `copilot -p` with Copilot CLI 1.0.105, and the VS Code process start time — local test, 2026-11-02: event types and fields, per-call credits summing exactly to the checkpoint (182.21 AI credits), the quota snapshot, the CLI showing progress lines and a 9.22-credit turn that matches its own footer, and the stale instruction copy in a VS Code session. [^5]
-- `copilot -p` runs (Copilot CLI 1.0.105), local test, 2026-11-03: a `preToolUse` hook denying `task` in a folder outside and inside the trusted folders, the recorded `toolArgs`, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check the same day (user-level `preToolUse` deny then allow, `userPromptSubmitted` in `-p`). [^6]
+- `copilot -p` runs (Copilot CLI 1.0.105), local test, 2026-11-03: a `preToolUse` hook denying `task` in a folder outside and inside the trusted folders, the recorded `toolArgs`, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check the same day (user-level `preToolUse` deny then allow, `userPromptSubmitted` in `-p`); an interactive session's `events.jsonl` (1.0.105, 2026-11-04: `hook.start` inputs). [^6]
 - `copilot/hooks/turn-tokens/turn-tokens.schema.md`, `specs/018-turn-tokens-copilot/` in agent-config — the report built on these facts.
 
 ## Related

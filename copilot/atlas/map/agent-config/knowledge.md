@@ -203,6 +203,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/js-runtime/promise-rejections.md`](../../../knowledge/js-runtime/promise-rejections.md)
 - [`copilot/knowledge/js-runtime/subpath-imports.md`](../../../knowledge/js-runtime/subpath-imports.md)
 - [`copilot/knowledge/js-runtime/v8-hidden-classes.md`](../../../knowledge/js-runtime/v8-hidden-classes.md)
+- [`copilot/knowledge/js-runtime/worker-thread-pools.md`](../../../knowledge/js-runtime/worker-thread-pools.md)
 - [`copilot/knowledge/kubernetes/architecture/control-plane-and-reconciliation.md`](../../../knowledge/kubernetes/architecture/control-plane-and-reconciliation.md)
 - [`copilot/knowledge/kubernetes/architecture/life-of-a-pod-deep-dive.md`](../../../knowledge/kubernetes/architecture/life-of-a-pod-deep-dive.md)
 - [`copilot/knowledge/kubernetes/container-cpu-memory-limits-deep-dive.md`](../../../knowledge/kubernetes/container-cpu-memory-limits-deep-dive.md)

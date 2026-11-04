@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: js-runtime
-last-updated: 2026-10-28
+last-updated: 2026-11-03
 ---
 
 # JavaScript runtime internals
@@ -19,6 +19,7 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [barrel-files.md](barrel-files.md) | concept | Re-export files (`index.ts`): measured load cost, cycles, and the alternative of importing the declaring file | verified |
 | [enums-and-literal-unions.md](enums-and-literal-unions.md) | concept | `enum` vs `as const` object, `as const` array and literal union: erasability, measured emit, what a rename breaks, and which to pick (an object for codes the project owns and repeats) | verified |
 | [abort-signal.md](abort-signal.md) | concept | AbortController and AbortSignal as a cancellation contract across fetch and own APIs | verified |
+| [worker-thread-pools.md](worker-thread-pools.md) | concept | piscina task dispatch, `availableParallelism()` under a container CPU limit, measured worker sizing, and pool statistics that mislead | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 
 ## References
