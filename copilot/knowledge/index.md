@@ -1,7 +1,7 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-10-31
+last-updated: 2026-11-04
 ---
 
 # Global knowledge
@@ -14,17 +14,20 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | Topic | Summary | Docs |
 |---|---|---|
 | [software-design/](software-design/index.md) | Design principles (SOLID, DRY, KISS/YAGNI, separation of concerns, least astonishment, cohesion/coupling) and domain modeling: OOP (core concepts, encapsulation, polymorphism, composition over inheritance, Law of Demeter, DI, design by contract), DDD (building blocks, aggregates, layering, bounded contexts), architecture styles (hexagonal, clean, onion, how they combine) and functional modeling (immutability, functional core, types as rules, pipelines, testing) | 5 subtopics |
+| [algorithms/](algorithms/index.md) | Practical algorithms and data structures, each with a lab measurement: Big-O measured, amortized cost, data-structure costs, hash tables, trees/heaps/B-tree indexes, library sorting (stability, adaptivity), BFS/DFS/Dijkstra/topological sort, dynamic programming and greedy | 5 subtopics + 1 reference |
+| [performance/](performance/index.md) | Performance engineering: percentiles and tail latency, queueing and Little's law, Amdahl's law, caches and locality, branch prediction, false sharing, trustworthy benchmarking, profiling and flame graphs, optimization playbook, caching — laws simulated, hardware effects measured | 4 subtopics + 1 reference |
 | [code-documentation/](code-documentation/index.md) | Doc-comment standards: C# XML tags, TSDoc, JSDoc, Python, Go and Rust side by side, and the lint that requires them | topic index |
 | [versioning/](versioning/index.md) | Semantic versioning: MAJOR.MINOR.PATCH meaning, frozen releases, pre-1.0 rules, pinning by major or commit SHA | topic index |
 | [js-runtime/](js-runtime/index.md) | V8 and Node.js runtime behavior that shapes how TypeScript/JavaScript code is written: hidden classes, promise rejections, AbortSignal | topic index |
 | [concurrency/](concurrency/index.md) | Cross-language concurrency: structured concurrency, blocking inside async runtimes, shared state and data races (Go, Python, Rust, TypeScript) | topic index |
 | [error-handling/](error-handling/index.md) | Cross-language error design: handle errors once, library vs. application errors | topic index |
-| [kubernetes/](kubernetes/index.md) | How workloads get configuration and credentials from the cluster (Secret vs volume vs mounted folder, `secret:` vs `projected:` volumes, external secret stores), and how container CPU/memory limits work: vCPU, CPU throttling, OOM kills, eviction | topic index |
+| [linux/](linux/index.md) | Linux internals from the system-call boundary to containers: system calls, boot, permissions, modules and udev, KVM, processes, signals, EEVDF scheduling, IPC, virtual memory, page cache and OOM killer, VFS, `fsync`, ext4 and LVM, the packet path, netfilter/NAT, TCP states, epoll and io_uring, namespaces, cgroups v2, overlayfs, container networking and isolation (with a build-a-container-by-hand deep dive), LSMs and Landlock, systemd, observability, eBPF and triage; a learning path and a lab, with outputs captured on Linux 6.17 | 8 subtopics + 1 reference + 1 how-to |
+| [kubernetes/](kubernetes/index.md) | How the cluster works and workloads run: life of a pod from kubectl to iptables (deep dive), control plane and reconciliation, pods, probes, rollouts, workload controllers, scheduling, CNI and DNS, Services and kube-proxy, Ingress/Gateway/NetworkPolicy, persistent volumes, RBAC and Pod Security, troubleshooting and autoscaling; plus config and credential delivery (Secret, projected volumes) and container CPU/memory limits (throttling, OOM kills) | 6 subtopics + 6 docs |
 | [operations/](operations/index.md) | Runtime operation concerns in code: config at startup, structured logging | topic index |
 | [web-apis/](web-apis/index.md) | HTTP API design: mapping errors to status codes and problem details | topic index |
 | [testing/](testing/index.md) | Putting tests around code and tools that have none: characterization tests, Gherkin scenarios, proving coverage by sabotage | topic index |
 | [product-tours/](product-tours/index.md) | In-app onboarding tours with Product Fruits: integration in React/Next.js, per-user state, settings and API catalog | topic index |
-| [windows/](windows/index.md) | Windows specifics: creating symlinks needs admin, Developer Mode or the symlink user right regardless of shell or PowerShell version | 1 |
+| [windows/](windows/index.md) | Windows internals mapped to Linux: user/kernel mode, boot phases, registry and services, processes, handles, jobs and scheduling, reserve/commit memory and the page file, NTFS and IRPs, tokens, DACLs, integrity levels and UAC, the Windows Filtering Platform, Windows containers and WSL 2, diagnostics tools; plus symlink privileges | 8 subtopics + 1 reference + 1 legacy |
 | [ai-agents/](ai-agents/index.md) | Prompt, context and harness engineering deep dives, Graph Engineering study guide, comparison with SDD / AI-DLC / Spec Kit, Claude Code agents and skills, token accounting and usage references for Claude Code, Codex and GitHub Copilot, token-saving tools, LangGraph.js runtime facts, and existing loop-engineering guides | 3 deep dives + 3 concepts + 6 references + 1 how-to + 2 legacy |
 | [analytics/](analytics/) | *legacy* — GTM → GA4 → BigQuery → Looker Studio pipeline | 5 |
 | [blink/](blink/) | *legacy* — rollout notes | 1 |
