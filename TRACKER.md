@@ -57,7 +57,28 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-04
 
+### T-25 Verify the Windows docs on a real Windows machine
+- status: open
+- next: Windows docs are verified against Microsoft Learn but their examples were never run; run each stage exercise in knowledge/windows/learning-path.md on Windows 10/11 or a VM and replace illustrative outputs with captured ones
+- from: 2026-11-04
+- updated: 2026-11-04
+
 ## Done
+
+### T-23 Commit the Linux knowledge base (copilot/knowledge/linux)
+- status: done
+- next: Review the new docs on branch docs/linux-knowledge-base (knowledge/linux: 33 docs + deep dive; knowledge/kubernetes: 16 new docs; knowledge/windows: 12 new docs; indexes and atlas), then commit and open a PR
+- waiting-on: V
+- from: 2026-11-04
+- updated: 2026-11-04
+- closed: 2026-11-04 · Linux, Kubernetes, Windows, algorithms and performance knowledge committed on docs/linux-knowledge-base and merged by PR, 2026-11-04
+
+### T-24 Verify the remaining unverified claims in the linux docs
+- status: done
+- next: Check each ⚠️ unverified claim in knowledge/linux (about 120 across 31 docs) and knowledge/kubernetes (about 90 across 16 docs) against kernel.org, man7.org and kubernetes.io; mark ✅ or remove it, and promote docs with none left to verified
+- from: 2026-11-04
+- updated: 2026-11-04
+- closed: 2026-11-04 · All unverified claims in linux (129) and kubernetes (70) resolved by lab runs or sources; windows (57) resolved against Microsoft Learn; docs promoted to verified, 2026-11-04
 
 ### T-16 Finish the workflow runner (spec 020, phase 2)
 - status: done
