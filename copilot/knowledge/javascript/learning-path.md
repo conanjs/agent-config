@@ -62,6 +62,16 @@ The v1 docs under `knowledge/javascript/`, one subtopic per javascript.info Part
 | 14 Miscellaneous | proxy, eval, currying-partials, reference-type | `misc/proxy-eval-currying-and-reference-type.md` |
 | 14 Miscellaneous | bigint, unicode, weakref-finalizationregistry | `misc/bigint-unicode-and-weakrefs.md` |
 
+### Deep dives (read after the matching stage)
+
+| After stage | Deep dive |
+|---|---|
+| 3 Data types | `data-types/types-and-coercion-deep-dive.md`, `regular-expressions/regular-expressions-deep-dive.md` |
+| 4 Functions in depth | `advanced-functions/scope-and-closures-deep-dive.md` |
+| 5 Prototypes and classes | `prototypes/objects-this-and-delegation-deep-dive.md` |
+| 6 Errors and async | `async/async-patterns-and-performance-deep-dive.md` |
+| 7 Modules and advanced | `misc/build-a-small-language-deep-dive.md` |
+
 ### Free, authoritative resources
 
 | Resource | Why |
@@ -76,7 +86,6 @@ The v1 docs under `knowledge/javascript/`, one subtopic per javascript.info Part
 |---|---|---|
 | Browser APIs: DOM, events, forms (javascript.info Part 2) | new `browser/` topic | javascript.info Part 2 |
 | Network requests, storage, workers (javascript.info Part 3) | new `browser/` topic | javascript.info Part 3 |
-| Regular expressions | `javascript/` | javascript.info "Regular expressions" |
 | `Temporal` and `Intl` date handling | `javascript/data-types/` | MDN `Intl` |
 
 ## Lookup notes

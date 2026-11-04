@@ -13,6 +13,7 @@ The `[[Prototype]]` chain, `F.prototype`, native prototypes, `Object.create` and
 | Doc | Type | Summary | Status |
 |---|---|---|---|
 | [prototypal-inheritance.md](prototypal-inheritance.md) | concept | Reads follow the `[[Prototype]]` chain while writes stay own; `F.prototype` and `new`, native prototypes, and null-prototype dictionaries | verified |
+| [objects-this-and-delegation-deep-dive.md](objects-this-and-delegation-deep-dive.md) | deep-dive | Object containers, the four `this` rules with precedence, every way binding is lost, three outcomes of assigning through the chain, classes as sharing, delegation (with a corrected book example) | verified |
 
 ## References
 - [The Modern JavaScript Tutorial, Part 1: The JavaScript language](https://javascript.info/js) — javascript.info, living. Backs: subtopic scope (one subtopic per chapter).

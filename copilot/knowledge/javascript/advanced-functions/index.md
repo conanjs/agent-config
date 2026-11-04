@@ -14,6 +14,7 @@ Lexical environments and closures, `var` and the global object, recursion and th
 |---|---|---|---|
 | [scope-closures-and-var.md](scope-closures-and-var.md) | concept | Lexical environments, why every function is a closure with live lookups, `var` hoisting and function scope, and `globalThis` | verified |
 | [function-objects-and-calls.md](function-objects-and-calls.md) | concept | Recursion and the stack, rest/spread, function properties, `new Function`, timers, decorators with `call`/`apply`, `bind`, arrow functions | verified |
+| [scope-and-closures-deep-dive.md](scope-and-closures-deep-dive.md) | deep-dive | Scope fixed at compile time, lookup failures, shadowing, global scope in six environments, hoisting/TDZ, parameter scope, closures and V8 context sharing measured, the module pattern | verified |
 
 ## References
 - [The Modern JavaScript Tutorial, Part 1: The JavaScript language](https://javascript.info/js) — javascript.info, living. Backs: subtopic scope (one subtopic per chapter).
