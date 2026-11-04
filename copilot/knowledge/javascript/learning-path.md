@@ -66,11 +66,13 @@ The v1 docs under `knowledge/javascript/`, one subtopic per javascript.info Part
 
 | After stage | Deep dive |
 |---|---|
-| 3 Data types | `data-types/types-and-coercion-deep-dive.md`, `regular-expressions/regular-expressions-deep-dive.md` |
-| 4 Functions in depth | `advanced-functions/scope-and-closures-deep-dive.md` |
+| Any time | `introduction/modern-javascript-by-edition-deep-dive.md` |
+| 3 Data types | `data-types/types-and-coercion-deep-dive.md`, `data-types/data-structures-in-javascript-deep-dive.md`, `regular-expressions/regular-expressions-deep-dive.md` |
+| 4 Functions in depth | `advanced-functions/scope-and-closures-deep-dive.md`, `advanced-functions/functional-programming-deep-dive.md` |
 | 5 Prototypes and classes | `prototypes/objects-this-and-delegation-deep-dive.md` |
 | 6 Errors and async | `async/async-patterns-and-performance-deep-dive.md` |
-| 7 Modules and advanced | `misc/build-a-small-language-deep-dive.md` |
+| 7 Modules and advanced | `misc/build-a-small-language-deep-dive.md`, `misc/design-patterns-deep-dive.md` |
+| After the language | `browser/browser-platform-deep-dive.md`, `node/node-services-deep-dive.md`, `node/data-wrangling-deep-dive.md` |
 
 ### Free, authoritative resources
 
@@ -84,8 +86,7 @@ The v1 docs under `knowledge/javascript/`, one subtopic per javascript.info Part
 
 | Topic | Fits under | Start with |
 |---|---|---|
-| Browser APIs: DOM, events, forms (javascript.info Part 2) | new `browser/` topic | javascript.info Part 2 |
-| Network requests, storage, workers (javascript.info Part 3) | new `browser/` topic | javascript.info Part 3 |
+| Typed docs for the browser (DOM, events, forms, network, storage) | `javascript/browser/` | synthesize `browser/browser-platform-deep-dive.md`; javascript.info Parts 2–3 |
 | `Temporal` and `Intl` date handling | `javascript/data-types/` | MDN `Intl` |
 
 ## Lookup notes
