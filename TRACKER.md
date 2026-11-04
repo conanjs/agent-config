@@ -51,6 +51,12 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-04
 
+### T-21 Check the workflow guard in VS Code's Copilot
+- status: waiting
+- next: In VS Code (Copilot harness, hooks in Preview), run /agentic-sdlc on a scratch repo to a gate, then ask the agent to launch the next role: confirm the preToolUse hook fires, the sub-agent tool is named task (the guard only matches task/Agent), and the deny shows; record the result in copilot-usage-reference.md
+- waiting-on: V
+- from: 2026-11-04
+
 ## Done
 
 ### T-16 Finish the workflow runner (spec 020, phase 2)

@@ -4,8 +4,8 @@ type: reference
 topic: ai-agents
 status: draft
 applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02"]
-last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-verified: 2026-11-04
+last-updated: 2026-11-04
 tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructions]
 ---
 
@@ -53,6 +53,8 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | Item | Fact | Status |
 |---|---|---|
 | Shared runtime | VS Code, the GitHub Copilot app and the Copilot CLI share the hook format | ✅[^2] |
+| VS Code status | Hooks are in Preview in VS Code. The Copilot harness reads the same user files (`~/.copilot/hooks/`, or `$COPILOT_HOME/hooks/`); the setting `chat.useHooks` controls only the older Local harness, not the shared Copilot runtime. A `preToolUse` deny is `{"permissionDecision":"deny","permissionDecisionReason":"…"}` and `{}` means no decision, as in the CLI (read 2026-11-04) | ✅[^2] |
+| Sub-agent tool name in VS Code | The VS Code page does not name the tool a `preToolUse` hook sees when the agent launches a sub-agent (the CLI's is `task`, ✅[^6]); whether VS Code's Copilot harness also sends `task` is not tested | ⚠️ unverified |
 | Locations | `~/.copilot/hooks/*.json` (user), `.github/hooks/*.json` (repository), a `hooks` block in `~/.copilot/settings.json` or `.github/copilot/settings.json`, plugins | ✅[^1] |
 | Format | `{"version": 1, "hooks": {"<event>": [{"type": "command", "bash": …, "powershell": …, "timeoutSec": …}]}}` | ✅[^1] |
 | `agentStop` input | camelCase: `sessionId`, `timestamp`, `cwd`, `transcriptPath`, `stopReason`, `stop_hook_active`; the VS Code-style name `Stop` gives the same in snake_case | ✅[^1] |
@@ -91,7 +93,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 30 claims (✅) · Unverified: 2 claims (⚠️) · Last verified: 2026-11-03
+- Verified: 32 claims (✅) · Unverified: 3 claims (⚠️) · Last verified: 2026-11-04
 
 ## References
 - [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines, `preToolUse` deny, the `task` subagent tool and subagent events. [^1]
