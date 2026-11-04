@@ -7,7 +7,7 @@ last-updated: 2026-11-04
 
 # JavaScript, the language
 
-The JavaScript language as taught in Part 1 of javascript.info ("The JavaScript language"), consolidated into 24 docs written in our own words, one subtopic per chapter, from the basics (types, operators, functions) through objects, data types, closures, prototypes, classes, errors, promises and `async`/`await`, generators, modules and advanced features (Proxy, BigInt, Unicode, WeakRef). Seven deep dives go further: four built on You Don't Know JS (scope and closures; objects, `this` and delegation; types and coercion; async and performance) and two on Eloquent JavaScript (regular expressions; building a small language). Every behaviour was run in Node.js 24.22.1. Start with `learning-path.md`, which also maps all 94 lessons to their doc. Not covered: browser APIs (javascript.info Parts 2 and 3), engine and Node.js runtime internals (see `js-runtime/`).
+The JavaScript language as taught in Part 1 of javascript.info ("The JavaScript language"), consolidated into 24 docs written in our own words, one subtopic per chapter, from the basics (types, operators, functions) through objects, data types, closures, prototypes, classes, errors, promises and `async`/`await`, generators, modules and advanced features (Proxy, BigInt, Unicode, WeakRef). Thirteen deep dives go further: four built on You Don't Know JS (scope and closures; objects, `this` and delegation; types and coercion; async and performance), two on Eloquent JavaScript (regular expressions; building a small language), and seven topic dives built from open sources (modern JavaScript by edition, functional programming, data structures, design patterns, Node services, data wrangling, the browser platform). Every behaviour was run in Node.js 24.22.1. Start with `learning-path.md`, which also maps all 94 lessons to their doc. Not covered: typed docs synthesized from the deep dives (the browser topic exists only as a deep dive so far), engine and Node.js runtime internals (see `js-runtime/`).
 
 ## Docs
 | Doc | Type | Summary | Status |
@@ -31,6 +31,8 @@ The JavaScript language as taught in Part 1 of javascript.info ("The JavaScript 
 | [generators-iterators/](generators-iterators/index.md) | Generators, `yield*`, async iteration and async generators |
 | [modules/](modules/index.md) | ES modules, export/import forms, live bindings, dynamic `import()` |
 | [misc/](misc/index.md) | Proxy and Reflect, `eval`, currying, Reference Type, BigInt, Unicode, WeakRef; building a small language (deep dive) |
+| [browser/](browser/index.md) | DOM, events and delegation, loading order, `fetch` and CORS, storage — verified in Chrome (deep dive) |
+| [node/](node/index.md) | Node.js services (event loop, thread pool, timeouts, graceful shutdown) and data wrangling (streams, CSV, backpressure) (deep dives) |
 | [regular-expressions/](regular-expressions/index.md) | Flags, Unicode, groups, lookaround, backtracking and ReDoS, methods and `lastIndex` (deep dive) |
 
 ## References

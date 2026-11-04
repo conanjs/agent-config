@@ -15,6 +15,7 @@ Proxy and Reflect, `eval`, currying, the Reference Type, BigInt, Unicode string 
 | [proxy-eval-currying-and-reference-type.md](proxy-eval-currying-and-reference-type.md) | concept | Proxy traps with Reflect and their limits (internal slots, private fields), `eval` scopes, currying, and how the Reference Type carries `this` | verified |
 | [bigint-unicode-and-weakrefs.md](bigint-unicode-and-weakrefs.md) | reference | Lookup tables for BigInt rules, UTF-16 surrogate pairs and normalization, and `WeakRef`/`FinalizationRegistry` behaviour | verified |
 | [build-a-small-language-deep-dive.md](build-a-small-language-deep-dive.md) | deep-dive | Eloquent JavaScript's Egg: recursive-descent parser, AST, evaluator, special forms, scopes as prototype chains, closures, define vs set, compiling to JavaScript | verified |
+| [design-patterns-deep-dive.md](design-patterns-deep-dive.md) | deep-dive | Which classic patterns JavaScript makes built-in, idiomatic forms of singleton, factory, observer, pub/sub, decorator, proxy, strategy, command, middleware, DI and mixins, verified | verified |
 
 ## References
 - [The Modern JavaScript Tutorial, Part 1: The JavaScript language](https://javascript.info/js) — javascript.info, living. Backs: subtopic scope (one subtopic per chapter).
