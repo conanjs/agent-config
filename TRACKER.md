@@ -57,13 +57,58 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-04
 
+### T-22 Fix the defects found in the first Copilot run of the workflow graph
+- status: waiting
+- next: Review of session 8dd89c27 (api-portal-frontend, R-001), 2026-11-04: (1) verify, then parse, batched preToolUse input toolCalls[] so parallel launches are guarded; (2) P0 chose new-feature in a repo with no .specify/, skipping P2, and the constitution stayed an empty template; (3) record accepts role steps with no launch (T003 execute/checks/review in one second, review by the orchestrator); (4) tasks.md boxes not ticked; (5) no way to park a run stopped before P7; (6) P6 ran on develop with no feature branch; (7) gen_ai.agent.name sdlc-script; (8) no frontend stack; (9) desktop-notify.js fails on every agentStop (ESM)
+- waiting-on: V
+- from: 2026-11-04
+
 ### T-25 Verify the Windows docs on a real Windows machine
 - status: open
 - next: Windows docs are verified against Microsoft Learn but their examples were never run; run each stage exercise in knowledge/windows/learning-path.md on Windows 10/11 or a VM and replace illustrative outputs with captured ones
 - from: 2026-11-04
 - updated: 2026-11-04
 
+### T-30 Synthesize the 13 JavaScript deep dives into typed docs
+- status: open
+- next: Follow deep-dive.schema.md Synthesis for each javascript/*-deep-dive.md: extend existing v1 docs or add concept/reference docs (browser/ has none yet), fill synthesized-into both ways
+- from: 2026-11-04
+
+### T-31 Knowledge schema v1.1: image convention and missing doc types
+- status: waiting
+- next: V drafts or approves: assets folder + alt-text rule, tutorial/learning-path, troubleshooting, glossary types, source-license field, mechanical-verification limits; then validator scenarios and tests
+- waiting-on: V
+- from: 2026-11-04
+
 ## Done
+
+### T-29 Topic deep dives covering the 23 commercial ebook subjects (7)
+- status: done
+- next: On V's go-ahead: functional programming, data structures in JS, browser DOM/events/fetch (javascript.info Parts 2-3 from the private mirror), Node services, data wrangling, design patterns, modern ES2015-2025; from open sources only, never from the PDFs
+- waiting-on: V
+- from: 2026-11-04
+- closed: 2026-11-04
+
+### T-28 Deep dives from Eloquent JavaScript (2) and feed browser/Node topics
+- status: done
+- next: On V's go-ahead: regular expressions (ch9 + javascript.info regexp part), building a small language (ch12 Egg); use the root NN_*.md chapters and code/solutions, not src/ (build scripts)
+- waiting-on: V
+- from: 2026-11-04
+- closed: 2026-11-04
+
+### T-27 Deep dives from You Don't Know JS (4)
+- status: done
+- next: On V's go-ahead: scope & closures (2nd ed), objects/classes + this & prototypes, types & coercion, async & performance (1st ed); own words only (CC BY-NC-ND forbids adaptations); verify in the Node lab; synthesize into javascript/
+- waiting-on: V
+- from: 2026-11-04
+- closed: 2026-11-04
+
+### T-26 Merge PR #16 (IEEE 754 and JavaScript knowledge)
+- status: done
+- next: When validate-docs passes, merge with the conanjs token: gh pr merge 16 -R conanjs/agent-config --merge
+- waiting-on: CI validate-docs
+- from: 2026-11-04
+- closed: 2026-11-04
 
 ### T-23 Commit the Linux knowledge base (copilot/knowledge/linux)
 - status: done
