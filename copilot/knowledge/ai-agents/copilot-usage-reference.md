@@ -4,8 +4,8 @@ type: reference
 topic: ai-agents
 status: draft
 applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02"]
-last-verified: 2026-11-04
-last-updated: 2026-11-04
+last-verified: 2026-11-05
+last-updated: 2026-11-05
 tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructions]
 ---
 
@@ -54,8 +54,8 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 |---|---|---|
 | Shared runtime | VS Code, the GitHub Copilot app and the Copilot CLI share the hook format | ✅[^2] |
 | VS Code status | Hooks are in Preview in VS Code. The Copilot harness reads the same user files (`~/.copilot/hooks/`, or `$COPILOT_HOME/hooks/`); the setting `chat.useHooks` controls only the older Local harness, not the shared Copilot runtime. A `preToolUse` deny is `{"permissionDecision":"deny","permissionDecisionReason":"…"}` and `{}` means no decision, as in the CLI (read 2026-11-04) | ✅[^2] |
-| `preToolUse` in an interactive session log | In an interactive Copilot CLI 1.0.105 session (2026-11-04, 75 calls), every `hook.start` event for `preToolUse` logs its input as `{sessionId, cwd, toolCalls: [{id, name, args}]}`, and 9 of the 75 invocations covered two or more tool calls at once (for example two parallel `task` launches). The command hook's stdin in `copilot -p` was per call, `{toolName, toolArgs}` (2026-11-03) | ✅[^6] |
-| Batched stdin in interactive runs | Whether a config-file command hook receives the batched `toolCalls` shape in an interactive session, rather than one `{toolName, toolArgs}` per call, is not tested. A hook that reads only `toolName` would see nothing to check in a batched payload | ⚠️ unverified |
+| `preToolUse` in the session log | The session log groups the tool calls of one model reply into one hook invocation: every `hook.start` event for `preToolUse` logs its input as `{sessionId, cwd, toolCalls: [{id, name, args}]}`, and `hook.end` keys any deny by tool-call id. In an interactive Copilot CLI 1.0.105 session (2026-11-04, 75 calls), 9 of the 75 invocations covered two or more tool calls at once (for example two parallel `task` launches). `copilot -p` sessions log the same shape, and so does every CLI version in the local logs back to 1.0.73 | ✅[^6][^7] |
+| Hook stdin is one call at a time | The log's `toolCalls` array is not what a config-file command hook reads: Copilot runs the command once per tool call, with `{sessionId, timestamp, cwd, toolName, toolArgs}` on stdin, in `copilot -p` and in an interactive session (`copilot -i`) alike. A deny blocks only its own call: with two parallel `bash` calls in one reply, the hook denied the first and the second ran. A hook that reads only `toolName` therefore checks every call in a batch | ✅[^7] |
 | Sub-agent tool name in VS Code | The VS Code page does not name the tool a `preToolUse` hook sees when the agent launches a sub-agent (the CLI's is `task`, ✅[^6]); whether VS Code's Copilot harness also sends `task` is not tested | ⚠️ unverified |
 | Locations | `~/.copilot/hooks/*.json` (user), `.github/hooks/*.json` (repository), a `hooks` block in `~/.copilot/settings.json` or `.github/copilot/settings.json`, plugins | ✅[^1] |
 | Format | `{"version": 1, "hooks": {"<event>": [{"type": "command", "bash": …, "powershell": …, "timeoutSec": …}]}}` | ✅[^1] |
@@ -95,7 +95,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 33 claims (✅) · Unverified: 4 claims (⚠️) · Last verified: 2026-11-04
+- Verified: 34 claims (✅) · Unverified: 3 claims (⚠️) · Last verified: 2026-11-05
 
 ## References
 - [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines, `preToolUse` deny, the `task` subagent tool and subagent events. [^1]
@@ -104,6 +104,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - [Usage-based billing for individuals](https://docs.github.com/copilot/concepts/billing/usage-based-billing-for-individuals) — GitHub, living. Backs: 1 AI credit = $0.01, monthly allowances. [^4]
 - `~/.copilot/session-state/*/events.jsonl`, `copilot -p` with Copilot CLI 1.0.105, and the VS Code process start time — local test, 2026-11-02: event types and fields, per-call credits summing exactly to the checkpoint (182.21 AI credits), the quota snapshot, the CLI showing progress lines and a 9.22-credit turn that matches its own footer, and the stale instruction copy in a VS Code session. [^5]
 - `copilot -p` runs (Copilot CLI 1.0.105), local test, 2026-11-03: a `preToolUse` hook denying `task` in a folder outside and inside the trusted folders, the recorded `toolArgs`, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check the same day (user-level `preToolUse` deny then allow, `userPromptSubmitted` in `-p`); an interactive session's `events.jsonl` (1.0.105, 2026-11-04: `hook.start` inputs). [^6]
+- Batched `preToolUse` probe (Copilot CLI 1.0.105), local test, 2026-11-05: a repository hook in a temporary trusted folder wrote each stdin to a file and denied any call containing `DENYME`; the prompt asked for two parallel `bash` calls (`echo DENYME-…` and `echo allowed-…`). Run once with `copilot -p --trust-folder` (session `9ffebe8b`) and once interactively with `copilot -i` on a pseudo-terminal (session `97a68944`). Each run logged one `hook.start` with two `toolCalls`; the hook ran twice with `{toolName, toolArgs}`; the first call was denied and the second printed its output. Also: a count of the `hook.start` input shapes in all local session logs (CLI 1.0.73 to 1.0.105). [^7]
 - `copilot/hooks/turn-tokens/turn-tokens.schema.md`, `specs/018-turn-tokens-copilot/` in agent-config — the report built on these facts.
 
 ## Related
