@@ -259,6 +259,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/linux/system-management/systemd-services.md`](../../../knowledge/linux/system-management/systemd-services.md)
 - [`copilot/knowledge/nodejs/node-nvm-corepack-pnpm-yarn-architecture.md`](../../../knowledge/nodejs/node-nvm-corepack-pnpm-yarn-architecture.md)
 - [`copilot/knowledge/operations/config-at-startup.md`](../../../knowledge/operations/config-at-startup.md)
+- [`copilot/knowledge/operations/macos-app-path.md`](../../../knowledge/operations/macos-app-path.md)
 - [`copilot/knowledge/operations/structured-logging.md`](../../../knowledge/operations/structured-logging.md)
 - [`copilot/knowledge/performance/fundamentals/amdahls-law-and-scalability.md`](../../../knowledge/performance/fundamentals/amdahls-law-and-scalability.md)
 - [`copilot/knowledge/performance/fundamentals/latency-percentiles-and-tail.md`](../../../knowledge/performance/fundamentals/latency-percentiles-and-tail.md)
