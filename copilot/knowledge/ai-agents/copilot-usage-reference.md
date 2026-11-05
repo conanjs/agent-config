@@ -2,8 +2,8 @@
 schema: knowledge-doc/v1
 type: reference
 topic: ai-agents
-status: draft
-applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02"]
+status: verified
+applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code 1.143.0 (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02"]
 last-verified: 2026-11-05
 last-updated: 2026-11-05
 tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructions]
@@ -12,12 +12,12 @@ tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructi
 # GitHub Copilot usage, AI credits and hooks
 
 ## Summary
-**TL;DR:** The Copilot CLI and the Copilot agent in VS Code share one agent runtime: both log every model call to `~/.copilot/session-state/<session id>/events.jsonl` with its tokens and its exact cost in AI credits (1 AI credit = $0.01), and both read hooks from `~/.copilot/hooks/*.json`. The end-of-turn hook (`agentStop`) gets the log's path but cannot show a message field; progress lines it prints appear in the CLI. VS Code's Copilot kept using the copy of the user instructions it read when VS Code started.
+**TL;DR:** The Copilot CLI and the Copilot agent in VS Code share one agent runtime: both log every model call to `~/.copilot/session-state/<session id>/events.jsonl` with its tokens and its exact cost in AI credits (1 AI credit = $0.01), and both read hooks from `~/.copilot/hooks/*.json`. The end-of-turn hook (`agentStop`) gets the log's path but cannot show a message field; progress lines it prints appear in the CLI but not in VS Code. VS Code runs one Copilot runtime for all its windows; it keeps the copy of the user instructions it first read for a workspace folder until VS Code quits, and Developer: Reload Window does not refresh it.
 **Use this when:** measuring or reporting Copilot token use and credits, writing a Copilot hook, or finding out why Copilot ignores a newly added instruction.
 **Not this doc:** the same for Claude Code and Codex → `claude-code-usage-reference.md`, `codex-usage-reference.md`; counting rules → `agent-token-accounting.md`; the older SQLite-based notes → `../github-copilot/copilot-cli-internals.md` (legacy).
 
 ## Scope
-GitHub Copilot's local usage records, its AI-credit billing, its hooks and how VS Code loads user instructions: from the docs read on 2026-11-02 and from this machine's logs (Copilot CLI 1.0.105; a VS Code session whose system message reads "You are an AI assistant using Copilot SDK in VS Code", runtime 1.0.100).
+GitHub Copilot's local usage records, its AI-credit billing, its hooks and how VS Code loads user instructions: from the docs read on 2026-11-02 and from this machine's logs (Copilot CLI 1.0.105; a VS Code session whose system message reads "You are an AI assistant using Copilot SDK in VS Code", runtime 1.0.100; VS Code 1.143.0 probes on 2026-11-05).
 
 ## Catalog
 
@@ -56,7 +56,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | VS Code status | Hooks are in Preview in VS Code. The Copilot harness reads the same user files (`~/.copilot/hooks/`, or `$COPILOT_HOME/hooks/`); the setting `chat.useHooks` controls only the older Local harness, not the shared Copilot runtime. A `preToolUse` deny is `{"permissionDecision":"deny","permissionDecisionReason":"…"}` and `{}` means no decision, as in the CLI (read 2026-11-04) | ✅[^2] |
 | `preToolUse` in the session log | The session log groups the tool calls of one model reply into one hook invocation: every `hook.start` event for `preToolUse` logs its input as `{sessionId, cwd, toolCalls: [{id, name, args}]}`, and `hook.end` keys any deny by tool-call id. In an interactive Copilot CLI 1.0.105 session (2026-11-04, 75 calls), 9 of the 75 invocations covered two or more tool calls at once (for example two parallel `task` launches). `copilot -p` sessions log the same shape, and so does every CLI version in the local logs back to 1.0.73 | ✅[^6][^7] |
 | Hook stdin is one call at a time | The log's `toolCalls` array is not what a config-file command hook reads: Copilot runs the command once per tool call, with `{sessionId, timestamp, cwd, toolName, toolArgs}` on stdin, in `copilot -p` and in an interactive session (`copilot -i`) alike. A deny blocks only its own call: with two parallel `bash` calls in one reply, the hook denied the first and the second ran. A hook that reads only `toolName` therefore checks every call in a batch | ✅[^7] |
-| Sub-agent tool name in VS Code | The VS Code page does not name the tool a `preToolUse` hook sees when the agent launches a sub-agent (the CLI's is `task`, ✅[^6]); whether VS Code's Copilot harness also sends `task` is not tested | ⚠️ unverified |
+| Sub-agent tool name in VS Code | VS Code's Copilot harness names it `task`, as the CLI does (✅[^6]): a user-level `preToolUse` hook received `{sessionId, timestamp, cwd, toolName: "task", toolArgs: {name, agent_type, description, prompt}}`, and its deny stopped the launch; the chat showed a "Delegating task" step with "Tool execution failed: Denied by preToolUse hook: <reason>" | ✅[^8] |
 | Locations | `~/.copilot/hooks/*.json` (user), `.github/hooks/*.json` (repository), a `hooks` block in `~/.copilot/settings.json` or `.github/copilot/settings.json`, plugins | ✅[^1] |
 | Format | `{"version": 1, "hooks": {"<event>": [{"type": "command", "bash": …, "powershell": …, "timeoutSec": …}]}}` | ✅[^1] |
 | `agentStop` input | camelCase: `sessionId`, `timestamp`, `cwd`, `transcriptPath`, `stopReason`, `stop_hook_active`; the VS Code-style name `Stop` gives the same in snake_case | ✅[^1] |
@@ -70,7 +70,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | `userPromptSubmitted` | Input `sessionId`, `timestamp`, `cwd`, `prompt`; a config-file hook's output is dropped (only SDK hooks may return `modifiedPrompt`) | ✅[^1] |
 | `copilot -p --agent <name>` | Runs the prompt as that custom agent (tested with `sdlc-qa`) | ✅[^6] |
 | `userPromptSubmitted` in `copilot -p` | A user-level hook (`~/.copilot/hooks/*.json`) received the prompt of a non-interactive run, with `sessionId` and `cwd`; a user-level `preToolUse` hook denied `task` and then allowed it (agentic-sdlc workflow guard, live test) | ✅[^6] |
-| Progress lines in VS Code | Not documented and not yet seen | ⚠️ unverified |
+| Progress lines in VS Code | Not shown. A `preToolUse` hook whose run succeeded printed a progress line before its decision, and the chat showed only the tool step and the answer. Progress lines from `agentStop` (the probe's and the turn token report's, which did run and save its record) did not show either; there the whole `agentStop` run was marked failed because another hook (`desktop-notify`) crashed | ✅[^8] |
 | Order at the end of a turn | The last `session.usage_record`, then the final `assistant.message` (no `toolRequests`), then `assistant.turn_end`, then the `agentStop` hook | ✅[^5] |
 
 ### User instructions in VS Code
@@ -80,22 +80,23 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | Location | Copilot user instructions live in `~/.copilot/instructions`; VS Code also reads the folders in `chat.instructionsFilesLocations` | ✅[^3] |
 | `applyTo` | A file is attached automatically when its `applyTo` pattern matches a file the agent creates or modifies; a `description` lets the agent load it on demand | ✅[^3] |
 | A stale copy | A VS Code session on 2026-11-02 had the version of `personal-defaults.instructions.md` from before 29 Oct 15:18 (no "Pin Before You Change", no tracker rule), although the file had changed three times since; VS Code had been running since 29 Oct 08:58 | ✅[^5] |
-| Why | VS Code keeps the copy it read when it started; a reload or restart makes it read the file again | ⚠️ unverified |
+| Why | VS Code runs one Copilot runtime process (`copilot-runtime`, under VS Code's agent host) for all its windows, started with VS Code. It reads the user instructions the first time a workspace folder starts a session and gives later sessions in that folder the same copy: after the file changed, a new chat and a Developer: Reload Window (which restarts only the window's extension host) still got the old text, while a newly opened folder got the new text, and quitting and reopening VS Code gave the first folder the new text too | ✅[^8] |
 
 ## Lookup notes
 - Copilot's `inputTokens` already contains the cache reads and writes, as Codex's `input_tokens` does; Claude Code's `input_tokens` does not (`agent-token-accounting.md`).
 - To report Copilot usage after every turn, use the turn token report: `copilot/hooks/turn-tokens/turn-tokens.schema.md` in agent-config (TT-13 … TT-16).
-- After changing a file in `~/.copilot/instructions` or `~/.copilot/hooks`, reload VS Code (Developer: Reload Window) before trusting that its Copilot uses the change.
+- After changing a file in `~/.copilot/instructions`, quit and reopen VS Code (Cmd+Q) before trusting that its Copilot uses the change; Developer: Reload Window is not enough. A hook file newly added to `~/.copilot/hooks` was used by the next session in a newly opened folder without a restart.
+- VS Code hooks run with the PATH of that runtime: the environment VS Code read from the login shell when it started from the Dock. If reading it takes longer than `application.shellEnvironmentResolutionTimeout` (10 seconds by default), VS Code starts without the shell's environment[^9]. Then nvm's `node` is missing: two VS Code sessions on 2026-11-02 and 2026-11-03 failed their `node` hooks with `/bin/bash: node: command not found`, and VS Code's log has "Unable to resolve your shell environment in a reasonable time" on 2026-10-26. A hook that needs Node should find it itself, as `turn-tokens-hook.sh` does.
 
 ## Takeaways
 - Copilot's log carries its own exact cost per call: sum `copilotUsage.totalNanoAiu`, do not price tokens yourself.
-- A Copilot end-of-turn hook can only talk to the user through progress lines.
+- A Copilot end-of-turn hook can only talk to the user through progress lines, and only the CLI shows them; in VS Code it has no way to show the user anything.
 
 ## Used by
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 34 claims (✅) · Unverified: 3 claims (⚠️) · Last verified: 2026-11-05
+- Verified: 37 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-05
 
 ## References
 - [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines, `preToolUse` deny, the `task` subagent tool and subagent events. [^1]
@@ -105,6 +106,8 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - `~/.copilot/session-state/*/events.jsonl`, `copilot -p` with Copilot CLI 1.0.105, and the VS Code process start time — local test, 2026-11-02: event types and fields, per-call credits summing exactly to the checkpoint (182.21 AI credits), the quota snapshot, the CLI showing progress lines and a 9.22-credit turn that matches its own footer, and the stale instruction copy in a VS Code session. [^5]
 - `copilot -p` runs (Copilot CLI 1.0.105), local test, 2026-11-03: a `preToolUse` hook denying `task` in a folder outside and inside the trusted folders, the recorded `toolArgs`, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check the same day (user-level `preToolUse` deny then allow, `userPromptSubmitted` in `-p`); an interactive session's `events.jsonl` (1.0.105, 2026-11-04: `hook.start` inputs). [^6]
 - Batched `preToolUse` probe (Copilot CLI 1.0.105), local test, 2026-11-05: a repository hook in a temporary trusted folder wrote each stdin to a file and denied any call containing `DENYME`; the prompt asked for two parallel `bash` calls (`echo DENYME-…` and `echo allowed-…`). Run once with `copilot -p --trust-folder` (session `9ffebe8b`) and once interactively with `copilot -i` on a pseudo-terminal (session `97a68944`). Each run logged one `hook.start` with two `toolCalls`; the hook ran twice with `{toolName, toolArgs}`; the first call was denied and the second printed its output. Also: a count of the `hook.start` input shapes in all local session logs (CLI 1.0.73 to 1.0.105). [^7]
+- VS Code probes (VS Code 1.143.0, Copilot runtime 1.0.100-1), local test with V, 2026-11-05: a temporary user-level hook (`preToolUse` recorded stdin and PATH and denied sub-agent launches; both it and `agentStop` printed a progress line) and a temporary user instruction file with a marker, in two throwaway folders opened with `code -n` and prompted with `code chat -m agent`. Sessions `4d8dada9` (marker A, `task` denied), `83ab9839` (file changed to B, same folder: A), `f725a133` (after Reload Window at 07:42:40, same `copilot-runtime` process 2571 started 2026-11-04: A), `bbe0a9a4` (new folder: B), `44c03b4f` (after quitting VS Code, new runtime process 88398: B). V watched the chat and saw no progress line. [^8]
+- [Resolving shell environment fails (VS Code FAQ)](https://code.visualstudio.com/docs/supporting/faq#_resolving-shell-environment-fails) — Microsoft, living. Backs: VS Code started from the Dock resolves the shell environment and, after `application.shellEnvironmentResolutionTimeout` (10 seconds), starts without it. [^9]
 - `copilot/hooks/turn-tokens/turn-tokens.schema.md`, `specs/018-turn-tokens-copilot/` in agent-config — the report built on these facts.
 
 ## Related
