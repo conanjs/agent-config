@@ -124,7 +124,7 @@ Real misses caught while using this pattern, so they don't repeat:
 
 **Local artifacts:**
 - `copilot/knowledge/git/multi-account-ssh-identity.md` — the full topic this pattern's worked example is drawn from.
-- `copilot/instructions/personal-defaults.instructions.md` — the short pointer rule that sends an agent here.
+- `copilot/instructions/core.instructions.md` — the short pointer rule that sends an agent here.
 
 ## Related
 

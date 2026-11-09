@@ -1,6 +1,6 @@
 # Doc Template — Base (format-agnostic)
 
-**Purpose:** Reusable spec for any document meant for the user's team. Loaded automatically via the global instruction chain (`~/.claude/CLAUDE.md` → `~/.copilot/instructions/personal-defaults.instructions.md`) whenever the user asks for a team-facing document, in any project. Only the *topic* and *length* need to be asked each time — audience, language, and level are fixed here.
+**Purpose:** Reusable spec for any document meant for the user's team. Reached through the `team-doc` skill (`skills/team-doc/SKILL.md`), which every agent matches against a request for a team-facing document, in any project. Only the *topic* and *length* need to be asked each time — audience, language, and level are fixed here.
 
 **This process is itself a loop-engineering instance:** Action (draft the doc) → Check (Stop Condition, per format, below) → Decide (pass → ship; fail → fix using [[lessons-learned]], then re-draft). See [[loop-engineering]] for the underlying concept.
 
@@ -67,14 +67,14 @@ A draft passes the content check when, and only when:
 - Every sentence is under ~12 words (spot-check at minimum the analogy and summary sections).
 - Every technical term used has a one-line definition + analogy at first use.
 - The analogy used is universally concrete (see [[lessons-learned]] for a running list of analogies that failed this check before).
-- References/Related sections are populated per the global rule in `personal-defaults.instructions.md`.
+- End every team document and Confluence page with a "References" section, listing both the local artifacts it cites (files, configs, tools) and authoritative external sources (official docs, specs, RFCs), and a "Related" section listing other docs or topics to read next.
 
 Format-specific checks in each `formats/*.md` file are *additional* to this, not a replacement for it.
 
 ## References
 
 **Local artifacts:**
-- `~/.claude/CLAUDE.md` → `~/.copilot/instructions/personal-defaults.instructions.md` — the global rule (added 2026-09-14) that auto-loads this template for team docs in every project, plus the rule requiring References/Related on every knowledge doc.
+- `skills/team-doc/SKILL.md` — the skill that sends agents here. From 2026-09-14 to 2026-11-09 a line in `personal-defaults.instructions.md` did this, and that file also held the References/Related rule now stated above.
 - [[lessons-learned]] — running log of past mistakes this template exists to prevent repeating.
 - `copilot/knowledge/ai-agents/loop-engineering-simple.md` (removed 2026-10-30; `git log --all -- <that path>` finds it) — first document built from this template, written for one team.
 

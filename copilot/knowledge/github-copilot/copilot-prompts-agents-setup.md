@@ -108,7 +108,7 @@ description: "Background context on shipment architecture"
 
 Often called "global" because files here apply across all workspaces — but they are still **file-based instructions**, subject to the same `applyTo:` rules.
 
-- `personal-defaults.instructions.md` has `applyTo: '**'` → applied on every request in every workspace ✅
+- `core.instructions.md` (until 2026-11-09 `personal-defaults.instructions.md`) has `applyTo: "**"` → applied on every request in every workspace ✅
 - A file in `~/.copilot/instructions/` with **no `applyTo:`** → NOT applied automatically, even though it is "global"
 
 The "always-on everywhere" behavior comes from `applyTo: '**'`, not from being in `~/.copilot/`.
@@ -121,7 +121,7 @@ The "always-on everywhere" behavior comes from `applyTo: '**'`, not from being i
 |---|---|---|---|
 | `.github/copilot-instructions.md` | N/A (always-on type) | ✅ Every request | Current workspace |
 | `AGENTS.md` | N/A (always-on type) | ✅ Every request | Current workspace |
-| `~/.copilot/instructions/personal-defaults.instructions.md` | `**` | ✅ Every request, every workspace | Everywhere (wildcard) |
+| `~/.copilot/instructions/core.instructions.md` | `**` | ✅ Every request, every workspace | Everywhere (wildcard) |
 | `.github/instructions/cargo-release.instructions.md` | `src/cargo-release/**` | ✅ When glob matches context | Workspace, matching files only |
 | `.github/instructions/reference.instructions.md` | *(none)* | ❌ Manual only or semantic match | Must be attached by user |
 

@@ -8,10 +8,18 @@ Up: [Atlas](../../index.md) › agent-config
 
 ## Instruction files
 
-<a id="instruction"></a>Personal defaults, the answer patterns and tool instructions, loaded in every session
+<a id="instruction"></a>The core: working agreements, the default answer layout and triggers, loaded in every session by every agent
 
-Where: `copilot/instructions/*.instructions.md` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: `~/.copilot/instructions`
+Where: `copilot/instructions/*.instructions.md` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: `~/.copilot/instructions, ~/.codex/AGENTS.md`
 
-- [`copilot/instructions/answer-patterns.instructions.md`](../../../instructions/answer-patterns.instructions.md)
-- [`copilot/instructions/code-review-graph.instructions.md`](../../../instructions/code-review-graph.instructions.md)
-- [`copilot/instructions/personal-defaults.instructions.md`](../../../instructions/personal-defaults.instructions.md)
+- [`copilot/instructions/core.instructions.md`](../../../instructions/core.instructions.md)
+
+## On-demand references
+
+<a id="reference"></a>Files the core tells agents to read only when needed: answer patterns, the code-review-graph guide, SQL rules
+
+Where: `copilot/references/*.md` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: `~/.copilot/references`
+
+- [`copilot/references/answer-patterns.md`](../../../references/answer-patterns.md)
+- [`copilot/references/code-review-graph.md`](../../../references/code-review-graph.md)
+- [`copilot/references/sql-and-nested-data.md`](../../../references/sql-and-nested-data.md)

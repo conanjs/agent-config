@@ -3,10 +3,10 @@ schema: knowledge-doc/v1
 type: reference
 topic: ai-agents
 status: verified
-applies-to: ["Codex CLI 0.164.0-alpha.11.1 (bundled with the ChatGPT desktop app)", "Codex docs read 2026-10-30"]
-last-verified: 2026-11-03
-last-updated: 2026-11-03
-tags: [codex, openai, tokens, usage, rate-limits, prompt-caching, compaction, opentelemetry, subagents]
+applies-to: ["Codex CLI 0.164.0-alpha.11.1 (bundled with the ChatGPT desktop app)", "Codex CLI 0.166.0-alpha.6 (instruction-file benchmark)", "Codex docs read 2026-10-30"]
+last-verified: 2026-11-09
+last-updated: 2026-11-09
+tags: [codex, openai, tokens, usage, rate-limits, prompt-caching, compaction, opentelemetry, subagents, agents-md]
 ---
 
 # Codex usage, context and multi-agent controls
@@ -113,6 +113,16 @@ The Codex harness (CLI, IDE extension and the Codex part of the ChatGPT desktop 
 | `[agents] max_concurrent_threads_per_session` (legacy `max_threads`) | Codex chooses | Open subagent threads per session | ✅[^4][^10] |
 | `[agents] default_subagent_model`, `default_subagent_reasoning_effort` | inherit | Cheaper model or effort for subagents | ✅[^10] |
 
+### Global instructions that point to other files
+
+Codex has no import syntax for `AGENTS.md` (Claude Code has `@path` imports; Copilot CLI loads every `~/.copilot/instructions/*.instructions.md` itself). A global `~/.codex/AGENTS.md` can only ask Codex, in prose, to read other files.
+
+| Behavior | Observed | Status |
+|---|---|---|
+| A global `AGENTS.md` that says "read and follow these files" | Codex ran `cat` on each of the three named files before answering, in all 10 sessions, whatever the task, a one-line email included | ✅[^14] |
+| Cost of those reads | The email took 51,137 and 51,093 input tokens with the pointer file (three files, about 3,400 tokens), against 22,542 and 22,516 with a 7-line core that names files to read only on a trigger | ✅[^14] |
+| A conditional pointer ("if the message begins with `pattern:`, read X") | Followed: the pattern file was read in both `pattern:bugfix` sessions and in neither email session | ✅[^14] |
+
 ### What breaks the prompt cache
 
 | Cause | Why | Status |
@@ -146,6 +156,7 @@ The Codex harness (CLI, IDE extension and the Codex part of the ChatGPT desktop 
 - Never add `cached_input_tokens` to `input_tokens`: it is already inside. `threads.tokens_used` and `total_tokens` measure processed volume, not cost.
 - The rollout format is not documented and changes with versions (`token_usage_record` is newer than `token_count`); the per-response records summed to exactly Codex's own thread total in all 4 threads tested ✅[^9].
 - Subagent threads have their own rollout files; find them through `thread_spawn_edges` ✅[^9].
+- In `codex exec --json`, a `command_execution` item's `exit_code` belongs to the whole command line. Codex chains commands, so a command can read a file and still fail: `cat AGENTS.md services/payments/AGENTS.md; command -v code-review-graph; rg … | rg 'graph|sqlite'` printed both files and exited 1 because the last search found nothing ✅[^14]. To tell whether a file was read, match the command text of every command, not only those that exited 0; scoring only exit-0 commands misscored 1 of 44 benchmark runs ✅[^14].
 
 ## Takeaways
 - For one thread, `/status`; for a script, `codex exec --json` and sum `turn.completed.usage`; for a fleet, `[otel]`.
@@ -156,7 +167,7 @@ The Codex harness (CLI, IDE extension and the Codex part of the ChatGPT desktop 
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 81 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
+- Verified: 86 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
 
 ## References
 - [Unrolling the Codex agent loop](https://openai.com/index/unrolling-the-codex-agent-loop/) — OpenAI (Michael Bolin), 2026. Backs: shared harness, cache-miss causes, appended config messages, `/responses/compact`. [^1]
@@ -172,6 +183,8 @@ The Codex harness (CLI, IDE extension and the Codex part of the ChatGPT desktop 
 - [Hooks](https://learn.chatgpt.com/docs/hooks) — OpenAI, living. Backs: hook locations, trust, events, input and output fields, `PreToolUse` on `spawn_agent` and its deny forms, transcript stability warning. [^11]
 - [codex-rs/core/src/tools/registry.rs at rust-v0.164.0-alpha.11](https://github.com/openai/codex/blob/rust-v0.164.0-alpha.11/codex-rs/core/src/tools/registry.rs), [hook_names.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/hook_names.rs), [tools/mod.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/mod.rs), [tools/router.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/router.rs), [multi_agents_spec.rs](https://github.com/openai/codex/blob/rust-v0.164.0-alpha.11/codex-rs/core/src/tools/handlers/multi_agents_spec.rs) — OpenAI, read 2026-11-03 (also `registry.rs` at [rust-v0.166.0](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/core/src/tools/registry.rs)). Backs: hook tool names and aliases, flat names, encrypted collaboration arguments, `task_name` rules. [^13]
 - `codex exec` runs (codex-cli 0.164.0-alpha.11.1) with the agentic-sdlc workflow guard's trusted hooks, a logging wrapper on the hook's stdin, and the session's rollout file — local test, 2026-11-03 (agent-config `specs/019-workflow-graph/`). [^12]
+
+- Local benchmark, 2026-11-07, re-checked 2026-11-09 — Codex CLI 0.166.0-alpha.6 (bundled in the ChatGPT app), `codex exec --ignore-user-config --ephemeral --json -m gpt-6.1-sol -c model_reasoning_effort="medium"`. Variant A: a copy of this repo's `codex/AGENTS.md` and the three `copilot/instructions/*.instructions.md` files, byte-identical to the repo on 2026-11-09. Variant B: a 7-line core with conditional reads. Five prompts, two runs each per variant. Event logs `~/Documents/Codex/2026-11-06/referenced-chatgpt-conversation-this-is-an/work/bench/out/codex-*.jsonl`, scored in `…/outputs/cli-instructions-benchmark.csv`; on 2026-11-09 the CSV totals were re-added and every run's commands were re-read, including those that exited non-zero. [^14]
 
 ## Related
 - `ai-agents/agent-token-accounting.md`

@@ -20,7 +20,7 @@ Format per entry: **What went wrong → Why it's wrong → Rule now baked into t
 
 **Why it's wrong:** Guessing a URL structure for a real organization's site is exactly the kind of unverified claim the global instructions prohibit ("do NOT state assumptions as fact... verify via reliable, authoritative sources"). A plausible-looking URL that 404s is worse than no citation — it looks verified but isn't.
 
-**Rule now baked into the template:** Any external URL added to a References section must be the literal result of a WebSearch/WebFetch call in the same turn, never typed from memory — even for a domain the model is confident about. This is really a restatement of the existing global rule in `personal-defaults.instructions.md`, logged here because it was the concrete failure case that proved the rule needs active enforcement, not just statement.
+**Rule now baked into the template:** Any external URL added to a References section must be the literal result of a WebSearch/WebFetch call in the same turn, never typed from memory — even for a domain the model is confident about. This is really a restatement of the global rule then in `personal-defaults.instructions.md` (since 2026-11-09 in `core.instructions.md`), logged here because it was the concrete failure case that proved the rule needs active enforcement, not just statement.
 
 ---
 

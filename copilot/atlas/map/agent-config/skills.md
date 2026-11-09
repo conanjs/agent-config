@@ -13,6 +13,7 @@ Up: [Atlas](../../index.md) › agent-config
 Where: `skills/*/SKILL.md` · Schema: `copilot/frameworks/agentic-sdlc/schemas/skill-wrapper.schema.md` · Index: — · Checked by: validate.mjs SKILL · Scenarios: `tests/validate-sdlc/validate-sdlc.feature` · Installed to: `~/.claude/skills, ~/.agents/skills`
 
 - [`skills/agentic-sdlc/SKILL.md`](../../../../skills/agentic-sdlc/SKILL.md)
+- [`skills/github-governance/SKILL.md`](../../../../skills/github-governance/SKILL.md)
 - [`skills/review-docs/SKILL.md`](../../../../skills/review-docs/SKILL.md)
 - [`skills/sdlc-architecture-preset/SKILL.md`](../../../../skills/sdlc-architecture-preset/SKILL.md)
 - [`skills/sdlc-coordinator-preset/SKILL.md`](../../../../skills/sdlc-coordinator-preset/SKILL.md)
@@ -29,3 +30,5 @@ Where: `skills/*/SKILL.md` · Schema: `copilot/frameworks/agentic-sdlc/schemas/s
 - [`skills/sdlc-stack-typescript-node/SKILL.md`](../../../../skills/sdlc-stack-typescript-node/SKILL.md)
 - [`skills/sdlc-system-architecture-preset/SKILL.md`](../../../../skills/sdlc-system-architecture-preset/SKILL.md)
 - [`skills/sdlc-tech-stack-preset/SKILL.md`](../../../../skills/sdlc-tech-stack-preset/SKILL.md)
+- [`skills/spec-kit-setup/SKILL.md`](../../../../skills/spec-kit-setup/SKILL.md)
+- [`skills/team-doc/SKILL.md`](../../../../skills/team-doc/SKILL.md)

@@ -3,9 +3,9 @@ schema: knowledge-doc/v1
 type: concept
 topic: ai-agents
 status: verified
-applies-to: ["Claude Code 2.1.278–2.1.308", "Codex CLI 0.164 (ChatGPT desktop app)", "docs read 2026-10-30"]
-last-verified: 2026-10-31
-last-updated: 2026-11-07
+applies-to: ["Claude Code 2.1.278–2.1.308", "Codex CLI 0.164 (ChatGPT desktop app)", "docs read 2026-10-30", "Claude Code 2.1.318, Copilot CLI 1.0.105, Codex CLI 0.166.0-alpha.6 (2026-11-09)"]
+last-verified: 2026-11-09
+last-updated: 2026-11-09
 tags: [tokens, prompt-caching, compaction, claude-code, codex, cost, multi-agent]
 ---
 
@@ -169,6 +169,7 @@ The same shape in a one-day Claude Code session (Opus, 1,407 requests): 2,920 un
 ## Edge cases
 | Case | What happens | Why |
 |---|---|---|
+| Moving instructions into files read on demand | Each request gets cheaper, but every read adds a model request that sends the whole context again. Measured 2026-11-09 with a 915-token core plus on-demand references, against today's three files (3,432 tokens), 16 sessions each. Codex CLI with `gpt-6.1-sol`: input −25.2%. Copilot CLI with Claude Sonnet 5.5: input −5.7%, AI credits −31.9%. Claude Code with Claude Opus 5.5: input −0.3%, list-price estimate −4.3%. A prompt that needed the pattern file went from one call to two, adding about 41,000 input tokens in Claude Code and about 20,000 in Copilot CLI ✅[^13] | A tool call ends one request and starts another with the full history ✅[^1] Measure whole sessions, not file sizes, before moving rules out of the always-loaded file |
 | Summing input over all requests | A number many times the real context (1.6M for a 196k context in the Copilot CLI doc) | The history is re-sent with every request ✅[^1] |
 | Claude Code `input_tokens` is 2 | Looks like nothing was sent | Cached tokens are in `cache_read_input_tokens` and `cache_creation_input_tokens` ✅[^3] |
 | Adding `cached_input_tokens` to Codex `input_tokens` | Counts the cached part twice | It is already inside `input_tokens`: `total_tokens` = input + output ✅[^7] |
@@ -199,7 +200,7 @@ The same shape in a one-day Claude Code session (Opus, 1,407 requests): 2,920 un
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 51 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-31
+- Verified: 53 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
 
 ## References
 - [Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching) — OpenAI, living, read 2026-11-07. Backs: rate-scope clarification; does not revalidate the older local measurements.
@@ -216,6 +217,8 @@ The same shape in a one-day Claude Code session (Opus, 1,407 requests): 2,920 un
 - [Hooks reference](https://code.claude.com/docs/en/hooks) — Anthropic, living. Backs: `Stop` hook input (`transcript_path`), and the warning that the transcript may not hold the final message at `Stop` time. [^11]
 - [Hooks](https://learn.chatgpt.com/docs/hooks) — OpenAI, living. Backs: Codex hooks get `transcript_path`; the transcript format is not a stable interface for hooks. [^12]
 - `../github-copilot/copilot-cli-internals.md` — the GitHub Copilot CLI counterpart (legacy), source of the 1.6M-vs-196k example.
+
+- Local measurement, 2026-11-09 — Claude Code 2.1.318 (Claude Opus 5.5), GitHub Copilot CLI 1.0.105 (Claude Sonnet 5.5) and Codex CLI 0.166.0-alpha.6 (`gpt-6.1-sol`), 8 prompts × 2 variants × 2 runs each, isolated from the live instructions; method and per-prompt numbers in agent-config `proposals/instruction-loading.md` section 6.2. [^13]
 
 ## Related
 - `ai-agents/claude-code-usage-reference.md`

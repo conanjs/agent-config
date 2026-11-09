@@ -82,7 +82,7 @@ The tool runs these checks without changing anything. When an open item's check 
 
 ## How agents use it
 
-The global instruction (`copilot/instructions/personal-defaults.instructions.md`) says:
+The global instruction (`copilot/instructions/core.instructions.md`) says:
 1. **At session start**, the hook puts the open items in context. Mention an item that **looks done**, and close it once the user agrees.
 2. **At the end of a turn that leaves work undone**, add one item per piece of work with `--add`. Write the next step as something a newcomer could start on.
 3. **When a turn finishes an item**, close it with `--close`. Drop it with `--why` when it is no longer wanted. Items are never deleted, so the Done section is the history.

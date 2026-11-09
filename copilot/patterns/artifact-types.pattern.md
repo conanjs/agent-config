@@ -16,7 +16,7 @@ These types are **not one list**. They sit on three axes. Pick the axis first, t
 
 | Type | One-line definition | Loaded when | Home | Example |
 |---|---|---|---|---|
-| **Instruction** | A preference that applies to every request | Every session, automatically | `copilot/instructions/` | `personal-defaults.instructions.md` |
+| **Instruction** | A preference that applies to every request | Every session, automatically | `copilot/instructions/` | `core.instructions.md` |
 | **Skill** | A capability the model finds by its `description` | When the description matches the task | `skills/<name>/SKILL.md` (flat) | `sdlc-stack-go` |
 | **Prompt** | A shortcut a human invokes, with arguments | When the user types it | `copilot/prompts/` | `init-repo-kb.prompt.md` |
 | **Agent** | A persona with its own context, tools and model | When delegated to | `copilot/agents/` (+ per-tool wrappers) | `sdlc-qa` |
