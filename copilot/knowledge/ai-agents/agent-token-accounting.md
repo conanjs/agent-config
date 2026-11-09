@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["Claude Code 2.1.278–2.1.308", "Codex CLI 0.164 (ChatGPT desktop app)", "docs read 2026-10-30"]
 last-verified: 2026-10-31
-last-updated: 2026-10-31
+last-updated: 2026-11-07
 tags: [tokens, prompt-caching, compaction, claude-code, codex, cost, multi-agent]
 ---
 
@@ -20,6 +20,8 @@ tags: [tokens, prompt-caching, compaction, claude-code, codex, cost, multi-agent
 Three numbers, all called "tokens", can differ by a factor of 100 for the same work. One real Codex thread showed 6,668,133 "tokens used", while its context was 188,056 tokens and its output was 67,911 tokens ✅[^7]. Adding up input over all requests counts the same history again and again. In Claude Code, `input_tokens` can read `2` for a request that sent 80,393 tokens, because cached tokens sit in other fields ✅[^3]. Reports built on the wrong number make a cheap run look expensive, or hide the part that really costs.
 
 ## Mental model
+**Rate scope clarification (source-checked 2026-11-07):** the approximate one-tenth analogies below describe the earlier measured examples, not a universal rate. Current [OpenAI API prompt-caching documentation](https://developers.openai.com/api/docs/guides/prompt-caching) distinguishes model-family write and read pricing. Use [skills, delegation and cache economics](skills-delegation-cache-economics.md) for that API distinction; retain the local measurements here as historical evidence.
+
 **Analogy:** a reader who must re-read a growing binder before writing each new page. Every step, the agent hands the model the whole binder plus one new page. The prompt cache is a bookmark: pages read in the last few minutes are skimmed at about a tenth of the price, but if any early page changes (other tools, another model), everything after that page must be read in full again.
 
 **Artifact:** the usage object of one request, as each tool writes it to disk (real values, trimmed):
@@ -200,6 +202,7 @@ The same shape in a one-day Claude Code session (Opus, 1,407 requests): 2,920 un
 - Verified: 51 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-31
 
 ## References
+- [Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching) — OpenAI, living, read 2026-11-07. Backs: rate-scope clarification; does not revalidate the older local measurements.
 - [Unrolling the Codex agent loop](https://openai.com/index/unrolling-the-codex-agent-loop/) — OpenAI (Michael Bolin), 2026. Backs: How it works 1, 2, 5, 6; cache-miss causes. [^1]
 - [How Claude Code uses prompt caching](https://code.claude.com/docs/en/prompt-caching) — Anthropic, living. Backs: request layers, prefix match, cache lifetime, invalidating actions, subagent caches. [^2]
 - [Customize your status line](https://code.claude.com/docs/en/statusline) — Anthropic, living. Backs: context = input + cache writes + cache reads; `input_tokens` excludes the cache. [^3]

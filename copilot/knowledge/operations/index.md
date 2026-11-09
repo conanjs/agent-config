@@ -13,7 +13,6 @@ Operations practices covers runtime configuration and observability patterns tha
 | Doc | Type | Summary | Status |
 |---|---|---|---|
 | [config-at-startup.md](config-at-startup.md) | concept | Environment-backed config validated once at startup and passed as typed immutable data | verified |
-| [macos-app-path.md](macos-app-path.md) | how-to | Why Dock-opened apps (VS Code, its hooks and MCP servers) miss nvm's Node, and setting their PATH with `launchctl config user path` | draft |
 | [structured-logging.md](structured-logging.md) | concept | JSON event logs with stable names, correlation fields, levels, redaction, and one injected logger | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js package-manager dispatch and Corepack behavior | — |
 
@@ -22,6 +21,8 @@ Operations practices covers runtime configuration and observability patterns tha
 - [OpenTelemetry documentation](https://opentelemetry.io/docs/) — OpenTelemetry project, living. Backs: observability scope.
 
 ## Related
+
+- [Node on the PATH of macOS apps opened from the Dock](../macos/macos-app-path.md) — desktop app startup environments.
 - `js-runtime/` — runtime behavior that operational rules depend on.
 - `web-apis/` — API error boundaries that use config and logs.
 - `nodejs/node-nvm-corepack-pnpm-yarn-architecture.md` — legacy Node.js operations reference.

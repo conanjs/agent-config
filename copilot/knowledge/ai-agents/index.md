@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: ai-agents
-last-updated: 2026-11-02
+last-updated: 2026-11-07
 ---
 
 # Ai Agents
@@ -18,6 +18,9 @@ Agent and workflow coordination: prompt, context and harness engineering, feedba
 | [Prompt engineering, end to end](prompt-engineering-deep-dive.md) | deep-dive | Prompt parts, message roles, techniques with evidence, reasoning models, evals, prompt injection, failure matrix | verified |
 | [Context engineering, end to end](context-engineering-deep-dive.md) | deep-dive | Why long contexts fail; write/select/compress/isolate; caching, memory, compaction, sub-agents; interaction and failure matrices | verified |
 | [Harness engineering, end to end](harness-engineering-deep-dive.md) | deep-dive | Agent = model + harness; guides and sensors; the five disciplines compared; Anthropic, OpenAI and LangChain cases; failure matrix | verified |
+| [Agent Skills portability](agent-skills-portability.md) | reference | Portable format versus host discovery, invocation and execution controls; acceptance cases | verified |
+| [Subagent execution boundaries](subagent-execution-boundaries.md) | reference | Claude forked skills, custom agents, Codex inheritance, permissions and delegation tickets | verified |
+| [Skills, delegation and cache economics](skills-delegation-cache-economics.md) | concept | Combined workflow design, API model-family cache rules, illustrative cost comparison and measurement plan | verified |
 | [Claude Code subagents and skills](claude-code-agents-and-skills.md) | reference | Where agents and skills load, the four ways to call an agent, and the synced claude.ai skills folder | verified |
 | [Token accounting in coding agents](agent-token-accounting.md) | concept | Why one agent turn is many requests, what each usage field counts in Claude Code vs. Codex, cache and compaction effects, counting traps | verified |
 | [Claude Code usage, context and multi-agent controls](claude-code-usage-reference.md) | reference | Where usage is recorded, usage fields, commands, JSON and OpenTelemetry outputs, cache and compaction settings, subagents, teams, workflows, fast mode | verified |

@@ -20,6 +20,8 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [enums-and-literal-unions.md](enums-and-literal-unions.md) | concept | `enum` vs `as const` object, `as const` array and literal union: erasability, measured emit, what a rename breaks, and which to pick (an object for codes the project owns and repeats) | verified |
 | [abort-signal.md](abort-signal.md) | concept | AbortController and AbortSignal as a cancellation contract across fetch and own APIs | verified |
 | [worker-thread-pools.md](worker-thread-pools.md) | concept | piscina task dispatch, `availableParallelism()` under a container CPU limit, measured worker sizing, and pool statistics that mislead | verified |
+| [node-worker-default-heap-limit.md](node-worker-default-heap-limit.md) | concept | The heap limit a Node.js worker gets without `resourceLimits` in a memory-limited container: `clamp(limit ÷ 2, 256 MiB, 2 GiB)` per worker, why several workers can still get the container OOM-killed, measured at 11 limits | verified |
+| [piscina-queue-size.md](piscina-queue-size.md) | concept | What piscina's `queueSize` counts (waiting tasks only, minus starting workers), why `maxQueue` is not enforced for tasks with an `AbortSignal`, and how `needsDrain` and `'drain'` really behave, measured on 5.3.2 | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 
 ## References

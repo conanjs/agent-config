@@ -43,6 +43,8 @@ This is one instance of the **Company KB Framework**, defined at [`{{AGENT_HOME}
 - [Local Dev Testing Setup](infra/local-dev-testing.md) — IPv6/Citrix workaround, auth stubs, full test cycle, quick revert
 - [Container+ Test Data Lookup](infra/container-plus-test-data-lookup.md) — recipe for finding real upstream Apigee test bookings covering the 8 Container+ display scenarios
 - [Stage Secrets Migration to GSM](infra/stage-secrets-gsm-migration.md) — how the two shipment APIs get secrets and service-account files in stage, the GSM-backed ExternalSecrets, live-cluster findings and open items
+- [ne-import-shipment-api CPU and memory limits](infra/import-shipment-api-cpu-memory-limits.md) — the `resources:` of every overlay, `cpu.max`/`memory.max`, what `availableParallelism()` and `os.cpus()` return per overlay, default pdfmake worker count, live-pod evidence
+- [ne-import-shipment-api `--cpuset-cpus` / `N` Q&A](infra/import-shipment-api-cpuset-and-availableparallelism-qa.md) — what `--cpuset-cpus=0,1` means, whether `N` is always `os.cpus().length`, the no-quota case, the `min(N, max(1, floor(quota ÷ period)))` rule, and why `N` = 4 in the internal-test pod
 
 ## Conventions
 

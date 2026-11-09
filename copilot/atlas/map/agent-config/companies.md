@@ -19,6 +19,8 @@ Where: `copilot/companies/**` · Schema: `copilot/frameworks/company-kb/schemas/
 - [`copilot/companies/ots/index.md`](../../../companies/ots/index.md)
 - [`copilot/companies/ots/infra/container-plus-test-data-lookup.md`](../../../companies/ots/infra/container-plus-test-data-lookup.md)
 - [`copilot/companies/ots/infra/gke-clusters.md`](../../../companies/ots/infra/gke-clusters.md)
+- [`copilot/companies/ots/infra/import-shipment-api-cpu-memory-limits.md`](../../../companies/ots/infra/import-shipment-api-cpu-memory-limits.md)
+- [`copilot/companies/ots/infra/import-shipment-api-cpuset-and-availableparallelism-qa.md`](../../../companies/ots/infra/import-shipment-api-cpuset-and-availableparallelism-qa.md)
 - [`copilot/companies/ots/infra/local-dev-testing.md`](../../../companies/ots/infra/local-dev-testing.md)
 - [`copilot/companies/ots/infra/stage-secrets-gsm-migration.md`](../../../companies/ots/infra/stage-secrets-gsm-migration.md)
 - [`copilot/companies/ots/repos/ne-api-gateway/features/container-plus-vas.md`](../../../companies/ots/repos/ne-api-gateway/features/container-plus-vas.md)
