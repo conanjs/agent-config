@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["Claude Code 2.1.129 (CLI), and the docs read 2026-10-29"]
 last-verified: 2026-10-29
-last-updated: 2026-10-29
+last-updated: 2026-11-07
 tags: [claude-code, subagents, skills, install, synced]
 ---
 
@@ -34,6 +34,7 @@ Claude Code's user and project agent folders, the four ways to call an agent, an
 | Moving `synced/` away | Not downloaded again by the next session: tested 2026-10-29 by replacing `~/.claude/skills` with a link (the folder went to a backup) and running `claude -p` with 2.1.129; no `synced/` appeared within a minute | ✅ |
 
 ## Lookup notes
+- **Current-doc clarification (2026-11-07):** the failed re-download observation in the Catalog belongs to 2.1.129, not all future releases. Current [skills documentation](https://code.claude.com/docs/en/skills#where-synced-skills-load) describes terminal background sync from v2.1.273 (the [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) lists the feature under 2.1.275, so treat 2.1.275 as the safe minimum), conditional on authentication and feature flags; short non-interactive runs can finish before download. This is source-checked behavior, not a rerun of the historical experiment. For current cross-host execution semantics, see [subagent execution boundaries](subagent-execution-boundaries.md).
 - An installer that links the whole `~/.claude/skills` folder to a repo moves `synced/` into its backup. agent-config's installer does this on purpose (V, 2026-10-29: the synced skills are minor and come back once used); the per-skill alternative was built, tested and withdrawn (`specs/011`). To keep a copy, take it from the install run's backup folder.
 - To call the agent-config coordinator: in the terminal CLI, `@agent-sdlc-coordinator where is …` or `claude --agent sdlc-coordinator` for a whole session; in the desktop app, "Use the sdlc-coordinator agent: where is …".
 
@@ -48,6 +49,7 @@ Claude Code's user and project agent folders, the four ways to call an agent, an
 - Verified: 9 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
 ## References
+- [Extend Claude with skills](https://code.claude.com/docs/en/skills) — Anthropic, living, read 2026-11-07. Backs: current-doc clarification of sync scope; earlier local tests remain dated.
 - [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — Anthropic, living. Backs: Catalog rows 1–6. [^1]
 - Claude Code settings schema, `syncClaudeAiSkills`: "previously synced skills (~/.claude/skills/synced) can no longer be run" when off — read from the settings JSON schema bundled with Claude Code, 2026-10-29. Backs: Catalog row 7. [^2]
 - `specs/011-installer-link-each/research.md` in agent-config — the test of moving `synced/`, and why `link-each` was added.

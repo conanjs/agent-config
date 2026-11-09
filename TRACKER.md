@@ -23,12 +23,6 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: For each PR-4 warning in check-docs.sh, read the tool's current docs and record version and last-verified
 - from: 2026-10-30 · check-docs.sh warnings
 
-### T-9 Reload VS Code and confirm the Copilot token report there
-- status: waiting
-- next: Run Developer: Reload Window in VS Code, then end one Copilot turn: see whether the report's progress lines show in the chat, and that ~/.copilot/turn-tokens/ gets the session; record the answer in copilot-usage-reference.md
-- waiting-on: V
-- from: 2026-11-02
-
 ### T-11 Split the Graph Engineering study guide below ~400 lines (KD-6)
 - status: open
 - next: Move the runnable simulation and its trace, or the survey views, into their own knowledge-doc/v1 doc; keep a pointer
@@ -57,13 +51,119 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-04
 
+### T-22 Fix the defects found in the first Copilot run of the workflow graph
+- status: waiting
+- next: Review of session 8dd89c27 (api-portal-frontend, R-001), 2026-11-04: (1) DONE 2026-11-05, no change needed: Copilot runs a preToolUse command hook once per tool call with toolName even when the log batches toolCalls[] (copilot-usage-reference.md [^7]), so the guard already sees parallel launches; (2) P0 chose new-feature in a repo with no .specify/, skipping P2, and the constitution stayed an empty template; (3) record accepts role steps with no launch (T003 execute/checks/review in one second, review by the orchestrator); (4) tasks.md boxes not ticked; (5) no way to park a run stopped before P7; (6) P6 ran on develop with no feature branch; (7) gen_ai.agent.name sdlc-script; (8) no frontend stack; (9) desktop-notify.js fails on every agentStop: an ES-module error when node is found (VS Code 2026-11-05), node: command not found when VS Code started without the shell PATH (2026-11-02, 2026-11-03)
+- waiting-on: V
+- from: 2026-11-04
+- updated: 2026-11-05
+
 ### T-25 Verify the Windows docs on a real Windows machine
 - status: open
 - next: Windows docs are verified against Microsoft Learn but their examples were never run; run each stage exercise in knowledge/windows/learning-path.md on Windows 10/11 or a VM and replace illustrative outputs with captured ones
 - from: 2026-11-04
 - updated: 2026-11-04
 
+### T-30 Synthesize the 13 JavaScript deep dives into typed docs
+- status: open
+- next: Follow deep-dive.schema.md Synthesis for each javascript/*-deep-dive.md: extend existing v1 docs or add concept/reference docs (browser/ has none yet), fill synthesized-into both ways
+- from: 2026-11-04
+
+### T-31 Knowledge schema v1.1: image convention and missing doc types
+- status: waiting
+- next: V drafts or approves: assets folder + alt-text rule, tutorial/learning-path, troubleshooting, glossary types, source-license field, mechanical-verification limits; then validator scenarios and tests
+- waiting-on: V
+- from: 2026-11-04
+
+### T-32 Merge PR #19 (reviewed leftover agent-config changes)
+- status: waiting
+- next: When validate-docs passes: GH_TOKEN=$(gh auth token -u conanjs) gh pr merge 19 -R conanjs/agent-config --merge
+- waiting-on: CI validate-docs
+- from: 2026-11-05
+
+### T-36 Repair stale Spec Kit complex-features source URL
+- status: open
+- next: Find and open the current authoritative replacement for the HTTP 404 complex-features.html link in copilot/knowledge/ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md; update only its supported claim and reference.
+- from: 2026-11-07
+
+### T-37 Repair stale Spec Kit existing-projects source URL
+- status: open
+- next: Find and open the current authoritative replacement for the HTTP 404 existing-projects.html link in copilot/knowledge/testing/characterization-tests.md; preserve the existing explanation and rerun URL validation.
+- from: 2026-11-07
+
 ## Done
+
+### T-38 Commit the reviewed agent-config changes (57 files, review of 2026-11-09)
+- status: done
+- next: V approves; then commit on chore/review-pending-agent-config (macOS, ai-agents, algorithms, performance, js-runtime, gcp, OTS infra, indexes, atlas) and push to PR #19 or a new PR
+- waiting-on: V
+- from: 2026-11-09
+- closed: 2026-11-09 · Committed after re-checking all files and checks; pushed to PR #19 and merged
+
+### T-35 macOS knowledge base (copilot/knowledge/macos/): integrate the 9 agent-written docs
+- status: done
+- next: Ten macOS articles integrated and the atlas regenerated. Review the local changes and confirm whether to commit and push the macOS files to pull request #19. The separate Dock app verification is tracked in T-34.
+- waiting-on: V
+- from: 2026-11-05
+- updated: 2026-11-06
+- closed: 2026-11-09 · Covered by T-38: the macOS docs are committed with the 2026-11-09 review
+
+### T-34 Make node available to apps started from the Dock (VS Code hooks, MCP servers)
+- status: done
+- next: The LaunchAgent (launchctl setenv PATH) did not reach VS Code reopened from the Dock (08:26, still /usr/bin:/bin:/usr/sbin:/sbin). V runs /tmp/set-app-path.sh in Terminal (sudo launchctl config user path …, removes the LaunchAgent), reboots, opens VS Code; then Claude checks VS Code's main process PATH has node-fallback, marks the Verify claim in macos/macos-app-path.md verified, and closes
+- waiting-on: V
+- from: 2026-11-05
+- updated: 2026-11-05
+- closed: 2026-11-09 · After the reboot of 2026-11-07, VS Code's main and helper processes have node-fallback on PATH; macos-app-path.md marked verified
+
+### T-39 Decide the form of the OTS cpuset Q&A doc
+- status: done
+- next: V picks: keep import-shipment-api-cpuset-and-availableparallelism-qa.md as a word-for-word chat Q&A, or fold its unique part (section 3, the live-pod check) into import-shipment-api-cpu-memory-limits.md and drop the rest
+- waiting-on: V
+- from: 2026-11-09
+- closed: 2026-11-09 · V keeps the Q&A doc as it is: it reads well on its own
+
+### T-9 Reload VS Code and confirm the Copilot token report there
+- status: done
+- next: Run Developer: Reload Window in VS Code, then end one Copilot turn: see whether the report's progress lines show in the chat, and that ~/.copilot/turn-tokens/ gets the session; record the answer in copilot-usage-reference.md
+- waiting-on: V
+- from: 2026-11-02
+- closed: 2026-11-05 · 2026-11-05 VS Code probe: progress lines are not shown in VS Code; turn-tokens did run and saved each session to ~/.copilot/turn-tokens/ (copilot-usage-reference.md [^8])
+
+### T-33 Verify the 3 VS Code rows in copilot-usage-reference.md, then mark the doc verified
+- status: done
+- next: V picks: allow a temporary user-level probe (hook + instruction file under ~/.copilot, removed after) and glance at the VS Code chat for PROBE-PROGRESS-LINE; or move the 3 VS Code claims out so the doc can be status: verified
+- waiting-on: V
+- from: 2026-11-05
+- closed: 2026-11-05 · 2026-11-05: VS Code probes done with V; copilot-usage-reference.md has 37 verified, 0 unverified, status verified
+
+### T-29 Topic deep dives covering the 23 commercial ebook subjects (7)
+- status: done
+- next: On V's go-ahead: functional programming, data structures in JS, browser DOM/events/fetch (javascript.info Parts 2-3 from the private mirror), Node services, data wrangling, design patterns, modern ES2015-2025; from open sources only, never from the PDFs
+- waiting-on: V
+- from: 2026-11-04
+- closed: 2026-11-04
+
+### T-28 Deep dives from Eloquent JavaScript (2) and feed browser/Node topics
+- status: done
+- next: On V's go-ahead: regular expressions (ch9 + javascript.info regexp part), building a small language (ch12 Egg); use the root NN_*.md chapters and code/solutions, not src/ (build scripts)
+- waiting-on: V
+- from: 2026-11-04
+- closed: 2026-11-04
+
+### T-27 Deep dives from You Don't Know JS (4)
+- status: done
+- next: On V's go-ahead: scope & closures (2nd ed), objects/classes + this & prototypes, types & coercion, async & performance (1st ed); own words only (CC BY-NC-ND forbids adaptations); verify in the Node lab; synthesize into javascript/
+- waiting-on: V
+- from: 2026-11-04
+- closed: 2026-11-04
+
+### T-26 Merge PR #16 (IEEE 754 and JavaScript knowledge)
+- status: done
+- next: When validate-docs passes, merge with the conanjs token: gh pr merge 16 -R conanjs/agent-config --merge
+- waiting-on: CI validate-docs
+- from: 2026-11-04
+- closed: 2026-11-04
 
 ### T-23 Commit the Linux knowledge base (copilot/knowledge/linux)
 - status: done

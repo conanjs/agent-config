@@ -21,6 +21,8 @@ Operations practices covers runtime configuration and observability patterns tha
 - [OpenTelemetry documentation](https://opentelemetry.io/docs/) — OpenTelemetry project, living. Backs: observability scope.
 
 ## Related
+
+- [Node on the PATH of macOS apps opened from the Dock](../macos/macos-app-path.md) — desktop app startup environments.
 - `js-runtime/` — runtime behavior that operational rules depend on.
 - `web-apis/` — API error boundaries that use config and logs.
 - `nodejs/node-nvm-corepack-pnpm-yarn-architecture.md` — legacy Node.js operations reference.

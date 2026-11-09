@@ -4,8 +4,8 @@ type: concept
 topic: operations
 status: verified
 applies-to: ["services", "TypeScript", "Python", "12-factor services"]
-last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-verified: 2026-11-03
+last-updated: 2026-11-03
 tags: [logging, observability, json, redaction]
 ---
 
@@ -71,6 +71,7 @@ The log sink can index `event`, `requestId`, `route`, and severity without regul
 | Request log written on the response's `finish` event (Node.js) | A client that disconnects before the response is sent leaves no line at all | `finish` fires only once the response has been handed to the operating system, and `close` also fires when the connection ends early ✅[^5]. Log on `finish`, plus a `request.aborted` line on `close` when `finish` never came. Tested 2026-10-28 on the stack reference v4.1.0 branch (Express 5.3, Node 24): half a body then a hang-up was unlogged before the fix |
 | A test reads the request log right after the response | It can run before the line is written | `finish` "does not imply that the client has received anything yet" ✅[^5], so the order is not fixed; wait for the line instead of reading at once |
 | Client-supplied request id | Kept as is, it can carry newlines or huge text into the logs | Treat it as untrusted input ✅[^4]: keep it only when it matches a short plain pattern, else make a new one (stack reference: `[A-Za-z0-9_.-]{1,128}`) |
+| `logger.debug(...)` while no `level` is configured | The line is dropped; only `info` and above are written ✅[^3] | Pino's `level` option defaults to `'info'` ✅[^3]. Tested 2026-11-03 with nestjs-pino and NestJS `Logger` routed through `app.useLogger`: `debug` and `verbose` wrote nothing, `log` and `warn` were written. Use `log` for output that must show in a deployed service, or set `level` from config |
 
 ## Trade-offs
 | Option | Gains | Costs |
@@ -91,7 +92,7 @@ The log sink can index `event`, `requestId`, `route`, and severity without regul
 | stack idiom | TSN-10 | Source: |
 
 ## Verification status
-- Verified: 33 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
+- Verified: 35 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
 ## References
 - [The Twelve-Factor App: Logs](https://12factor.net/logs) — Adam Wiggins, living. Backs: Summary, Problem, How it works, Edge cases. [^1]
