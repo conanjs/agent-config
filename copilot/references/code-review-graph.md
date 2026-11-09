@@ -1,11 +1,6 @@
----
-name: Code review graph
-description: Use code-review-graph MCP tools for token-efficient codebase exploration and code review, on any project with an indexed graph.
-applyTo: "**"
----
+# code-review-graph tool guide
 
-<!-- code-review-graph MCP tools -->
-## MCP Tools: code-review-graph
+Read before the first code-review-graph call in an indexed repo.
 
 **IMPORTANT: Prefer the code-review-graph MCP tools over file/search tools when
 the current project has an indexed knowledge graph.** The graph is faster,

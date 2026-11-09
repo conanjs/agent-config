@@ -3,9 +3,9 @@ schema: knowledge-doc/v1
 type: reference
 topic: ai-agents
 status: verified
-applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code 1.143.0 (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02"]
-last-verified: 2026-11-05
-last-updated: 2026-11-05
+applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code 1.143.0 (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02", "GitHub Copilot CLI 1.0.105 (local test 2026-11-09)"]
+last-verified: 2026-11-09
+last-updated: 2026-11-09
 tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructions]
 ---
 
@@ -83,6 +83,8 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | Why | VS Code runs one Copilot runtime process (`copilot-runtime`, under VS Code's agent host) for all its windows, started with VS Code. It reads the user instructions the first time a workspace folder starts a session and gives later sessions in that folder the same copy: after the file changed, a new chat and a Developer: Reload Window (which restarts only the window's extension host) still got the old text, while a newly opened folder got the new text, and quitting and reopening VS Code gave the first folder the new text too | ✅[^8] |
 
 ## Lookup notes
+- **`--no-custom-instructions` turns off every custom instruction source**, the user's `~/.copilot/instructions` and the project's `.github/copilot-instructions.md` alike: the first request fell by the instruction files' size, and adding a project file under the flag changed nothing (1.0.105) ✅[^10].
+- **To test other global instructions without touching `~/.copilot`,** point `COPILOT_HOME` at a temporary folder holding a link to `~/.copilot/config.json` and an `instructions/` folder. Copilot CLI signed in and loaded that folder's instructions (1.0.105) ✅[^10]. `copilot help environment` describes `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` as additional folders to search, "in addition to git root and current working directory", so it cannot remove the user's instructions ✅[^10].
 - Copilot's `inputTokens` already contains the cache reads and writes, as Codex's `input_tokens` does; Claude Code's `input_tokens` does not (`agent-token-accounting.md`).
 - To report Copilot usage after every turn, use the turn token report: `copilot/hooks/turn-tokens/turn-tokens.schema.md` in agent-config (TT-13 … TT-16).
 - After changing a file in `~/.copilot/instructions`, quit and reopen VS Code (Cmd+Q) before trusting that its Copilot uses the change; Developer: Reload Window is not enough. A hook file newly added to `~/.copilot/hooks` was used by the next session in a newly opened folder without a restart.
@@ -96,7 +98,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 37 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-05
+- Verified: 40 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
 
 ## References
 - [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines, `preToolUse` deny, the `task` subagent tool and subagent events. [^1]
@@ -109,6 +111,8 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - VS Code probes (VS Code 1.143.0, Copilot runtime 1.0.100-1), local test with V, 2026-11-05: a temporary user-level hook (`preToolUse` recorded stdin and PATH and denied sub-agent launches; both it and `agentStop` printed a progress line) and a temporary user instruction file with a marker, in two throwaway folders opened with `code -n` and prompted with `code chat -m agent`. Sessions `4d8dada9` (marker A, `task` denied), `83ab9839` (file changed to B, same folder: A), `f725a133` (after Reload Window at 07:42:40, same `copilot-runtime` process 2571 started 2026-11-04: A), `bbe0a9a4` (new folder: B), `44c03b4f` (after quitting VS Code, new runtime process 88398: B). V watched the chat and saw no progress line. [^8]
 - [Resolving shell environment fails (VS Code FAQ)](https://code.visualstudio.com/docs/supporting/faq#_resolving-shell-environment-fails) — Microsoft, living. Backs: VS Code started from the Dock resolves the shell environment and, after `application.shellEnvironmentResolutionTimeout` (10 seconds), starts without it. [^9]
 - `copilot/hooks/turn-tokens/turn-tokens.schema.md`, `specs/018-turn-tokens-copilot/` in agent-config — the report built on these facts.
+
+- Local test, 2026-11-09, GitHub Copilot CLI 1.0.105 (`copilot -p --output-format json`, `claude-sonnet-5.5`): first-request input from `session.usage_checkpoint` with and without `--no-custom-instructions`, with a project `.github/copilot-instructions.md`, and with `COPILOT_HOME` set to a temporary folder; `copilot help environment` read for `COPILOT_CUSTOM_INSTRUCTIONS_DIRS`. Numbers in agent-config `proposals/instruction-loading.md` section 6. [^10]
 
 ## Related
 - `ai-agents/agent-token-accounting.md`

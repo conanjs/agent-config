@@ -34,10 +34,10 @@ This file is written to be fed to an AI agent (Claude Code, Copilot CLI, etc.) o
 
 ## What NOT to do
 
-- Don't hand-edit `personal-defaults.instructions.md` to record this machine's repo path — that file is git-tracked and meant to be byte-identical across every machine. The machine-specific value belongs only in the `seed-once`-deployed `global-variables.md`, never in a symlinked/tracked file.
+- Don't hand-edit `core.instructions.md` to record this machine's repo path — that file is git-tracked and meant to be byte-identical across every machine. The machine-specific value belongs only in the `seed-once`-deployed `global-variables.md`, never in a symlinked/tracked file.
 - Don't re-run steps 3–5 on a machine where the relevant variable is already filled in correctly — nothing breaks if you do, but there's no reason to.
 - Don't skip step 6's confirmation just because detection seems obviously correct.
-- Don't invent a per-company file for company repo-root variables — they belong in `global-variables.md` alongside `{{AGENT_CONFIG_REPO}}`, for the same reason `{{AGENT_CONFIG_REPO}}` isn't in `personal-defaults.instructions.md` (see `global-variables.md`'s "Company repo roots" section for the exact constraint).
+- Don't invent a per-company file for company repo-root variables — they belong in `global-variables.md` alongside `{{AGENT_CONFIG_REPO}}`, for the same reason `{{AGENT_CONFIG_REPO}}` isn't in `core.instructions.md` (see `global-variables.md`'s "Company repo roots" section for the exact constraint).
 
 ## References
 

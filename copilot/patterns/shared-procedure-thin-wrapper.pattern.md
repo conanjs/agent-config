@@ -19,10 +19,10 @@
 
 | Shared source (single source of truth) | Wrapper(s) | Tool-specific glue / notes |
 |---|---|---|
-| `copilot/instructions/*.instructions.md` (personal-defaults, answer-patterns, code-review-graph) | `claude/CLAUDE.md` — one `@import` line per file | Claude Code's `@import` takes individual file paths only, no glob/directory import (verified) — that's *why* a wrapper is needed here at all |
-| (same) | `codex/AGENTS.md` — prose pointer | Codex has no `@import`-equivalent; the wrapper is plain prose telling the agent to go read the files |
+| `copilot/instructions/core.instructions.md` | `claude/CLAUDE.md` — one `@import` line | Claude Code's `@import` takes individual file paths only, no glob/directory import (verified) — that's *why* a wrapper is needed here at all |
+| (same) | `~/.codex/AGENTS.md` — a link to the file itself (`mapping.yaml`) | Codex has no `@import`-equivalent. Until 2026-11-09 the wrapper was a prose pointer (`codex/AGENTS.md`); Codex followed it, but each read cost an extra model request, so the file is now linked directly (`codex/README.md`) |
 | (same) | *(none for Copilot)* | Copilot CLI/Chat's own native discovery already reads `~/.copilot/instructions/*.instructions.md` directly — the shared source happens to already be in Copilot's native format |
-| `global-variables.md` | Pointed at from `personal-defaults.instructions.md`; every tool resolves `{{VAR}}` the same way | This is shared *data*, not a procedure — no per-tool glue needed at all |
+| `global-variables.md` | Pointed at from `core.instructions.md`; every tool resolves `{{VAR}}` the same way | This is shared *data*, not a procedure — no per-tool glue needed at all |
 | `copilot/procedures/init-repo-kb.procedure.md` | `copilot/prompts/init-repo-kb.prompt.md` (Copilot) | Prompt needs `argument-hint`/`{{company}}`/`{{repos}}` templating glue, and deliberately avoids writing the knowledge-base's own `{{VAR}}` syntax in its body — see the file's own comment for why |
 | `copilot/frameworks/agentic-sdlc/agents/<role>.md` | `claude/agents/sdlc-<role>.md`, `copilot/agents/sdlc-<role>.agent.md`, `codex/agents/sdlc-<role>.toml` | Each tool's agent format differs (Codex is TOML), so each needs its own one-paragraph wrapper; tool glue is only frontmatter (`model`, `skills:` preload in Claude Code, `user-invocable: false` in Copilot) |
 | `copilot/frameworks/agentic-sdlc/stacks/<id>/`, `paradigms/<id>.md`, a role's Preset list | `skills/sdlc-stack-<id>/`, `skills/sdlc-paradigm-<id>/`, `skills/sdlc-<role>-preset/` `SKILL.md` — **one** wrapper each for all three tools | `SKILL.md` is the same format in Claude Code, Copilot and Codex (verified 2026-10-03), so one `skills/` folder is linked to both `~/.claude/skills` and `~/.agents/skills` (the latter read by Copilot and Codex) — rule 4 applied across tools instead of per tool |
@@ -39,8 +39,8 @@
 
 **Local artifacts:**
 - `copilot/frameworks/company-kb/conventions.md`, `schemas/_system.md` — the incident that motivated documenting this pattern.
-- `copilot/instructions/personal-defaults.instructions.md` — the second incident, and the always-loaded pointer that gives Claude Code its "no wrapper" parity above.
-- `claude/CLAUDE.md`, `codex/AGENTS.md`, `copilot/prompts/init-repo-kb.prompt.md` — the worked wrapper examples in the table above.
+- `copilot/instructions/core.instructions.md` — the always-loaded pointer that gives Claude Code its "no wrapper" parity above. The second incident happened in its predecessor, `personal-defaults.instructions.md` (replaced 2026-11-09).
+- `claude/CLAUDE.md`, `codex/README.md`, `copilot/prompts/init-repo-kb.prompt.md` — the worked wrapper examples in the table above.
 
 ## Related
 

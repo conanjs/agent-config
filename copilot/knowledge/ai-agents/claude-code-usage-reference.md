@@ -3,9 +3,9 @@ schema: knowledge-doc/v1
 type: reference
 topic: ai-agents
 status: verified
-applies-to: ["Claude Code 2.1.278–2.1.308 (local tests)", "Claude Code docs read 2026-10-30 (features up to v2.1.307)"]
-last-verified: 2026-11-03
-last-updated: 2026-11-03
+applies-to: ["Claude Code 2.1.278–2.1.308 (local tests)", "Claude Code docs read 2026-10-30 (features up to v2.1.307)", "Claude Code 2.1.318 (local test 2026-11-09)"]
+last-verified: 2026-11-09
+last-updated: 2026-11-09
 tags: [claude-code, tokens, usage, cost, prompt-caching, compaction, opentelemetry, subagents, agent-teams, workflows]
 ---
 
@@ -48,6 +48,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 |---|---|---|
 | `/usage` | Session block: total cost (estimate at list price, or at `modelPricing` rates), API and wall duration, usage by model; `Prompt cache (main)` line (v2.1.251+); on Pro/Max/Team/Enterprise: plan bars, attribution to skills/subagents/plugins/MCP servers, recommendations (≥ 10% share), `/loop` rows; `d`/`w` for 24 h / 7 days; `f` applies fixable recommendations (v2.1.305+) | ✅[^1] |
 | `/context` | Shows what fills the context window | ✅[^1] |
+| `claude -p "/context"` | Works in print mode too: prints the breakdown as Markdown tables, including a "Memory Files" table with each loaded `CLAUDE.md` or `AGENTS.md` and its token count (2.1.318) | ✅[^18] |
 | `/clear` | Starts a new session; costs nothing; resets the `/usage` totals (v2.1.211+) | ✅[^1] |
 | `/compact [focus]` | Replaces history with a summary; the summary request itself reads the whole conversation | ✅[^2] |
 | `/autocompact <tokens>` / `auto` | Sets how full the context gets before auto-compaction, saved per model | ✅[^6] |
@@ -150,6 +151,9 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 | Specific prompts, plan mode, early `Esc` | Avoid broad scans and wrong paths | ✅[^1] |
 
 ## Lookup notes
+- **`@` imports of files outside the project are skipped in `claude -p`.** A project `CLAUDE.md` importing `@/Users/…/file.md` or `@~/…/file.md` loaded only its own lines: `/context` listed the `CLAUDE.md` (98 tokens) but none of the imported files. An import inside the project (`@AGENTS.md`) loaded. Imports in the user's `~/.claude/CLAUDE.md` load as usual (2.1.318) ✅[^18]. The docs say an import in a project `CLAUDE.md` that resolves outside the working directory needs a one-time approval, and stays disabled until approved; print mode shows no dialog ✅[^19]. Block-level HTML comments in a `CLAUDE.md` are stripped before the content reaches the model ✅[^19].
+- **`--settings '{"claudeMdExcludes": ["<path to ~/.claude/CLAUDE.md>"]}'` drops the user `CLAUDE.md` and its imports for one run:** the first request fell by 5,672 tokens, the size of the three imported instruction files plus their wrapper (2.1.318) ✅[^18].
+- **`--strict-mcp-config` without `--mcp-config` keeps every MCP server out, the claude.ai connectors included.** Without it, `claude -p` sessions connected those connectors in some runs and not others, moving the first request by about 4,000 tokens ✅[^18].
 - `/usage`, the status line and OpenTelemetry costs are client-side estimates at list price unless `modelPricing` is set; the Claude Console or the org analytics page is the bill ✅[^1].
 - The transcript format is not documented and changes between versions; read token totals from `cost-state`, `/usage` or OpenTelemetry when they must match Claude Code, and use the transcript for per-request detail (see `measure-agent-tokens.md`).
 - On subscriptions, `rate_limits` in the status line appears only after the first response, and each window can be absent ✅[^3].
@@ -164,7 +168,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 87 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
+- Verified: 93 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
 
 ## References
 - [Manage costs effectively](https://code.claude.com/docs/en/costs) — Anthropic, living. Backs: `/usage`, `/insights`, levers, background usage, agent team costs, `modelPricing`. [^1]
@@ -184,6 +188,10 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - `~/.claude/projects/*/*.jsonl` — local test, 2026-10-30, Claude Code 2.1.278 and 2.1.308: transcript layout, `cost-state`, `compact_boundary`, placeholder outputs; `claude --version` on `PATH` printed 2.1.129. [^14]
 - `~/.claude/turn-tokens/` — local test, 2026-10-31, Claude desktop app with Claude Code 2.1.308: a new session wrote its `Stop`-hook report there but no status-line file. [^16]
 - `claude -p` runs (Claude Code 2.1.129 on PATH), local test, 2026-11-03: a `PreToolUse` hook denying `Agent`, the recorded hook input, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check (a denied `Agent` launch, an approval recorded by `UserPromptSubmit` in `-p`, the launch then allowed). [^17]
+
+- Local test, 2026-11-09, Claude Code 2.1.318 (terminal, signed in with a subscription): `claude -p` with `--output-format stream-json --verbose`, `--strict-mcp-config`, `--settings` with `claudeMdExcludes`, and `claude -p "/context"` in test folders whose `CLAUDE.md` imported files inside and outside the project; first-request `usage` compared. Numbers in agent-config `proposals/instruction-loading.md` section 6. [^18]
+
+- [Manage Claude's memory](https://code.claude.com/docs/en/memory) — Anthropic, living, read 2026-11-09. Backs: external imports in a project need a one-time approval and stay disabled if declined; user-scope memory files load without it; `claudeMdExcludes` skips files by absolute path or glob; block-level HTML comments are stripped. [^19]
 
 ## Related
 - `ai-agents/agent-token-accounting.md`

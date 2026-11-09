@@ -2,7 +2,7 @@
 
 Single source of truth for every `{{VAR}}` symbol referenced in docs across this repo and the deployed knowledge base. Defined here once so nothing else needs per-machine edits.
 
-**Deployment:** this file is shipped as a template in the repo and deployed to `~/.copilot/global-variables.md` via the `seed-once` strategy in `mapping.yaml` — copied into place once, then never overwritten by future installs, so the machine-specific values below persist across `git pull`s of this repo. `copilot/instructions/personal-defaults.instructions.md` points every agent at the deployed copy.
+**Deployment:** this file is shipped as a template in the repo and deployed to `~/.copilot/global-variables.md` via the `seed-once` strategy in `mapping.yaml` — copied into place once, then never overwritten by future installs, so the machine-specific values below persist across `git pull`s of this repo. `copilot/instructions/core.instructions.md` points every agent at the deployed copy.
 
 ## Path variables
 
@@ -31,7 +31,7 @@ Add one row per company here as new companies are onboarded — don't create a s
 ## References
 
 **Local artifacts:**
-- `copilot/instructions/personal-defaults.instructions.md` — points every agent at the deployed copy of this file.
+- `copilot/instructions/core.instructions.md` — points every agent at the deployed copy of this file.
 - `mapping.yaml` — the `seed-once` entry that deploys this file.
 - `SETUP.md` — fills in `{{AGENT_CONFIG_REPO}}` and company repo-root variables during onboarding.
 - `{{AGENT_HOME}}/companies/ots/index.md` — consumes `{{OTS_REPOS_ROOT}}` in its repo table.

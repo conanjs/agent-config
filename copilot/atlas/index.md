@@ -7,8 +7,8 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 ## Tree
 
 - **agent-config** (`agent-config`) — Agent instructions, frameworks, knowledge, procedures, wrappers, skills and their installers
-  - [Start here](map/agent-config/start.md) — What the repo is, how to set it up, how to contribute, and what gets installed where (10 files)
-  - [Instructions](map/agent-config/instructions.md) — Always-on instructions every agent loads (3 files)
+  - [Start here](map/agent-config/start.md) — What the repo is, how to set it up, how to contribute, and what gets installed where (12 files)
+  - [Instructions](map/agent-config/instructions.md) — Always-on instructions every agent loads (4 files)
   - [Atlas](map/agent-config/atlas.md) — This map: the registry, its schema, its tool and the generated pages (33 files)
   - [Tracker](map/agent-config/tracker.md) — Open work carried across sessions: the TRACKER.md format, its tool and the session-start hooks (4 files)
   - [Turn token report](map/agent-config/turn-tokens.md) — What each Claude Code or Codex turn used and the running total: the report's rules, its tool and the Stop hooks (4 files)
@@ -17,14 +17,14 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
     - [Knowledge framework](map/agent-config/knowledge-framework.md) — Schemas and validator for the global knowledge base (6 files)
     - [Company KB framework](map/agent-config/company-kb-framework.md) — Schemas for per-company knowledge bases (11 files)
     - [Agent Foundry](map/agent-config/agent-foundry.md) — Charters, floors, trees and lenses for standalone review and triage agents (25 files)
-  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (345 files)
+  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (347 files)
   - [Company knowledge bases](map/agent-config/companies.md) — Facts about one company's systems, one folder per company (22 files)
   - [Procedures](map/agent-config/procedures.md) — Repeatable multi-step tasks, written once in tool-neutral prose (10 files)
   - [Patterns](map/agent-config/patterns.md) — Named, reusable techniques learned from real cases (12 files)
   - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (55 files)
-  - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (17 files)
+  - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (20 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
-  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (148 files)
+  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (149 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (107 files)
   - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (14 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
@@ -46,7 +46,9 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Repo guides](map/agent-config/start.md#repo-guide) | Start here | `{README,SETUP,CONTRIBUTING,CODE_OF_CONDUCT,SECURITY}.md` | — | `README.md` | — | — | — |
 | [Interface catalog](map/agent-config/start.md#interface-catalog) | Start here | `{INTERFACES.md,catalog-info.yaml}` | `copilot/frameworks/agentic-sdlc/foundations/design/contract-design.md` | `INTERFACES.md` | workflow-graph interfaces (described tools) | `tests/workflow-graph/workflow-graph.feature` | — |
 | [Install map and variables](map/agent-config/start.md#install-config) | Start here | `{mapping.yaml,global-variables.md,CODEOWNERS}` | — | `README.md` | — | `tests/installers/installers.feature` | `global-variables.md → ~/.copilot (seed-once)` |
-| [Instruction files](map/agent-config/instructions.md#instruction) | Instructions | `copilot/instructions/*.instructions.md` | — | — | — | — | `~/.copilot/instructions` |
+| [Instruction files](map/agent-config/instructions.md#instruction) | Instructions | `copilot/instructions/*.instructions.md` | — | — | — | — | `~/.copilot/instructions, ~/.codex/AGENTS.md` |
+| [On-demand references](map/agent-config/instructions.md#reference) | Instructions | `copilot/references/*.md` | — | — | — | — | `~/.copilot/references` |
+| [Repo rules for agents](map/agent-config/start.md#repo-rules) | Start here | `{AGENTS.md,CLAUDE.md}` | — | `README.md` | — | — | — |
 | [Registry](map/agent-config/atlas.md#atlas-registry) | Atlas | `copilot/atlas/atlas.yaml` | `copilot/atlas/schemas/atlas.schema.md` | `copilot/atlas/index.md` | atlas.mjs AT-1 … AT-7 | `tests/atlas/atlas.feature` | `~/.copilot/atlas` |
 | [Registry schema](map/agent-config/atlas.md#atlas-schema) | Atlas | `copilot/atlas/schemas/*.md` | — | `copilot/atlas/index.md` | — | — | `~/.copilot/atlas` |
 | [Atlas tool](map/agent-config/atlas.md#atlas-tool) | Atlas | `copilot/atlas/tools/*.mjs` | — | `copilot/atlas/index.md` | scenarios | `tests/atlas/atlas.feature` | `~/.copilot/atlas` |
@@ -89,7 +91,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Claude Code agents](map/agent-config/agents.md#claude-agent) | Agents, prompts and tool settings | `claude/agents/*.md` | `copilot/frameworks/agentic-sdlc/schemas/role-wrapper.schema.md` | — | validate.mjs WRAP (sdlc-*) | `tests/validate-sdlc/validate-sdlc.feature` | `~/.claude/agents` |
 | [Codex agents](map/agent-config/agents.md#codex-agent) | Agents, prompts and tool settings | `codex/agents/*.toml` | `copilot/frameworks/agentic-sdlc/schemas/role-wrapper.schema.md` | — | validate.mjs WRAP (sdlc-*) | `tests/validate-sdlc/validate-sdlc.feature` | `~/.codex/agents` |
 | [Copilot prompts](map/agent-config/agents.md#prompt) | Agents, prompts and tool settings | `copilot/prompts/*.prompt.md` | — | `README.md` | — | — | `~/.copilot/prompts` |
-| [Tool settings and hooks](map/agent-config/agents.md#tool-settings) | Agents, prompts and tool settings | `{claude/{CLAUDE.md,settings.json,plugins/**},codex/{AGENTS.md,hooks.json},copilot/hooks/{*.json,scripts/**}}` | — | `README.md` | — | — | `~/.claude, ~/.codex, ~/.copilot/hooks` |
+| [Tool settings and hooks](map/agent-config/agents.md#tool-settings) | Agents, prompts and tool settings | `{claude/{CLAUDE.md,settings.json,plugins/**},codex/{README.md,hooks.json},copilot/hooks/{*.json,scripts/**}}` | — | `README.md` | — | — | `~/.claude, ~/.codex, ~/.copilot/hooks` |
 | [Skills](map/agent-config/skills.md#skill) | Skills | `skills/*/SKILL.md` | `copilot/frameworks/agentic-sdlc/schemas/skill-wrapper.schema.md` | — | validate.mjs SKILL | `tests/validate-sdlc/validate-sdlc.feature` | `~/.claude/skills, ~/.agents/skills` |
 | [Installer scripts](map/agent-config/installers.md#installer) | Installers | `installers/**` | — | `README.md` | — | `tests/installers/installers.feature` | — |
 | [Spec Kit setup](map/agent-config/specs.md#spec-kit) | Specs and decisions | `{.specify/**,.claude/skills/speckit-*/SKILL.md}` | — | `copilot/procedures/spec-driven-development.procedure.md` | — | — | — |

@@ -36,3 +36,12 @@ Where: `{mapping.yaml,global-variables.md,CODEOWNERS}` · Schema: — · Index: 
 - [`CODEOWNERS`](../../../../CODEOWNERS)
 - [`global-variables.md`](../../../../global-variables.md)
 - [`mapping.yaml`](../../../../mapping.yaml)
+
+## Repo rules for agents
+
+<a id="repo-rules"></a>Rules for agents working in this repo: knowledge-base schemas, review before commit, installer backups
+
+Where: `{AGENTS.md,CLAUDE.md}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
+
+- [`AGENTS.md`](../../../../AGENTS.md)
+- [`CLAUDE.md`](../../../../CLAUDE.md)

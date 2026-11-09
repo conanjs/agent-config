@@ -86,8 +86,7 @@ Read the reply as someone who saw only your messages, not the tool output, then 
 ## References
 
 **Local artifacts:**
-- `copilot/instructions/personal-defaults.instructions.md` — the instruction lines quoted in Why this exists, and the line that points here.
-- `copilot/instructions/answer-patterns.instructions.md` — the `default` reply structure.
+- `copilot/instructions/core.instructions.md` — the line that points here, and the default reply layout. The instruction lines quoted in Why this exists come from its predecessors, `personal-defaults.instructions.md` and `answer-patterns.instructions.md`, replaced on 2026-11-09 (their text is in git history).
 - `copilot/frameworks/knowledge/schemas/_system.md` — KB-6 and KB-7, the same ideas for documents.
 - `copilot/knowledge/ai-agents/agent-token-accounting.md` — where the explanations from the worked example now live.
 

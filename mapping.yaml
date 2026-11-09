@@ -14,6 +14,7 @@
 #                         global-variables.md's machine-specific values).
 
 - { source: copilot/instructions,            target: ~/.copilot/instructions,            strategy: symlink }
+- { source: copilot/references,              target: ~/.copilot/references,              strategy: symlink }
 - { source: copilot/knowledge,               target: ~/.copilot/knowledge,               strategy: symlink }
 - { source: copilot/companies,               target: ~/.copilot/companies,               strategy: symlink }
 - { source: copilot/frameworks,               target: ~/.copilot/frameworks,               strategy: symlink }
@@ -28,7 +29,7 @@
 - { source: claude/plugins/blocklist.json,   target: ~/.claude/plugins/blocklist.json,   strategy: symlink }
 - { source: claude/settings.json,            target: ~/.claude/settings.json,            strategy: seed-once }
 - { source: claude/agents,                   target: ~/.claude/agents,                   strategy: symlink }
-- { source: codex/AGENTS.md,                 target: ~/.codex/AGENTS.md,                 strategy: symlink }
+- { source: copilot/instructions/core.instructions.md, target: ~/.codex/AGENTS.md,    strategy: symlink }
 - { source: codex/hooks.json,                target: ~/.codex/hooks.json,                strategy: symlink }
 - { source: codex/agents,                    target: ~/.codex/agents,                    strategy: symlink }
 # skills/ is tool-neutral (SKILL.md is the same format everywhere): ~/.claude/skills

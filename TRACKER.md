@@ -91,6 +91,29 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: Find and open the current authoritative replacement for the HTTP 404 existing-projects.html link in copilot/knowledge/testing/characterization-tests.md; preserve the existing explanation and rerun URL validation.
 - from: 2026-11-07
 
+### T-40 Instruction loading: answer the decisions in proposals/instruction-loading.md
+- status: waiting
+- next: Deployed 2026-11-09 (core, references, skills, root AGENTS.md, mapping relinked by the installer; D1–D14 in proposals/instruction-loading.md). Left: V approves the commit and PR on chore/instruction-loading-inventory; restart VS Code fully so it drops its cached instructions
+- waiting-on: V
+- from: 2026-11-09 · 2026-11-09, Codex handoff graph-instructions-handoff.md
+- updated: 2026-11-09
+
+### T-41 Repair stale AWS hexagonal-architecture source URL
+- status: open
+- next: Find the current AWS Prescriptive Guidance page replacing the HTTP 404 hexagonal-architecture.html link in copilot/knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md; update only its reference
+- from: 2026-11-09 · 2026-11-09, link check during the tokenizer doc
+
+### T-42 Shrink the tracker hook output and scope the sdlc-* skills (instruction-loading D9)
+- status: open
+- next: Cap the session-start hook's list of open items and limit the 13 sdlc-* skills to agentic-SDLC work; measure both before and after with the level-1 method in proposals/instruction-loading.md section 6
+- from: 2026-11-09 · 2026-11-09, proposals/instruction-loading.md D9 (V: "D9 -> a")
+
+### T-43 Decide where VS Code's copilot-lessons.instructions.md belongs (instruction-loading D10)
+- status: waiting
+- next: V deferred D10 on 2026-11-09 ("ignore (note, deal later)"); when picked up, choose between moving its rules into this repo for every agent or keeping it VS Code-only
+- waiting-on: V
+- from: 2026-11-09 · 2026-11-09, proposals/instruction-loading.md VS-1
+
 ## Done
 
 ### T-38 Commit the reviewed agent-config changes (57 files, review of 2026-11-09)

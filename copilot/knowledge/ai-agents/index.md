@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: ai-agents
-last-updated: 2026-11-07
+last-updated: 2026-11-09
 ---
 
 # Ai Agents
@@ -26,6 +26,8 @@ Agent and workflow coordination: prompt, context and harness engineering, feedba
 | [Claude Code usage, context and multi-agent controls](claude-code-usage-reference.md) | reference | Where usage is recorded, usage fields, commands, JSON and OpenTelemetry outputs, cache and compaction settings, subagents, teams, workflows, fast mode | verified |
 | [Codex usage, context and multi-agent controls](codex-usage-reference.md) | reference | Rollout and SQLite records, usage fields, `/status` and `/usage`, `exec --json`, OTel, config keys, cache breakers, subagents, fast modes, credits | verified |
 | [Measure tokens in a Claude Code or Codex session](measure-agent-tokens.md) | how-to | Two tested Python scripts and jq/SQL one-liners that report requests, peak context, output, cache hits and the tool's own totals | verified |
+| [How coding agents follow instruction wording](instruction-wording-findings.md) | reference | Tested wordings with complied/run counts per agent and model: triggers on visible tags and phrases work, conditions the agent must look up cause extra reads, a "default" layout is skipped | verified |
+| [Counting tokens for the models behind coding agents](tokenizers-for-coding-agents.md) | reference | Each vendor's official tokenizer or count endpoint (OpenAI `tiktoken` and `input_tokens`, Anthropic `count_tokens`, Google `countTokens` and `LocalTokenizer`), Copilot's lack of one, tokenizer changes, each agent's `/context` | verified |
 | [GitHub Copilot usage, AI credits and hooks](copilot-usage-reference.md) | reference | Session logs with per-call tokens and exact AI-credit cost, the monthly allowance, the shared CLI/VS Code hooks (`agentStop`, progress lines), and VS Code's stale instruction copy | verified |
 | [LangGraph.js: graph runtime facts](langgraph-js-reference.md) | reference | Nodes as functions, conditional edges, `Send` fan-out, reducers and joins, SQLite checkpoints, `interrupt()` gates resumed from another process (tested) | verified |
 | [Tools and techniques that cut agent tokens](token-saving-tools.md) | reference | Third-party tools (ccusage, RTK, Serena, code-review-graph, Context7, Repomix, TOON, claude-mem, routers) and vendor techniques, with activity and evidence | draft |
