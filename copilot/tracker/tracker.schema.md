@@ -80,13 +80,14 @@ The tool runs these checks without changing anything. When an open item's check 
 | TR-9 | An open item with no change for more than 14 days (`updated`, else `from`) is reported as stale | — | script (warn) |
 | TR-10 | A `done-when` that cannot be run (not a git repo, an unknown ref) is reported, so it can be fixed | — | script (warn) |
 | TR-11 | The session-start brief (`--hook`) lists at most 5 open items (`TRACKER_BRIEF_MAX`), most urgent first, and leaves out items untouched for more than 2 days (`TRACKER_QUIET_DAYS`; `updated`, else `from`) unless they look done, are overdue, high priority or doing. A last line says how many were left out and that `--brief` lists every open item. Nothing is removed from the file | the brief reaches the model in every session: 20 items cost 1,843 tokens on 2026-11-10, more than the core instructions | scenarios |
+| TR-12 | Closed and dropped items live in `TRACKER.done.md` beside `TRACKER.md` (the same format, only a `## Done` section, newest first). `--close` and `--drop` move the item there at once; any edit, or `--archive`, also moves done items still in `TRACKER.md`. A new id is higher than every id in both files; an id in both files, or an `## Open` section in the archive, fails. A local-only `TRACKER.md` keeps its archive local too | `TRACKER.md` stays a short list of open work; the history stays readable in the archive | scenarios |
 
 ## How agents use it
 
 The global instruction (`copilot/instructions/core.instructions.md`) says:
 1. **At session start**, the hook puts the open items in context. Mention an item that **looks done**, and close it once the user agrees.
 2. **At the end of a turn that leaves work undone**, add one item per piece of work with `--add`. Write the next step as something a newcomer could start on.
-3. **When a turn finishes an item**, close it with `--close`. Drop it with `--why` when it is no longer wanted. Items are never deleted, so the Done section is the history.
+3. **When a turn finishes an item**, close it with `--close`. Drop it with `--why` when it is no longer wanted. Items are never deleted: closing or dropping one moves it to `TRACKER.done.md`, which is the history (TR-12).
 
 A new `TRACKER.md` is **local by default**: `--add` lists it in `.git/info/exclude`, so it never shows up in a work repo's `git status`. To share it with the repo, run `git add -f TRACKER.md` once. After that git tracks it like any other file.
 

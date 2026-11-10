@@ -553,6 +553,15 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       - from: 2026-10-30
 
       ## Done
+      """
+    # TR-12: an edit moves the done items still in TRACKER.md to TRACKER.done.md.
+    And the file "TRACKER.done.md" contains exactly:
+      """
+      # Done items
+
+      Items closed or dropped in TRACKER.md, newest first. Format and tool: tracker/v1 (agent-config, copilot/tracker/).
+
+      ## Done
 
       ### T-7 Fix the broken link
       - status: done
@@ -678,14 +687,10 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       - from: 2026-10-25
 
       ## Done
-
-      ### T-3 Fix the broken link
-      - status: done
-      - from: 2026-10-01
-      - closed: 2026-10-02
       """
+    And the file "TRACKER.done.md" has the line "### T-3 Fix the broken link"
 
-  Scenario: --close moves the item to the top of Done with today's date and the note
+  Scenario: TR-12 --close moves the item to the top of TRACKER.done.md with today's date and the note
     When the tool runs with arguments:
       """
       --close
@@ -696,7 +701,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       """
     Then it exits with 0 and prints:
       """
-      closed T-1
+      closed T-1; moved to TRACKER.done.md
       """
     And the file "TRACKER.md" contains exactly:
       """
@@ -711,6 +716,14 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       - next: Pop it or drop it
       - waiting-on: V
       - from: 2026-10-25
+
+      ## Done
+      """
+    And the file "TRACKER.done.md" contains exactly:
+      """
+      # Done items
+
+      Items closed or dropped in TRACKER.md, newest first. Format and tool: tracker/v1 (agent-config, copilot/tracker/).
 
       ## Done
 
@@ -742,10 +755,78 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       """
     Then it exits with 0 and prints:
       """
-      dropped T-2
+      dropped T-2; moved to TRACKER.done.md
       """
-    And the file "TRACKER.md" has the line "- status: dropped"
-    And the file "TRACKER.md" has the line "- why: The stash was already applied"
+    And the file "TRACKER.done.md" has the line "- status: dropped"
+    And the file "TRACKER.done.md" has the line "- why: The stash was already applied"
+
+  Scenario: TR-12 --archive moves the done items left in TRACKER.md, and a new id counts the archive too
+    When the tool runs with "--archive {root}"
+    Then it exits with 0 and prints:
+      """
+      moved 1 done item to TRACKER.done.md
+      """
+    And the file "TRACKER.md" has no line containing "### T-3"
+    When the tool runs with "--archive {root}"
+    Then it exits with 0 and prints:
+      """
+      nothing to move: TRACKER.md has no done items
+      """
+    When the tool runs with "--add Write_the_changelog --next Draft_it {root}"
+    Then it exits with 0 and prints:
+      """
+      added T-4 to TRACKER.md
+      """
+
+  Scenario: TR-12 a TRACKER.md that git tracks gets a shared archive, even when .git/info/exclude still lists it
+    Given "." is a git repository with everything committed
+    And the file ".git/info/exclude" contains:
+      """
+      /TRACKER.md
+      """
+    When the tool runs with "--archive {root}"
+    Then it exits with 0 and prints:
+      """
+      moved 1 done item to TRACKER.done.md
+      """
+    And the file ".git/info/exclude" has no line containing "TRACKER.done.md"
+
+  Scenario: TR-12 a local-only TRACKER.md keeps its archive local too
+    Given the file "TRACKER.md" is removed
+    And the file "README.md" contains:
+      """
+      # Readme
+      """
+    And "." is a git repository with everything committed
+    When the tool runs with "--add Decide_on_the_stash --next Pop_it {root}"
+    And the tool runs with "--close T-1 {root}"
+    Then it exits with 0 and prints:
+      """
+      closed T-1; moved to TRACKER.done.md
+      """
+    And the file ".git/info/exclude" has the line "/TRACKER.done.md"
+
+  Scenario: TR-12 an archive with an Open section, or an id in both files, fails the check
+    Given the file "TRACKER.done.md" contains:
+      """
+      # Done items
+
+      ## Open
+
+      ## Done
+
+      ### T-1 Write the setup guide
+      - status: done
+      - from: 2026-10-20
+      - closed: 2026-10-29
+      """
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (2)
+        TR-12  TRACKER.done.md: an archive holds only a "## Done" section
+        TR-12  T-1 is in both TRACKER.md and TRACKER.done.md
+      """
 
   Scenario: An edit names an item that does not exist, or one already closed
     When the tool runs with "--close T-9 {root}"
