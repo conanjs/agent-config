@@ -3,9 +3,9 @@ schema: knowledge-doc/v1
 type: reference
 topic: ai-agents
 status: verified
-applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code 1.143.0 (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02", "GitHub Copilot CLI 1.0.105 (local test 2026-11-09)"]
-last-verified: 2026-11-09
-last-updated: 2026-11-09
+applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code 1.143.0 (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02", "GitHub Copilot CLI 1.0.105 (local test 2026-11-09)", "Copilot session logs of 2026-10-26 to 2026-11-09 (read 2026-11-10)"]
+last-verified: 2026-11-10
+last-updated: 2026-11-10
 tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructions]
 ---
 
@@ -40,6 +40,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | `outputTokens`, `reasoningTokens` | Output, and its reasoning part | ✅[^5] |
 | `maxPromptTokens` | The prompt limit of the model in this session (968,000 for Claude Opus 5.5 in VS Code; 200,000 in the CLI run) | ✅[^5] |
 | `copilotUsage.totalNanoAiu` | The call's cost in billionths of an AI credit; `tokenDetails` gives the rate per token type (`costPerBatch` per 1,000,000 tokens) | ✅[^5] |
+| `cacheExpiresAt` | When the prompt cache written or read by this call expires, usually about 5 minutes later. In 2,128 calls it was a median of 4.9 minutes after the record's own time (range 3.5 to 30) | ✅[^11] |
 
 ### Billing
 
@@ -86,6 +87,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - **`--no-custom-instructions` turns off every custom instruction source**, the user's `~/.copilot/instructions` and the project's `.github/copilot-instructions.md` alike: the first request fell by the instruction files' size, and adding a project file under the flag changed nothing (1.0.105) ✅[^10].
 - **To test other global instructions without touching `~/.copilot`,** point `COPILOT_HOME` at a temporary folder holding a link to `~/.copilot/config.json` and an `instructions/` folder. Copilot CLI signed in and loaded that folder's instructions (1.0.105) ✅[^10]. `copilot help environment` describes `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` as additional folders to search, "in addition to git root and current working directory", so it cannot remove the user's instructions ✅[^10].
 - Copilot's `inputTokens` already contains the cache reads and writes, as Codex's `input_tokens` does; Claude Code's `input_tokens` does not (`agent-token-accounting.md`).
+- **After a pause longer than about 5 minutes, the next request usually writes the whole context to the cache again**, at the cache-write rate (Claude Opus 5.5: 500 AI credits per million tokens, against 20 for a cache read). In this machine's logs on 2026-11-10 (44 sessions, 2,172 calls, 2026-10-26 to 2026-11-09), 101 calls came more than 5 minutes after the previous one and wrote more than half of a context above 50,000 tokens to the cache. They cost 17,950 of 37,586 AI credits (47.8%): 8,576 after pauses of 5–15 minutes, 5,755 after 15–60 minutes, 3,619 after more than an hour. The costs are Copilot's own per-call figures; that the cache had expired is inferred from the timing and the write size ✅[^11]. In a long session, finish or compact before a break, and start a new session for a new task.
 - To report Copilot usage after every turn, use the turn token report: `copilot/hooks/turn-tokens/turn-tokens.schema.md` in agent-config (TT-13 … TT-16).
 - After changing a file in `~/.copilot/instructions`, quit and reopen VS Code (Cmd+Q) before trusting that its Copilot uses the change; Developer: Reload Window is not enough. A hook file newly added to `~/.copilot/hooks` was used by the next session in a newly opened folder without a restart.
 - VS Code hooks run with the PATH of that runtime: the environment VS Code read from the login shell when it started from the Dock. If reading it takes longer than `application.shellEnvironmentResolutionTimeout` (10 seconds by default), VS Code starts without the shell's environment[^9]. Then nvm's `node` is missing: two VS Code sessions on 2026-11-02 and 2026-11-03 failed their `node` hooks with `/bin/bash: node: command not found`, and VS Code's log has "Unable to resolve your shell environment in a reasonable time" on 2026-10-26. A hook that needs Node should find it itself, as `turn-tokens-hook.sh` does.
@@ -98,7 +100,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 40 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
+- Verified: 42 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-10
 
 ## References
 - [GitHub Copilot hooks reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-hooks-reference) — GitHub, living. Backs: hook locations, format, `agentStop` input and output, progress lines, `preToolUse` deny, the `task` subagent tool and subagent events. [^1]
@@ -113,6 +115,8 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 - `copilot/hooks/turn-tokens/turn-tokens.schema.md`, `specs/018-turn-tokens-copilot/` in agent-config — the report built on these facts.
 
 - Local test, 2026-11-09, GitHub Copilot CLI 1.0.105 (`copilot -p --output-format json`, `claude-sonnet-5.5`): first-request input from `session.usage_checkpoint` with and without `--no-custom-instructions`, with a project `.github/copilot-instructions.md`, and with `COPILOT_HOME` set to a temporary folder; `copilot help environment` read for `COPILOT_CUSTOM_INSTRUCTIONS_DIRS`. Numbers in agent-config `proposals/instruction-loading.md` section 6. [^10]
+
+- `~/.copilot/session-state/*/events.jsonl` — local read-only scan, 2026-11-10: every `session.usage_record` (2,172 calls in 44 sessions, Claude Opus 5.5, Claude Sonnet 5.5 and `gpt-6.1-sol`); `cacheExpiresAt` against the record time (2,128 calls carry it); calls with input above 50,000, cache write above half the input and more than 5 minutes after the previous call, summed by `copilotUsage.totalNanoAiu`. Method and the other patterns in agent-config `proposals/efficiency-auditor.md` section 3. [^11]
 
 ## Related
 - `ai-agents/agent-token-accounting.md`
