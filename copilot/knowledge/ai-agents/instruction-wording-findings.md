@@ -3,7 +3,7 @@ schema: knowledge-doc/v1
 type: reference
 topic: ai-agents
 status: verified
-applies-to: ["Claude Code 2.1.318 with Claude Opus 5.5", "GitHub Copilot CLI 1.0.105 with Claude Sonnet 5.5", "Codex CLI 0.166.0-alpha.6 with gpt-6.1-sol", "runs of 2026-11-07 and 2026-11-09"]
+applies-to: ["Claude Code 2.1.318 with Claude Opus 5.5", "GitHub Copilot CLI 1.0.105 with Claude Sonnet 5.5", "Codex CLI 0.166.0-alpha.6 with gpt-6.1-sol and gpt-6-luna", "runs of 2026-11-07 and 2026-11-09"]
 last-verified: 2026-11-09
 last-updated: 2026-11-09
 tags: [instructions, wording, compliance, triggers, agents-md, claude-md, copilot-instructions, measurement]
@@ -45,12 +45,14 @@ The runs were scripted (`claude -p`, `copilot -p`, `codex exec`), in a small tes
 | IW-11 | Candidate wording: "Use this layout for every response, including drafts, emails and short answers, unless a `pattern:` tag says otherwise: 1. Answer: direct, no preamble (a requested draft goes here). 2. Rationale: why, briefly. 3. Caveats … (omit if none). 4. Next steps … (omit if none)." | The layout was used, the draft placed under "Answer". Sections with nothing to say were left out, as allowed. Same-day runs of today's wording (IW-1) for comparison: email 0/6, ordinary questions 6/18 | Email 2/2, ordinary questions 6/6 | Email 2/2, ordinary questions 5/6 | Email 2/2, ordinary questions 6/6 | ✅[^3] |
 | IW-12 | Candidate wording: "code-review-graph MCP tools are available in this session: prefer them for exploring code, impact and review, and read `<guide>` before the first call. Otherwise use targeted file search and do not read that guide." | With no graph tools in the session, no agent read the guide, and every agent still found the caller by file search (compare IW-7) | Read 0/2, found 2/2 | Read 0/2, found 2/2 | Read 0/2, found 2/2 | ✅[^3] |
 | IW-13 | "Before your first tool call, work out every file this task needs: those named below, in the message, or in files you already know. Request them all in one turn, as parallel tool calls. Make another round only for paths you learn from what you just read." | Fewer model requests for the same files; the same files read and the same answers. A read that depends on an earlier one still takes its own round. Compared with the same core without the line, on 5 prompts that read files | Model requests 34 → 28, input −16.8%, list-price estimate −2.9% | Model calls 26 → 25, input −2.6%, AI credits −5.1% | Input −9.6%; commands 28 → 34, so more reads per request | ✅[^4] |
+| IW-14 | Repo-scoped, in agent-config's `AGENTS.md`: "to learn what a file is, which schema and checks apply, where it is installed and what links to it, run `node copilot/atlas/tools/atlas.mjs --explain <path>` first (for a new file, give its folder) … do not read the `copilot/atlas/map/` pages whole." Prompt: which schema, index, checks, tests and install path apply to a new doc in `copilot/knowledge/js-runtime/` | `--explain` was run in every session with the line and in none without it. Given a folder, it prints only the kinds of files there, so Codex still read the schemas and searched to verify. Input and answers barely changed. Repo-wide searches hit the atlas map pages, which list every path, in both variants | — | — | Codex CLI 0.166.0-alpha.6 with `gpt-6-luna` (cheap model): `--explain` 4/4 with the line, 0/4 without; all 5 facts 2/2 with, 1/2 without (second batch); mean input 177,962 with, 176,012 without; 10–18 commands with, 4–5 without | ✅[^5] |
 
 ## Lookup notes
 - **The pattern behind the findings.**
   - Triggers keyed to something in the message or the context were followed in every run: a `pattern:` tag (IW-3), a phrase (IW-5), a `{{VAR}}` placeholder (IW-8).
   - A trigger keyed to a fact the agent must look up was not: whether a graph exists (IW-7). Key a trigger to what the agent can see, for example "when code-review-graph tools are available in this session".
 - **"Default" reads as optional; naming the cases works.** Neither wording of IW-1 made the layout reliable, and Codex never applied it. The wording of IW-11 names the cases it covers ("every response, including drafts, emails and short answers") and was followed in 23 of 24 runs. It cost little output: Copilot CLI's output rose 1%, and Codex's fell.
+- **A pointer to a cheap lookup only pays if the lookup answers the question.** IW-14's trigger was followed every time, but `--explain` on a folder returns too little, so the agent read the files anyway. Point to the input that returns the answer (here, an existing file of the same kind), and test with the real question.
 - **Asking for reads up front saves requests.** IW-13 had agents plan their file reads before the first tool call and issue them together. Claude Code saved the most (6 fewer model requests in 10 sessions, −16.8% input), because its context is large and each saved request resends it.
 - **Key a condition to the session, and say what not to do.** IW-7 asked about a fact the agent had to check (an indexed graph), and agents read the guide to find out. IW-12 asks about the session (tools available) and adds "do not read that guide": 0 reads in 6 runs.
 - **A pointer is a command to Codex.** Codex executes "read these files" on every task (IW-6). Each read costs a model request that sends the whole context again (`agent-token-accounting.md`).
@@ -61,6 +63,7 @@ The runs were scripted (`claude -p`, `copilot -p`, `codex exec`), in a small tes
   - Codex: a temporary `CODEX_HOME`.
 
   Answers were checked by script, then read by hand wherever a check failed. The method and raw numbers are in agent-config `proposals/instruction-loading.md` sections 6.1–6.2.
+- **Which agent and model to test with:** from 2026-11-09, new tests in agent-config run on Codex CLI or Copilot CLI with a cheap model (agent-config `AGENTS.md`), so a finding can hold for a cheap model and not for the models used daily. Keep the model in every row.
 - **Adding a finding:** quote the exact wording, name the agent version and model, give "complied / runs", the date, and the source run. Add a row; never overwrite an older row when a new wording is tested: add the new wording as its own row.
 
 ## Takeaways
@@ -72,7 +75,7 @@ The runs were scripted (`claude -p`, `copilot -p`, `codex exec`), in a small tes
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
+- Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
 
 ## References
 - Local measurement, 2026-11-09:
@@ -84,6 +87,8 @@ The runs were scripted (`claude -p`, `copilot -p`, `codex exec`), in a small tes
 - Local measurement, 2026-11-09, second run: the same three agents and models; 4 prompts (an email, find the caller, two ordinary questions) × today's instructions and the revised candidate core (IW-11, IW-12) × 2 runs per agent, 48 sessions; details in agent-config `proposals/instruction-loading.md` section 6.3. [^3]
 
 - Local measurement, 2026-11-09, third run: the same three agents and models; 5 prompts that read files (`pattern:bugfix`, deep dive, payments rule, doc review, find the caller) × the revised core with and without IW-13's line × 2 runs per agent, 60 sessions; details in agent-config `proposals/instruction-loading.md` section 6.4. [^4]
+
+- Local measurement, 2026-11-09, fourth run: Codex CLI 0.166.0-alpha.6 with `gpt-6-luna`, two exported copies of agent-config differing only in IW-14's `AGENTS.md` line, one question, two batches of 2 runs per variant (the first batch's answers were misparsed, so only its tool use and tokens count); global instructions = the deployed core. [^5]
 
 ## Related
 - `ai-agents/agent-token-accounting.md` — why each file read adds a full model request.
