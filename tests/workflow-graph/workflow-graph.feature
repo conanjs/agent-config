@@ -741,3 +741,58 @@ Feature: The agentic-sdlc workflow is an enforced graph (specs/019)
         IF-7  catalog-info.yaml: API workflow-graph-ledger: definition interfaces/schemas/ledger-line.schema.json does not exist
       FAIL (1)
       """
+
+  # ---- the hook launcher's fast exit (WG-38) --------------------------------------------------------------
+  # The launcher runs with a fake Node that prints "node started: <stdin>" when it is started on the tool.
+  # project/ has workflow runs (.specify/runs); plain/ has none.
+
+  Scenario: WG-38 a plain tool call in a folder with no workflow runs is answered without starting Node
+    When the hook launcher runs with "hook guard --agent codex" and this on stdin:
+      """
+      {"hook_event_name":"PreToolUse","tool_name":"exec_command","cwd":"{root}/plain","tool_input":{"cmd":"ls"}}
+      """
+    Then it exits with 0 and prints nothing
+    When the hook launcher runs with "hook guard --agent copilot-cli" and this on stdin:
+      """
+      {"sessionId":"c1","timestamp":1,"cwd":"{root}/plain","toolName":"bash","toolArgs":{"command":"ls"}}
+      """
+    Then it exits with 0 and prints:
+      """
+      {}
+      """
+    When the hook launcher runs with "hook approve --agent copilot-cli" and this on stdin:
+      """
+      {"sessionId":"c1","timestamp":1,"cwd":"{root}/plain","prompt":"fix the login bug"}
+      """
+    Then it exits with 0 and prints:
+      """
+      {}
+      """
+
+  Scenario: WG-38 a folder with workflow runs still goes to the guard, with stdin unchanged
+    When the hook launcher runs with "hook guard --agent codex" and this on stdin:
+      """
+      {"hook_event_name":"PreToolUse","tool_name":"exec_command","cwd":"{root}/project","tool_input":{"cmd":"ls"}}
+      """
+    Then it exits with 0 and prints:
+      """
+      node started: {"hook_event_name":"PreToolUse","tool_name":"exec_command","cwd":"{root}/project","tool_input":{"cmd":"ls"}}
+      """
+
+  Scenario: WG-38 input that names a run or an approval goes to the guard even in a folder with no runs
+    When the hook launcher runs with "hook guard --agent claude-code" and this on stdin:
+      """
+      {"hook_event_name":"PreToolUse","tool_name":"Agent","cwd":"{root}/plain","tool_input":{"prompt":"role: architecture\nrun: R-001"}}
+      """
+    Then it exits with 0 and prints:
+      """
+      node started: {"hook_event_name":"PreToolUse","tool_name":"Agent","cwd":"{root}/plain","tool_input":{"prompt":"role: architecture\nrun: R-001"}}
+      """
+    When the hook launcher runs with "hook approve --agent codex" and this on stdin:
+      """
+      {"hook_event_name":"UserPromptSubmit","cwd":"{root}/plain","prompt":"approve G2 R-001"}
+      """
+    Then it exits with 0 and prints:
+      """
+      node started: {"hook_event_name":"UserPromptSubmit","cwd":"{root}/plain","prompt":"approve G2 R-001"}
+      """
