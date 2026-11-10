@@ -15,6 +15,8 @@ registerTool('turn-tokens', {
     env: {
       TZ: 'UTC',
       TURN_TOKENS_NOW: '2026-10-31T09:20:00.000Z',
+      TURN_TOKENS_REMIND: 'record', // TT-18: write the reminder file, start no background process
+      TURN_TOKENS_NOTIFY: 'print', // TT-18: print the notification instead of showing it
       CLAUDE_CONFIG_DIR: world.at('claude-home'),
       CODEX_HOME: world.at('codex-home'),
       COPILOT_HOME: world.at('copilot-home'),

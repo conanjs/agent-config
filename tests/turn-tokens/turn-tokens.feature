@@ -2,7 +2,7 @@ Feature: The turn token report shows what each turn used and the running total (
 
   `copilot/hooks/turn-tokens/turn-tokens.mjs` runs as the `Stop` hook of Claude Code and Codex. It reads the
   tool's own log, prints one report (turn, tools, subagents, session, limits) and appends it to a history file in
-  the tool's own folder (TT-1 … TT-12). "Now" is 2026-10-31T09:20:00Z and times print in UTC in every scenario.
+  the tool's own folder (TT-1 … TT-12); a large context adds a Cache line and a reminder (TT-17, TT-18). "Now" is 2026-10-31T09:20:00Z and times print in UTC in every scenario.
 
   The fixture holds a Claude Code session `s1` (2 turns, a subagent per turn) and a Codex thread `t1` (2 turns, one
   subagent thread `c1`), plus an unrelated Codex thread `t2`. Every number below was worked out by hand.
@@ -399,6 +399,81 @@ Feature: The turn token report shows what each turn used and the running total (
       {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
       """
     Then the file "copilot-home/turn-tokens/g1.jsonl" has a line containing "\"tool\":\"copilot\",\"session\":\"g1\",\"turn\":2,\"pending\":false,\"unit\":\"ai-credits\",\"contextWindow\":968000"
+
+  # ---- the cache line and its reminder (TT-17, TT-18) -------------------------------------------------
+  # "Now" is 2026-10-31T09:20:00Z, before the fixture's turns, so a reminder the hook writes is still ahead.
+
+  Scenario: TT-17 a Copilot turn whose last call sent 615,000 tokens shows when its cache expires
+    Given in "copilot-home/session-state/g1/events.jsonl", `"inputTokens":15000,` becomes `"inputTokens":615000,`
+    And in "copilot-home/session-state/g1/events.jsonl", `"maxPromptTokens":968000,"copilotUsage":{"tokenDetails":[],"totalNanoAiu":3000000000}` becomes `"maxPromptTokens":968000,"cacheExpiresAt":"2026-11-02T09:15:20.000Z","copilotUsage":{"tokenDetails":[],"totalNanoAiu":3000000000}`
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then the output has the line "Cache · 615,000 tokens cached until 09:15 · before a longer break: /compact"
+
+  Scenario: TT-17 a Claude Code turn with a 5-minute cache write expires 5 minutes after its last request
+    # The last reply (09:10:30) sent 2 + 500 + 230,000 = 230,502 tokens; its cache write was a 5-minute write.
+    Given in "claude-home/projects/p/s1.jsonl", `"cache_read_input_tokens":23000,"output_tokens":300` becomes `"cache_read_input_tokens":230000,"output_tokens":300`
+    When the tool runs with "--hook claude --text" and this on stdin:
+      """
+      {"session_id":"s1","transcript_path":"{root}/claude-home/projects/p/s1.jsonl"}
+      """
+    Then the output has the line "Cache · 230,502 tokens cached until 09:15 · before a longer break: /compact"
+
+  Scenario: TT-17 a Claude Code turn with a 1-hour cache write expires an hour after its last request
+    Given in "claude-home/projects/p/s1.jsonl", `"cache_read_input_tokens":23000,"output_tokens":300` becomes `"cache_read_input_tokens":230000,"output_tokens":300`
+    And in "claude-home/projects/p/s1.jsonl", `"ephemeral_5m_input_tokens":500,"ephemeral_1h_input_tokens":0` becomes `"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":500`
+    When the tool runs with "--hook claude --text" and this on stdin:
+      """
+      {"session_id":"s1","transcript_path":"{root}/claude-home/projects/p/s1.jsonl"}
+      """
+    Then the output has the line "Cache · 230,502 tokens cached until 10:10 · before a longer break: /compact"
+
+  Scenario: TT-18 the report schedules a reminder 2 minutes before the cache expires
+    Given in "copilot-home/session-state/g1/events.jsonl", `"inputTokens":15000,` becomes `"inputTokens":615000,`
+    And in "copilot-home/session-state/g1/events.jsonl", `"maxPromptTokens":968000,"copilotUsage":{"tokenDetails":[],"totalNanoAiu":3000000000}` becomes `"maxPromptTokens":968000,"cacheExpiresAt":"2026-11-02T09:15:20.000Z","copilotUsage":{"tokenDetails":[],"totalNanoAiu":3000000000}`
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then the file "copilot-home/turn-tokens/reminder-g1.json" has a line containing "\"lastCallAt\":\"2026-11-02T09:10:20.000Z\",\"context\":615000,\"expiresAt\":\"2026-11-02T09:15:20.000Z\",\"notifyAt\":\"2026-11-02T09:13:20.000Z\""
+
+  Scenario: TT-18 a turn under 100,000 tokens schedules no reminder
+    When the tool runs with "--hook copilot --text" and this on stdin:
+      """
+      {"sessionId":"g1","transcriptPath":"{root}/copilot-home/session-state/g1/events.jsonl","stopReason":"end_turn"}
+      """
+    Then "copilot-home/turn-tokens/reminder-g1.json" does not exist
+
+  Scenario: TT-18 at its time the reminder notifies, then removes its file
+    Given the file "copilot-home/turn-tokens/reminder-g1.json" contains:
+      """
+      {"schema":"turn-tokens/v1","kind":"cache-reminder","tool":"copilot","session":"g1","log":"{root}/copilot-home/session-state/g1/events.jsonl","lastCallAt":"2026-11-02T09:10:20.000Z","context":615000,"expiresAt":"2026-10-31T09:22:00.000Z","notifyAt":"2026-10-31T09:19:00.000Z"}
+      """
+    When the tool runs with "--remind {root}/copilot-home/turn-tokens/reminder-g1.json"
+    Then it exits with 0 and prints:
+      """
+      notify · Copilot: cache expires in 2 min · 615,000 tokens cached until 09:22. Reply now, or /compact before a longer break.
+      """
+    And "copilot-home/turn-tokens/reminder-g1.json" does not exist
+
+  Scenario: TT-18 no notification once the session made a newer request
+    # The reminder was set after the 09:10:10 call; the log's last call is 09:10:20.
+    Given the file "copilot-home/turn-tokens/reminder-g1.json" contains:
+      """
+      {"schema":"turn-tokens/v1","kind":"cache-reminder","tool":"copilot","session":"g1","log":"{root}/copilot-home/session-state/g1/events.jsonl","lastCallAt":"2026-11-02T09:10:10.000Z","context":615000,"expiresAt":"2026-10-31T09:22:00.000Z","notifyAt":"2026-10-31T09:19:00.000Z"}
+      """
+    When the tool runs with "--remind {root}/copilot-home/turn-tokens/reminder-g1.json"
+    Then it exits with 0 and prints nothing
+
+  Scenario: TT-18 no notification once the cache has expired
+    Given the file "copilot-home/turn-tokens/reminder-g1.json" contains:
+      """
+      {"schema":"turn-tokens/v1","kind":"cache-reminder","tool":"copilot","session":"g1","log":"{root}/copilot-home/session-state/g1/events.jsonl","lastCallAt":"2026-11-02T09:10:20.000Z","context":615000,"expiresAt":"2026-10-31T09:19:00.000Z","notifyAt":"2026-10-31T09:17:00.000Z"}
+      """
+    When the tool runs with "--remind {root}/copilot-home/turn-tokens/reminder-g1.json"
+    Then it exits with 0 and prints nothing
 
   # ---- traceability -----------------------------------------------------------------------------------
 

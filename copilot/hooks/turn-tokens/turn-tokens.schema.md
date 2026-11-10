@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-11-02
+last-updated: 2026-11-10
 ---
 
 # Schema: Turn token report (`turn-tokens/v1`)
@@ -54,6 +54,7 @@ Limits · monthly 3% used (1,920 of 60,000), resets 1 Dec 00:00
 | at least | Some replies in the sum still carry a placeholder count, so the true number is higher |
 | ≈ $ / credits | An estimate from the price table, `prices.mjs`; not a bill |
 | AI credits | Copilot's own per-call cost (`copilotUsage.totalNanoAiu` ÷ 10⁹); 1 AI credit = $0.01 |
+| Cache · … cached until | When the prompt cache of the last request expires; a pause past it makes the next request write the whole context again (`copilot/knowledge/ai-agents/copilot-usage-reference.md`) |
 
 ## The history record
 
@@ -83,6 +84,8 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 | TT-14 | Copilot tools are the `toolName` of the turn's `tool.execution_start` events, in order of first use, `×N` when used more than once | — | scenarios |
 | TT-15 | Copilot cost is the sum of each call's `copilotUsage.totalNanoAiu` ÷ 10⁹, shown as AI credits with their dollar value (1 AI credit = $0.01); a call without `copilotUsage` names its model as unpriced | sums match Copilot's own `session.usage_checkpoint` | scenarios |
 | TT-16 | Copilot limits come from the latest `quotaSnapshots.premium_interactions` in the log: "monthly P% used (used of entitlement), resets <date>", "monthly allowance unlimited" when unlimited, "unknown" without one | — | scenarios |
+| TT-17 | When the session's last request (Copilot: the last call not made by a sub-agent) sent 100,000 tokens or more, the report adds, before the Limits line, `Cache · <tokens> tokens cached until <hh:mm> · before a longer break: /compact`. The expiry: Copilot's `cacheExpiresAt` of that call, else 5 minutes after it; Claude Code 1 hour after the last request when the latest cache write was a 1-hour write (`ephemeral_1h_input_tokens` above 0), else 5 minutes. Codex has no Cache line: its cache lifetime is not in the log | — | scenarios |
+| TT-18 | With a Cache line, the hook writes `turn-tokens/reminder-<session id>.json` (`kind: cache-reminder`, the log, `lastCallAt`, `context`, `expiresAt`, `notifyAt` = `expiresAt` − `TURN_TOKENS_REMIND_LEAD_MIN`, default 2 minutes) when `notifyAt` is still ahead, replacing any earlier one, and starts a detached `turn-tokens.mjs --remind <file>`. That process waits until `notifyAt`, then shows a desktop notification (`osascript` on macOS, `notify-send` on Linux) titled "<tool>: cache expires in N min" only when the file still holds its `lastCallAt`, the log's last request is still that one, and the cache has not expired; it then removes the file. `TURN_TOKENS_REMIND=off` turns this off; `record` writes the file without starting the process, and `TURN_TOKENS_NOTIFY=print` prints the notification (tests) | the notification reaches VS Code users too, where hook messages do not show | scenarios |
 
 ## Lookup notes
 
@@ -94,7 +97,7 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 
 | Check | Tool |
 |---|---|
-| TT-1 … TT-16 | `tests/turn-tokens/turn-tokens.feature`, run by `scripts/check-docs.sh` |
+| TT-1 … TT-18 | `tests/turn-tokens/turn-tokens.feature`, run by `scripts/check-docs.sh` |
 
 ## References
 

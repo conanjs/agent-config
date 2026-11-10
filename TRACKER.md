@@ -126,7 +126,7 @@ Work this repo still owes, carried from one session to the next. Format and tool
 
 ### T-47 Cut Copilot's cache rebuilds after a pause (efficiency-auditor D13)
 - status: doing
-- next: Trial started 2026-11-10: Copilot CLI contextTier=default (~/.copilot/settings.json); V sets Context Size to the default window for Claude Opus 5.5 in VS Code's chat model picker and uses /compact before a break, /new per task. On 2026-11-17 run efficiency-audit.mjs week --week 2026-11-16: target Copilot EA-6a below 20% of its AI credits (48.7% from 2026-11-02 to 2026-11-10); record the result in copilot-usage-reference.md
+- next: Trial started 2026-11-10: Copilot CLI contextTier=default (~/.copilot/settings.json); V sets Context Size to the default window for Claude Opus 5.5 in VS Code's chat model picker and uses /compact before a break, /new per task; the turn token report shows each large cache's expiry and notifies 2 minutes before it (TT-17, TT-18, live after PR #24 merges). On 2026-11-17 run efficiency-audit.mjs week --week 2026-11-16: target Copilot EA-6a below 20% of its AI credits (48.7% from 2026-11-02 to 2026-11-10); record the result in copilot-usage-reference.md
 - from: 2026-11-10
 - updated: 2026-11-10
 
