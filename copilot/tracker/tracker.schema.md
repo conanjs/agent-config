@@ -79,6 +79,7 @@ The tool runs these checks without changing anything. When an open item's check 
 | TR-8 | An open item past its `due` date is reported as overdue | — | script (warn) |
 | TR-9 | An open item with no change for more than 14 days (`updated`, else `from`) is reported as stale | — | script (warn) |
 | TR-10 | A `done-when` that cannot be run (not a git repo, an unknown ref) is reported, so it can be fixed | — | script (warn) |
+| TR-11 | The session-start brief (`--hook`) lists at most 5 open items (`TRACKER_BRIEF_MAX`), most urgent first, and leaves out items untouched for more than 2 days (`TRACKER_QUIET_DAYS`; `updated`, else `from`) unless they look done, are overdue, high priority or doing. A last line says how many were left out and that `--brief` lists every open item. Nothing is removed from the file | the brief reaches the model in every session: 20 items cost 1,843 tokens on 2026-11-10, more than the core instructions | scenarios |
 
 ## How agents use it
 

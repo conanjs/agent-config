@@ -105,8 +105,9 @@ Work this repo still owes, carried from one session to the next. Format and tool
 
 ### T-42 Shrink the tracker hook output and scope the sdlc-* skills (instruction-loading D9)
 - status: open
-- next: Cap the session-start hook's list of open items and limit the 13 sdlc-* skills to agentic-SDLC work; measure both before and after with the level-1 method in proposals/instruction-loading.md section 6
+- next: Brief part done 2026-11-10 (TR-11: at most 5 items, items untouched for over 2 days left out; the model's brief here fell from 1,952 to 615 tokens). Left: the 13 sdlc-* skills (824 tokens in every skill list). disable-model-invocation would hide them in Claude Code but then the sdlc-* agents cannot preload them (Claude Code sub-agents docs); V decides between installing them only in repos that use the agentic SDLC, or leaving them
 - from: 2026-11-09 · 2026-11-09, proposals/instruction-loading.md D9 (V: "D9 -> a")
+- updated: 2026-11-10
 
 ### T-43 Decide where VS Code's copilot-lessons.instructions.md belongs (instruction-loading D10)
 - status: waiting
