@@ -86,6 +86,7 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 | TT-16 | Copilot limits come from the latest `quotaSnapshots.premium_interactions` in the log: "monthly P% used (used of entitlement), resets <date>", "monthly allowance unlimited" when unlimited, "unknown" without one | — | scenarios |
 | TT-17 | When the session's last request (Copilot: the last call not made by a sub-agent) sent 100,000 tokens or more, the report adds, before the Limits line, `Cache · <tokens> tokens cached until <hh:mm> · before a longer break: /compact`. The expiry: Copilot's `cacheExpiresAt` of that call, else 5 minutes after it; Claude Code 1 hour after the last request when the latest cache write was a 1-hour write (`ephemeral_1h_input_tokens` above 0), else 5 minutes. Codex has no Cache line: its cache lifetime is not in the log | — | scenarios |
 | TT-18 | With a Cache line, the hook writes `turn-tokens/reminder-<session id>.json` (`kind: cache-reminder`, the log, `lastCallAt`, `context`, `expiresAt`, `notifyAt` = `expiresAt` − `TURN_TOKENS_REMIND_LEAD_MIN`, default 2 minutes) when `notifyAt` is still ahead, replacing any earlier one, and starts a detached `turn-tokens.mjs --remind <file>`. That process waits until `notifyAt`, then shows a desktop notification (`osascript` on macOS, `notify-send` on Linux) titled "<tool>: cache expires in N min" only when the file still holds its `lastCallAt`, the log's last request is still that one, and the cache has not expired; it then removes the file. `TURN_TOKENS_REMIND=off` turns this off; `record` writes the file without starting the process, and `TURN_TOKENS_NOTIFY=print` prints the notification (tests) | the notification reaches VS Code users too, where hook messages do not show | scenarios |
+| TT-19 | The waiting `--remind` process re-checks every `TURN_TOKENS_REMIND_POLL_MS` (default 30,000 ms) whether its file was replaced or removed, or the log has a newer request, and exits as soon as one holds, instead of sleeping until its `notifyAt` | each turn's report starts a new reminder, and a Claude Code 1-hour cache would otherwise leave one sleeping Node process per turn for up to about an hour | scenarios |
 
 ## Lookup notes
 
@@ -97,7 +98,7 @@ One JSON line per report, appended to `turn-tokens/<session id>.jsonl` in the to
 
 | Check | Tool |
 |---|---|
-| TT-1 … TT-18 | `tests/turn-tokens/turn-tokens.feature`, run by `scripts/check-docs.sh` |
+| TT-1 … TT-19 | `tests/turn-tokens/turn-tokens.feature`, run by `scripts/check-docs.sh` |
 
 ## References
 

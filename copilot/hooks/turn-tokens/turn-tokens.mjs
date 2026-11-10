@@ -32,6 +32,7 @@ const POLL_MS = 250;
 const CACHE_LINE_MIN = 100000; // TT-17: show the Cache line from this context size
 const LEAD_MIN = Number(process.env.TURN_TOKENS_REMIND_LEAD_MIN ?? 2); // TT-18: notify this many minutes before expiry
 const MIN_MS = 60000;
+const REMIND_POLL_MS = Number(process.env.TURN_TOKENS_REMIND_POLL_MS ?? 30000); // TT-19: how often a waiting reminder re-checks
 const NOTE = '  note: the final reply was not in the log yet; the session total will include it in the next report';
 
 class Unavailable extends Error {}
@@ -486,13 +487,23 @@ async function remind(file) {
   const read = () => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
   const mine = read();
   if (!mine || mine.kind !== 'cache-reminder') return;
-  const wait = Date.parse(mine.notifyAt) - now().getTime();
-  if (wait > 0) await sleep(wait);
-  const current = read();
-  if (!current || current.lastCallAt !== mine.lastCallAt) return; // replaced by a newer report, or removed
-  let latest = null;
-  try { latest = (mine.tool === 'claude' ? analyzeClaude(mine.log) : analyzeCopilot(mine.log)).cache; } catch { /* log gone: still remind */ }
-  if (latest && latest.at !== mine.lastCallAt) return; // the session moved on: its cache was refreshed
+  // Wait in steps, re-checking at each one, so a reminder that a newer report replaced exits within one step
+  // instead of sleeping until its own notifyAt: a session keeps about one waiting process, not one per turn. TT-19
+  const stale = () => {
+    const current = read();
+    if (!current || current.lastCallAt !== mine.lastCallAt) return true; // replaced by a newer report, or removed
+    let latest = null;
+    try { latest = (mine.tool === 'claude' ? analyzeClaude(mine.log) : analyzeCopilot(mine.log)).cache; } catch { /* log gone: still remind */ }
+    return Boolean(latest && latest.at !== mine.lastCallAt); // the session moved on: its cache was refreshed
+  };
+  let wait = Date.parse(mine.notifyAt) - now().getTime();
+  for (;;) {
+    if (stale()) return;
+    if (wait <= 0) break;
+    const step = Math.min(wait, REMIND_POLL_MS);
+    await sleep(step);
+    wait -= step;
+  }
   if (now().getTime() >= Date.parse(mine.expiresAt)) return;
   const left = Math.max(1, Math.round((Date.parse(mine.expiresAt) - now().getTime()) / MIN_MS));
   const title = `${NAME[mine.tool] ?? mine.tool}: cache expires in ${left} min`;

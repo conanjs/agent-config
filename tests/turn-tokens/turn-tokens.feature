@@ -458,6 +458,16 @@ Feature: The turn token report shows what each turn used and the running total (
       """
     And "copilot-home/turn-tokens/reminder-g1.json" does not exist
 
+  Scenario: TT-19 a reminder whose session moved on exits at its first check, not at its notification time
+    # notifyAt is an hour ahead; the log's last call (09:10:20) is newer than the reminder's (09:10:10).
+    # Before TT-19 this process slept the full hour before checking.
+    Given the file "copilot-home/turn-tokens/reminder-g1.json" contains:
+      """
+      {"schema":"turn-tokens/v1","kind":"cache-reminder","tool":"copilot","session":"g1","log":"{root}/copilot-home/session-state/g1/events.jsonl","lastCallAt":"2026-11-02T09:10:10.000Z","context":615000,"expiresAt":"2026-10-31T10:22:00.000Z","notifyAt":"2026-10-31T10:20:00.000Z"}
+      """
+    When the tool runs with "--remind {root}/copilot-home/turn-tokens/reminder-g1.json"
+    Then it exits with 0 and prints nothing
+
   Scenario: TT-18 no notification once the session made a newer request
     # The reminder was set after the 09:10:10 call; the log's last call is 09:10:20.
     Given the file "copilot-home/turn-tokens/reminder-g1.json" contains:
