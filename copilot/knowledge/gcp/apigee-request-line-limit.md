@@ -4,8 +4,8 @@ type: concept
 topic: gcp
 status: verified
 applies-to: ["Apigee Edge (apigee.net runtime)", "clients sending lists in GET query strings"]
-last-verified: 2026-11-06
-last-updated: 2026-11-06
+last-verified: 2026-11-09
+last-updated: 2026-11-09
 tags: [apigee, http-414, url-length, query-string, request-line, bullmq-retries]
 ---
 
@@ -50,6 +50,7 @@ Concrete artifact, the Apigee fault body returned for a 7,676-byte request line 
 |---|---|---|
 | Threshold set as "more than 500 items → fetch all" | 467–500 items always fail with 414; 501+ switch to the heavy call | The threshold ignores encoding and the other parameters ✅[^2] |
 | Longer filter values (user IDs, dates, extra filters) | The safe item count drops | They share the same 7,168-byte request line ✅[^1] |
+| A second service with more filter parameters in the same request (measured 2026-11-09) | 446 IDs fitted and 454 failed with 414, against 466 / 467 in the first service; fetching everything for a filter of 1,495 records succeeded, while 3,059 records ended in a 502 from the CDN on all 3 attempts (about 85–115 s each, HTTP 500 to the caller after 250–262 s) ✅[^2] | More parameters leave fewer bytes for the list; the "fetch everything" path fails on the filter size, whatever the number selected |
 | Failing call inside a retried queue job | The error appears only after all attempts and backoffs | Each attempt fails the same way; retries add delay, not success ✅[^2] |
 | "Fetch everything, filter in memory" for large filters | Can exceed the upstream's response time: 3 attempts each ended in a 502 from the CDN in front of the gateway after 46–65 s with about 9,600 matching records ✅[^2] | The response size follows the filter, not the selection |
 
@@ -69,11 +70,11 @@ Concrete artifact, the Apigee fault body returned for a 7,676-byte request line 
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 12 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-06
+- Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-09
 
 ## References
 - [Apigee Edge product limits](https://docs.apigee.com/api-platform/reference/limits) — Google, living. Backs: Summary, How it works §2, Edge cases ("API proxy request URL size: 7 KB", enforced; "Request Line Limit 7K"). [^1]
-- Local measurement, 2026-11-06 — a NestJS service calling an Apigee Edge proxy through a CDN, axios with `params`, BullMQ 5.80.9 with `attempts: 3` / exponential backoff 30 s; request-line lengths computed with `URLSearchParams` on real 12-character IDs; fault body and timings read from the service's logs. Backs: Summary, Mental model, How it works §1, §3–4, Worked example, Edge cases. [^2]
+- Local measurements, 2026-11-06 and 2026-11-09 — two NestJS services calling an Apigee Edge proxy through a CDN, axios with `params`, BullMQ 5.80.9 with `attempts: 3` / exponential backoff 30 s; request-line lengths computed with `URLSearchParams` on real 12-character IDs; fault body and timings read from the service's logs. Backs: Summary, Mental model, How it works §1, §3–4, Worked example, Edge cases. [^2]
 - [Apigee: Limits (Apigee X and hybrid)](https://cloud.google.com/apigee/docs/api-platform/reference/limits) — Google, living. Lists "API proxy request URL size" for the newer Apigee products; check it when not on Edge.
 
 ## Related

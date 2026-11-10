@@ -114,7 +114,18 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - waiting-on: V
 - from: 2026-11-09 · 2026-11-09, proposals/instruction-loading.md VS-1
 
+### T-44 Make the atlas cheap to use: trigger wording and search noise
+- status: open
+- next: In agent-config AGENTS.md, point agents at 'atlas.mjs --explain <an existing file of the same kind>' (a folder returns only kinds, IW-14), add an .rgignore excluding copilot/atlas/map/ so repo-wide rg searches stop matching the generated file lists, then re-test with Codex gpt-6-luna (AGENTS.md measurement rule)
+- from: 2026-11-09 · 2026-11-09, atlas review and IW-14
+
 ## Done
+
+### T-45 Fill the browser and web-platform gaps against javascript.info
+- status: done
+- next: Write knowledge docs for the 32 uncovered javascript.info lessons (events: mouse, pointer, keyboard, scroll, drag-and-drop; forms and focus; element size, scroll and coordinates; selection and range; popups and clickjacking; File and FileReader; fetch progress and options, XMLHttpRequest, resumable upload; IndexedDB; CSS and JS animation, Bezier curves; the 7 web-components lessons), deepen the 12 mentioned only in passing, and add YDKJS boxing/unboxing and [[Class]]; done when every javascript.info lesson in parts 2-8 is cited by a knowledge doc
+- from: 2026-11-09 · 2026-11-09, coverage check of javascript.info (commit 20208769e5) and You-Dont-Know-JS (2nd-ed 7a83c85, 1st-ed 59d33b0)
+- closed: 2026-11-10 · PR conanjs/agent-config#21: 10 typed browser docs, lesson map for all 64 Parts 2-8 lessons, lab how-to, boxing and [[Class]] in the types deep dive; check-docs passes
 
 ### T-38 Commit the reviewed agent-config changes (57 files, review of 2026-11-09)
 - status: done
