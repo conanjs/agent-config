@@ -5,7 +5,7 @@ topic: javascript
 status: verified
 applies-to: ["the docs under knowledge/javascript/ as of 2026-11-04", "javascript.info Part 1 (The JavaScript language)"]
 last-verified: 2026-11-04
-last-updated: 2026-11-04
+last-updated: 2026-11-10
 tags: [javascript, learning-path, curriculum, javascript-info]
 ---
 
@@ -72,7 +72,7 @@ The v1 docs under `knowledge/javascript/`, one subtopic per javascript.info Part
 | 5 Prototypes and classes | `prototypes/objects-this-and-delegation-deep-dive.md` |
 | 6 Errors and async | `async/async-patterns-and-performance-deep-dive.md` |
 | 7 Modules and advanced | `misc/build-a-small-language-deep-dive.md`, `misc/design-patterns-deep-dive.md` |
-| After the language | `browser/browser-platform-deep-dive.md`, `node/node-services-deep-dive.md`, `node/data-wrangling-deep-dive.md` |
+| After the language | `browser/lesson-map.md` (javascript.info Parts 2–8), `browser/browser-platform-deep-dive.md`, `node/node-services-deep-dive.md`, `node/data-wrangling-deep-dive.md` |
 
 ### Free, authoritative resources
 
@@ -86,7 +86,7 @@ The v1 docs under `knowledge/javascript/`, one subtopic per javascript.info Part
 
 | Topic | Fits under | Start with |
 |---|---|---|
-| Typed docs for the browser (DOM, events, forms, network, storage) | `javascript/browser/` | synthesize `browser/browser-platform-deep-dive.md`; javascript.info Parts 2–3 |
+| Typed docs for the deep dive's own browser topics (DOM navigation, attributes, event path, fetch and CORS, web storage); the other Parts 2–8 lessons have typed docs | `javascript/browser/` | synthesize `browser/browser-platform-deep-dive.md` |
 | `Temporal` and `Intl` date handling | `javascript/data-types/` | MDN `Intl` |
 
 ## Lookup notes

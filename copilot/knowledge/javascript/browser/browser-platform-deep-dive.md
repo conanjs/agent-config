@@ -3,7 +3,7 @@ schema: deep-dive/v1
 topic: javascript/browser
 status: verified
 applies-to: ["WHATWG DOM and HTML living standards", "Fetch standard", "Chrome 152 for every lab result"]
-last-updated: 2026-11-04
+last-updated: 2026-11-10
 last-verified: 2026-11-04
 synthesized-into: []
 tags: [javascript, browser, dom, events, bubbling, capturing, event-delegation, attributes-properties, script-loading, mutation-observer, fetch, cors, url, localstorage, cookies, microtasks]
@@ -168,6 +168,7 @@ Store JSON with `JSON.stringify`/`JSON.parse`; keep secrets out of web storage (
 - [DOM Standard](https://dom.spec.whatwg.org/) — WHATWG, living. Background: nodes, events and dispatch.
 
 ## Related
+- `javascript/browser/lesson-map.md` — the typed docs that cover the javascript.info Parts 2–8 lessons this dive mentions only in passing (node classes, geometry, UI events, forms, frames, binary data, network, IndexedDB, animation, web components).
 - `javascript/async/event-loop-and-async-await.md` — tasks and microtasks.
 - `javascript/node/node-services-deep-dive.md` — the server side of long polling and timeouts.
 - `javascript/misc/design-patterns-deep-dive.md` — observer and delegation patterns.

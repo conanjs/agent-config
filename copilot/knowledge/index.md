@@ -1,7 +1,7 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-11-07
+last-updated: 2026-11-10
 ---
 
 # Global knowledge
@@ -18,7 +18,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [performance/](performance/index.md) | Performance engineering: percentiles and tail latency, queueing and Little's law, Amdahl's law, caches and locality, branch prediction, false sharing, trustworthy benchmarking, profiling and flame graphs, optimization playbook, caching — foundations measured; added cross-layer workload, database, overload, load-test, runtime/client, accelerator/cost synthesis and three sourced cases | 4 subtopics + 13 root docs |
 | [code-documentation/](code-documentation/index.md) | Doc-comment standards: C# XML tags, TSDoc, JSDoc, Python, Go and Rust side by side, and the lint that requires them | topic index |
 | [versioning/](versioning/index.md) | Semantic versioning: MAJOR.MINOR.PATCH meaning, frozen releases, pre-1.0 rules, pinning by major or commit SHA | topic index |
-| [javascript/](javascript/index.md) | The JavaScript language, consolidated from javascript.info Part 1 into one subtopic per chapter: types and conversions, operators, functions, objects and `this`, data types and collections, closures, prototypes, classes, errors, promises and the event loop, generators, modules, Proxy, BigInt and Unicode — every behaviour run in Node 24, with a lesson-to-doc map | 14 subtopics + 1 reference |
+| [javascript/](javascript/index.md) | The JavaScript language, consolidated from javascript.info Part 1 into one subtopic per chapter: types and conversions, operators, functions, objects and `this`, data types and collections, closures, prototypes, classes, errors, promises and the event loop, generators, modules, Proxy, BigInt and Unicode — every behaviour run in Node 24, with a lesson-to-doc map; plus the browser platform from javascript.info Parts 2–8 (DOM, events, forms, frames, binary data, network, IndexedDB, animation, web components) verified in Chrome 152 | 17 subtopics + 1 reference |
 | [floating-point/](floating-point/index.md) | IEEE 754 end to end: binary formats and limits, rounding and error growth, ±0/∞/NaN/subnormals and exception flags, choosing representations for money and IDs — measured in C, Python and JavaScript | 1 deep dive + 4 docs |
 | [js-runtime/](js-runtime/index.md) | V8 and Node.js runtime behavior that shapes how TypeScript/JavaScript code is written: hidden classes, promise rejections, AbortSignal | topic index |
 | [concurrency/](concurrency/index.md) | Cross-language concurrency: structured concurrency, blocking inside async runtimes, shared state and data races (Go, Python, Rust, TypeScript) | topic index |
