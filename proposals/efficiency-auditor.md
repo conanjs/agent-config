@@ -1,6 +1,15 @@
 # Proposal: Efficiency auditor — find token waste in real agent sessions
 
-**Status:** Draft (2026-11-10). Nothing is built. V answers the decisions in section 12; phase 2 builds only what they approve.
+**Status:** Implemented (2026-11-10). V answered every decision in section 12 with "Approve all recommended": the recommended option (a) of D1–D13. Where each landed: the rules in `copilot/efficiency-audit/efficiency-audit.schema.md` (D1–D8), the tool and `triggers.json` in `copilot/efficiency-audit/` (D5, D12), the how-to `copilot/knowledge/ai-agents/audit-agent-efficiency.md` (D9, D11), `SETUP.md` step 15 (D6, D9), the atlas area `efficiency-audit` (D12), and `TRACKER.md` T-46 (D10) and T-47 (D13). The Copilot cache fact is in `copilot/knowledge/ai-agents/copilot-usage-reference.md`.
+
+**Differences from the draft**, found while building it on the real logs:
+- EA-6a uses Copilot's own `cacheExpiresAt` of the previous call before the 5-minute rule, and skips the first request after a compaction.
+- EA-5 also forgets earlier reads after a shell command that may change files (`sed -i`, a redirect, `git checkout`, a package manager), and counts only full reads (`cat` not piped, a read tool without a range).
+- EA-10 counts a Codex call only when it runs the search alone: one `exec` often joins a search with several `cat`s, and its output is not the search's.
+- EA-9 has the "no file edited" condition (D3).
+- Scripted sessions are found by a working folder under a temporary folder, or Codex's `originator: codex_exec`; no reliable field was found for Claude Code or Copilot.
+- The tool is not deployed to `~/.copilot`: that folder's `efficiency-audit/` holds only the history (D6), so it runs from the repo.
+- Earlier weeks are filled by running `week --week <date>` for each, oldest first.
 
 **Scope:** Claude Code (terminal and desktop app), GitHub Copilot (CLI and the Copilot agent in VS Code, which share one log format) and Codex (CLI and the ChatGPT desktop app). The auditor reads the logs these tools already write on this machine.
 
@@ -188,19 +197,19 @@ As for the tracker and the turn token report: Cucumber scenarios in `tests/effic
 
 | # | Question | Options | Recommended | V's answer | Lands in |
 |---|---|---|---|---|---|
-| D1 | Which inputs | (a) Raw logs plus the turn token history. (b) History only | (a): the history has no paths or per-request rows, so EA-1 to EA-6 and EA-10 need the raw logs | | `efficiency-audit.schema.md` (input rules) |
-| D2 | Scripted sessions (`claude -p`, `codex exec`, `copilot -p`, temporary folders) | (a) Listed apart, kept out of totals and trends. (b) Included. (c) Ignored | (a): 93 of 104 Claude Code sessions are measurement runs that read instruction files on purpose | | Schema rule |
-| D3 | Detectors in the first build | (a) EA-1 to EA-8 and EA-10 on; EA-9 only with the "no edits" condition and marked experimental. (b) All on as in section 3 | (a): EA-9 found only false positives as first defined | | Schema rules EA-1 … EA-10 |
-| D4 | Thresholds | (a) The values in section 5, in one table in the tool, changed only with their scenario. (b) A config file V edits | (a); a config file can come later if values change often | | The tool and its schema |
-| D5 | How EA-3 knows the triggers | (a) A small hand-kept trigger table beside the tool, with a scenario that checks each named file still appears in `core.instructions.md`. (b) Parse the core's prose | (a): prose parsing breaks on rewording | | `copilot/efficiency-audit/triggers.json` |
-| D6 | Where the weekly history lives | (a) `~/.copilot/efficiency-audit/history.jsonl`, local, counts only. (b) Committed in the repo | (a): it is derived from private logs; what is worth keeping becomes a dated knowledge row (section 8) | | Schema rule; `SETUP.md` |
-| D7 | Knowledge docs | (a) The report prints suggested rows; the agent writes them and runs `review-docs`. (b) The tool edits the docs | (a): the knowledge validator and `review-docs` apply to every change there | | Schema rule; the how-to |
-| D8 | Tracker items | (a) Print the `--add` commands; run them only with `--tracker`, at most 3 per run, deduplicated by detector and week. (b) Always add | (a) | | Schema rule |
-| D9 | How it runs | (a) On demand now; (b) a weekly `launchd` job later, if V wants it. (c) A session-start hook | (a), with (b) offered after 2–3 weeks; not (c) | | The how-to; `SETUP.md` if (b) |
-| D10 | Cheap-model suggestions of new detectors | (a) Later: build `--suggest` once 3 weeks of history exist, with Codex `gpt-6-luna` or Copilot `gpt-5.4-mini` on a counts-and-paths bundle. (b) Build now. (c) Never | (a): with one week of history there are no trends to explain | | `TRACKER.md` item, then the tool |
-| D11 | Where usage is documented | (a) New how-to `ai-agents/audit-agent-efficiency.md`, plus a step in `measure-agent-tokens.md`. (b) A section in `measure-agent-tokens.md` only | (a): that doc is about one session's numbers; the auditor is a separate workflow | | `copilot/knowledge/ai-agents/` |
-| D12 | Where the tool lives | (a) `copilot/efficiency-audit/` (`efficiency-audit.mjs`, `.schema.md`, `triggers.json`), like `copilot/tracker/`. (b) Inside `copilot/hooks/turn-tokens/` | (a): it is not a hook; it can reuse the turn token report's log readers by import | | The atlas (`atlas.mjs --write`) |
-| D13 | Act on the Copilot cache finding now (47.8% of AI credits in rebuilds after a pause)? The fact itself is already recorded in `copilot-usage-reference.md` (2026-11-10), as the knowledge rules require | (a) Track a follow-up now: test a habit or setting that cuts it (compact before a break, one session per task) and measure it. (b) Wait for the auditor | (a): it is the largest waste found and needs no tool to act on | | `TRACKER.md` |
+| D1 | Which inputs | (a) Raw logs plus the turn token history. (b) History only | (a): the history has no paths or per-request rows, so EA-1 to EA-6 and EA-10 need the raw logs | "Approve all recommended": (a) | `efficiency-audit.schema.md` (input rules) |
+| D2 | Scripted sessions (`claude -p`, `codex exec`, `copilot -p`, temporary folders) | (a) Listed apart, kept out of totals and trends. (b) Included. (c) Ignored | (a): 93 of 104 Claude Code sessions are measurement runs that read instruction files on purpose | "Approve all recommended": (a) | Schema rule |
+| D3 | Detectors in the first build | (a) EA-1 to EA-8 and EA-10 on; EA-9 only with the "no edits" condition and marked experimental. (b) All on as in section 3 | (a): EA-9 found only false positives as first defined | "Approve all recommended": (a) | Schema rules EA-1 … EA-10 |
+| D4 | Thresholds | (a) The values in section 5, in one table in the tool, changed only with their scenario. (b) A config file V edits | (a); a config file can come later if values change often | "Approve all recommended": (a) | The tool and its schema |
+| D5 | How EA-3 knows the triggers | (a) A small hand-kept trigger table beside the tool, with a scenario that checks each named file still appears in `core.instructions.md`. (b) Parse the core's prose | (a): prose parsing breaks on rewording | "Approve all recommended": (a) | `copilot/efficiency-audit/triggers.json` |
+| D6 | Where the weekly history lives | (a) `~/.copilot/efficiency-audit/history.jsonl`, local, counts only. (b) Committed in the repo | (a): it is derived from private logs; what is worth keeping becomes a dated knowledge row (section 8) | "Approve all recommended": (a) | Schema rule; `SETUP.md` |
+| D7 | Knowledge docs | (a) The report prints suggested rows; the agent writes them and runs `review-docs`. (b) The tool edits the docs | (a): the knowledge validator and `review-docs` apply to every change there | "Approve all recommended": (a) | Schema rule; the how-to |
+| D8 | Tracker items | (a) Print the `--add` commands; run them only with `--tracker`, at most 3 per run, deduplicated by detector and week. (b) Always add | (a) | "Approve all recommended": (a) | Schema rule |
+| D9 | How it runs | (a) On demand now; (b) a weekly `launchd` job later, if V wants it. (c) A session-start hook | (a), with (b) offered after 2–3 weeks; not (c) | "Approve all recommended": (a) | The how-to; `SETUP.md` if (b) |
+| D10 | Cheap-model suggestions of new detectors | (a) Later: build `--suggest` once 3 weeks of history exist, with Codex `gpt-6-luna` or Copilot `gpt-5.4-mini` on a counts-and-paths bundle. (b) Build now. (c) Never | (a): with one week of history there are no trends to explain | "Approve all recommended": (a) | `TRACKER.md` item, then the tool |
+| D11 | Where usage is documented | (a) New how-to `ai-agents/audit-agent-efficiency.md`, plus a step in `measure-agent-tokens.md`. (b) A section in `measure-agent-tokens.md` only | (a): that doc is about one session's numbers; the auditor is a separate workflow | "Approve all recommended": (a) | `copilot/knowledge/ai-agents/` |
+| D12 | Where the tool lives | (a) `copilot/efficiency-audit/` (`efficiency-audit.mjs`, `.schema.md`, `triggers.json`), like `copilot/tracker/`. (b) Inside `copilot/hooks/turn-tokens/` | (a): it is not a hook; it can reuse the turn token report's log readers by import | "Approve all recommended": (a) | The atlas (`atlas.mjs --write`) |
+| D13 | Act on the Copilot cache finding now (47.8% of AI credits in rebuilds after a pause)? The fact itself is already recorded in `copilot-usage-reference.md` (2026-11-10), as the knowledge rules require | (a) Track a follow-up now: test a habit or setting that cuts it (compact before a break, one session per task) and measure it. (b) Wait for the auditor | (a): it is the largest waste found and needs no tool to act on | "Approve all recommended": (a) | `TRACKER.md` |
 
 ## References
 

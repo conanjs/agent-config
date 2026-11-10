@@ -97,6 +97,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 
 - [`copilot/knowledge/ai-agents/agent-skills-portability.md`](../../../knowledge/ai-agents/agent-skills-portability.md)
 - [`copilot/knowledge/ai-agents/agent-token-accounting.md`](../../../knowledge/ai-agents/agent-token-accounting.md)
+- [`copilot/knowledge/ai-agents/audit-agent-efficiency.md`](../../../knowledge/ai-agents/audit-agent-efficiency.md)
 - [`copilot/knowledge/ai-agents/claude-code-agents-and-skills.md`](../../../knowledge/ai-agents/claude-code-agents-and-skills.md)
 - [`copilot/knowledge/ai-agents/claude-code-usage-reference.md`](../../../knowledge/ai-agents/claude-code-usage-reference.md)
 - [`copilot/knowledge/ai-agents/codex-usage-reference.md`](../../../knowledge/ai-agents/codex-usage-reference.md)

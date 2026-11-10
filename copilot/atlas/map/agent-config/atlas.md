@@ -43,6 +43,7 @@ Where: `copilot/atlas/{index.md,map/**}` · Schema: — · Index: `copilot/atlas
 - [`copilot/atlas/map/agent-config/atlas.md`](atlas.md)
 - [`copilot/atlas/map/agent-config/companies.md`](companies.md)
 - [`copilot/atlas/map/agent-config/company-kb-framework.md`](company-kb-framework.md)
+- [`copilot/atlas/map/agent-config/efficiency-audit.md`](efficiency-audit.md)
 - [`copilot/atlas/map/agent-config/frameworks.md`](frameworks.md)
 - [`copilot/atlas/map/agent-config/installers.md`](installers.md)
 - [`copilot/atlas/map/agent-config/instructions.md`](instructions.md)
