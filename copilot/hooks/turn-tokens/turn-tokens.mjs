@@ -4,14 +4,19 @@
 // Usage:
 //   turn-tokens.mjs --hook claude|codex|copilot [--text] [--wait-ms <n>]   the end-of-turn hook: hook JSON on stdin, report out
 //   turn-tokens.mjs --statusline                                   Claude Code's status line: saves the limits
+//   turn-tokens.mjs --remind <reminder file>                       the cache reminder a report schedules (TT-18)
 //
 // After every turn it reads the tool's own log (the Claude Code transcript or the Codex rollout file), prints one
 // report as {"systemMessage": …} (plain text with --text) and appends it to turn-tokens/<session id>.jsonl in the
 // tool's own folder. No dependencies, no network. In hook mode it always exits 0, so a turn never fails because of it.
+// When the last request's context is large it adds a Cache line (TT-17) and schedules a desktop notification for
+// shortly before that cache expires, skipped if the session moved on (TT-18).
 
+import { spawn, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { anthropic, codex as codexRates, codexFastTiers } from './prices.mjs';
 
 const args = process.argv.slice(2);
@@ -24,6 +29,10 @@ const home = {
   copilot: process.env.COPILOT_HOME || path.join(os.homedir(), '.copilot'),
 };
 const POLL_MS = 250;
+const CACHE_LINE_MIN = 100000; // TT-17: show the Cache line from this context size
+const LEAD_MIN = Number(process.env.TURN_TOKENS_REMIND_LEAD_MIN ?? 2); // TT-18: notify this many minutes before expiry
+const MIN_MS = 60000;
+const REMIND_POLL_MS = Number(process.env.TURN_TOKENS_REMIND_POLL_MS ?? 30000); // TT-19: how often a waiting reminder re-checks
 const NOTE = '  note: the final reply was not in the log yet; the session total will include it in the next report';
 
 class Unavailable extends Error {}
@@ -126,7 +135,7 @@ function claudeReplies(lines) {
     idx: r.idx, lastIdx: r.lastIdx, ts: r.ts, stop: r.stop, model: r.model, tools: r.tools,
     newInput: r.usage.input, cacheWrite: r.usage.cacheWrite, cacheRead: r.usage.cacheRead,
     context: r.usage.input + r.usage.cacheWrite + r.usage.cacheRead, output: r.usage.output,
-    placeholder: r.stop === null, price: claudePrice(r.model, r.usage),
+    placeholder: r.stop === null, price: claudePrice(r.model, r.usage), oneHour: r.usage.oneHour,
   }));
 }
 
@@ -149,8 +158,17 @@ function analyzeClaude(file) {
   return {
     turnNo: Math.max(turns.length, 1), final,
     turn: sumOf(turn), turnSubs: sumOf(subs.filter((r) => r.ts >= startTs)),
-    session: sumOf(replies), sessionSubs: sumOf(subs),
+    session: sumOf(replies), sessionSubs: sumOf(subs), cache: claudeCache(replies),
   };
+}
+
+/** The main conversation's cache after its last request: 1 hour when its latest cache write was a 1-hour write, else 5 minutes. TT-17 */
+function claudeCache(replies) {
+  const last = replies.reduce((a, r) => (!a || r.lastIdx > a.lastIdx ? r : a), null);
+  if (!last || !last.ts) return null;
+  const write = [...replies].sort((x, y) => x.lastIdx - y.lastIdx).filter((r) => r.cacheWrite > 0).pop();
+  const ttlMin = write && write.oneHour > 0 ? 60 : 5;
+  return { at: last.ts, context: last.context, expiresAt: new Date(Date.parse(last.ts) + ttlMin * MIN_MS).toISOString(), ttlMin };
 }
 
 function claudeLimits(session) { // TT-10
@@ -279,10 +297,14 @@ function analyzeCopilot(file) {
   const calls = [];
   let contextWindow = null;
   let quota = null;
+  let cache = null;
   lines.forEach((e, idx) => {
     const d = e.data ?? {};
     if (e.type === 'session.usage_record') { // TT-13, TT-15
       const u = d.usage ?? {};
+      if (u.initiator !== 'sub-agent' && e.timestamp) { // TT-17: Copilot logs when each call's cache expires
+        cache = { at: e.timestamp, context: u.inputTokens ?? 0, expiresAt: u.cacheExpiresAt ?? new Date(Date.parse(e.timestamp) + 5 * MIN_MS).toISOString() };
+      }
       const input = u.inputTokens ?? 0;
       const cacheRead = u.cacheReadTokens ?? 0;
       const cacheWrite = u.cacheWriteTokens ?? 0;
@@ -303,7 +325,7 @@ function analyzeCopilot(file) {
   const final = Boolean(lastAnswer && !(lastAnswer.data?.toolRequests ?? []).length); // TT-4
   return {
     turnNo: Math.max(prompts.length, 1), final, contextWindow, turn, turnSubs: newSum(), session: sumOf(calls), sessionSubs: newSum(),
-    limits: quota ? { source: 'log', monthly: quota } : null,
+    limits: quota ? { source: 'log', monthly: quota } : null, cache,
   };
 }
 
@@ -362,9 +384,18 @@ function render(tool, a) {
   if (a.sessionSubs.calls) {
     out.push(`  subagents: ${callsText(a.sessionSubs.calls)} · output ${a.sessionSubs.outputAtLeast ? 'at least ' : ''}${n(a.sessionSubs.output)} · ${money(a.sessionSubs, usd)}`);
   }
+  const c = cacheLine(tool, a.cache);
+  if (c) out.push(c);
   out.push(limitsLine(tool, a.limits));
   return out.join('\n');
 }
+
+/** TT-17: Claude Code and Copilot, when the last request sent 100,000 tokens or more. */
+function cacheLine(tool, cache) {
+  if (!showsCache(tool, cache)) return null;
+  return `Cache · ${n(cache.context)} tokens cached until ${hhmm(new Date(cache.expiresAt))} · before a longer break: /compact`;
+}
+const showsCache = (tool, cache) => tool !== 'codex' && Boolean(cache) && cache.context >= CACHE_LINE_MIN && !Number.isNaN(Date.parse(cache.expiresAt));
 
 function limitsLine(tool, limits) { // TT-10, TT-16
   if (tool === 'copilot') {
@@ -423,7 +454,70 @@ async function hook(tool) { // TT-1
   }
   if (tool === 'claude') Object.assign(a, claudeLimits(session));
   appendHistory(tool, session, record(tool, session, a));
+  scheduleReminder(tool, session, file, a.cache);
   return render(tool, a);
+}
+
+// ---- the cache reminder (TT-18) -------------------------------------------------------------------------------
+
+const NAME = { claude: 'Claude Code', copilot: 'Copilot' };
+const reminderFile = (tool, session) => path.join(home[tool], 'turn-tokens', `reminder-${safeName(session)}.json`);
+
+/** Writes the reminder file and starts a detached `--remind` process; a later report replaces the file. */
+function scheduleReminder(tool, session, log, cache) {
+  const mode = process.env.TURN_TOKENS_REMIND ?? 'on';
+  if (mode === 'off' || !showsCache(tool, cache)) return;
+  const notifyAt = Date.parse(cache.expiresAt) - LEAD_MIN * MIN_MS;
+  if (notifyAt <= now().getTime()) return;
+  const file = reminderFile(tool, session);
+  const rem = { schema: 'turn-tokens/v1', kind: 'cache-reminder', tool, session, log, lastCallAt: cache.at, context: cache.context, expiresAt: cache.expiresAt, notifyAt: new Date(notifyAt).toISOString() };
+  try {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, JSON.stringify(rem) + '\n');
+  } catch { return; }
+  if (mode === 'record') return; // tests: write the file only
+  try {
+    const child = spawn(process.execPath, [fileURLToPath(import.meta.url), '--remind', file], { detached: true, stdio: 'ignore', env: process.env });
+    child.unref();
+  } catch { /* the report still shows */ }
+}
+
+/** The `--remind` process: waits until notifyAt, then notifies unless the reminder was replaced, the session made a newer request, or the cache already expired. */
+async function remind(file) {
+  const read = () => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
+  const mine = read();
+  if (!mine || mine.kind !== 'cache-reminder') return;
+  // Wait in steps, re-checking at each one, so a reminder that a newer report replaced exits within one step
+  // instead of sleeping until its own notifyAt: a session keeps about one waiting process, not one per turn. TT-19
+  const stale = () => {
+    const current = read();
+    if (!current || current.lastCallAt !== mine.lastCallAt) return true; // replaced by a newer report, or removed
+    let latest = null;
+    try { latest = (mine.tool === 'claude' ? analyzeClaude(mine.log) : analyzeCopilot(mine.log)).cache; } catch { /* log gone: still remind */ }
+    return Boolean(latest && latest.at !== mine.lastCallAt); // the session moved on: its cache was refreshed
+  };
+  let wait = Date.parse(mine.notifyAt) - now().getTime();
+  for (;;) {
+    if (stale()) return;
+    if (wait <= 0) break;
+    const step = Math.min(wait, REMIND_POLL_MS);
+    await sleep(step);
+    wait -= step;
+  }
+  if (now().getTime() >= Date.parse(mine.expiresAt)) return;
+  const left = Math.max(1, Math.round((Date.parse(mine.expiresAt) - now().getTime()) / MIN_MS));
+  const title = `${NAME[mine.tool] ?? mine.tool}: cache expires in ${left} min`;
+  const body = `${n(mine.context)} tokens cached until ${hhmm(new Date(mine.expiresAt))}. Reply now, or /compact before a longer break.`;
+  notify(title, body);
+  try { fs.unlinkSync(file); } catch { /* already gone */ }
+}
+
+function notify(title, body) {
+  if (process.env.TURN_TOKENS_NOTIFY === 'print') { process.stdout.write(`notify · ${title} · ${body}\n`); return; }
+  try {
+    if (process.platform === 'darwin') execFileSync('osascript', ['-e', `display notification ${JSON.stringify(body)} with title ${JSON.stringify(title)}`], { stdio: 'ignore' });
+    else if (process.platform === 'linux') execFileSync('notify-send', [title, body], { stdio: 'ignore' });
+  } catch { /* no notifier: nothing to show */ }
 }
 
 function statusline() { // TT-12
@@ -445,7 +539,9 @@ function statusline() { // TT-12
 }
 
 const tool = opt('--hook');
-if (args.includes('--statusline')) {
+if (opt('--remind')) {
+  await remind(opt('--remind'));
+} else if (args.includes('--statusline')) {
   process.stdout.write(statusline() + '\n');
 } else if (tool === 'claude' || tool === 'codex' || tool === 'copilot') {
   let text;
@@ -457,6 +553,6 @@ if (args.includes('--statusline')) {
   process.stdout.write(out + '\n');
   process.exitCode = 0;
 } else {
-  process.stderr.write('usage: turn-tokens.mjs --hook claude|codex|copilot [--text] [--wait-ms <n>] | --statusline\n');
+  process.stderr.write('usage: turn-tokens.mjs --hook claude|codex|copilot [--text] [--wait-ms <n>] | --statusline | --remind <file>\n');
   process.exitCode = 2;
 }
