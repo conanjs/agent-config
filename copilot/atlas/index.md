@@ -56,7 +56,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Generated pages](map/agent-config/atlas.md#atlas-page) | Atlas | `copilot/atlas/{index.md,map/**}` | — | `copilot/atlas/index.md` | atlas.mjs AT-5 | `tests/atlas/atlas.feature` | `~/.copilot/atlas` |
 | [Tracker schema](map/agent-config/tracker.md#tracker-schema) | Tracker | `copilot/tracker/tracker.schema.md` | — | — | — | — | `~/.copilot/tracker` |
 | [Tracker tool](map/agent-config/tracker.md#tracker-tool) | Tracker | `copilot/tracker/*.{mjs,sh}` | `copilot/tracker/tracker.schema.md` | — | scenarios | `tests/tracker/tracker.feature` | `~/.copilot/tracker` |
-| [This repo's tracker](map/agent-config/tracker.md#tracker-file) | Tracker | `TRACKER.md` | `copilot/tracker/tracker.schema.md` | — | tracker.mjs TR-1 … TR-10 | `tests/tracker/tracker.feature` | — |
+| [This repo's tracker](map/agent-config/tracker.md#tracker-file) | Tracker | `{TRACKER.md,TRACKER.done.md}` | `copilot/tracker/tracker.schema.md` | — | tracker.mjs TR-1 … TR-10 | `tests/tracker/tracker.feature` | — |
 | [Turn token report schema](map/agent-config/turn-tokens.md#tt-schema) | Turn token report | `copilot/hooks/turn-tokens/*.md` | — | — | — | — | `~/.copilot/hooks` |
 | [Turn token tool](map/agent-config/turn-tokens.md#tt-tool) | Turn token report | `copilot/hooks/turn-tokens/*.{mjs,sh}` | `copilot/hooks/turn-tokens/turn-tokens.schema.md` | — | scenarios | `tests/turn-tokens/turn-tokens.feature` | `~/.copilot/hooks` |
 | [Efficiency audit schema](map/agent-config/efficiency-audit.md#ea-schema) | Efficiency audit | `copilot/efficiency-audit/*.md` | — | — | — | — | `— (run from the repo; ~/.copilot/efficiency-audit holds only the history)` |

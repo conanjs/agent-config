@@ -25,8 +25,8 @@ Where: `copilot/tracker/*.{mjs,sh}` · Schema: `copilot/tracker/tracker.schema.m
 
 ## This repo's tracker
 
-<a id="tracker-file"></a>The work agent-config still owes
+<a id="tracker-file"></a>The work agent-config still owes (TRACKER.md) and the items already closed or dropped (TRACKER.done.md)
 
-Where: `TRACKER.md` · Schema: `copilot/tracker/tracker.schema.md` · Index: — · Checked by: tracker.mjs TR-1 … TR-10 · Scenarios: `tests/tracker/tracker.feature` · Installed to: —
+Where: `{TRACKER.md,TRACKER.done.md}` · Schema: `copilot/tracker/tracker.schema.md` · Index: — · Checked by: tracker.mjs TR-1 … TR-10 · Scenarios: `tests/tracker/tracker.feature` · Installed to: —
 
 - [`TRACKER.md`](../../../../TRACKER.md)

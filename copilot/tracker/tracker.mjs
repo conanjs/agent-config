@@ -3,7 +3,7 @@
 // to the next (tracker/v1, schema: tracker.schema.md beside this file).
 //
 // Usage: node tracker.mjs [file or folder] [mode]
-//   (no mode)          check TR-1 … TR-10
+//   (no mode)          check TR-1 … TR-12
 //   --brief            the open items, most urgent first; nothing when there are none
 //   --hook claude      the brief as SessionStart JSON (systemMessage for the user, additionalContext for the model);
 //                      --hook codex: the same JSON, which Codex reads too; --hook copilot: Copilot CLI's (additionalContext)
@@ -11,6 +11,8 @@
 //   --add <title> --next <step> [--status open|doing|waiting] [--waiting-on <who>] [--priority high|normal|low]
 //         [--due <date>] [--done-when <check>] [--from <context>] [--note <text>] [--links <text>]
 //   --update T-<n> [the same fields]   --close T-<n> [--note <text>]   --drop T-<n> --why <text>
+//   --archive          move done and dropped items still in TRACKER.md to TRACKER.done.md (any edit does it too)
+// Closed and dropped items live in TRACKER.done.md beside TRACKER.md, newest first (TR-12).
 // The folder defaults to the current one; inside a git repo the tracker is TRACKER.md at the repo's top level.
 // A TRACKER.md created by --add is listed in .git/info/exclude (local until `git add -f`). Edits that would break a
 // rule are refused. "Today" is TRACKER_TODAY when set (tests), else the local date.
@@ -35,7 +37,7 @@ const GUIDE = `These are the open items in this repo's ${NAME} (tracker/v1). Tel
 
 // ---- arguments ------------------------------------------------------------------------------------------
 const VALUED = ['add', 'next', 'status', 'waiting-on', 'priority', 'due', 'done-when', 'from', 'note', 'links', 'update', 'close', 'drop', 'why', 'hook'];
-const FLAGS = ['brief', 'stdin'];
+const FLAGS = ['brief', 'stdin', 'archive'];
 const stop = (msg) => { console.log(msg); process.exit(1); };
 const opts = {}; const positional = [];
 const argv = process.argv.slice(2);
@@ -70,9 +72,12 @@ function locate(p) {
 let start = positional[0] ?? process.cwd();
 if (opts.stdin) { try { start = JSON.parse(fs.readFileSync(0, 'utf8')).cwd || start; } catch { /* no payload: the current folder */ } }
 const { file, dir } = locate(start);
+const doneFile = path.join(path.dirname(file), `${path.basename(file, '.md')}.done.md`); // TR-12
+const DONE_NAME = path.basename(doneFile);
+const ARCHIVE_PREAMBLE = `# Done items\n\nItems closed or dropped in ${NAME}, newest first. Format and tool: tracker/v1 (agent-config, copilot/tracker/).`;
 
 // ---- parse and check (TR-1 … TR-6) -----------------------------------------------------------------------
-function parse(text) {
+function parse(text, archive = false) { // archive: TRACKER.done.md, which holds only ## Done (TR-12)
   const fails = []; const fail = (code, msg) => fails.push(`  ${code}  ${msg}`);
   const lines = text.replace(/\n$/, '').split(/\r?\n/);
   const items = []; const seen = new Map(); let section = null; let cur = null; let preambleEnd = lines.length;
@@ -98,7 +103,8 @@ function parse(text) {
     if (f && cur) { if (!cur.skip) { if (cur.fields.has(f[1])) cur.twice.push(f[1]); else cur.fields.set(f[1], f[2].trim()); } return; }
     fail('TR-1', `line ${n}: "${line}" is not an item heading, a "- key: value" line or blank`);
   });
-  if (!seen.has('Open')) fail('TR-1', 'there is no "## Open" section');
+  if (archive && seen.has('Open')) fail('TR-12', 'an archive holds only a "## Done" section');
+  if (!archive && !seen.has('Open')) fail('TR-1', 'there is no "## Open" section');
   if (!seen.has('Done')) fail('TR-1', 'there is no "## Done" section');
   if (seen.has('Open') && seen.has('Done') && seen.get('Done') < seen.get('Open')) fail('TR-1', '"## Done" comes before "## Open"');
   const byId = new Map();
@@ -214,16 +220,30 @@ function render(m) {
   for (const it of m.items.filter((x) => x.section === 'Done')) out.push(...item(it));
   return `${out.join('\n').trimEnd()}\n`;
 }
-if (opts.add || opts.update || opts.close || opts.drop) {
+function renderDone(a) {
+  const out = [(a.preamble.trim() || ARCHIVE_PREAMBLE), '', '## Done', ''];
+  for (const it of a.items) out.push(`### ${it.id} ${it.title}`, ...KEYS.filter((k) => it.fields.has(k)).map((k) => `- ${k}: ${it.fields.get(k)}`), '');
+  return `${out.join('\n').trimEnd()}\n`;
+}
+const readDone = () => parse(fs.existsSync(doneFile) ? fs.readFileSync(doneFile, 'utf8') : `${ARCHIVE_PREAMBLE}\n\n## Done\n`, true);
+if (opts.add || opts.update || opts.close || opts.drop || opts.archive) {
   const created = !fs.existsSync(file);
   const m = created ? parse(`${PREAMBLE}\n\n## Open\n\n## Done\n`) : read();
   if (m.fails.length) { console.log(`${NAME} has format errors; fix them first:`); for (const f of m.fails) console.log(f); process.exit(1); }
+  const a = readDone();
+  if (a.fails.length) { console.log(`${DONE_NAME} has format errors; fix them first:`); for (const f of a.fails) console.log(f); process.exit(1); }
+  // TR-12: done and dropped items do not stay in TRACKER.md; any edit moves them to the archive, newest first.
+  const leftover = m.items.filter((x) => x.section === 'Done');
+  m.items = m.items.filter((x) => x.section !== 'Done');
+  a.items.unshift(...leftover);
   const setFields = (it) => { for (const k of FIELD_OPTS) if (opts[k] !== undefined) it.fields.set(k, opts[k]); };
   let done;
   if (opts.add) {
-    const it = { id: `T-${Math.max(0, ...m.items.map((x) => x.n)) + 1}`, title: opts.add, section: 'Open', fields: new Map([['status', 'open']]) };
+    const it = { id: `T-${Math.max(0, ...m.items.map((x) => x.n), ...a.items.map((x) => x.n)) + 1}`, title: opts.add, section: 'Open', fields: new Map([['status', 'open']]) }; // ids stay unique across both files
     setFields(it); it.fields.set('from', opts.from ? `${today} · ${opts.from}` : today);
     m.items.push(it); done = `added ${it.id} to ${NAME}`;
+  } else if (opts.archive) {
+    done = leftover.length ? `moved ${leftover.length} done item${leftover.length === 1 ? '' : 's'} to ${DONE_NAME}` : `nothing to move: ${NAME} has no done items`;
   } else {
     const id = opts.update ?? opts.close ?? opts.drop;
     const it = m.items.find((x) => x.id === id && x.section === 'Open');
@@ -235,15 +255,31 @@ if (opts.add || opts.update || opts.close || opts.drop) {
       if (opts.drop) it.fields.set('why', opts.why);
       m.items.splice(m.items.indexOf(it), 1);
       it.section = 'Done';
-      const firstDone = m.items.findIndex((x) => x.section === 'Done');
-      m.items.splice(firstDone < 0 ? m.items.length : firstDone, 0, it);
-      done = `${opts.close ? 'closed' : 'dropped'} ${id}`;
+      a.items.unshift(it);
+      done = `${opts.close ? 'closed' : 'dropped'} ${id}; moved to ${DONE_NAME}`;
     }
   }
   const text = render(m);
   const after = parse(text);
   if (after.fails.length) { console.log(`${NAME} not changed:`); for (const f of after.fails) console.log(f); process.exit(1); }
+  const doneText = a.items.length ? renderDone(a) : null;
+  if (doneText) {
+    const afterDone = parse(doneText, true);
+    if (afterDone.fails.length) { console.log(`${NAME} not changed:`); for (const f of afterDone.fails) console.log(f); process.exit(1); }
+  }
   fs.writeFileSync(file, text);
+  if (doneText && (!fs.existsSync(doneFile) || fs.readFileSync(doneFile, 'utf8') !== doneText)) {
+    const firstArchive = !fs.existsSync(doneFile);
+    fs.writeFileSync(doneFile, doneText);
+    if (firstArchive) { // a local-only TRACKER.md (excluded and not tracked by git) keeps its archive local too
+      try {
+        const exclude = path.resolve(dir, git(dir, 'rev-parse', '--git-path', 'info/exclude').trim());
+        const lines = fs.existsSync(exclude) ? fs.readFileSync(exclude, 'utf8').split('\n') : [];
+        let tracked = true; try { git(dir, 'ls-files', '--error-unmatch', '--', file); } catch { tracked = false; }
+        if (!tracked && lines.includes(`/${NAME}`) && !lines.includes(`/${DONE_NAME}`)) fs.appendFileSync(exclude, `${fs.readFileSync(exclude, 'utf8').endsWith('\n') ? '' : '\n'}/${DONE_NAME}\n`);
+      } catch { /* not a git repo */ }
+    }
+  }
   if (created) {
     let exclude = null;
     try { exclude = path.resolve(dir, git(dir, 'rev-parse', '--git-path', 'info/exclude').trim()); } catch { /* not a git repo */ }
@@ -262,6 +298,12 @@ const m = read();
 if (!m) { console.log(`no ${NAME} in ${dir}: nothing to check`); process.exit(0); }
 const fails = m.fails; const warns = [];
 const warn = (code, msg) => warns.push(`  warn  ${code}  ${msg}`);
+// TR-12: the archive is checked with the same rules, and an id is used once across both files.
+const arch = fs.existsSync(doneFile) ? parse(fs.readFileSync(doneFile, 'utf8'), true) : { items: [], fails: [] };
+for (const f of arch.fails) fails.push(f.replace(/^(\s*\S+\s+)/, `$1${DONE_NAME}: `));
+const ids = new Set(m.items.map((x) => x.id));
+for (const it of arch.items) if (ids.has(it.id)) fails.push(`  TR-12  ${it.id} is in both ${NAME} and ${DONE_NAME}`);
+
 if (!fails.length) for (const it of openOf(m)) {
   const s = state(it);
   if (s.done) warn('TR-7', `${it.id} looks done: ${s.done}; close it with --close ${it.id}`);
@@ -269,7 +311,7 @@ if (!fails.length) for (const it of openOf(m)) {
   if (s.stale) warn('TR-9', `${it.id} is stale: no change for ${s.stale} days`);
   if (s.cannot) warn('TR-10', `${it.id}: cannot check "${it.fields.get('done-when')}": ${s.cannot}`);
 }
-console.log(`tracker check: ${path.basename(file)}, ${openOf(m).length} open, ${m.items.length - openOf(m).length} done`);
+console.log(`tracker check: ${path.basename(file)}, ${openOf(m).length} open, ${m.items.length - openOf(m).length + arch.items.length} done`);
 for (const w of warns) console.log(w);
 if (fails.length) { console.log(`FAIL (${fails.length})`); for (const f of fails) console.log(f); process.exit(1); }
 console.log(`PASS (${warns.length} warning(s))`);
