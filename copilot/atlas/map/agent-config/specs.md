@@ -172,6 +172,7 @@ Where: `proposals/**` · Schema: — · Index: `proposals/README.md` · Checked 
 - [`proposals/agentic-sdlc-v2/schemas/stack.schema.md`](../../../../proposals/agentic-sdlc-v2/schemas/stack.schema.md)
 - [`proposals/agentic-sdlc-v2/schemas/task-line.schema.md`](../../../../proposals/agentic-sdlc-v2/schemas/task-line.schema.md)
 - [`proposals/agentic-sdlc-v2/schemas/tree.schema.md`](../../../../proposals/agentic-sdlc-v2/schemas/tree.schema.md)
+- [`proposals/efficiency-auditor.md`](../../../../proposals/efficiency-auditor.md)
 - [`proposals/instruction-loading.md`](../../../../proposals/instruction-loading.md)
 - [`proposals/loose-coupling-backplane.md`](../../../../proposals/loose-coupling-backplane.md)
 - [`proposals/practice-packs.md`](../../../../proposals/practice-packs.md)

@@ -9,23 +9,24 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 - **agent-config** (`agent-config`) — Agent instructions, frameworks, knowledge, procedures, wrappers, skills and their installers
   - [Start here](map/agent-config/start.md) — What the repo is, how to set it up, how to contribute, and what gets installed where (12 files)
   - [Instructions](map/agent-config/instructions.md) — Always-on instructions every agent loads (4 files)
-  - [Atlas](map/agent-config/atlas.md) — This map: the registry, its schema, its tool and the generated pages (33 files)
+  - [Atlas](map/agent-config/atlas.md) — This map: the registry, its schema, its tool and the generated pages (34 files)
   - [Tracker](map/agent-config/tracker.md) — Open work carried across sessions: the TRACKER.md format, its tool and the session-start hooks (4 files)
   - [Turn token report](map/agent-config/turn-tokens.md) — What each Claude Code or Codex turn used and the running total: the report's rules, its tool and the Stop hooks (4 files)
+  - [Efficiency audit](map/agent-config/efficiency-audit.md) — Token waste found in the Claude Code, Codex and Copilot logs: the detectors, the weekly report and its history (3 files)
   - [Frameworks](map/agent-config/frameworks.md) — Rule sets with schemas and validators: agentic-sdlc, knowledge, company-kb, agent-foundry (264 files)
     - [Agentic SDLC framework](map/agent-config/agentic-sdlc.md) — Roles, foundations, decision trees, stacks and paradigms for spec-driven, multi-agent delivery (222 files)
     - [Knowledge framework](map/agent-config/knowledge-framework.md) — Schemas and validator for the global knowledge base (6 files)
     - [Company KB framework](map/agent-config/company-kb-framework.md) — Schemas for per-company knowledge bases (11 files)
     - [Agent Foundry](map/agent-config/agent-foundry.md) — Charters, floors, trees and lenses for standalone review and triage agents (25 files)
-  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (359 files)
+  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (360 files)
   - [Company knowledge bases](map/agent-config/companies.md) — Facts about one company's systems, one folder per company (22 files)
   - [Procedures](map/agent-config/procedures.md) — Repeatable multi-step tasks, written once in tool-neutral prose (10 files)
   - [Patterns](map/agent-config/patterns.md) — Named, reusable techniques learned from real cases (12 files)
   - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (55 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (20 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
-  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (149 files)
-  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (107 files)
+  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (150 files)
+  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (118 files)
   - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (14 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
@@ -58,6 +59,8 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [This repo's tracker](map/agent-config/tracker.md#tracker-file) | Tracker | `TRACKER.md` | `copilot/tracker/tracker.schema.md` | — | tracker.mjs TR-1 … TR-10 | `tests/tracker/tracker.feature` | — |
 | [Turn token report schema](map/agent-config/turn-tokens.md#tt-schema) | Turn token report | `copilot/hooks/turn-tokens/*.md` | — | — | — | — | `~/.copilot/hooks` |
 | [Turn token tool](map/agent-config/turn-tokens.md#tt-tool) | Turn token report | `copilot/hooks/turn-tokens/*.{mjs,sh}` | `copilot/hooks/turn-tokens/turn-tokens.schema.md` | — | scenarios | `tests/turn-tokens/turn-tokens.feature` | `~/.copilot/hooks` |
+| [Efficiency audit schema](map/agent-config/efficiency-audit.md#ea-schema) | Efficiency audit | `copilot/efficiency-audit/*.md` | — | — | — | — | `— (run from the repo; ~/.copilot/efficiency-audit holds only the history)` |
+| [Efficiency audit tool](map/agent-config/efficiency-audit.md#ea-tool) | Efficiency audit | `copilot/efficiency-audit/*.{mjs,json}` | `copilot/efficiency-audit/efficiency-audit.schema.md` | — | scenarios; check-triggers (AU-10) | `tests/efficiency-audit/efficiency-audit.feature` | `— (run from the repo)` |
 | [Overview and conventions](map/agent-config/agentic-sdlc.md#sdlc-overview) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/{index,conventions}.md` | `copilot/frameworks/agentic-sdlc/schemas/framework-index.schema.md` | `copilot/frameworks/agentic-sdlc/index.md` | validate.mjs CONV, INDEX | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Roles](map/agent-config/agentic-sdlc.md#sdlc-role) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/agents/*.md` | `copilot/frameworks/agentic-sdlc/schemas/agent-role.schema.md` | `copilot/frameworks/agentic-sdlc/conventions.md` | validate.mjs ROLE | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |
 | [Foundations](map/agent-config/agentic-sdlc.md#sdlc-foundation) | Agentic SDLC framework | `copilot/frameworks/agentic-sdlc/foundations/**/*.md` | `copilot/frameworks/agentic-sdlc/schemas/foundation.schema.md` | `copilot/frameworks/agentic-sdlc/index.md` | validate.mjs FND, RULE, SRC | `tests/validate-sdlc/validate-sdlc.feature` | `~/.copilot/frameworks` |

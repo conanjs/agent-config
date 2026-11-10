@@ -1,0 +1,9 @@
+{
+  "about": "The core triggers EA-3 checks (proposals/efficiency-auditor.md D5). Each entry: the file a trigger names, the visible condition that must hold before reading it, and the text that must appear in copilot/instructions/core.instructions.md (check-triggers, AU-10). Triggers that need judgment are left out.",
+  "triggers": [
+    { "file": "~/.copilot/references/answer-patterns.md", "when": "pattern-tag-or-deep-dive", "core": "~/.copilot/references/answer-patterns.md" },
+    { "file": "~/.copilot/references/code-review-graph.md", "when": "graph-tools", "core": "~/.copilot/references/code-review-graph.md" },
+    { "file": "~/.copilot/global-variables.md", "when": "placeholder", "core": "~/.copilot/global-variables.md" },
+    { "file": "~/.copilot/companies/ots/index.md", "when": { "words": ["ots", "ne-manage-shipment-frontend", "ne-api-gateway", "ne-import-shipment-api", "ne-shipment-api"] }, "core": "~/.copilot/companies/<company>/index.md" }
+  ]
+}

@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["Claude Code 2.1.278–2.1.308", "Codex CLI 0.164.0-alpha.11.1", "Python ≥ 3.8", "macOS or Linux"]
 last-verified: 2026-10-31
-last-updated: 2026-10-31
+last-updated: 2026-11-10
 tags: [tokens, measurement, claude-code, codex, transcripts, jsonl, sqlite]
 ---
 
@@ -193,6 +193,7 @@ tags: [tokens, measurement, claude-code, codex, transcripts, jsonl, sqlite]
    cp ~/.codex/state_5.sqlite* /tmp/ && sqlite3 /tmp/state_5.sqlite "select id, model, reasoning_effort, tokens_used from threads order by rowid desc limit 10;"
    ```
 10. To get these numbers after every turn without running anything, install the turn token report: a `Stop` hook for each tool that applies the same counting rules, shows the turn, its tools and subagents, the session total and the plan limits, and keeps a history in `~/.claude/turn-tokens/` and `~/.codex/turn-tokens/`. Its rules and report format: `copilot/hooks/turn-tokens/turn-tokens.schema.md` in agent-config; setup: that repo's `SETUP.md`, step 12.
+11. To find patterns that waste tokens across many sessions, all three agents and several weeks (one file read per request, cache rebuilds after a pause, needless instruction reads), use the efficiency auditor instead: `audit-agent-efficiency.md`.
 
 ## Verify
 Expected output shape, from real runs on 2026-10-30 ✅[^1][^2]:
@@ -258,4 +259,5 @@ Checks that prove the numbers are right:
 - `ai-agents/agent-token-accounting.md`
 - `ai-agents/claude-code-usage-reference.md`
 - `ai-agents/codex-usage-reference.md`
+- `ai-agents/audit-agent-efficiency.md` — the same logs read across sessions and weeks, for waste patterns
 - `github-copilot/copilot-cli-internals.md` — the same measurements for GitHub Copilot CLI (legacy, SQLite based)

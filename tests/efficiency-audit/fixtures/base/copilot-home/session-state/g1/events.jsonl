@@ -1,0 +1,19 @@
+{"type":"session.start","timestamp":"2026-11-05T09:00:00Z","data":{"sessionId":"g1","context":{"cwd":"/work/g"}}}
+{"type":"user.message","timestamp":"2026-11-05T09:00:00Z","data":{"content":"Where do notes go?"}}
+{"type":"session.usage_record","timestamp":"2026-11-05T09:00:05Z","data":{"usage":{"model":"claude-opus-5.5","inputTokens":60000,"cacheWriteTokens":60000,"cacheReadTokens":0,"outputTokens":100,"maxPromptTokens":968000,"initiator":"agent","cacheExpiresAt":"2026-11-05T09:05:05Z","copilotUsage":{"totalNanoAiu":30000000000}}}}
+{"type":"session.warning", broken
+{"type":"assistant.message","timestamp":"2026-11-05T09:00:05Z","data":{"content":"","toolRequests":[{"name":"view"}]}}
+{"type":"tool.execution_start","timestamp":"2026-11-05T09:00:05Z","data":{"toolCallId":"v1","toolName":"view","arguments":{"path":"/home/v/.copilot/global-variables.md"}}}
+{"type":"tool.execution_complete","timestamp":"2026-11-05T09:00:06Z","data":{"toolCallId":"v1","result":{"content":"AGENT_HOME=~/.copilot"}}}
+{"type":"session.usage_record","timestamp":"2026-11-05T09:00:08Z","data":{"usage":{"model":"claude-opus-5.5","inputTokens":61000,"cacheWriteTokens":1000,"cacheReadTokens":60000,"outputTokens":100,"maxPromptTokens":968000,"initiator":"agent","cacheExpiresAt":"2026-11-05T09:05:08Z","copilotUsage":{"totalNanoAiu":2000000000}}}}
+{"type":"assistant.message","timestamp":"2026-11-05T09:00:08Z","data":{"content":"In the notes folder."}}
+{"type":"session.usage_record","timestamp":"2026-11-05T09:00:09Z","data":{"usage":{"model":"claude-opus-5.5","inputTokens":90000,"cacheWriteTokens":90000,"cacheReadTokens":0,"outputTokens":50,"maxPromptTokens":968000,"initiator":"sub-agent","cacheExpiresAt":"2026-11-05T09:05:09Z","copilotUsage":{"totalNanoAiu":40000000000}}}}
+{"type":"user.message","timestamp":"2026-11-05T09:06:08Z","data":{"content":"Resolve {{AGENT_HOME}}/notes"}}
+{"type":"session.usage_record","timestamp":"2026-11-05T09:06:10Z","data":{"usage":{"model":"claude-opus-5.5","inputTokens":62000,"cacheWriteTokens":62000,"cacheReadTokens":0,"outputTokens":100,"maxPromptTokens":968000,"initiator":"agent","cacheExpiresAt":"2026-11-05T09:36:10Z","copilotUsage":{"totalNanoAiu":32000000000}}}}
+{"type":"tool.execution_start","timestamp":"2026-11-05T09:06:10Z","data":{"toolCallId":"v2","toolName":"view","arguments":{"path":"/home/v/.copilot/global-variables.md"}}}
+{"type":"tool.execution_complete","timestamp":"2026-11-05T09:06:11Z","data":{"toolCallId":"v2","result":{"content":"AGENT_HOME=~/.copilot"}}}
+{"type":"session.usage_record","timestamp":"2026-11-05T09:06:12Z","data":{"usage":{"model":"claude-opus-5.5","inputTokens":63000,"cacheWriteTokens":1000,"cacheReadTokens":62000,"outputTokens":100,"maxPromptTokens":968000,"initiator":"agent","cacheExpiresAt":"2026-11-05T09:36:12Z","copilotUsage":{"totalNanoAiu":2000000000}}}}
+{"type":"assistant.message","timestamp":"2026-11-05T09:06:12Z","data":{"content":"~/.copilot/notes"}}
+{"type":"user.message","timestamp":"2026-11-05T09:13:00Z","data":{"content":"Thanks"}}
+{"type":"session.usage_record","timestamp":"2026-11-05T09:13:05Z","data":{"usage":{"model":"claude-opus-5.5","inputTokens":64000,"cacheWriteTokens":50000,"cacheReadTokens":14000,"outputTokens":20,"maxPromptTokens":968000,"initiator":"agent","cacheExpiresAt":"2026-11-05T09:18:05Z","copilotUsage":{"totalNanoAiu":26000000000}}}}
+{"type":"assistant.message","timestamp":"2026-11-05T09:13:05Z","data":{"content":"You are welcome."}}

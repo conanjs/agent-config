@@ -119,6 +119,16 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: In agent-config AGENTS.md, point agents at 'atlas.mjs --explain <an existing file of the same kind>' (a folder returns only kinds, IW-14), add an .rgignore excluding copilot/atlas/map/ so repo-wide rg searches stop matching the generated file lists, then re-test with Codex gpt-6-luna (AGENTS.md measurement rule)
 - from: 2026-11-09 · 2026-11-09, atlas review and IW-14
 
+### T-46 Efficiency audit: add --suggest once 3 weeks of history exist (efficiency-auditor D10)
+- status: open
+- next: After the week of 2026-11-16 is in ~/.copilot/efficiency-audit/history.jsonl: build --suggest, which sends the flagged detectors' counts and paths (no text) to codex exec -m gpt-6-luna or copilot --model gpt-5.4-mini and writes proposed detector rules to a draft for V; add scenarios
+- from: 2026-11-10
+
+### T-47 Cut Copilot's cache rebuilds after a pause (efficiency-auditor D13)
+- status: open
+- next: Pick a habit or setting to test (compact before a break, one session per task, smaller contexts), use it for a week, then compare Copilot EA-6a in efficiency-audit.mjs week against the weeks before (47.8% of Copilot AI credits on disk went to these rebuilds)
+- from: 2026-11-10
+
 ## Done
 
 ### T-45 Fill the browser and web-platform gaps against javascript.info
