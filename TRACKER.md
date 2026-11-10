@@ -91,13 +91,6 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: Find and open the current authoritative replacement for the HTTP 404 existing-projects.html link in copilot/knowledge/testing/characterization-tests.md; preserve the existing explanation and rerun URL validation.
 - from: 2026-11-07
 
-### T-40 Instruction loading: answer the decisions in proposals/instruction-loading.md
-- status: waiting
-- next: Deployed 2026-11-09 (core, references, skills, root AGENTS.md, mapping relinked by the installer; D1–D14 in proposals/instruction-loading.md). Left: V approves the commit and PR on chore/instruction-loading-inventory; restart VS Code fully so it drops its cached instructions
-- waiting-on: V
-- from: 2026-11-09 · 2026-11-09, Codex handoff graph-instructions-handoff.md
-- updated: 2026-11-09
-
 ### T-41 Repair stale AWS hexagonal-architecture source URL
 - status: open
 - next: Find the current AWS Prescriptive Guidance page replacing the HTTP 404 hexagonal-architecture.html link in copilot/knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md; update only its reference
@@ -132,12 +125,21 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - from: 2026-11-10
 - updated: 2026-11-10
 
+## Done
+
 ### T-48 Fast-path the workflow guard hook when no workflow run is active
-- status: open
+- status: done
 - next: workflow-graph-hook.sh starts Node twice (a version check, then main.ts) before every tool call in Codex (PreToolUse '*') and Copilot (preToolUse): 130-190 ms each, even with no agentic-sdlc run. Exit before starting Node when the repo has no active run (for example no .specify/runs/*/ledger.jsonl), and cache the Node version check; add scenarios in tests/workflow-graph
 - from: 2026-11-10 · 2026-11-10, efficiency review of agent-config
+- closed: 2026-11-10 · workflow-graph-hook.sh answers in about 10 ms instead of 130-190 ms when no workflow run can be involved (WG-38, 3 scenarios)
 
-## Done
+### T-40 Instruction loading: answer the decisions in proposals/instruction-loading.md
+- status: done
+- next: Deployed 2026-11-09 (core, references, skills, root AGENTS.md, mapping relinked by the installer; D1–D14 in proposals/instruction-loading.md). Left: V approves the commit and PR on chore/instruction-loading-inventory; restart VS Code fully so it drops its cached instructions
+- waiting-on: V
+- from: 2026-11-09 · 2026-11-09, Codex handoff graph-instructions-handoff.md
+- updated: 2026-11-09
+- closed: 2026-11-10 · V closed it 2026-11-10: core deployed and merged (PR #20); restart VS Code fully to drop its cached instructions
 
 ### T-45 Fill the browser and web-platform gaps against javascript.info
 - status: done

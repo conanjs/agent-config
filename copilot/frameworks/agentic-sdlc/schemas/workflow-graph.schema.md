@@ -83,6 +83,7 @@ Required: `seq`, `prev`, `hash`, `at`, `run`, `node`, `result`, `actor` (`orches
 | WG-35 | P6 tasks run one at a time in their own worktree | Each task, in order and after the tasks it `requires:`, runs in `<project>.runs/<run>-<task>` on branch `run/<run>-<task>`; after review `pass` it is merged into `run/<run>` and its worktree removed; failed checks repeat within the graph's budget, then escalate | script |
 | WG-36 | A launch with no recorded end is never repeated blindly | A launch journalled as started but not finished stops the run for a person instead of launching again | script |
 | WG-37 | Only a person at a terminal approves through the runner | `run approve` reads the confirmation from the controlling terminal (`/dev/tty`); without one it records nothing | script |
+| WG-38 | The hook launcher answers without starting Node when no workflow run can be involved | `workflow-graph-hook.sh hook guard|approve`: when no `cwd` in the input nor the hook's folder has `.specify/runs`, and the input mentions no run (`run:`), launch prompt, run file (`.specify/runs`) or approval, it prints what the guard prints for no decision (nothing; `{}` for Copilot CLI) and exits 0; otherwise it passes stdin unchanged to the tool. A malformed input in such a folder is allowed rather than denied, as when Node is missing | scenarios |
 
 ## References
 

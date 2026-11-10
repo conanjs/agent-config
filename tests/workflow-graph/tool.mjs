@@ -3,7 +3,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { Given } from '@cucumber/cucumber';
+import { Given, When } from '@cucumber/cucumber';
 import { registerTool, repo } from '../support/tools.mjs';
 
 const framework = 'copilot/frameworks/agentic-sdlc';
@@ -116,4 +116,19 @@ Given('in run {string}, task {string} passes', function (run, task) {
 Given('{string} is typed for run {string}', function (word, run) {
   const [verb, gate] = word.split(' ');
   approve(this, run, gate, verb);
+});
+
+// WG-38: the hook launcher itself (workflow-graph-hook.sh), with a fake Node that passes the version check and, when
+// started on main.ts, prints "node started" and what it got on stdin, so a scenario sees whether Node ran.
+When('the hook launcher runs with {string} and this on stdin:', function (a, doc) {
+  const fake = this.at('fake-node');
+  fs.writeFileSync(fake, '#!/bin/sh\n[ "$1" = "-e" ] && exit 0\nprintf "node started: %s\\n" "$(cat)"\n', { mode: 0o755 });
+  const launcher = path.join(repo, framework, 'tools/workflow-graph/workflow-graph-hook.sh');
+  const fill = (t) => t.replaceAll('{root}', this.root);
+  let out = '';
+  let code = 0;
+  try {
+    out = execFileSync('sh', [launcher, ...fill(a).split(' ')], { encoding: 'utf8', input: fill(doc), cwd: this.root, env: { PATH: '/usr/bin:/bin', HOME: this.root, NODE: fake } });
+  } catch (e) { code = e.status ?? 1; out = String(e.stdout ?? ''); }
+  this.result = { code, out: out.trimEnd().replaceAll(this.root, '{root}'), stdout: out, stderr: '' };
 });
