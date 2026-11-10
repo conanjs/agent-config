@@ -29,4 +29,5 @@ Where: `copilot/tracker/*.{mjs,sh}` · Schema: `copilot/tracker/tracker.schema.m
 
 Where: `{TRACKER.md,TRACKER.done.md}` · Schema: `copilot/tracker/tracker.schema.md` · Index: — · Checked by: tracker.mjs TR-1 … TR-10 · Scenarios: `tests/tracker/tracker.feature` · Installed to: —
 
+- [`TRACKER.done.md`](../../../../TRACKER.done.md)
 - [`TRACKER.md`](../../../../TRACKER.md)

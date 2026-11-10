@@ -10,7 +10,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Start here](map/agent-config/start.md) — What the repo is, how to set it up, how to contribute, and what gets installed where (12 files)
   - [Instructions](map/agent-config/instructions.md) — Always-on instructions every agent loads (4 files)
   - [Atlas](map/agent-config/atlas.md) — This map: the registry, its schema, its tool and the generated pages (34 files)
-  - [Tracker](map/agent-config/tracker.md) — Open work carried across sessions: the TRACKER.md format, its tool and the session-start hooks (4 files)
+  - [Tracker](map/agent-config/tracker.md) — Open work carried across sessions: the TRACKER.md format, its tool and the session-start hooks (5 files)
   - [Turn token report](map/agent-config/turn-tokens.md) — What each Claude Code or Codex turn used and the running total: the report's rules, its tool and the Stop hooks (4 files)
   - [Efficiency audit](map/agent-config/efficiency-audit.md) — Token waste found in the Claude Code, Codex and Copilot logs: the detectors, the weekly report and its history (3 files)
   - [Frameworks](map/agent-config/frameworks.md) — Rule sets with schemas and validators: agentic-sdlc, knowledge, company-kb, agent-foundry (264 files)
