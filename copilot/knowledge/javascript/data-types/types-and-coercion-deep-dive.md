@@ -3,10 +3,10 @@ schema: deep-dive/v1
 topic: javascript/data-types
 status: verified
 applies-to: ["ECMAScript 2025", "Node.js 24 (V8)"]
-last-updated: 2026-11-04
-last-verified: 2026-11-04
+last-updated: 2026-11-10
+last-verified: 2026-11-10
 synthesized-into: []
-tags: [javascript, types, primitives, coercion, toprimitive, tonumber, tostring, toboolean, equality, samevalue, loose-equality, relational-comparison, grammar, asi, ydkjs]
+tags: [javascript, types, primitives, boxing, unboxing, class-tag, tostringtag, coercion, toprimitive, tonumber, tostring, toboolean, equality, samevalue, loose-equality, relational-comparison, grammar, asi, ydkjs]
 ---
 
 # Types, coercion, equality and grammar, end to end
@@ -14,7 +14,7 @@ tags: [javascript, types, primitives, coercion, toprimitive, tonumber, tostring,
 ## Summary
 **TL;DR:** JavaScript values have types; variables do not. Every implicit conversion is a call to one of a handful of specification **abstract operations** — `ToPrimitive`, `ToString`, `ToNumber`, `ToBoolean` — and every comparison is one of `SameValue`, `SameValueZero`, `IsStrictlyEqual` (`===`), `IsLooselyEqual` (`==`) or `IsLessThan` (`<`). Once those few tables are known, the famous "WAT" results (`[] == ![]`, `{} + []`, `parseInt(0.0000005)`) become mechanical. The real culprits are a few conversion corner cases (`Number("")` is 0, `String([])` is `""`, `Number(false)` is 0), not `==` itself. Grammar has its own traps: statement completion values, automatic semicolons, and `arguments` aliasing in sloppy mode.
 **Use this when:** you need to predict an implicit conversion or comparison exactly, decide between `==` and `===` with reasons, or debug a grammar surprise; or you are reading You Don't Know JS *Types & Grammar* and want a verified companion.
-**Depth:** the eight types and `typeof`; primitives' immutability and wrappers; number and string internals relevant to coercion; each abstract operation as a table of inputs and outputs; the `+` operator; `SameValue` vs `SameValueZero` vs `===` vs `==` with the full loose-equality algorithm; relational comparison; corner cases traced step by step; the `==` versus `===` debate reconciled; grammar (completion values, labels, ASI, precedence, `arguments`, `finally`, `switch`). Every ✅[^2] row ran in Node.js 24.22.1.
+**Depth:** the eight types and `typeof`; primitives' immutability and wrappers, boxing and unboxing, the internal `[[Class]]` and `Object.prototype.toString` tags; number and string internals relevant to coercion; each abstract operation as a table of inputs and outputs; the `+` operator; `SameValue` vs `SameValueZero` vs `===` vs `==` with the full loose-equality algorithm; relational comparison; corner cases traced step by step; the `==` versus `===` debate reconciled; grammar (completion values, labels, ASI, precedence, `arguments`, `finally`, `switch`). Every ✅[^2] row ran in Node.js 24.22.1.
 
 ## 1. Values, types and `typeof`
 
@@ -29,6 +29,20 @@ Seven primitive types — `undefined`, `null`, `boolean`, `number`, `bigint`, `s
 | `Symbol()`, `1n` | `"symbol"`, `"bigint"` | ✅[^2] |
 
 **Primitives are immutable.** In strict code, `'abc'.x = 1` throws `TypeError`; reading a method on a primitive temporarily boxes it (`Object('abc')` is a `String` object, `typeof` `"object"`) ✅[^2] ✅[^3].
+
+**Boxing and unboxing.** `String`, `Number`, `Boolean`, `Symbol` and `BigInt` are the *natives* whose objects wrap a primitive. Analogy: a primitive is a letter; boxing puts it in an envelope (an object) so it can carry methods, and unboxing takes the letter out again. ✅[^11] ✅[^12]
+
+| Fact (Node 24.22.1, 2026-11-10) | Result |
+|---|---|
+| `typeof 'abc'`, `typeof new String('abc')`, `typeof Object('abc')`, `typeof String('abc')` | `"string"`, `"object"`, `"object"`, `"string"` — `String(x)` without `new` converts, it does not box ✅[^11] |
+| `'abc'.length`, `(5).toFixed(1)` | `3`, `"5.0"` — the engine boxes implicitly to reach the prototype method, then discards the wrapper; pre-boxing "for speed" is pointless ✅[^11] ✅[^12] |
+| `'abc' == new String('abc')`, `===`, `new String('a') == new String('a')` | `true`, `false`, `false` — two wrappers are two objects ✅[^11] |
+| `!!new Boolean(false)` | `true` — every object is truthy, the classic wrapper gotcha ✅[^11] ✅[^12] |
+| Unboxing: `new String('abc').valueOf()`, `new String('abc') + '!'`, `Number(new Number(5)) + 1` | `"abc"`, `"abc!"`, `6` — `valueOf` explicitly, or implicitly through `ToPrimitive` ✅[^11] ✅[^12] |
+| `new Symbol()`; `typeof Object(Symbol('x'))`, `typeof Object(1n)` | `TypeError`; `"object"`, `"object"` — symbols and bigints can be boxed only with `Object(..)` ✅[^11] |
+| `function f() { return typeof this }` called with `f.call(5)` | `"number"` in strict mode, `"object"` in sloppy mode — sloppy mode boxes a primitive `this` ✅[^11] |
+
+**The internal `[[Class]]`, now a tag.** Up to ES5 every object carried an internal `[[Class]]` string, readable only through `Object.prototype.toString`. Since ES2015 the specification has no `[[Class]]`: `toString` builds the tag from the object's internal slots (Array, Arguments, Function, Error, Boolean, Number, String, Date, RegExp) and lets `Symbol.toStringTag` override it ✅[^12] ✅[^13]. Measured tags: `[]` → `[object Array]`, `null` → `[object Null]`, `undefined` → `[object Undefined]`, `1` → `[object Number]` (boxed first), `Symbol()` → `[object Symbol]`, `1n` → `[object BigInt]`, `new Map` → `[object Map]`, `Promise.resolve()` → `[object Promise]`, `JSON` → `[object JSON]`, `arguments` → `[object Arguments]`, `{[Symbol.toStringTag]: 'User'}` → `[object User]` ✅[^11].
 
 **Numbers** are IEEE 754 binary64 (limits: `Number.MAX_SAFE_INTEGER` 9007199254740991, `Number.EPSILON` = 2⁻⁵², `Number.MIN_VALUE` 5e-324; `2**53 === 2**53 + 1`) ✅[^2] — the full treatment is `floating-point/ieee-754-deep-dive.md`. **Bitwise operators convert to 32-bit integers**: `2**31 | 0` is −2147483648, `~~-3.7` is −3, `-1 >>> 0` is 4294967295 ✅[^2] ✅[^3].
 
@@ -192,7 +206,7 @@ The book's point: the absurdity comes from three conversion corner cases — `St
 ## 9. How this deep dive was built
 - **Primary narrative:** You Don't Know JS Yet, *Types & Grammar* (2nd edition, rough draft, chapters 1–4) and the 1st edition's chapters 4–5 and Appendix A (grammar, ASI, `arguments`, Annex B).
 - **Reconciled with:** the ECMAScript abstract operations and MDN; the `==`/`===` disagreement is presented with both sides.
-- **Verified:** every ✅[^2] row ran in `node:24.22.1-alpine` on 2026-11-04 (lab file `types.js`).
+- **Verified:** every ✅[^2] row ran in `node:24.22.1-alpine` on 2026-11-04 (lab file `types.js`). The boxing and `[[Class]]` rows (✅[^11]) ran in Node.js 24.22.1 on 2026-11-10; they add the 1st edition's chapter 3 "Natives".
 
 ## References
 - [You Don't Know JS Yet: Types & Grammar, ch. 1 "Primitive Values"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/types-grammar/ch1.md) — Kyle Simpson, 2nd ed. (rough draft), CC BY-NC-ND 4.0. Backs: value types, `typeof`, number and string internals. [^1]
@@ -205,6 +219,9 @@ The book's point: the absurdity comes from three conversion corner cases — `St
 - [You Don't Know JS Yet: Types & Grammar, ch. 4 "Coercing Values"](https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/types-grammar/ch4.md) — Kyle Simpson. Backs: abstract operations, `[] == ![]` trace, type-aware equality argument. [^8]
 - [You Don't Know JS: Types & Grammar, ch. 5 "Grammar"](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/types%20%26%20grammar/ch5.md) — Kyle Simpson, 1st ed. Backs: completion values, ASI, precedence, `arguments`, `finally`, `switch`. [^9]
 - [You Don't Know JS: Types & Grammar, Appendix A "Mixed Environment JavaScript"](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/types%20%26%20grammar/apA.md) — Kyle Simpson, 1st ed. Backs: Annex B, host objects, DOM globals. [^10]
+- `linux/lab-setup.md` — the same Node.js 24.22.1 lab, boxing, unboxing and `Object.prototype.toString` tags run on 2026-11-10. [^11]
+- [You Don't Know JS: Types & Grammar, ch. 3 "Natives"](https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/types%20%26%20grammar/ch3.md) — Kyle Simpson, 1st ed. Backs: internal `[[Class]]`, boxing wrappers and their gotchas, unboxing. [^12]
+- [ECMAScript: Object.prototype.toString](https://tc39.es/ecma262/#sec-object.prototype.tostring) — Ecma TC39, living. Backs: built-in tag from internal slots, `Symbol.toStringTag`, no `[[Class]]` since ES2015. [^13]
 
 ## Related
 - `javascript/fundamentals/operators-and-comparisons.md` — the short catalog this dive explains.
