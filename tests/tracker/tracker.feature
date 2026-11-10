@@ -364,6 +364,9 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
   # ---- hooks ------------------------------------------------------------------------------------------
 
   Scenario: --hook claude shows the user a summary and gives the model the list and how to use it
+    # Both items were touched within the last 2 days, so the session-start brief lists them (TR-11).
+    Given in "TRACKER.md", `- from: 2026-10-20` becomes `- from: 2026-10-29`
+    And in "TRACKER.md", `- from: 2026-10-25` becomes `- from: 2026-10-28`
     When the tool runs with "--hook claude {root}"
     Then it exits with 0 and prints:
       """
@@ -376,7 +379,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       }
       """
 
-  Scenario: --hook claude shows the user at most 5 items and says how many more there are
+  Scenario: TR-11 --hook claude lists at most 5 items, for the model too, and says how to see the rest
     Given the file "TRACKER.md" contains:
       """
       # Tracker
@@ -419,15 +422,18 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
     Then it exits with 0 and prints:
       """
       {
-        "systemMessage": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n… and 1 more",
+        "systemMessage": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n… 1 more not listed; all of them: node ~/.copilot/tracker/tracker.mjs --brief",
         "hookSpecificOutput": {
           "hookEventName": "SessionStart",
-          "additionalContext": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n- T-6 Six · next: f\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+          "additionalContext": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n… 1 more not listed; all of them: node ~/.copilot/tracker/tracker.mjs --brief\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
         }
       }
       """
 
   Scenario: --hook codex prints the same SessionStart JSON as Claude Code, which Codex reads
+    # Both items were touched within the last 2 days, so the session-start brief lists them (TR-11).
+    Given in "TRACKER.md", `- from: 2026-10-20` becomes `- from: 2026-10-29`
+    And in "TRACKER.md", `- from: 2026-10-25` becomes `- from: 2026-10-28`
     When the tool runs with "--hook codex {root}"
     Then it exits with 0 and prints:
       """
@@ -446,11 +452,35 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       """
 
   Scenario: --hook copilot gives the model the list as additionalContext
+    # Both items were touched within the last 2 days, so the session-start brief lists them (TR-11).
+    Given in "TRACKER.md", `- from: 2026-10-20` becomes `- from: 2026-10-29`
+    And in "TRACKER.md", `- from: 2026-10-25` becomes `- from: 2026-10-28`
     When the tool runs with "--hook copilot {root}"
     Then it exits with 0 and prints:
       """
       {
         "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+      }
+      """
+
+  Scenario: TR-11 the session-start brief leaves out items untouched for more than 2 days, and says how to list them
+    # "Today" is 2026-10-30; T-1 was last touched 2026-10-20 and T-2 2026-10-25. --brief still lists both.
+    When the tool runs with "--hook copilot {root}"
+    Then it exits with 0 and prints:
+      """
+      {
+        "additionalContext": "TRACKER.md: 2 open — 1 waiting\n… 2 more not listed (2 untouched for more than 2 days); all of them: node ~/.copilot/tracker/tracker.mjs --brief\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+      }
+      """
+
+  Scenario: TR-11 an old item stays in the brief when it is high priority, and an update makes it recent again
+    Given in "TRACKER.md", `- next: Draft the install steps` becomes `- next: Draft the install steps\n- priority: high`
+    And in "TRACKER.md", `- from: 2026-10-25` becomes `- from: 2026-10-25\n- updated: 2026-10-29`
+    When the tool runs with "--hook copilot {root}"
+    Then it exits with 0 and prints:
+      """
+      {
+        "additionalContext": "TRACKER.md: 2 open — 1 high, 1 waiting\n- T-1 Write the setup guide · high priority · next: Draft the install steps\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
       }
       """
 

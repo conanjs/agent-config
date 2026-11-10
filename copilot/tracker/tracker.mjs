@@ -28,6 +28,8 @@ const SECTION_OF = { open: 'Open', doing: 'Open', waiting: 'Open', done: 'Done',
 const PRIORITIES = ['high', 'normal', 'low'];
 const DATED = ['from', 'updated', 'closed', 'due'];
 const STALE_DAYS = 14;
+const QUIET_DAYS = Number(process.env.TRACKER_QUIET_DAYS ?? 2); // TR-11: the session-start brief leaves out items untouched for longer
+const BRIEF_MAX = Number(process.env.TRACKER_BRIEF_MAX ?? 5); // TR-11: and lists at most this many
 const PREAMBLE = '# Tracker\n\nWork this repo still owes, carried from one session to the next. Format and tool: tracker/v1 (agent-config, copilot/tracker/).';
 const GUIDE = `These are the open items in this repo's ${NAME} (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ${TOOL} --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it.`;
 
@@ -150,6 +152,7 @@ function state(it) {
   if (v('due') && dayOf(v('due')) < dayOf(today)) s.overdue = v('due');
   const since = dayOf(today) - dayOf(v('updated') ?? v('from'));
   if (since > STALE_DAYS) s.stale = since;
+  s.quiet = since > QUIET_DAYS && !s.done && !s.overdue && s.priority !== 'high' && s.status !== 'doing'; // TR-11
   s.rank = s.done ? 0 : s.overdue ? 1 : s.priority === 'high' ? 2 : s.status === 'doing' ? 3 : s.status === 'waiting' ? 4 : s.priority === 'low' ? 6 : 5;
   return s;
 }
@@ -157,7 +160,7 @@ function state(it) {
 // ---- output --------------------------------------------------------------------------------------------------
 const read = () => (fs.existsSync(file) ? parse(fs.readFileSync(file, 'utf8')) : null);
 const openOf = (m) => m.items.filter((it) => it.section === 'Open');
-function brief(m) {
+function brief(m, hook = false) {
   if (m.fails.length) return [`${NAME}: ${m.fails.length} format error${m.fails.length === 1 ? '' : 's'}; run: node ${TOOL} to see it`];
   const states = openOf(m).map(state).sort((a, b) => a.rank - b.rank); // stable: oldest first within a rank
   if (!states.length) return [];
@@ -165,7 +168,10 @@ function brief(m) {
   const notes = [['looks done', (s) => s.done], ['overdue', (s) => s.overdue], ['high', (s) => s.priority === 'high'], ['doing', (s) => s.status === 'doing'], ['waiting', (s) => s.status === 'waiting'], ['stale', (s) => s.stale]]
     .map(([label, f]) => [count(f), label]).filter(([n]) => n).map(([n, label]) => `${n} ${label}`);
   const lines = [`${NAME}: ${states.length} open${notes.length ? ` — ${notes.join(', ')}` : ''}`];
-  for (const s of states) {
+  // TR-11: the session-start brief lists at most BRIEF_MAX items and leaves out quiet ones (untouched for more than
+  // QUIET_DAYS, unless they look done, are overdue, high or doing); --brief still lists every open item.
+  const listed = hook ? states.filter((s) => !s.quiet).slice(0, BRIEF_MAX) : states;
+  for (const s of listed) {
     const flags = [];
     if (s.done) flags.push(`looks done: ${s.done}`);
     if (s.overdue) flags.push(`overdue: due ${s.overdue}`);
@@ -177,19 +183,23 @@ function brief(m) {
     flags.push(`next: ${s.it.fields.get('next')}`);
     lines.push(`- ${s.it.id} ${s.it.title} · ${flags.join(' · ')}`);
   }
+  const left = states.length - listed.length;
+  if (left) {
+    const quiet = states.filter((s) => s.quiet).length;
+    lines.push(`… ${left} more not listed${quiet ? ` (${quiet} untouched for more than ${QUIET_DAYS} days)` : ''}; all of them: node ${TOOL} --brief`);
+  }
   return lines;
 }
 
 if (opts.brief || opts.hook) {
   const m = read();
-  const lines = m ? brief(m) : [];
+  const lines = m ? brief(m, Boolean(opts.hook)) : [];
   if (!lines.length) process.exit(0);
   const context = `${lines.join('\n')}\n\n${GUIDE}`;
   if (opts.brief) console.log(lines.join('\n'));
   else if (opts.hook === 'copilot') console.log(JSON.stringify({ additionalContext: context }, null, 2));
   else {
-    const shown = lines.slice(0, 6); const more = lines.length - shown.length;
-    console.log(JSON.stringify({ systemMessage: [...shown, ...(more ? [`… and ${more} more`] : [])].join('\n'), hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: context } }, null, 2));
+    console.log(JSON.stringify({ systemMessage: lines.join('\n'), hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: context } }, null, 2));
   }
   process.exit(0);
 }
