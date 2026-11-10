@@ -27,7 +27,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (9 files)
   - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (150 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (118 files)
-  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (14 files)
+  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (15 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
   - [Source](map/reference-typescript-node/ref-src.md) — The composition root, module composers and the four layers of each module
@@ -104,7 +104,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Features](map/agent-config/tests.md#test-feature) | Tool tests | `tests/*/{*.feature,tool.mjs}` | — | — | cucumber-js | — | — |
 | [Fixtures](map/agent-config/tests.md#test-fixture) | Tool tests | `tests/*/fixtures/**` | — | — | — | — | — |
 | [Checks, hooks and CI](map/agent-config/tooling.md#repo-check) | Repo tooling | `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` | — | `README.md` | — | — | — |
-| [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,.nvmrc,.gitignore}` | — | `README.md` | — | — | — |
+| [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,.nvmrc,.gitignore,.ignore}` | — | `README.md` | — | — | — |
 | [GitHub repo templates](map/agent-config/templates.md#template) | Templates | `templates/**` | — | `copilot/procedures/init-github-governance.procedure.md` | — | — | — |
 | [Composition root and entry point](map/reference-typescript-node/ref-src.md#ref-composition) | Source | `src/{CompositionRoot,main}.ts` | — | `docs/architecture.md` | lint (MOD-11 zones) | `test/integration/documents.int.test.ts` | — |
 | [Module composers](map/reference-typescript-node/ref-src.md#ref-composer) | Source | `src/modules/*/*Module.ts` | — | `docs/architecture.md` | lint (MOD-11 zones) | — | — |

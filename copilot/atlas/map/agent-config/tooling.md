@@ -23,11 +23,12 @@ Where: `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` · Schema: 
 
 ## Node setup
 
-<a id="test-setup"></a>Node 24, pnpm (one workspace package: the workflow-graph tool), Cucumber.js and the ignore rules
+<a id="test-setup"></a>Node 24, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, and the git and search ignore rules
 
-Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,.nvmrc,.gitignore}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
+Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,.nvmrc,.gitignore,.ignore}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
 
 - [`.gitignore`](../../../../.gitignore)
+- [`.ignore`](../../../../.ignore)
 - [`.nvmrc`](../../../../.nvmrc)
 - [`cucumber.mjs`](../../../../cucumber.mjs)
 - [`package.json`](../../../../package.json)

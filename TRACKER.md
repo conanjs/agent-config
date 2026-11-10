@@ -116,8 +116,9 @@ Work this repo still owes, carried from one session to the next. Format and tool
 
 ### T-44 Make the atlas cheap to use: trigger wording and search noise
 - status: open
-- next: In agent-config AGENTS.md, point agents at 'atlas.mjs --explain <an existing file of the same kind>' (a folder returns only kinds, IW-14), add an .rgignore excluding copilot/atlas/map/ so repo-wide rg searches stop matching the generated file lists, then re-test with Codex gpt-6-luna (AGENTS.md measurement rule)
+- next: Done 2026-11-10: .ignore keeps copilot/atlas/map/ out of searches; an AGENTS.md trigger to atlas.mjs --explain was tested twice on Codex gpt-6-luna and dropped (IW-14, IW-15: the agent explained, then read the files anyway, +66% input). Left: make 'atlas.mjs --explain <path that does not exist yet>' print the facts of the kind that path would belong to (schema, index, checks, scenarios, install target), with scenarios; then re-test a trigger on that
 - from: 2026-11-09 · 2026-11-09, atlas review and IW-14
+- updated: 2026-11-10
 
 ### T-46 Efficiency audit: add --suggest once 3 weeks of history exist (efficiency-auditor D10)
 - status: open
@@ -129,6 +130,11 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: Trial started 2026-11-10: Copilot CLI contextTier=default (~/.copilot/settings.json); V sets Context Size to the default window for Claude Opus 5.5 in VS Code's chat model picker and uses /compact before a break, /new per task; the turn token report shows each large cache's expiry and notifies 2 minutes before it (TT-17, TT-18, live after PR #24 merges). On 2026-11-17 run efficiency-audit.mjs week --week 2026-11-16: target Copilot EA-6a below 20% of its AI credits (48.7% from 2026-11-02 to 2026-11-10); record the result in copilot-usage-reference.md
 - from: 2026-11-10
 - updated: 2026-11-10
+
+### T-48 Fast-path the workflow guard hook when no workflow run is active
+- status: open
+- next: workflow-graph-hook.sh starts Node twice (a version check, then main.ts) before every tool call in Codex (PreToolUse '*') and Copilot (preToolUse): 130-190 ms each, even with no agentic-sdlc run. Exit before starting Node when the repo has no active run (for example no .specify/runs/*/ledger.jsonl), and cache the Node version check; add scenarios in tests/workflow-graph
+- from: 2026-11-10 · 2026-11-10, efficiency review of agent-config
 
 ## Done
 
