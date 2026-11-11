@@ -2,12 +2,12 @@
 schema: topic-index/v1
 kind: topic
 topic: ai-agents
-last-updated: 2026-11-09
+last-updated: 2026-11-11
 ---
 
 # Ai Agents
 
-Agent and workflow coordination: prompt, context and harness engineering, feedback loops, graph orchestration, the relationship to specification-driven delivery, and how Claude Code and Codex count, report and save tokens. Product setup rules live in procedures and framework configuration.
+Agent and workflow coordination: prompt, context and harness engineering, feedback loops, graph orchestration, the relationship to specification-driven delivery, and how Claude Code, Codex and GitHub Copilot count, report and save tokens, and what each loads at session start (instructions, skills, agents, plugins, MCP tools, memory). Product setup rules live in procedures and framework configuration.
 
 ## Docs
 
@@ -21,6 +21,9 @@ Agent and workflow coordination: prompt, context and harness engineering, feedba
 | [Agent Skills portability](agent-skills-portability.md) | reference | Portable format versus host discovery, invocation and execution controls; acceptance cases | verified |
 | [Subagent execution boundaries](subagent-execution-boundaries.md) | reference | Claude forked skills, custom agents, Codex inheritance, permissions and delegation tickets | verified |
 | [Skills, delegation and cache economics](skills-delegation-cache-economics.md) | concept | Combined workflow design, API model-family cache rules, illustrative cost comparison and measurement plan | verified |
+| [What each coding agent loads at session start](session-start-context-by-agent.md) | reference | Instructions, skill list, agent list, MCP tools, memory and hooks per agent, with each budget and switch; the 9,900-token skill list measured here; synced skills reaching all four agents | draft |
+| [Plugins and MCP servers: what they add](agent-plugins-and-mcp-loading.md) | reference | Plugin contents and per-turn cost, turning plugins off per scope, MCP deferral, tool limits and keeping a server inside one subagent | verified |
+| [Agent memory features](agent-memory-features.md) | reference | Claude Code auto memory, Copilot Memory, VS Code memory files and Codex local memories: storage, defaults, what loads, expiry | verified |
 | [Claude Code subagents and skills](claude-code-agents-and-skills.md) | reference | Where agents and skills load, the four ways to call an agent, and the synced claude.ai skills folder | verified |
 | [Token accounting in coding agents](agent-token-accounting.md) | concept | Why one agent turn is many requests, what each usage field counts in Claude Code vs. Codex, cache and compaction effects, counting traps | verified |
 | [Claude Code usage, context and multi-agent controls](claude-code-usage-reference.md) | reference | Where usage is recorded, usage fields, commands, JSON and OpenTelemetry outputs, cache and compaction settings, subagents, teams, workflows, fast mode | verified |
