@@ -12,7 +12,6 @@ Up: [Atlas](../../index.md) › agent-config
 
 Where: `copilot/agents/*.agent.md` · Schema: `copilot/frameworks/agentic-sdlc/schemas/role-wrapper.schema.md` · Index: — · Checked by: validate.mjs WRAP (sdlc-*) · Scenarios: `tests/validate-sdlc/validate-sdlc.feature` · Installed to: `~/.copilot/agents`
 
-- [`copilot/agents/agent1.agent.md`](../../../agents/agent1.agent.md)
 - [`copilot/agents/foundry-ci-failure-triager.agent.md`](../../../agents/foundry-ci-failure-triager.agent.md)
 - [`copilot/agents/foundry-knowledge-researcher.agent.md`](../../../agents/foundry-knowledge-researcher.agent.md)
 - [`copilot/agents/foundry-pr-reviewer.agent.md`](../../../agents/foundry-pr-reviewer.agent.md)
