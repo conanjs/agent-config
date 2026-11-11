@@ -1,7 +1,7 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-11-10
+last-updated: 2026-11-11
 ---
 
 # Global knowledge
@@ -31,7 +31,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [testing/](testing/index.md) | Putting tests around code and tools that have none: characterization tests, Gherkin scenarios, proving coverage by sabotage | topic index |
 | [product-tours/](product-tours/index.md) | In-app onboarding tours with Product Fruits: integration in React/Next.js, per-user state, settings and API catalog | topic index |
 | [windows/](windows/index.md) | Windows internals mapped to Linux: user/kernel mode, boot phases, registry and services, processes, handles, jobs and scheduling, reserve/commit memory and the page file, NTFS and IRPs, tokens, DACLs, integrity levels and UAC, the Windows Filtering Platform, Windows containers and WSL 2, diagnostics tools; plus symlink privileges | 8 subtopics + 1 reference + 1 legacy |
-| [ai-agents/](ai-agents/index.md) | Prompt, context and harness engineering deep dives, Graph Engineering study guide, comparison with SDD / AI-DLC / Spec Kit, cross-host skill portability, subagent execution boundaries, prompt-cache economics, Claude Code agents and skills, token accounting and usage references for Claude Code, Codex and GitHub Copilot, official tokenizers and count endpoints per model vendor, tested findings on how agents follow instruction wording, token-saving tools, LangGraph.js runtime facts, and existing loop-engineering guides | 3 deep dives + 4 concepts + 10 references + 1 how-to + 2 legacy |
+| [ai-agents/](ai-agents/index.md) | Prompt, context and harness engineering deep dives, Graph Engineering study guide, comparison with SDD / AI-DLC / Spec Kit, cross-host skill portability, subagent execution boundaries, what each agent loads at session start, plugins and MCP loading, agent memory features, prompt-cache economics, Claude Code agents and skills, token accounting and usage references for Claude Code, Codex and GitHub Copilot, official tokenizers and count endpoints per model vendor, tested findings on how agents follow instruction wording, token-saving tools, LangGraph.js runtime facts, and existing loop-engineering guides | 3 deep dives + 4 concepts + 13 references + 1 how-to + 2 legacy |
 | [analytics/](analytics/) | *legacy* — GTM → GA4 → BigQuery → Looker Studio pipeline | 5 |
 | [blink/](blink/) | *legacy* — rollout notes | 1 |
 | [datadog/](datadog/) | *legacy* — error-rate SLOs | 1 |
@@ -39,7 +39,7 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 | [documentation/](documentation/index.md) | Learning Explanation Framework, team doc conventions, and format guides (Markdown, HTML, Word, PDF, Excel) | 1 how-to + 7 legacy |
 | [gcp/](gcp/index.md) | Google Cloud: Apigee limits, GKE access | 1 concept + 2 legacy |
 | [git/](git/index.md) | Merging stacked pull requests; *legacy:* multi-account SSH, shallow clones with SonarQube | 1 how-to + 2 legacy |
-| [github-copilot/](github-copilot/) | *legacy* — Copilot CLI internals and setup | 2 |
+| [github-copilot/](github-copilot/index.md) | Which VS Code harness reads which instruction, skill and agent files; *legacy:* Copilot CLI internals and setup notes | 1 reference + 2 legacy |
 | [grpc/](grpc/) | *legacy* — stale-connection keepalive deep dive (a candidate synthesis source) | 1 |
 | [nodejs/](nodejs/) | *legacy* — nvm, corepack, pnpm and yarn architecture | 1 |
 

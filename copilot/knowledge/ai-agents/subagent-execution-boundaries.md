@@ -3,9 +3,9 @@ schema: knowledge-doc/v1
 type: reference
 topic: ai-agents
 status: verified
-applies-to: ["Official documentation read 2026-11-07; host-specific behavior"]
-last-verified: 2026-11-07
-last-updated: 2026-11-07
+applies-to: ["Official documentation read 2026-11-07 (Claude Code, Codex) and 2026-11-11 (Claude Code limits, Copilot CLI, VS Code); host-specific behavior"]
+last-verified: 2026-11-11
+last-updated: 2026-11-11
 tags: [skills, subagents, context, portability, prompt-caching]
 ---
 
@@ -16,7 +16,7 @@ tags: [skills, subagents, context, portability, prompt-caching]
 **Use this when:** deciding whether a skill should delegate, porting an agent definition, or investigating missing context in a child run.
 
 ## Scope
-Current documented Claude Code and ChatGPT/Codex behavior, checked 2026-11-07. Think of a skill as a recipe and a subagent as the cook assigned to execute a job. The job ticket must say which ingredients and result are required. Model Context Protocol (MCP) supplies connections to external tools. YAML and TOML are text configuration formats; the examples below are the concrete artifacts.
+Current documented Claude Code and ChatGPT/Codex behavior, checked 2026-11-07; Claude Code limits and GitHub Copilot (CLI and VS Code) added 2026-11-11. Think of a skill as a recipe and a subagent as the cook assigned to execute a job. The job ticket must say which ingredients and result are required. Model Context Protocol (MCP) supplies connections to external tools. YAML and TOML are text configuration formats; the examples below are the concrete artifacts.
 
 ## Catalog
 
@@ -29,6 +29,10 @@ Current documented Claude Code and ChatGPT/Codex behavior, checked 2026-11-07. T
 | `skills:` | Injects named skills' full bodies at startup; unlisted skills can remain callable | ✅[^agent] |
 | Tools | `tools` selects; `disallowedTools` removes; omitted `tools` inherits tools available to subagents | ✅[^agent] |
 | Repository isolation | `isolation: worktree` requests a separate checkout; context isolation alone does not | ✅[^agent] |
+| Description budget | Every subagent's description is in the parent's context; above 15,000 tokens combined (built-ins excluded) Claude Code warns at startup and still loads them all | ✅[^agent] |
+| What loads at startup | The whole `CLAUDE.md` hierarchy the main conversation loads (not for Explore and Plan, or with `omitClaudeMd`); not the main conversation's auto memory, which the agent's own `memory` field replaces | ✅[^agent] |
+| Inline `mcpServers` | An inline server definition connects when the subagent starts and disconnects when it ends; the parent never gets its tools. A name reference shares the parent's connection. Ignored for plugin subagents | ✅[^agent] |
+| Nesting depth | Subagents may spawn subagents up to three layers below the main conversation; at the limit the `Agent` tool is withheld | ✅[^agent] |
 
 | OpenAI surface or control | Meaning | Evidence |
 |---|---|---|
@@ -39,6 +43,22 @@ Current documented Claude Code and ChatGPT/Codex behavior, checked 2026-11-07. T
 | Model settings | Custom file wins; otherwise explicit spawn, configured defaults, then parent. Selecting another model without effort can select that model's default effort | ✅[^openai] |
 | Capability reduction | Supported feature switches and `skills.config` can disable capabilities; “read-only” prose creates no separate sandbox | ✅[^openai] |
 | Concurrency | `[agents].max_concurrent_threads_per_session`; no fixed universal default promised | ✅[^openai] |
+
+| GitHub Copilot CLI control | Meaning | Evidence |
+|---|---|---|
+| Custom definition | Markdown agent files in `~/.copilot/agents/` (highest priority), `.github/agents/` and `.claude/agents/` from the working folder up to the Git root, added roots, plugins, then organization agents | ✅[^copilot] |
+| Context | A subagent runs in its own context window | ✅[^copilotcli] |
+| Repository instructions | A custom agent spawned as a subagent gets `copilot-instructions.md`, `AGENTS.md` and `CLAUDE.md` only with `include-custom-instructions: true`; the `general-purpose` subagent gets them; built-in `explore`, `task` and `code-review` do not | ✅[^copilot] |
+| Automatic delegation | `infer: false` stops the main agent from delegating to it (default true) | ✅[^copilot] |
+| Model | `model`, `models` (first one the plan allows), `modelPolicy` (`preferred` can be overridden, `required` cannot); an explicit `--model` loses to `modelPolicy: required` | ✅[^copilot] |
+| Tools and servers | `tools` (default all); agent-scoped `mcp-servers` | ✅[^copilot] |
+| Memory | Only the root agent stores or votes on memories; subagents may read them | ✅[^copilot] |
+
+| VS Code Copilot control | Meaning | Evidence |
+|---|---|---|
+| Locations | `.github/agents`, `.claude/agents`, `~/.copilot/agents`, `~/.claude/agents` | ✅[^vscode] |
+| Visibility | `user-invocable: false` hides it from the picker; `disable-model-invocation: true` stops other agents from calling it; `infer` is deprecated | ✅[^vscode] |
+| Copilot-harness fields | `skills` (preload), `include-custom-instructions`, `deferred-tool-loading`, `mcp-servers`, `model-policy`; handoffs work only in the Local harness | ✅[^vscode] |
 
 ## Lookup notes
 **Configuration example, not an installed agent:** TOML is a text format for settings. This minimal Codex file deliberately leaves model selection to the session:
@@ -81,18 +101,22 @@ Review observation: Anthropic's changelog records a fix for workflow agents rece
 - Put task-specific facts in the delegation ticket.
 - Keep skill loading, worker creation, result collection and access control as distinct checks.
 - Do not translate Claude YAML fields directly into Codex TOML.
+- A Copilot custom agent used as a subagent does not see repository instructions unless it sets `include-custom-instructions: true`.
 
 ## Used by
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 15 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-07
+- Verified: 29 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-11
 
 Source verification only: current official pages were read; illustrative configurations were not executed in a product session. Recommendations and worked scenarios are this document's synthesis, not measured product guarantees.
 
 ## References
 - [Run skills in a subagent](https://code.claude.com/docs/en/skills#run-skills-in-a-subagent) — Anthropic, living. Backs: forked-skill semantics. [^skill]
-- [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — Anthropic, living. Backs: Claude definitions, preloading, tools and worktrees. [^agent]
+- [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — Anthropic, living, re-read 2026-11-11. Backs: Claude definitions, preloading, tools, worktrees, description budget, startup context, inline `mcpServers`, nesting depth. [^agent]
+- [GitHub Copilot CLI command reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference) — GitHub, living, read 2026-11-11. Backs: Copilot CLI agent locations, fields, instructions for subagents, memory. [^copilot]
+- [Creating and using custom agents for GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/create-custom-agents-for-cli) — GitHub, living, read 2026-11-11. Backs: own context window. [^copilotcli]
+- [Custom agent file reference](https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference) — Microsoft, living, read 2026-11-11. Backs: VS Code locations and fields. [^vscode]
 - [Subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) — OpenAI, living. Backs: surfaces, definitions and inheritance. [^openai]
 - [Claude Code changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) — Anthropic, living; v2.1.295 entry read 2026-11-07. Backs: workflow result-delivery fix. [^changes]
 - `copilot/knowledge/ai-agents/claude-code-agents-and-skills.md` — older version-scoped local observations.
@@ -102,3 +126,4 @@ Source verification only: current official pages were read; illustrative configu
 - [Skill portability](agent-skills-portability.md).
 - [Skills, delegation and cache economics](skills-delegation-cache-economics.md).
 - [Codex usage reference](codex-usage-reference.md).
+- [What each coding agent loads at session start](session-start-context-by-agent.md).

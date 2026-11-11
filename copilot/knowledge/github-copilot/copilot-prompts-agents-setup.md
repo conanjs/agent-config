@@ -465,8 +465,10 @@ JSX double-brace `value={{ a, b }}` conflicts with template syntax — use an in
 |---|---|---|
 | Reads `settings.json` | ✅ | ❌ never |
 | Reads `~/.copilot/` | ✅ | ✅ only source |
-| Custom agents/prompts | ✅ via settings + Local mode | ❌ not supported |
-| Extra instruction paths | ✅ | ❌ |
+| Custom agents/prompts | ✅ via settings + Local mode | Agents ✅: `~/.copilot/agents/`, `.github/agents/`, `.claude/agents/`, `--agent` (corrected 2026-11-11) |
+| Extra instruction paths | ✅ | ✅ `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` (corrected 2026-11-11) |
+
+> **Corrected 2026-11-11:** the two CLI cells above said "not supported". The current [Copilot CLI command reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference) documents both. For which VS Code harness reads which folders, see [vscode-copilot-loading.md](vscode-copilot-loading.md).
 
 ---
 
