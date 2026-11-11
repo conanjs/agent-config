@@ -26,6 +26,7 @@ Where: `copilot/knowledge/**/index.md` · Schema: `copilot/frameworks/knowledge/
 - [`copilot/knowledge/floating-point/index.md`](../../../knowledge/floating-point/index.md)
 - [`copilot/knowledge/gcp/index.md`](../../../knowledge/gcp/index.md)
 - [`copilot/knowledge/git/index.md`](../../../knowledge/git/index.md)
+- [`copilot/knowledge/github-copilot/index.md`](../../../knowledge/github-copilot/index.md)
 - [`copilot/knowledge/index.md`](../../../knowledge/index.md)
 - [`copilot/knowledge/javascript/advanced-functions/index.md`](../../../knowledge/javascript/advanced-functions/index.md)
 - [`copilot/knowledge/javascript/async/index.md`](../../../knowledge/javascript/async/index.md)
@@ -95,6 +96,8 @@ Where: `copilot/knowledge/**/index.md` · Schema: `copilot/frameworks/knowledge/
 
 Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/schemas/knowledge-doc.schema.md` · Index: `copilot/knowledge/index.md` · Checked by: validate-knowledge.mjs KD, DD, KB · Scenarios: `tests/validate-knowledge/validate-knowledge.feature` · Installed to: `~/.copilot/knowledge`
 
+- [`copilot/knowledge/ai-agents/agent-memory-features.md`](../../../knowledge/ai-agents/agent-memory-features.md)
+- [`copilot/knowledge/ai-agents/agent-plugins-and-mcp-loading.md`](../../../knowledge/ai-agents/agent-plugins-and-mcp-loading.md)
 - [`copilot/knowledge/ai-agents/agent-skills-portability.md`](../../../knowledge/ai-agents/agent-skills-portability.md)
 - [`copilot/knowledge/ai-agents/agent-token-accounting.md`](../../../knowledge/ai-agents/agent-token-accounting.md)
 - [`copilot/knowledge/ai-agents/audit-agent-efficiency.md`](../../../knowledge/ai-agents/audit-agent-efficiency.md)
@@ -112,6 +115,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/ai-agents/loop-engineering.md`](../../../knowledge/ai-agents/loop-engineering.md)
 - [`copilot/knowledge/ai-agents/measure-agent-tokens.md`](../../../knowledge/ai-agents/measure-agent-tokens.md)
 - [`copilot/knowledge/ai-agents/prompt-engineering-deep-dive.md`](../../../knowledge/ai-agents/prompt-engineering-deep-dive.md)
+- [`copilot/knowledge/ai-agents/session-start-context-by-agent.md`](../../../knowledge/ai-agents/session-start-context-by-agent.md)
 - [`copilot/knowledge/ai-agents/skills-delegation-cache-economics.md`](../../../knowledge/ai-agents/skills-delegation-cache-economics.md)
 - [`copilot/knowledge/ai-agents/subagent-execution-boundaries.md`](../../../knowledge/ai-agents/subagent-execution-boundaries.md)
 - [`copilot/knowledge/ai-agents/token-saving-tools.md`](../../../knowledge/ai-agents/token-saving-tools.md)
@@ -175,6 +179,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/git/shallow-clone-sonarqube-new-code.md`](../../../knowledge/git/shallow-clone-sonarqube-new-code.md)
 - [`copilot/knowledge/github-copilot/copilot-cli-internals.md`](../../../knowledge/github-copilot/copilot-cli-internals.md)
 - [`copilot/knowledge/github-copilot/copilot-prompts-agents-setup.md`](../../../knowledge/github-copilot/copilot-prompts-agents-setup.md)
+- [`copilot/knowledge/github-copilot/vscode-copilot-loading.md`](../../../knowledge/github-copilot/vscode-copilot-loading.md)
 - [`copilot/knowledge/grpc/stale-connection-keepalive.md`](../../../knowledge/grpc/stale-connection-keepalive.md)
 - [`copilot/knowledge/javascript/advanced-functions/function-objects-and-calls.md`](../../../knowledge/javascript/advanced-functions/function-objects-and-calls.md)
 - [`copilot/knowledge/javascript/advanced-functions/functional-programming-deep-dive.md`](../../../knowledge/javascript/advanced-functions/functional-programming-deep-dive.md)

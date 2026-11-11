@@ -125,4 +125,14 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - from: 2026-11-10
 - updated: 2026-11-10
 
+### T-49 Check whether Claude Code's 9,900-token skill list is already cut
+- status: open
+- next: In an interactive Claude Code session run /doctor (or start with --debug and look for the skill-listing budget warning); record the answer in copilot/knowledge/ai-agents/session-start-context-by-agent.md and drop its one unverified marker. claude -p "/doctor" did not finish in print mode on 2026-11-11
+- from: 2026-11-11
+
+### T-50 Repair two dead Spec Kit URLs in the knowledge base
+- status: open
+- next: Find the current pages replacing github.github.com/spec-kit/concepts/complex-features.html (ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md) and github.github.io/spec-kit/guides/existing-projects.html (testing/characterization-tests.md), both HTTP 404 on 2026-11-11; update only those references
+- from: 2026-11-11
+
 ## Done
