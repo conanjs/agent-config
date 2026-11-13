@@ -146,6 +146,7 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/022-repo-split/plan.md`](../../../../specs/022-repo-split/plan.md)
 - [`specs/022-repo-split/research.md`](../../../../specs/022-repo-split/research.md)
 - [`specs/022-repo-split/spec.md`](../../../../specs/022-repo-split/spec.md)
+- [`specs/022-repo-split/tasks.md`](../../../../specs/022-repo-split/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Repo architecture
