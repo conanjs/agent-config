@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["Claude Code 2.1.278–2.1.308 (local tests)", "Claude Code docs read 2026-10-30 (features up to v2.1.307)", "Claude Code 2.1.318 (local test 2026-11-09)", "Claude Code 2.1.319 (transcripts and docs read 2026-11-10)"]
 last-verified: 2026-11-10
-last-updated: 2026-11-10
+last-updated: 2026-11-13
 tags: [claude-code, tokens, usage, cost, prompt-caching, compaction, opentelemetry, subagents, agent-teams, workflows]
 ---
 
@@ -83,7 +83,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 | Timing at `Stop` | The transcript is not guaranteed to hold the final message on every version: a script that reads it can miss the turn's last request | ✅[^15] |
 | `SubagentStop` | Runs when a subagent finishes; input adds `agent_id`, `agent_type`, `agent_transcript_path` (the subagent's own file) | ✅[^15] |
 | `systemMessage` (JSON output) | A message shown to the user; hook strings and plain output are capped at 10,000 characters | ✅[^15] |
-| Where hooks are set | The `hooks` key of `settings.json`, by event and matcher | ✅[^1] |
+| Where hooks are set | The `hooks` key of a settings file, by event and matcher. Locations: `~/.claude/settings.json` (user, fixed name), `.claude/settings.json` (project), `.claude/settings.local.json` (project, not committed), managed policy settings, a plugin's `hooks/hooks.json` (while the plugin is enabled), skill frontmatter (after the skill is invoked) and subagent frontmatter (while it runs). No documented way to load hooks from an extra user file; `--settings <file or JSON>` applies for one session only. `CLAUDE_CONFIG_DIR` moves `~/.claude` (settings, session history, plugins) | ✅[^1][^15][^21] |
 | `PreToolUse` on `Agent` | The subagent tool is `Agent` (`tool_input`: `prompt`, `description`, `subagent_type`, optional `model`); a hook with matcher `Agent` can refuse the launch with `hookSpecificOutput.permissionDecision: "deny"` and a reason, or with exit code 2 (stderr becomes the error) | ✅[^15] |
 | `SubagentStart` | Runs when a subagent starts (`agent_id`, `agent_type`); it can add context but cannot block the subagent | ✅[^15] |
 | `PreToolUse` deny in `claude -p` | A project hook (`--setting-sources project`) with matcher `Agent` denied the launch in a non-interactive run; the agent received the reason verbatim; the input held `tool_name: "Agent"`, `tool_input` {`description`, `prompt`, `subagent_type`} | ✅[^17] |
@@ -186,6 +186,7 @@ Claude Code's own usage reporting, context and cache controls, and multi-agent o
 - [Track cost and usage (Agent SDK)](https://code.claude.com/docs/en/agent-sdk/cost-tracking) — Anthropic, living. Backs: deduplicate by message ID, placeholder output. [^12]
 - [Environment variables](https://code.claude.com/docs/en/env-vars) — Anthropic, living. Backs: `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`. [^13]
 - [Hooks reference](https://code.claude.com/docs/en/hooks) — Anthropic, living. Backs: `Stop`, `SubagentStop`, `SubagentStart`, `PreToolUse` on `Agent` and its deny output, `systemMessage`, and the timing warning. [^15]
+- [Settings](https://code.claude.com/docs/en/settings) — Anthropic, living, read 2026-11-13. Backs: the four settings files, `--settings` for one session, precedence, `CLAUDE_CONFIG_DIR`. Hook locations table read the same day in the Hooks reference ("Hook locations"). [^21]
 - `~/.claude/projects/*/*.jsonl` — local test, 2026-10-30, Claude Code 2.1.278 and 2.1.308: transcript layout, `cost-state`, `compact_boundary`, placeholder outputs; `claude --version` on `PATH` printed 2.1.129. [^14]
 - `~/.claude/turn-tokens/` — local test, 2026-10-31, Claude desktop app with Claude Code 2.1.308: a new session wrote its `Stop`-hook report there but no status-line file. [^16]
 - `claude -p` runs (Claude Code 2.1.129 on PATH), local test, 2026-11-03: a `PreToolUse` hook denying `Agent`, the recorded hook input, and `--agent sdlc-qa` (`specs/019-workflow-graph/research.md`, capability spikes); the workflow guard's live check (a denied `Agent` launch, an approval recorded by `UserPromptSubmit` in `-p`, the launch then allowed). [^17]
