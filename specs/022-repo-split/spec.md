@@ -210,9 +210,9 @@ Each component declares the variables its docs use; V sets values once; the inst
 
 ---
 
-### User Story 10 - Company knowledge is its own repo, still public (Priority: P3) (Phase 3)
+### User Story 10 - Company knowledge is its own repo, still public (Priority: P2) (Phase 3)
 
-**Why this priority**: Its readers differ (it is read only while working on that company's repos), so it leaves the core and the default install; nothing else depends on it.
+**Why this priority**: Its readers differ (it is read only while working on that company's repos), so it leaves the core and the default install; nothing else depends on it. P2 by V's choice at G2 (2026-11-13), although the privacy reason is gone.
 
 **Independent Test**: Install once with and once without the company repo listed; search the core for company names.
 
