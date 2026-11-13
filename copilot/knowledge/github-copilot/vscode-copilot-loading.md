@@ -26,7 +26,7 @@ GitHub Copilot in VS Code as documented on 2026-11-11, plus what a VS Code sessi
 | Harness | What runs | Evidence |
 |---|---|---|
 | Copilot | The Copilot SDK in VS Code's Agent Host: the shared runtime of GitHub Copilot products, including Copilot CLI | ✅[^har] |
-| Local | VS Code's built-in harness in the extension host | ✅[^har] |
+| Local | VS Code's built-in harness in the extension host; the Agent Skills page's location table labels it "Local (deprecated)" (read 2026-11-13) | ✅[^har][^sk] |
 | Claude | The Anthropic Claude Agent SDK, using Claude project configuration | ✅[^har] |
 | Codex | OpenAI Codex, through its extension or the experimental Agent Host integration | ✅[^har] |
 
