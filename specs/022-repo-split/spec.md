@@ -51,7 +51,7 @@ V can read, for every connection between parts, one contract that says who owns 
 4. **AC-1.4** **Given** the three starting slots, **When** V reads `slots/v1`, **Then** `knowledge-storage` is `required: false, multiple: false` with contract `knowledge-provider/v1`; `company-knowledge-storage` is `required: false, multiple: true` with `company-kb/v1`; `framework` is `required: false, multiple: true`, per project, with `framework/v1`; and a slot whose `contract` is a list of two contracts validates.
 5. **AC-1.5** **Given** the constitution, **When** V reads principle I, **Then** it says the source is single and the per-platform files are generated, the version is `2.0.0`, the amendment is dated and states the change, and `scripts/check-docs.sh` passes.
 6. **AC-1.6** **Given** the architecture map, **When** a fixture adds the edge "knowledge area depends on agentic-sdlc", **Then** the fitness check fails and names the edge; **And Given** the real tree, **Then** the current violation counts (109 mention lines in 67 files; the checks that read another area's files) are recorded as a baseline and the check fails if any count rises.
-7. **AC-1.7** **Given** the baseline file, **When** V opens it, **Then** it holds for Claude Code, Copilot CLI and Codex the always-loaded size in characters (and a token estimate marked as an estimate), the measurement method, the tool version and the date, the count of `{{AGENT_HOME}}` lines in the files that agent loads at session start, and the Claude Code skill-list figure with its `sdlc-*` share.
+7. **AC-1.7** **Given** the baseline file, **When** V opens it, **Then** it holds for Claude Code, Copilot CLI and Codex the always-loaded size in characters (and a token estimate marked as an estimate), the measurement method, the tool version and the date, the count of `{{AGENT_HOME}}` lines in the files that agent loads at session start, and the Claude Code skill-list figure with its `sdlc-*` share; **And** each size is measured on the text as it would look rendered (C-4, A-28): a dry run swaps every `{{AGENT_HOME}}` and `~/.copilot` agent-home path for the real path and adds the generated-from line, in memory only, writing nothing.
 8. **AC-1.8** **Given** the `knowledge-provider/v1` and rendered-copies contracts, **When** V reads their worked examples, **Then** each shows one citation in both forms: the source form (link text `{{AGENT_HOME}}/knowledge/x.md`, target a GitHub address) and the rendered form on Mac (`/Users/v/.agent-config/knowledge/x.md`) and Windows (`C:\Users\v\.agent-config\knowledge\x.md`), each with the relative target `../../knowledge/x.md` for a copy at `generated/<component>/foo.md`.
 9. **AC-1.9** **Given** phase 0 merged, **When** V compares the install plan of the old installers before and after, **Then** the difference is empty.
 
@@ -260,7 +260,7 @@ Each component declares the variables its docs use; V sets values once; the inst
 3. **AC-12.3** **Given** V's existing keys in `~/.claude/settings.json`, **When** hooks are merged, **Then** every key V set is preserved and only the installer's hook entries are added or changed; the original is backed up first.
 4. **AC-12.4** **Given** the two skill targets, **Then** built skills appear in `~/.claude/skills` and `~/.agents/skills` linked entry by entry to the rendered skills under `generated/`, and skills synced from elsewhere into those folders are left alone.
 5. **AC-12.5** **Given** core text changed and Codex's file not re-rendered, **When** V runs `doctor`, **Then** it fails on the hash mismatch; **And** a post-merge hook and the session-start hook (AC-16.8) re-render it.
-6. **AC-12.6** **Given** all enabled components, **When** `install` or `doctor` totals their declared `idle-cost` per target, measured on the rendered text the agent receives (clarification C-4), **Then** a total over the target's ceiling fails and names the largest contributors.
+6. **AC-12.6** **Given** all enabled components, **When** `install` or `doctor` totals their declared `idle-cost` per target, measured on the rendered text the agent receives (C-4, A-28), **Then** a total over the target's ceiling fails and names the largest contributors.
 7. **AC-12.7** **Given** a component providing a service (for example an MCP server), **Then** it is registered for each agent at install and removed by `uninstall`.
 
 ---
@@ -445,7 +445,7 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 | SC-001 | G1 | The KB repo's check command passes in a checkout containing only that repo | AC-13.1 |
 | SC-002 | G2 | `{{AGENT_HOME}}/knowledge/index.md` and `{{AGENT_HOME}}/companies/index.md` resolve for Claude Code, Copilot CLI and Codex after install; 10 of 10 sampled old `~/.copilot/…` paths resolve to the same content during the release | AC-8.1, AC-8.6, AC-12.1 |
 | SC-003 | G3 | Files edited outside `adapters/<name>/` to add a platform: ≥ 3 → 0 | AC-11.7 |
-| SC-004 | G4 | Always-loaded characters per agent, measured on the rendered text (C-4), ≤ phase-0 baseline everywhere; outside SDLC projects, lower by the `sdlc-*` share (824 of 9,900 tokens for Claude Code) | AC-1.7, AC-12.6, AC-14.2 |
+| SC-004 | G4 | Always-loaded characters per agent, measured on the rendered text and compared with the phase-0 baseline, which was also measured rendered (C-4, A-28), ≤ baseline everywhere; outside SDLC projects, lower by the `sdlc-*` share (824 of 9,900 tokens for Claude Code) | AC-1.7, AC-12.6, AC-14.2 |
 | SC-005 | G5 | Install steps on a new machine: one command, same on Mac and Windows | AC-2.1, AC-2.2 |
 | SC-006 | G6 | Dropped at G2 (the company KB stays public); no criterion | none |
 | SC-007 | G7 | Root entries: only the target set fixed at P4 (today: 25 plus `copilot/` with 11 subfolders) | AC-15.1 |
@@ -530,18 +530,18 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 - **A-25** The three guards apply to rendered copies; generated-class files (routes, `global-variables.md`, Codex `AGENTS.md`, merged hooks) are protected by the hash check in `doctor` (AC-7.5).
 - **A-26** The other unconfirmed items in the blueprint's assumptions are P4 checks on Codex and Copilot CLI with a cheap model, not spec criteria: Codex accepting Copilot-only skill fields, Copilot CLI applying `applyTo` to user instructions, VS Code's Local harness not reading `~/.copilot`, and whether a skill with `disable-model-invocation` costs nothing in Copilot's list.
 - **A-27** From phase 5, `{{AGENT_HOME}}/companies/` and `{{AGENT_HOME}}/frameworks/<name>/` must show the rendered files of agent-companies and agentic-sdlc (the plan decides whether the path links to the copy or the copy sits there); `{{AGENT_HOME}}/knowledge/` links to the source because the knowledge base is not rendered. AC-10.3 needs only that `index.md` resolves.
+- **A-28** (C-4, V's choice at G2, 2026-11-13: "rendered both") The G4 baseline and every later size are measured on rendered text, so the fixed cost of rendering sits inside the baseline and G4 catches only real growth. Before phase 5 the baseline comes from a dry run that renders in memory; the phase-5 renderer MUST apply the same path swap and generated-from line, and its tests reuse the dry run's rules so the two numbers stay comparable. Estimate for the core today: 4,511 characters as written, about 4,950 rendered.
 
 ## Clarifications for G2 (max 3, ranked by impact)
 
-C-1 (company KB public), C-2 (repo names) and C-3 (compatibility-link length) are closed by V's G2 choices and now sit in A-16, A-12 and A-17. One new question remains.
+C-1 (company KB public), C-2 (repo names), C-3 (compatibility-link length) and C-4 (G4 measured on rendered text) are closed by V's G2 choices and now sit in A-16, A-12, A-17 and A-28. None remains open.
 
-1. **[NEEDS CLARIFICATION: C-4, the G4 ceiling after rendering.]** Rendering adds one generated-from line per rendered file and replaces the 14-character `{{AGENT_HOME}}` with a real path (29 characters for `/Users/vinh.doq/.agent-config`), so a rendered core can be longer than the phase-0 baseline even if no content grows. Options: A) measure the "≤ baseline" ceiling on the rendered text the agent receives, so any excess comes back to V (default; the honest measure) · B) measure on the source text and report the rendered growth separately (the ceiling then does not protect the agent's real cost) · Custom. Default: A.
 
 ## Self-check (SPEC rules)
 
 - No implementation choices beyond the interface V sees (SPEC-1): the terms "git", "path", `--write` and the field names are interface; no language or library appears except the declared runtime.
 - Every story has priority, rationale, an independent test and 5 to 10 scenarios with at least one failure case (SPEC-2, SPEC-3, SPEC-8); Story 16 is new.
 - Every FR traces to a story; every story has an FR. Phases 1 and 3 to 8 are at outcome depth by design.
-- One clarification marker (SPEC-7); assumptions A-1 to A-27 recorded (SPEC-6).
+- No clarification marker left (SPEC-7); assumptions A-1 to A-28 recorded (SPEC-6).
 - Success criteria SC-001 to SC-015 give each live goal G1 to G13 a number and a check; G6 is dropped (SPEC-5, SPEC-11).
 - Out of scope listed (SPEC-9); terms defined once (SPEC-10).

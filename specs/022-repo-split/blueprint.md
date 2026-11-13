@@ -64,7 +64,7 @@ v3.1 folds in V's G2 feedback (`changes G2 R-001`, 2026-11-13, ledger seq 7): th
 | G1 | The KB is its own repo with its validator, schemas and tests | Its `check.sh` passes with no agent-config checkout |
 | G2 | Every agent reads each layer at one agent-neutral path | `{{AGENT_HOME}}/knowledge/index.md` and `{{AGENT_HOME}}/companies/index.md` resolve after install for Claude Code, Copilot CLI and Codex; the old `~/.copilot/…` paths resolve through compatibility links for one release |
 | G3 | A new platform is one new adapter folder | Files edited outside `adapters/<name>/`: today ≥ 3 → 0 |
-| G4 | The always-loaded block does not grow, and shrinks where a component is scoped per project | Per-agent baseline recorded in phase 0 (Claude Code skill list 9,900 tokens; `sdlc-*` 824 of them) → ≤ baseline everywhere, minus the `sdlc-*` share outside SDLC projects |
+| G4 | The always-loaded block does not grow, and shrinks where a component is scoped per project | Per-agent baseline recorded in phase 0, measured on the text as rendered by an in-memory dry run (C-4, G2) (Claude Code skill list 9,900 tokens; `sdlc-*` 824 of them) → rendered size ≤ baseline everywhere, minus the `sdlc-*` share outside SDLC projects |
 | G5 | One install command per machine, Mac and Windows | Same steps as today |
 | G6 | Dropped at G2 (2026-11-13): the company KB stays public | — |
 | G7 | agent-config's root holds only motherboard parts | Root entries today 25 plus `copilot/` with 11 subfolders; target set at P4 |
