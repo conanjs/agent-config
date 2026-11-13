@@ -160,6 +160,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/documentation/interface-description-standards.md`](../../../knowledge/documentation/interface-description-standards.md)
 - [`copilot/knowledge/documentation/learning-explanation-framework.md`](../../../knowledge/documentation/learning-explanation-framework.md)
 - [`copilot/knowledge/documentation/lessons-learned.md`](../../../knowledge/documentation/lessons-learned.md)
+- [`copilot/knowledge/documentation/markdown-link-targets-in-vscode.md`](../../../knowledge/documentation/markdown-link-targets-in-vscode.md)
 - [`copilot/knowledge/documentation/opencli-deep-dive.md`](../../../knowledge/documentation/opencli-deep-dive.md)
 - [`copilot/knowledge/documentation/usage-spec-deep-dive.md`](../../../knowledge/documentation/usage-spec-deep-dive.md)
 - [`copilot/knowledge/error-handling/error-codes.md`](../../../knowledge/error-handling/error-codes.md)
