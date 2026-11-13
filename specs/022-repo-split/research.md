@@ -16,6 +16,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 | DR-301 to DR-309 | architecture | this file | New in this run |
 | DR-401 to DR-418 | system-architecture | `decisions/system-architecture.md` §4 | "Contract facts" lines kept as an extra field |
 | DR-501 | qa | `decisions/qa.md` §1 to §3 | The QA file calls it `DR-QA-1`, which is not a valid record id; renumbered here |
+| DR-601 to DR-606, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm), engineering (parser limits) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
 
 ## Conflicts between the role records, and how precedence resolves them
 
@@ -28,7 +29,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 | C-5 | security M-05 vs tech-stack DR-105 | DR-105 declares `git` as a runtime with no version and no protocol limits | Additive; security's floor is stricter | `git` 2.50.1 or later in the runtime check (AC-5.9 pattern), `GIT_ALLOW_PROTOCOL=https:ssh`, `--no-recurse-submodules`, `--` before URLs, refs and URLs starting with `-` refused, 60 s timeout (devops) | Resolved |
 | C-6 | security M-17 vs tech-stack DR-102 | DR-102 vendors `yaml` but sets no parser limits | Additive | The one wrapper sets: no custom tags, an alias limit, a 256 KiB size cap per file. Tech-stack confirms the option names against the `yaml` 2.9.1 documentation (unlisted need U-1) | Resolved in intent; option names unconfirmed |
 | C-7 | devops DR-202 vs tech-stack DR-105 | Windows link ladder for files: devops uses a hash-tracked copy (a hard link goes stale when its file is replaced by rename); tech-stack uses a hard link, then a copy only with consent | §7 has no tech-stack vs devops row; this is deployment topology, which devops owns against architecture (by analogy) | Devops ladder: symbolic link, then junction for folders; for files a hash-tracked copy. DR-105's rule that every degradation is reported stays; `doctor` shows the copy as "degraded" | Proposed; approving G3 settles it, otherwise escalate |
-| C-8 | devops DR-206 vs tech-stack DR-109 | Node 18 floor job on Ubuntu only (devops) or on Ubuntu and Windows (tech-stack) | Stricter wins (FR-033: Mac and Windows) | Node 18 job on Ubuntu and Windows; full matrix on Ubuntu, macOS and Windows on Node from `.nvmrc` | Resolved |
+| C-8 | devops DR-206 vs tech-stack DR-109 | Node 18 floor job on Ubuntu only (devops) or on Ubuntu and Windows (tech-stack) | Stricter wins (FR-033: Mac and Windows) | Node 18 job on Ubuntu and Windows; full matrix on Ubuntu, macOS and Windows on Node from `.nvmrc` | Moot: V's N-1 override removes the Node 18 job (DR-605) |
 | C-9 | devops DR-206 vs tech-stack DR-109 | How a provider's CI gets the contracts tool: `contracts.pin` fetch inside `scripts/check.sh` (devops) or `actions/checkout` at a pinned SHA (tech-stack) | Devops owns CI topology | `contracts.pin` and `providers.pin` fetch steps in `check.sh` (they also run locally); both pin a full SHA | Resolved |
 | C-10 | tech-stack DR-102, DR-106 vs architecture DR-304 | Module placement: `installers/core/vendor/yaml/` and `scripts/baseline.mjs` (tech-stack) vs `contracts/lib/` (architecture) | Conventions §1: module placement inside one repo is architecture's | Architecture wins on placement. Tech-stack's library, version pin, byte-compare test, "one wrapper is the only importer" rule and pure-module split all stay | Resolved |
 | C-11 | system-architecture DR-411 vs spec FR-044 | One shared `cite` implementation vs "each consumer's validator generates the targets" | §7: system-architecture between repos | Same intent: each repo runs `build cite` on its own files, pinned by SHA (G12 holds) | Resolved; wording amendment S-16 |
@@ -40,7 +41,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 | C-17 | devops DR-202 store depth vs mount depths | A relative citation target computed for `generated/<component>/` (depth 2) misresolves when a reader opens the file through a mount of another depth (`companies/ots/`, `instructions/`) | Inside one repo: architecture | DR-307: agents load rendered files at their `generated/` path; mount paths are addresses for link text | Resolved |
 | C-18 | qa TD-Q2 (fail-closed while no tier was recorded) vs security DR-001 | QA assumed YES because the tier was unknown | DR-001 sets HIGH | TD-Q2 is YES by the tier, so the negative cases are mandatory for every task | Resolved |
 
-**Unlisted needs** (the plan did not list them; the next gate sees them): U-1 tech-stack confirms the parser limits in `yaml` 2.9.1 (C-6). U-2 engineering walks the paradigm tree for `installers/core` (the constitution's default paradigm is `none`; DR-303 assumes a pure core with effects at the edges, which suits either listed paradigm). U-3 `docs/integrations/` docs for GitHub and the three agents' configuration folders (architecture §6), written in phases 2 and 5.
+**Unlisted needs** (the plan did not list them; the next gate sees them): U-1 tech-stack confirms the parser limits in `yaml` 2.9.1 (C-6; done at G4: DR-606). U-2 engineering walks the paradigm tree for `installers/core` (done at G4: `PDM-installers-core`, `PDM-contracts-lib`; the constitution's default paradigm is `none`; DR-303 assumes a pure core with effects at the edges, which suits either listed paradigm). U-3 `docs/integrations/` docs for GitHub and the three agents' configuration folders (architecture §6), written in phases 2 and 5.
 
 ---
 
@@ -54,7 +55,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 - **Supersedes:** none
 - **Decided by:** security · **Approved at:** G3 (pending, 2026-11-13)
 
-What HIGH switches on: the STRIDE table in `plan.md` before G3; the test-depth tree's security branch forced; security review on every task of this feature; security sign-off before G5. A tier only rises; lowering it needs a new record approved by V.
+What HIGH switches on: the STRIDE table in `plan.md` before G3; the test-depth tree's security branch forced; security review on every task of this feature (narrowed at G4 to the nine blocker-mitigation tasks, plan.md Security); security sign-off before G5. A tier only rises; lowering it needs a new record approved by V.
 
 ---
 
@@ -580,6 +581,110 @@ Baselines for the fitness checks: knowledge mentions of `agentic-sdlc` 109 lines
 - **Confidence:** high
 - **Supersedes:** none
 - **Decided by:** qa · **Approved at:** G3 (pending, 2026-11-13)
+
+---
+
+## Overrides and additions after G3 (run R-001, G4 approved 2026-11-13)
+
+V approved G4 on 2026-11-13 with every default. The records below do not edit the G3 records above: each one names what it supersedes. DR-601 to DR-605 carry the N-1 Node override ("latest Node 24 from 24.12 only; TypeScript run directly by Node type stripping"). Word used once here: **type stripping** = Node deletes the type annotations of a `.ts` file when it loads it and runs what is left, without compiling or checking types (Node.js 24 docs, "Modules: TypeScript"). Example: `const n: number = 1` runs as `const n = 1`.
+
+Measured 2026-11-13 on Node.js v24.22.1 (macOS): a class with `constructor(private readonly x: number)` fails with `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` ("TypeScript parameter property is not supported in strip-only mode"); the same class with an explicit field declaration and `this.x = x` in the constructor runs; `import { f } from "#lib/a.ts"` resolves through `package.json` `"imports": { "#lib/*.ts": "./lib/*.ts" }`, while a key without `.ts` makes the specifier lose its extension. Node.js 24 docs, "Modules: TypeScript": type stripping is stable from v24.12.0; `enum`, namespaces with runtime code, parameter properties and import aliases need `--experimental-transform-types`; `tsconfig.json` (so `paths`) is ignored; `.ts` files under `node_modules` are refused; `import type` is required for type-only imports.
+
+## DR-601: Language and runtime for the runtime code (N-1 override of DR-101)
+- **Tree path:** TS-Q0 (constitution and company KB name no stack → NO) → TS-Q1 (blueprint states a Node core → YES, keep it) → TS-Q2 and TS-Q4 unchanged from DR-101 → profile `typescript-node`; V overrode the version floor and the language form (G4, N-1).
+- **Criteria:** V's override N-1: latest Node.js 24 from 24.12 only. Type stripping is stable from v24.12.0 (Node.js 24 docs), so the Node 18 reason for plain JavaScript in DR-101 no longer exists; no build step and nothing generated committed (A-6) still hold; the stack profile is already `typescript-node`.
+- **Options considered:** (A) TypeScript run directly by Node type stripping, erasable syntax only | (B) plain ESM `.mjs` with JSDoc types (DR-101's choice) | (C) TypeScript compiled to JavaScript, output committed | (D) a loader package such as `tsx` | (E) `--experimental-transform-types`
+- **Chosen:** (A) — `.ts` files run with `node installers/core/main.ts`; erasable syntax only (no `enum`, no namespace with runtime code, no constructor parameter properties, no import aliases, `import type` for types); every relative or alias import keeps its `.ts` extension; `engines.node` is `>=24.12 <25`; `tsc --noEmit` type-checks and `erasableSyntaxOnly` makes a non-erasable construct a type error before Node meets it; no build step.
+- **Rejected:** (B) — V chose TypeScript, and the only reason for JSDoc types was Node 18; (C) — a committed compiled copy breaks A-6 and creates drift; (D) — a run-time dependency, against FR-034; (E) — an experimental flag every shim and test would have to pass, and it enables source maps by default.
+- **Confidence:** high (the stripping rules are in the Node.js 24 docs and the parameter-property failure was measured above)
+- **Supersedes:** DR-101
+- **Decided by:** human · **Approved at:** G4 (2026-11-13)
+
+## DR-602: Entry points `install.sh` and `install.ps1` (N-1 override of DR-107)
+- **Tree path:** TS-Q2 (`installers/` already has both) → thin shims, as in DR-107; only the runtime they look for changes.
+- **Criteria:** FR-033, FR-035, exit codes 0, 10, 1 and 2 pass through; N-1 (no Node 18).
+- **Options considered:** (A) each shim finds `node` (the `NODE` override first, then `PATH`), reads its version, and when it is not 24.12 or later within 24, prints one need and exits 10 with nothing changed (devops P-7); otherwise runs `node installers/core/main.ts "$@"` and returns its exit code | (B) shims that hold install logic | (C) shims that pass `--experimental-strip-types`
+- **Chosen:** (A) — no flag is needed because type stripping is on by default from Node 24.12; the PowerShell target stays Windows PowerShell 5.1.
+- **Rejected:** (B) — two copies of the logic, the drift the spec exists to avoid; (C) — the flag is not needed on the supported runtime, and passing it hides a runtime that is too old.
+- **Confidence:** high
+- **Supersedes:** DR-107
+- **Decided by:** human · **Approved at:** G4 (2026-11-13)
+
+## DR-603: Toolchain for agent-config (N-1 override of DR-108)
+- **Tree path:** TC-Q1 (partial: Cucumber, pnpm, the Node 24 pin and `check-docs.sh` exist) → inherit the configured slots → TC-Q2 (constitution size and complexity limits) → TC-Q3 for empty slots; the Node 18 floor no longer overrides the stack defaults.
+- **Criteria:** N-1; the stack default `cmd.test_unit` is vitest and vitest 5.0.5 is already locked in this repo; C-14 (the stack's `lint-baseline` is enforced by `validate-project.mjs`); IMP-4 and TSN-15 (an alias resolves the same way for type-check, run and test); Node.js 24 docs (`tsconfig.json` is ignored at run time).
+
+| Slot | Value |
+|---|---|
+| `package_manager` | pnpm, pinned by `packageManager`; unchanged |
+| language version | Node.js 24 from 24.12 only (`engines.node` `>=24.12 <25`; `.nvmrc` stays `24`); no Node 18 API limit |
+| `cmd.format` | `pnpm exec prettier --check .` (3.9.10); `vendor/` ignored; unchanged |
+| `cmd.lint` | `pnpm exec eslint . --max-warnings 0` (eslint 10.14.0 with typescript-eslint 8.72.1, as locked): one lint baseline for all new code, that is the stack's `lint-baseline` rule names plus `complexity` 10 and `max-lines-per-function` 50 (constitution); `eslint-plugin-n` is not added (its only job was the Node 18 API floor) |
+| `cmd.typecheck` | `pnpm exec tsc --noEmit -p <package>/tsconfig.json` (typescript 6.0.3); `strict`, `module` and `moduleResolution` `nodenext`, `target` `esnext`, `erasableSyntaxOnly`, `verbatimModuleSyntax`, `allowImportingTsExtensions`; `@types/node` 24.19.2 as locked |
+| `cmd.test_unit` | `pnpm exec vitest run` (vitest 5.0.5 as locked), replacing `node --test` |
+| alias mechanism | `package.json` `imports` with `#` keys that end in `.ts` (so a specifier keeps its extension), one key per module as in `docs/architecture.md` §4 (IMP-7); no `tsconfig` `paths` and no build rewrite because nothing is built (TSN-15 option "Node type stripping") |
+| acceptance scenarios | Cucumber `~13.3.0`, one scenario per acceptance criterion, driving the CLI through the shims in a temporary home; unchanged |
+| `cmd.test_integration`, `cmd.build` | n/a: scenarios are the integration level; runs from source |
+| `cmd.audit` | `pnpm audit --audit-level high` in CI; unchanged |
+| check command | `scripts/check-docs.sh` stays the one entry |
+
+- **Options considered:** vitest | `node:test` (DR-108's choice) | Jest for unit tests; one lint baseline for new code | a lighter baseline for the installer; `package.json` `imports` | `tsconfig` `paths` with a rewrite step for aliases
+- **Chosen:** the table — new exact dev dependencies are only `prettier`, `eslint`, `typescript`, `@types/node`, `vitest`, `typescript-eslint`, `yaml` and `ajv` at the versions above and in DR-102 and DR-103; `eslint-plugin-n` drops out.
+- **Rejected:** `node:test` — vitest is the stack default and the floor that blocked it is gone; Jest — a second tool for a filled slot (STK-R2); a lighter lint baseline — C-14 shows `validate-project.mjs` fails a `typescript-node` folder without the baseline names; `paths` plus rewrite — it needs the build step this override removes, and the type checker alone would accept an alias Node cannot resolve (IMP-4).
+- **Confidence:** medium (unconfirmed until phase 0: that vitest and the ESLint import resolver both read `package.json` `imports` keys that end in `.ts`; the smoke check of TSN-15 proves it)
+- **Supersedes:** DR-108
+- **Decided by:** human · **Approved at:** G4 (2026-11-13)
+
+## DR-604: Check command for each repo (N-1 override of DR-109)
+- **Tree path:** TC-Q1 per repo → inherit; only the agent-config row of DR-109 changes.
+- **Criteria:** N-1; DR-603 replaces the DR-108 table that the agent-config row cites.
+- **Options considered:** (A) the agent-config row runs the DR-603 table, the layout validator (report mode), atlas, tracker, contract fixtures and the parity test; the other three rows of DR-109 stay | (B) keep the DR-109 wording "Node 18 runtime code"
+- **Chosen:** (A) — `scripts/check.sh` per repo, as in DR-109; agent-config's line points at DR-603; `agent-knowledge`, `agentic-sdlc` and `agent-companies` rows are unchanged.
+- **Rejected:** (B) — it states a Node 18 limit that no longer exists.
+- **Confidence:** high
+- **Supersedes:** DR-109
+- **Decided by:** human · **Approved at:** G4 (2026-11-13)
+
+## DR-605: Continuous integration without a Node 18 job (N-1 override of the Node 18 job of DR-206)
+- **Tree path:** DT-Q2 (inherit) → the rest of DR-206 stands; only the Node 18 job is removed.
+- **Criteria:** N-1; conflict C-8 (Ubuntu only or Ubuntu and Windows) is about a job that no longer exists.
+- **Options considered:** (A) `installer.yml` runs one matrix: Ubuntu, macOS and Windows with a throwaway home, Node from `.nvmrc` (latest 24) | (B) the same matrix plus a job pinned to Node 24.12.0 | (C) keep the Node 18 job
+- **Chosen:** (A) — required checks `installer (macos)` and `installer (windows)` stay; everything else in DR-206 is unchanged.
+- **Rejected:** (B) — V chose latest Node 24 only, and the shim check (DR-602) already refuses a version below 24.12; (C) — type stripping does not exist on Node 18.
+- **Confidence:** high
+- **Supersedes:** none
+- **Narrows:** devops DR-206 in `decisions/devops.md`: only its Node 18 job is dropped; the rest of DR-206 stays in force.
+- **Decided by:** human · **Approved at:** G4 (2026-11-13)
+
+## DR-606: YAML parser limits for `yaml` 2.9.1 (clears unlisted need U-1; backs M-17; settles C-6)
+- **Tree path:** TS-Q1 (the YAML files are fixed interfaces; DR-102 chose the library) → STK-R2 (no second parser) → the limits go in the one wrapper (DR-102, DR-304); option names read from the installed package and measured.
+- **Criteria:** M-17 and T-17 (custom tags, alias expansion, very large files); C-6; `yaml` 2.9.1 `dist/options.d.ts` and `dist/compose/compose-node.js` read in the working copy; probes run on Node.js v24.22.1 on 2026-11-13 (findings in `copilot/knowledge/js-runtime/yaml-comment-round-trip.md`). Interface files use no anchors or aliases (no match in the contracts folder or the data model).
+- **Options considered:** (A) the wrapper (1) refuses text over 262 144 bytes (256 KiB, UTF-8) before parsing, (2) calls `parseDocument(text, { resolveKnownTags: false, logLevel: 'error' })` with the defaults `schema: 'core'`, `merge: false`, `uniqueKeys: true` kept and no `customTags`, (3) fails the file on any entry of `doc.errors` or `doc.warnings`, (4) reads values with `doc.toJS({ maxAliasCount: 0 })`, also before any edit through the document API | (B) library defaults only | (C) `schema: 'failsafe'` | (D) scan the text for `!`, `&` and `*`
+- **Chosen:** (A) — each option name is real in 2.9.1: `resolveKnownTags` and `logLevel` are parse options; `maxAliasCount` is a `toJS` option, listed under `ToJSOptions` and not among the parse options; the library has no size option, so the cap is the wrapper's own check; the library has no depth option, but a stack overflow is caught and reported as error `RESOURCE_EXHAUSTION`, which rule (3) turns into a failed file. Measured effects: an unknown tag, or `!!binary` and `!!set` once `resolveKnownTags` is `false`, gives warning `TAG_RESOLVE_FAILED` and is read as an ordinary value, which is why warnings fail the file; with the default `true`, `!!binary` silently becomes a `Buffer`; `maxAliasCount: 0` makes any alias throw ("Alias resolution is disabled"), and the default 100 stopped a nested-alias bomb with "Excessive alias count"; a duplicate key is error `DUPLICATE_KEY` and a second document is error `MULTIPLE_DOCS` by default (and with `logLevel: 'error'`, but with `logLevel: 'silent'` the library skips the check and drops the second document without any error, measured 2026-11-13, so the wrapper uses `'error'`); `<<` is a plain key because `merge` defaults to `false` for YAML 1.2.
+- **Rejected:** (B) — defaults accept `!!binary` and `!!set` silently, treat an unknown tag as a warning only and set no size cap; (C) — measured: `schema: 'failsafe'` still turned `!!binary` into a `Buffer` in 2.9.1, so it does not stop known tags; (D) — a text scan is not a parser: `!` and `&` also occur inside quoted text.
+- **Confidence:** high (names read from the package and each effect measured; the 256 KiB figure is M-17's own number)
+- **Supersedes:** none
+- **Decided by:** engineering · **Approved at:** G4 (2026-11-13)
+
+## PDM-installers-core: Paradigm for the installer core (`installers/core`, clears unlisted need U-2)
+- **Tree path:** PDM-Q1 (greenfield: `installers/core` does not exist yet → NO) → PDM-Q2 (does it own invariants enforced across operations? The cross-checks, such as majors, exports, "plan equals what apply does" and the approved privileged set, are rules over plain data; durable state lives in `components.lock` and `install-state.json`, not in objects with identity and lifecycle → NO) → PDM-Q3 (an input to output transform: files in, a plan as data (DR-306), effects at the edge, a report out → YES) → functional-pipeline. PDM-Q4 not reached; the constitution default is `none`.
+- **Criteria:** DR-303 (a pure core with effects at the edges, modules with `domain`, `application`, `infrastructure`, `interface`); DR-305 and DR-306 (ports, one report model, the plan is data); spec pipeline read → resolve → plan → apply → report (FR-016); Node type stripping rejects constructor parameter properties (measured on v24.22.1 and stated in the Node.js 24 docs), so a class-modeled choice would need explicit field declarations and constructor assignments; no layer override.
+- **Options considered:** functional-pipeline | class-modeled | ASK at G0
+- **Chosen:** functional-pipeline (`functional-pipeline@1`) for every module of `installers/core` — immutable data types, pure transformation functions composed into the pipeline, effects only in `infrastructure` and `interface` and wired at the composition root.
+- **Rejected:** class-modeled — no entity has a lifecycle or identity that must stay valid across operations, and under type stripping it would need explicit field declarations in every class; ASK at G0 — V answered at G4 with the proposed default.
+- **Confidence:** high
+- **Supersedes:** none
+- **Decided by:** human · **Approved at:** G4 (2026-11-13)
+
+## PDM-contracts-lib: Paradigm for the shared pure rules (`contracts/lib`)
+- **Tree path:** PDM-Q1 (greenfield → NO) → PDM-Q2 (NO: the manifest and list readers, the slot and location classifier, the citation classifier, the render rules, the character counter and the `yaml` wrapper hold no state across calls) → PDM-Q3 (YES: text in, value or finding out) → functional-pipeline.
+- **Criteria:** DR-304 (`contracts/lib/` holds the pure modules every repo's CI shares at a pinned tag); TR-6 (one rules module shared by dry run, `cite --write` and renderer); the Node type stripping rule above (explicit field declarations if a class were ever chosen).
+- **Options considered:** functional-pipeline | class-modeled | ASK at G0
+- **Chosen:** functional-pipeline (`functional-pipeline@1`) — pure functions over immutable data, no module state, no effects; the `yaml` wrapper is the one place that touches the library.
+- **Rejected:** class-modeled — there are no invariants held across operations and nothing has identity; ASK at G0 — answered at G4.
+- **Confidence:** high
+- **Supersedes:** none
+- **Decided by:** human · **Approved at:** G4 (2026-11-13)
 
 ## References
 

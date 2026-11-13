@@ -4,26 +4,27 @@
 
 **Input**: `specs/022-repo-split/spec.md`, `blueprint.md` (v3.1, G0), the five P4 role records in `decisions/`, merged into [research.md](research.md).
 
-**Gate**: G3 (pending). Run R-001. Written by `architecture` (execute). Risk tier **HIGH** (DR-001).
+**Gate**: G3 approved 2026-11-13 with every default except question 1 parts a and b, which V overrode (Node 24, TypeScript; record N-1); G4 approved 2026-11-13, all defaults (run R-001). Written by `architecture` (execute); amended by `engineering` in phase A of `tasks.md`. Risk tier **HIGH** (DR-001).
 
 Words used once here. **Motherboard**: agent-config, in two parts: `contracts/` (schemas, a pure library, the build tool) and the **composition root** (the installer, the component lists, the renderer). **Component**: a folder with a valid `component.yaml`. **Slot**: a named socket in `slots/v1` that components fill. **Home**: `{{AGENT_HOME}}`, `~/.agent-config` from phase 2. **Delivery class**: how the installer places a file: **linked** (a link to the source folder, edits show at once), **rendered** (a read-only copy in `generated/<component>/` with real paths), **generated** (machine-specific files such as routes and `global-variables.md`), plus **compat** (a temporary link at an old `~/.copilot/…` path). **Privileged entry**: anything that makes code or always-loaded instructions run as V: a hook, an MCP service, a status line, a route, skill or agent text. **NEEDS**: the exit-10 report of what only V can supply.
 
 ## Summary
 
-Contracts come first, then a minimal installer that composes components from `git` or `path` sources by slot, then content moves out one component at a time: company KB, then the build of skills and agents, the full installer with rendering, the knowledge base, the SDLC framework and the final layout. agent-config stays a modular monolith (DR-301) whose `contracts/` tier depends on nothing else (DR-302); the installer core is a Node 18 ES-module program (DR-101) with feature-first modules (DR-303) around a pure planner whose single `Plan` drives `plan`, `apply`, the journal, consent and dry runs (DR-306). Security is HIGH: nine blocker mitigations are mapped to phases below, and two of them (consent for privileged entries, staying on the lock) change what V sees, so they arrive as spec amendments at G3.
+Contracts come first, then a minimal installer that composes components from `git` or `path` sources by slot, then content moves out one component at a time: company KB, then the build of skills and agents, the full installer with rendering, the knowledge base, the SDLC framework and the final layout. agent-config stays a modular monolith (DR-301) whose `contracts/` tier depends on nothing else (DR-302); the installer core is a TypeScript program that the latest Node 24 (from 24.12) runs directly by type stripping, with no build step (DR-101 as superseded by N-1), in the functional-pipeline paradigm, with feature-first modules (DR-303) around a pure planner whose single `Plan` drives `plan`, `apply`, the journal, consent and dry runs (DR-306). Security is HIGH: nine blocker mitigations are mapped to phases below, and two of them (consent for privileged entries, staying on the lock) change what V sees, so they arrive as spec amendments at G3.
 
 ## Technical Context
 
 | Field | Value | Record |
 |---|---|---|
-| **Language/Version** | JavaScript ES modules (`.mjs`), JSDoc types checked by `tsc --noEmit --checkJs` with `strict`; runtime floor Node 18, development Node 24 (`.nvmrc`) | DR-101, DR-108 |
+| **Language/Version** | TypeScript (`.ts`) run directly by Node type stripping: erasable syntax only, `.ts` import specifiers, no build step; types checked by `tsc --noEmit` with `strict`; the latest Node 24 from 24.12 only (`.nvmrc` 24, `engines` `>=24 <25`); the legacy `.mjs` tools stay as they are | DR-101, DR-108 as superseded by N-1 (V, G3) |
+| **Paradigm** | functional-pipeline@1 for `installers/core` and `contracts/lib`: immutable data types, pure functions composed into pipelines, effects at the edges through ports. The per-tier record is U-2 (task T003); type stripping rejects constructor parameter properties and `enum`, so these tiers use plain functions and `as const` objects | G4-3; U-2 |
 | **Primary Dependencies** | None at run time except vendored `yaml` 2.9.1 (ISC); the `git` program ≥ 2.50.1 for `git` sources | DR-102, DR-105, C-5 |
 | **Storage** | Files only: `components.lock`, `install-state.json`, the journal (JSON, sorted keys, temp file + rename); human files in YAML | DR-104 |
-| **Testing** | `node --test` (unit, runs on 18 and 24); Cucumber `~13.3.0` (one scenario per acceptance criterion); JSON Schema 2020-12 checked with `ajv` 8.20.0 in development plus a parity test against the reader | DR-103, DR-108, DR-501 |
+| **Testing** | `vitest` (unit, table-driven); Cucumber `~13.3.0` (one scenario per acceptance criterion); JSON Schema 2020-12 checked with `ajv` 8.20.0 in development plus a parity test against the reader | DR-103, DR-108 as superseded by N-1, DR-501 |
 | **Target Platform** | macOS, Linux, Windows (Windows PowerShell 5.1 shim); Mac and Windows proven in CI and by hand each phase | DR-107, DR-206, DR-208 |
 | **Project Type** | CLI plus libraries in one repo; four repos in total | DR-301 |
 | **Performance Goals** | None beyond: session-start re-render ≤ 5 s by default, never blocking; unit layer < 60 s; scenario layer ≤ 3 min per OS (measured at the end of phase 0) | DR-406, QB-6 |
-| **Constraints** | No run-time package install (FR-034); nothing generated or built committed (A-6); unit ≤ 50 lines, complexity ≤ 10; nothing written before the home is confirmed (FR-013) | constitution, DR-101 |
+| **Constraints** | No run-time package install (FR-034); nothing generated or built committed (A-6), and the code has no build step; aliases come from `package.json` `imports` (`#` prefix), not `tsconfig` `paths`; Node older than 24.12 is refused before any write; unit ≤ 50 lines, complexity ≤ 10; nothing written before the home is confirmed (FR-013) | constitution, DR-101 as superseded by N-1 |
 | **Scale/Scope** | One user, two machines, tens of components | A-1 |
 
 ## Constitution Check
@@ -55,12 +56,12 @@ Full description: [docs/architecture.md](../../docs/architecture.md). This secti
 ```
 
 - `contracts/` imports nothing else in the repo. Provider CI runs it from a checkout pinned to a `contracts/vM.m.p` tag (devops P-3).
-- Shared pure rules live in `contracts/lib/`: manifest and list reader, slot and location classifier, citation classifier, render rules, character counter, the one `yaml` wrapper with `vendor/yaml/` (DR-304). The phase-0 baseline is `contracts/tools/build.mjs budget --baseline` (dry run).
+- Shared pure rules live in `contracts/lib/`: manifest and list reader, slot and location classifier, citation classifier, render rules, character counter, the one `yaml` wrapper with `vendor/yaml/` (DR-304). The phase-0 baseline is `contracts/tools/build.ts budget --baseline` (dry run).
 - The installer treats core like any component (slot `core`, reserved, DR-401). It never reads a content file except through a declared location.
 
 ### Installer core (DR-303, DR-305, DR-306)
 
-`installers/core/main.mjs` (entry) → `src/CompositionRoot.mjs` (the only file that chooses adapters) → one composer per module.
+`installers/core/main.ts` (entry) → `src/CompositionRoot.ts` (the only file that chooses adapters) → one composer per module. Paradigm: functional-pipeline@1 (G4-3): each use case is a pipeline of pure functions over immutable data; adapters sit at the edge behind the ports below.
 
 | Module | Owns | May depend on |
 |---|---|---|
@@ -82,7 +83,7 @@ Each module has `domain/ application/ infrastructure/ interface/` (MOD-9). Insid
 
 ### Contracts (15, DR-401 to DR-418)
 
-The spec counts fourteen; `framework/v1` is the fifteenth (DR-415, Q8). Every schema lands in phase 0 under `contracts/<name>/v1/` (`schema.json`, `README.md`, `examples/`), listed in `contracts/index.md`, tagged `contracts/v1.0.0`. Sketches: [contracts/](contracts/README.md).
+The spec counts fifteen (the blueprint's fourteen plus `framework/v1`, DR-415, Q8, amendment A-3). Every schema lands in phase 0 under `contracts/<name>/v1/` (`schema.json`, `README.md`, `examples/`), listed in `contracts/index.md`, tagged `contracts/v1.0.0`. Sketches: [contracts/](contracts/README.md).
 
 | # | Contract | Owner | Main consumers | Missing or stale on a machine |
 |---|---|---|---|---|
@@ -106,7 +107,7 @@ In-repo interfaces (not cross-repo contracts, owned here by architecture, CON-15
 
 ## Security: threat model (from DR-001 and `decisions/security.md` §2 to §5)
 
-Risk tier HIGH. Every task of this feature gets a security review; security signs off before G5. Read-only rendered files are **not** a security control: they stop accidental edits only.
+Risk tier HIGH. In P6 the `security` role reviews only the tasks that implement the nine blocker mitigations (M-01, M-02, M-03, M-04, M-05, M-09, M-11, M-14, M-18; V, G4, 2026-11-13); every other task is reviewed by `engineering` and `qa` only. Security signs off each phase's blocker tasks before G5. Read-only rendered files are **not** a security control: they stop accidental edits only.
 
 ### Scope
 
@@ -186,7 +187,7 @@ local folder ──B8 (live link)─────────┤
 
 ### Required mitigations, with phase and requirement
 
-**Blocker** = in this plan before G3, its task done before that phase's pull request merges. "Amend" = changes what V sees, so the spec is amended (section "Spec and blueprint amendments for G3"). Every mitigation becomes a P5 task with `[Sec]` review and mandatory unit and negative scenarios (DR-501).
+**Blocker** = in this plan before G3, its task done before that phase's pull request merges. "Amend" = changes what V sees, so the spec is amended (section "Spec and blueprint amendments for G3"). Every mitigation becomes a P5 task with mandatory unit and negative scenarios (DR-501); the nine blockers also get the `security` review in P6, and the others (M-06, M-07, M-08, M-10, M-12, M-13, M-15, M-16, M-17, M-19) get `engineering` and `qa` review only.
 
 | Id | Mitigation (testable) | Threats | Phase | Severity | Requirements | Design home |
 |---|---|---|---|---|---|---|
@@ -206,7 +207,7 @@ local folder ──B8 (live link)─────────┤
 | **M-14** | **The guard stays fail-closed through the move.** `doctor` fails on any merged hook whose command path does not resolve (the warning stays only for agents absent from the machine); `retired:` refuses to remove a compatibility link any merged hook command still uses; merged hook commands use the real home path, never a compatibility path; phase 5 adds a test that deletes the guard script and checks `doctor` exits 1 | T-13 | 2 (`retired:`), 5 | blocker | FR-029, FR-031, AC-7.5, AC-8.3; amend S-6 (Edge Cases) | `wiring` (compat links, hooks); `commands/doctor` |
 | M-15 | Quoting per shell: one tested function for bash, one for PowerShell; tests with a home containing a space (`Vinh Do`), `$`, a backtick, `'`, `"`; a home with a newline or NUL is refused | T-14 | 5 | major | Edge Cases (spaces) | `shared` quoting |
 | M-16 | Install log: `{{AGENT_HOME}}/install-log.jsonl` outside `generated/`, one line per run with time, command, component, redacted source, SHA before and after, approved privileged changes; rotated at 1 MB keeping one previous file (C-4) | T-15 | 2 | minor | — | `state` |
-| M-17 | YAML parser risk record: pinned by lockfile, `cmd.audit` clean, no custom tags, alias limit, 256 KiB cap per file; hooks stay parser-free (spec 019 D9) | T-17 | 2 | major | — (unlisted need U-1) | `contracts/lib/yaml.mjs` wrapper |
+| M-17 | YAML parser risk record: pinned by lockfile, `cmd.audit` clean, no custom tags, alias limit, 256 KiB cap per file; hooks stay parser-free (spec 019 D9) | T-17 | 2 | major | — (unlisted need U-1) | `contracts/lib/yaml.ts` wrapper |
 | **M-18** | **No component code at install.** `detect` rules are declarative only (an environment variable name, a path probe inside the home) and never run a command; the build runs only agent-config's pinned build tool and never a component script; `{{include:}}` follows M-03 | T-18 | 2, 4 | blocker | FR-025, FR-038, AC-6.4, AC-11.5 | `variables` detect; `contracts/tools` build |
 | M-19 | CI pins by SHA: provider CI references the build tool by full commit SHA; the contract still promises compatibility by major | T-20 | 4 | minor | AC-11.9 | `contracts.pin` (DR-206) |
 
@@ -283,7 +284,7 @@ H/components.lock, H/install-state.json, H/install-state.pending.json (journal),
 | Merged hooks and agent files (phase 5) | `uninstall` removes only matching entries; `--restore` returns `settings.json` | no | Scenario with a pre-filled `settings.json` |
 | Anything, worst case | Tag `pre-022` at `825ea82` and the old installer | yes | Last resort |
 
-**CI per repo** (DR-206, DR-109, C-8, C-9): one `.github/workflows/check.yml` per new repo, job `check`, read-only permissions, `pull_request` with no path filter, push to main, manual, weekly; actions pinned to full SHAs; no secrets. agent-config keeps `validate-docs` until phase 8 and adds `installer.yml` (Ubuntu, macOS, Windows with a throwaway home; Node 18 on Ubuntu and Windows; required from phase 2: `installer (macos)`, `installer (windows)`) and `integration.yml` (nightly and on `components.yaml` changes). Provider repos fetch the contracts tool through `contracts.pin` and check citations against `providers.pin`; the nightly job checks the provider's `main`.
+**CI per repo** (DR-206 and DR-109 as superseded by N-1, C-9; C-8 is moot): one `.github/workflows/check.yml` per new repo, job `check`, read-only permissions, `pull_request` with no path filter, push to main, manual, weekly; actions pinned to full SHAs; no secrets. agent-config keeps `validate-docs` until phase 8 and adds `installer.yml` (Ubuntu, macOS, Windows with a throwaway home, each on the Node from `.nvmrc`; required from phase 2: `installer (macos)`, `installer (windows)`) and `integration.yml` (nightly and on `components.yaml` changes). Provider repos fetch the contracts tool through `contracts.pin` and check citations against `providers.pin`; the nightly job checks the provider's `main`.
 
 **Releases** (DR-207): agent-config `vM.m.p` at the end of phases 2, 5 and 8 and when retiring compatibility links; `contracts/vM.m.p` for contracts; agentic-sdlc annotated tags equal to `framework-version`, pinned; content repos tag only when `component.yaml` `version` changes. Rollout of any contract change: contracts → content providers → consumers → composition-root pins → drop N-1 later.
 
@@ -293,19 +294,21 @@ H/components.lock, H/install-state.json, H/install-state.pending.json (journal),
 
 ## Phases (revised order: providers ship first)
 
-One pull request per phase; checks green before and after; the runbook on Mac and Windows; security review on every task. The phase content follows system-architecture's corrections (DR-405, DR-407, DR-408), pending Q8. **Exit check** = what must hold before V merges the phase (G5 for that pull request).
+One pull request per phase; checks green before and after; the runbook on Mac and Windows; security review on the blocker tasks only (G4-1), engineering and qa review on every task. The phase content follows system-architecture's corrections (DR-405, DR-407, DR-408), pending Q8. **Exit check** = what must hold before V merges the phase (G5 for that pull request).
 
 | # | Phase | Content (providers before consumers) | Blocker mitigations | Exit check |
 |---|---|---|---|---|
-| 0 | **Contracts and fitness** (nothing installed changes) | 1) Golden plans of the old installers recorded first (Mac, Linux, Windows; QB-3). 2) 15 schemas with examples, `contracts/index.md`, `contracts/slots.yaml`; `contracts/lib/` (reader, classifiers, render rules, character counter, `yaml` wrapper and vendor); JSON Schema parity test. 3) `build` tool skeleton: `budget --baseline` (dry run) and `layout` (report mode). 4) Constitution I amended (2.0.0). 5) `atlas.yaml` components, allowed and forbidden edges, baselines (Q8: 123/73 or 109/67; core → agentic-sdlc 20; core → companies 1), fitness checks in report mode failing only on a rise. 6) Toolchain (DR-108) and the ESLint config carrying the stack baseline names for new code (Q1 d). 7) `installer.yml` matrix and Node 18 job. 8) V tags `pre-022`; release `contracts/v1.0.0` | M-03 (schema rules) | `check-docs.sh` green; the three golden plans unchanged (AC-1.9); AC-1.1 to AC-1.9 scenarios pass; baseline file recorded with method, tool version, date (AC-1.7); QB-6 scenario budget measured; matrix job required |
+| 0 | **Contracts and fitness** (nothing installed changes) | 1) Golden plans of the old installers recorded first (Mac, Linux, Windows; QB-3). 2) 15 schemas with examples, `contracts/index.md`, `contracts/slots.yaml`; `contracts/lib/` (reader, classifiers, render rules, character counter, `yaml` wrapper and vendor); JSON Schema parity test. 3) `build` tool skeleton: `budget --baseline` (dry run) and `layout` (report mode). 4) Constitution I amended (2.0.0). 5) `atlas.yaml` components, allowed and forbidden edges, baselines (Q8: 123/73 or 109/67; core → agentic-sdlc 20; core → companies 1), fitness checks in report mode failing only on a rise. 6) Toolchain (DR-108 as superseded by N-1: `.nvmrc` 24, `engines`, `tsconfig` for `tsc --noEmit`, `vitest`, `package.json` `imports` aliases) and the ESLint config carrying the stack baseline names for new code (Q1 d). 7) `installer.yml` matrix on the Node from `.nvmrc`, no older-Node job. 8) V tags `pre-022`; release `contracts/v1.0.0` | M-03 (schema rules) | `check-docs.sh` green; the three golden plans unchanged (AC-1.9); AC-1.1 to AC-1.9 scenarios pass; baseline file recorded with method, tool version, date (AC-1.7); QB-6 scenario budget measured; matrix job required |
 | 1 | **Cut the cycles** | Characterization tests of `validate-knowledge.mjs` and `validate.mjs` first; `validate.mjs --knowledge <root> --adapters <map>`; "Used by" rule and backlink scan removed; deny-list check retired; `build cite [--write]`; knowledge mentions of `agentic-sdlc` → 0 (scope per Q8); core `{{VAR}}` rule "read locally, never fetch" | — | Fitness count → 0 and the check on for good (AC-9.1); AC-9.1 to AC-9.8 pass; QB-7 mutation proof recorded; runbook shows an empty install difference |
-| 2 | **Minimal installer** | Installer core modules `manifests`, `sources`, `resolution`, `variables`, `state`, `commands`, the compat-link part of `wiring`, the `global-variables.md` and `generated/index.md` part of `rendering`; home and confirmation; both lists, lock, `git` and `path` sources, `archive` refused; resolve, NEEDS, exit codes, `--json`; `set`, `add`, `use`, `init-component`, `plan`, `doctor`, `uninstall --restore`, `install --update`; store, journal, atomic switch, backups, install log; DR-414 variable import; compatibility links and `retired:`; the old installer moved to `installers/legacy/` behind `install.sh --legacy`; core's `component.yaml` and in-repo stand-in manifests for the KB and agentic-sdlc (`path` sources). The old installers keep wiring agent folders, pointed at the new home (FR-035) | M-01 (mechanism, privileged set, consent), M-02, M-03, M-04 (clones, `doctor`), M-05, M-11, M-14 (`retired:`), M-18 (`detect`) | Stories 2 to 8 scenarios on three OS runners; Windows runner green; rehearsal in a throwaway home; rollback drill (`uninstall --restore`, then `--legacy`); 10 sampled old paths resolve; AC-8.6 hash compare; agent-config tag `vM.m.p` |
+| 2 | **Minimal installer** | Installer core modules `manifests`, `sources`, `resolution`, `variables`, `state`, `commands`, the compat-link part of `wiring`, the `global-variables.md` and `generated/index.md` part of `rendering`; home and confirmation; both lists, lock, `git` and `path` sources, `archive` refused; resolve, NEEDS, exit codes, `--json`; `set`, `add`, `use`, `init-component`, `plan`, `doctor`, `uninstall --restore`, `install --update`; store, journal, atomic switch, backups, install log; DR-414 variable import; compatibility links and `retired:`; the entry scripts find Node 24.12 or later and run `main.ts` (older Node: exit 10, nothing changed); the old installer moved to `installers/legacy/` behind `install.sh --legacy`; core's `component.yaml` and in-repo stand-in manifests for the KB and agentic-sdlc (`path` sources). The old installers keep wiring agent folders, pointed at the new home (FR-035) | M-01 (mechanism, privileged set, consent), M-02, M-03, M-04 (clones, `doctor`), M-05, M-11, M-14 (`retired:`), M-18 (`detect`) | Stories 2 to 8 scenarios on three OS runners; Windows runner green; rehearsal in a throwaway home; rollback drill (`uninstall --restore`, then `--legacy`); 10 sampled old paths resolve; AC-8.6 hash compare; agent-config tag `vM.m.p` |
 | 3 | **Company KB → `agent-companies`, with a minimal routes renderer** | `routes/v1` renderer: Copilot `routes.instructions.md` (`applyTo: "**"`), one Claude import line, Codex `AGENTS.md` as core + routes (< 32 KiB); then V creates `agent-companies` (public, history kept with `git filter-repo`), its `component.yaml` and CI pinned to `contracts/v1` and to agent-config as provider; then agent-config removes `copilot/companies`, the company lines in core, `init-repo-kb:61` as plain words, and adds the entry to `components.yaml` | M-01 (routes) | Story 10 passes; 0 company names in core and variables source (AC-10.1); install with and without the entry; network-unplug drill (AC-10.4); FF-1 core → companies 1 → 0 |
 | 4 | **Build step and per-entry targets** | `skill-source/v1`, `agent-source/v1`, `adapter-fields/v1`, `build` subcommand; per-entry linking of built output into `~/.claude/skills`, `~/.agents/skills` and the three agent folders in the same pull request as the first migrated source (DR-408, DR-409); migrate the 12 agents and the wrapper skills; procedures become skills or `references/`; the 4 SDLC procedures move into the in-repo agentic-sdlc folder (DR-405); provider CI pins the tool by SHA | M-01 (skill and agent text), M-03, M-04, M-18 (build) | P4-22, P4-26a, P4-26d answered before start; Story 11 passes; same source built twice is byte-identical; 0 hand-written agent files; FF-1 core → agentic-sdlc 20 → 0; skill-list size against the baseline |
-| 5 | **Installer, full** | `rendering`: rendered copies, generated-from line, `generated/index.md`, read-only, session-start re-render; load paths at `generated/` (DR-307); routes and skill and agent links switched to rendered copies; `wiring`: hooks merge, services, status line; total budget; `doctor` drift checks | M-01 (hooks, services, status line), M-03, M-04, M-09, M-11, M-14 (guard-deletion test) | P4-14, P4-18, P4-26b, P4-19, P4-20, P4-26c answered; Stories 12 and 16 pass; rendered size ≤ baseline everywhere (SC-004); rehearsal with the exact `settings.json` diff in `plan`; backup of `settings.json` confirmed; Codex `AGENTS.md` < 32 KiB; `--restore` drill; security sign-off; agent-config tag |
-| 6 | **KB → `agent-knowledge`** | V creates the repo (history kept); `component.yaml` with `provides.contracts: [knowledge-provider/v1, company-kb/v1]` and the exports (41+); the 20 (+ 42 per Q8) `{{AGENT_HOME}}` lines converted; self-containment blocking; constitution III and `review-docs` stop naming `copilot/knowledge`; then agent-config switches `knowledge-storage` to the `git` source and removes the KB and both frameworks; then `cite --write` in core, the in-repo SDLC and agent-companies | M-03, M-04 (linked KB) | Story 13 passes; KB alone in a clean checkout passes its check; `path` and `git` sources give identical content (AC-13.8) |
+| 5 | **Installer, full** | `rendering`: rendered copies, generated-from line, `generated/index.md`, read-only, session-start re-render; load paths at `generated/` (DR-307); routes and skill and agent links switched to rendered copies; `wiring`: hooks merge, services, status line; total budget; `doctor` drift checks; then, with rendering in place, the 484 hard-coded `~/.copilot` lines are classified and the agent-home ones converted to `{{AGENT_HOME}}` (FR-032, AC-8.4), leaving the lines in knowledge files for phase 6 | M-01 (hooks, services, status line), M-03, M-04, M-09, M-11, M-14 (guard-deletion test) | P4-14, P4-18, P4-26b, P4-19, P4-20, P4-26c answered; Stories 12 and 16 pass; rendered size ≤ baseline everywhere (SC-004); rehearsal with the exact `settings.json` diff in `plan`; backup of `settings.json` confirmed; Codex `AGENTS.md` < 32 KiB; `--restore` drill; security sign-off; agent-config tag |
+| 6 | **KB → `agent-knowledge`** | V creates the repo (history kept); `component.yaml` with `provides.contracts: [knowledge-provider/v1, company-kb/v1]` and the exports (41+); the 20 (+ 42 per Q8) `{{AGENT_HOME}}` lines converted, so every knowledge file goes straight to its final form on arrival (not converted in phase 5 and again here); self-containment blocking; constitution III and `review-docs` stop naming `copilot/knowledge`; then agent-config switches `knowledge-storage` to the `git` source and removes the KB and both frameworks; then `cite --write` in core, the in-repo SDLC and agent-companies | M-03, M-04 (linked KB) | Story 13 passes; KB alone in a clean checkout passes its check; `path` and `git` sources give identical content (AC-13.8) |
 | 7 | **agentic-sdlc → own repo** | V creates the repo; tag `vM.m.p` = `framework-version`; `framework/v1` `enable` and `disable` per project (links kept out of git through `.git/info/exclude`); agent-config pins the tag and removes the folder; the workflow-graph hook entries move with it (DR-413) | M-01, M-14 (the guard's new command path) | Story 14 passes; pin and tag round trip; SDLC and non-SDLC project compared; guard still blocks after the move |
 | 8 | **Layout** | Move to the target root set (DR-308): `home/`, `adapters/`, `skills/`, `agents/`; `mapping.yaml` into `installers/legacy/` (or removed if the legacy installer has retired); `repo-layout/v1` blocking; retire compatibility links in a separate release once DR-417's evidence holds | M-14 (`retired:` guard) | Story 15 passes; the three golden files and the install state identical before and after (AC-15.2); root entries equal the DR-308 set |
+
+**Order of the path conversion** (V, G4-5; spec A-15). The 484 hard-coded `~/.copilot` lines are converted in phase 5, after rendering exists, and before the compatibility links retire in phase 8. Knowledge files are not touched in phase 5: they go straight to their final form in phase 6, when they move to `agent-knowledge`.
 
 ## Project Structure
 
@@ -333,17 +336,17 @@ contracts/                     # tier 1: depends on nothing else in the repo; ta
 ├── slots.yaml
 ├── <name>/v1/{schema.json, README.md, examples/}    # 15 contracts
 ├── lib/                       # pure: reader, slots and locations, citations, render rules, char counter
-│   ├── yaml.mjs
+│   ├── yaml.ts
 │   └── vendor/yaml/           # yaml 2.9.1, byte-compared with the lockfile
-└── tools/                     # build/v1: build.mjs build | budget [--baseline] | cite [--write] | layout
+└── tools/                     # build/v1: build.ts build | budget [--baseline] | cite [--write] | layout
 installers/                    # composition root
 ├── install.sh, install.ps1, uninstall.sh, uninstall.ps1   # shims (DR-107)
 ├── core/
-│   ├── main.mjs, package.json (engines >=18), tsconfig.json
+│   ├── main.ts, package.json (engines >=24 <25, imports), tsconfig.json
 │   └── src/
-│       ├── CompositionRoot.mjs
+│       ├── CompositionRoot.ts
 │       └── modules/{manifests,sources,resolution,variables,rendering,wiring,state,commands,shared}/
-│           └── {<Module>Module.mjs, domain/, application/<use-case>/, infrastructure/, interface/}
+│           └── {<Module>Module.ts, domain/, application/<use-case>/, infrastructure/, interface/}
 └── legacy/                    # old bash and PowerShell installer + mapping.yaml (until phase 5 + one tag)
 home/                          # core content (slot core): instructions, patterns, procedures, references,
                                # atlas, tracker, frameworks/agent-foundry, hooks, prompts, templates, efficiency-audit
@@ -352,7 +355,7 @@ skills/<name>/{skill.yaml, body.md, references/}      # core-owned skill sources
 agents/<name>/{agent.yaml, body.md}                   # core-owned agent sources (foundry, windows-software)
 component.yaml                 # core's manifest (slot core)
 components.yaml                # public default component list
-tests/<tool>/{*.feature, tool.mjs, fixtures/}, tests/support/
+tests/<tool>/{*.feature, tool.ts, fixtures/}, tests/support/
 scripts/                       # check-docs.sh (check.sh after phase 8), hooks for the repo itself
 docs/architecture.md
 ```
@@ -396,7 +399,7 @@ The plan does not edit `spec.md` or `blueprint.md`. Each row is a change the rol
 
 At most 8, deduplicated across the five roles. Each has a default; replying `approve G3 R-001` accepts every default.
 
-1. **Toolchain at the Node 18 floor** (tech-stack Q1 to Q3, conflict C-14). (a) Plain JavaScript with JSDoc and strict type checking instead of `.ts`; (b) keep the floor at Node 18 (it left upstream support in April 2025; 20 adds nothing structural); (c) keep JSON Schema files plus a hand-written reader with a parity test; (d) the stack's lint baseline applies to new code (`contracts/`, `installers/core/`), and the constitution records a style deviation for the legacy `.mjs` tools until each is touched. **Default: yes to all four.**
+1. **Toolchain** (tech-stack Q1 to Q3, conflict C-14). (a) **Overridden by V (G3, 2026-11-13):** plain JavaScript with JSDoc instead of `.ts`. New runtime code is TypeScript run directly by Node type stripping. (b) **Overridden by V (G3, 2026-11-13):** a runtime floor older than the latest Node 24. The runtime is the latest Node 24 from 24.12, with no older-Node job. (c) keep JSON Schema files plus a hand-written reader with a parity test; (d) the stack's lint baseline applies to new code (`contracts/`, `installers/core/`), and the constitution records a style deviation for the legacy `.mjs` tools until each is touched. **Default: yes to c and d; a and b are V's override (N-1).**
 2. **Consent model and accepted risks** (security AR-1, AR-2, AR-3). Approved hooks and MCP services run with your full rights, unsandboxed, with consent per change at an interactive terminal (M-01, M-11); doc content changes without consent; your username appears in rendered paths sent to model providers. **Default: accept all three, recorded as `Decided by: human`.**
 3. **Updates stay on the lock** (security M-02, conflict C-1). `install` never moves a `git` source; `install --update [<name>]` advances it and shows the commit range and any privileged change. **Default: yes.**
 4. **The guard when Node is missing** (security AR-4). Today the wrapper lets every tool call through when no Node ≥ 24.12 is found, against spec 019 D6. Keep that, or deny only inside folders that have `.specify/runs`? Security gave no default. **Default (architecture's proposal): deny only where `.specify/runs` exists, allow elsewhere.**
@@ -416,7 +419,7 @@ At most 8, deduplicated across the five roles. Each has a default; replying `app
 
 ## Unconfirmed, to check before the phase that needs it
 
-Windows: rename over a directory link, symbolic links on `windows-latest` runners, `fs.chmod` read-only, junctions without administrator rights, `os.homedir()` reading `USERPROFILE` (phases 0 and 2). Codex reading a linked `~/.codex/AGENTS.md` and `hooks.json`, and its session-start hook (P4-14, P4-18). Copilot CLI and Codex behaviour on a missing hook command (security §7; M-14 applies to all three until checked). VS Code relative-target clicks (P4-19, DR-307). The `yaml` 2.9.1 parser option names (U-1). Whether Claude Code accepts unknown keys inside hook entries (DR-413 avoids relying on it).
+Node 24.12 running `.ts` files without a flag, and the exact rules of type stripping (erasable syntax only, `.ts` specifiers, no stripping inside `node_modules`): the stack idioms record a check on Node 24.22 (2026-10-25), not on 24.12 itself (phase 0). `package.json` `imports` aliases resolving under `vitest`, under Cucumber step files and under plain `node` (TSN-15; phase 0). Cucumber `~13.3.0` loading `.ts` step files under type stripping (phase 0). The Windows PowerShell 5.1 shim finding Node 24.12 (phase 2). Windows: rename over a directory link, symbolic links on `windows-latest` runners, `fs.chmod` read-only, junctions without administrator rights, `os.homedir()` reading `USERPROFILE` (phases 0 and 2). Codex reading a linked `~/.codex/AGENTS.md` and `hooks.json`, and its session-start hook (P4-14, P4-18). Copilot CLI and Codex behaviour on a missing hook command (security §7; M-14 applies to all three until checked). VS Code relative-target clicks (P4-19, DR-307). The `yaml` 2.9.1 parser option names (U-1). Whether Claude Code accepts unknown keys inside hook entries (DR-413 avoids relying on it).
 
 ## References
 
@@ -429,6 +432,7 @@ Windows: rename over a directory link, symbolic links on `windows-latest` runner
 
 **External authoritative sources:**
 - [github/spec-kit](https://github.com/github/spec-kit): the plan template this file follows.
+- [Node.js: running TypeScript natively](https://nodejs.org/api/typescript.html): type stripping rules behind the Language/Version row (to be re-read at the start of phase 0, see Unconfirmed).
 - [Claude Code hooks reference](https://code.claude.com/docs/en/hooks): exit-code behaviour behind T-13.
 - [CVE-2024-32002](https://nvd.nist.gov/vuln/detail/CVE-2024-32002), [CVE-2025-48384](https://nvd.nist.gov/vuln/detail/CVE-2025-48384): the git floor in M-05.
 - [Git `GIT_ALLOW_PROTOCOL`](https://git-scm.com/docs/git#Documentation/git.txt-codeGITALLOWPROTOCOLcode), [`core.fsmonitor`](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corefsmonitor): M-05, M-06.

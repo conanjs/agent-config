@@ -4,7 +4,7 @@ Not a cross-repo contract: these are agent-config's own interfaces, listed in it
 
 ## Entry points
 
-`installers/install.sh` and `installers/install.ps1` find Node ≥ 18 (`NODE` override first, then `PATH`) and run `node installers/core/main.mjs <command> [args]`, returning its exit code. No Node: a one-line need and exit 10, nothing changed, no JSON (DR-107, P-7). `--legacy` (`-Legacy`) runs the old installer in `installers/legacy/` through phase 5 plus one tag (A-D2).
+`installers/install.sh` and `installers/install.ps1` find Node 24.12 or later (`NODE` override first, then `PATH`) and run `node installers/core/main.ts <command> [args]`, returning its exit code. Node runs the TypeScript file directly by type stripping: no build step. No Node: a one-line need and exit 10, nothing changed, no JSON (DR-107, P-7). `--legacy` (`-Legacy`) runs the old installer in `installers/legacy/` through phase 5 plus one tag (A-D2).
 
 ## Commands
 

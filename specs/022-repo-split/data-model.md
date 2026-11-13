@@ -55,7 +55,7 @@ Invariants: mounts are unique across all slots' locations; no mount is a prefix 
 | `provides.skills`, `provides.agents` | relative folders | `skill-source/v1`, `agent-source/v1` sources |
 | `provides.services` | list | Optional, for example an MCP server (AC-12.7); privileged (M-01) |
 | `depends.slots[]` | SlotDependency | `slot`, `contract`, `required`, `suggest` (shown only, never fetched, AC-4.5), `docs` (**generated** by `build cite --write`; a hand edit that differs fails, FR-017) |
-| `depends.runtime` | map | For example `node: ">=18"`, checked before apply (AC-5.9); the installer adds `git: ">=2.50.1"` for `git` sources (M-05) |
+| `depends.runtime` | map | For example `node: ">=24.12"`, checked before apply (AC-5.9); the installer adds `git: ">=2.50.1"` for `git` sources (M-05) |
 | `routes[]` | Route | `routes/v1` entries; privileged |
 | `hooks[]` | HookEntry | `hooks/v1` entries; privileged |
 | `variables[]` | VariableDeclaration | `variables/v1` declarations; public values only (M-08) |

@@ -1,7 +1,7 @@
 ---
 schema: repo-architecture/v2
 last-updated: 2026-11-13
-updated-by: specs/022-repo-split (P4 plan, G3 pending)
+updated-by: specs/022-repo-split (P4 plan; G3 and G4 approved 2026-11-13; phase A amendments: Node 24 and TypeScript, functional-pipeline, id-safe dependencies)
 ---
 
 # Architecture: agent-config
@@ -37,7 +37,7 @@ Forbidden edges: agent-knowledge → any component; core → agentic-sdlc; core 
 
 ## 3. Components
 
-Today's folders, each with the component it becomes (`target`) and the phase that moves it. Document folders use `kind: datastore` because the schema has no kind for agent-read documents (DR-309). Planned folders that do not exist yet (`contracts/`, `installers/core/`, `home/`, `adapters/`, `agents/`) are described in §4's second block and appear here when their phase merges.
+Today's folders, each with the component it becomes (`target`) and the phase that moves it. Document folders use `kind: datastore` because the schema has no kind for agent-read documents (DR-309). Planned folders that do not exist yet (`contracts/`, `installers/core/`, `home/`, `adapters/`, `agents/`) are described in the planned block below and in §4's second block, and move into the validated block here when the task that creates the folder merges.
 
 ```yaml
 components:
@@ -62,10 +62,21 @@ components:
   - { name: claude-adapter, path: claude/, kind: datastore, target: "adapters/claude", moves: "phase 4 (agents built), phase 8 (folder)", decisions: [DR-409, DR-410] }
   - { name: codex-adapter, path: codex/, kind: datastore, target: "adapters/codex", moves: "phase 4 (agents built), phase 8 (folder)", decisions: [DR-409, DR-410] }
   - { name: skills, path: skills/, kind: datastore, target: "skill sources", moves: "phase 4 to skill-source/v1", decisions: [DR-408] }
-  - { name: installers, path: installers/, kind: script, stack: typescript-node, target: composition-root, moves: "phase 2 adds installers/core/ (Node) and installers/legacy/; the shell scripts become shims", decisions: [DR-101, DR-105, DR-107, DR-303] }
+  - { name: installers, path: installers/, kind: script, stack: typescript-node, target: composition-root, moves: "covers the shell scripts that become shims and installers/legacy/; installers/core/ is its own component, installer-core (planned block below)", decisions: [DR-101, DR-105, DR-107, DR-303] }
   - { name: scripts, path: scripts/, kind: script, stack: typescript-node, target: checks, decisions: [DR-108, DR-109] }
   - { name: tests, path: tests/, kind: script, stack: typescript-node, target: checks, decisions: [DR-108, DR-501] }
   - { name: spec-kit-state, path: .specify/, kind: datastore, target: "repo tooling", decisions: [DR-308] }
+```
+
+**Planned components (not validated: the folders do not exist yet).** The validator reads only the first block above and requires every path to exist, so these entries wait here; the task that creates each folder moves its entry into the block above. `installer-core` is split out of `installers` so that tasks can name its folder (`installers/core/**`, including `src/`) and the `typescript-node` procedures, whose paths are relative to a component's `src/`. Both tiers use the **functional-pipeline** paradigm (V, G4): immutable data types, pure functions composed into pipelines, effects at the edges through ports. New runtime code is TypeScript that Node 24 (24.12 or later) runs directly by type stripping, with no build step.
+
+```yaml
+# planned: moves into the block above when the folder exists
+components:
+  - { name: installer-core, path: installers/core/, kind: script, stack: typescript-node, paradigm: functional-pipeline@1, target: composition-root, moves: "created in phase 2", decisions: [DR-101, DR-303] }
+  - { name: contracts-lib, path: contracts/lib/, kind: library, stack: typescript-node, paradigm: functional-pipeline@1, target: contracts, moves: "created in phase 0", decisions: [DR-101, DR-304] }
+  - { name: contracts-tools, path: contracts/tools/, kind: script, stack: typescript-node, target: contracts, moves: "created in phase 0", decisions: [DR-101, DR-304] }
+  - { name: contracts-schemas, path: contracts/, kind: datastore, target: contracts, moves: "created in phase 0; schemas, examples, slots.yaml", decisions: [DR-302] }
 ```
 
 `workflow-graph` sits inside `agentic-sdlc`'s folder and is its own component because it is the one package with its own `package.json`, `tsconfig.json` and lint config; the nested path wins for its folder. Not components: `specs/`, `proposals/` (design documents), `.github/`, `.githooks/`, `.claude/` (this repo's own CI, git hooks and Claude Code project settings).
@@ -94,10 +105,10 @@ agentic-sdlc → agent-companies is allowed only as an optional slot dependency 
 ```yaml
 # planned: installers/core/src/ (phase 2 onward)
 layers:
-  - { name: domain, path: domain/, may-depend-on: [] }                       # pure; may import contracts/lib (pure published language)
-  - { name: application, path: application/, may-depend-on: [domain] }       # one folder per use case; owns the ports
-  - { name: infrastructure, path: infrastructure/, may-depend-on: [application, domain] }   # port adapters: file system, links, git, clock, terminal
-  - { name: interface, path: interface/, may-depend-on: [application] }      # CLI handlers, text and JSON presenters
+  - { name: domain, path: domain/, may-depend-on: [], paradigm: functional-pipeline@1 }                       # pure; may import contracts/lib (pure published language)
+  - { name: application, path: application/, may-depend-on: [domain], paradigm: functional-pipeline@1 }       # one folder per use case; owns the ports
+  - { name: infrastructure, path: infrastructure/, may-depend-on: [application, domain], paradigm: functional-pipeline@1 }   # port adapters: file system, links, git, clock, terminal
+  - { name: interface, path: interface/, may-depend-on: [application], paradigm: functional-pipeline@1 }      # CLI handlers, text and JSON presenters
 modules:
   - { name: manifests, path: installers/core/src/modules/manifests/, may-depend-on: [shared], public: [application/**] }
   - { name: sources, path: installers/core/src/modules/sources/, may-depend-on: [manifests, shared], public: [application/**] }
@@ -110,7 +121,7 @@ modules:
   - { name: shared, path: installers/core/src/modules/shared/, may-depend-on: [], public: [domain/**, application/**] }
 ```
 
-Rules on top of the table: only `src/CompositionRoot.mjs` imports adapters and composers; no composer imports an adapter; no layer imports a composer (MOD-11). Domain and application never touch the file system, network, clock or process environment; they reach them through ports (`FileSystem`, `Links`, `Git`, `Clock`, `Environment`, `Terminal`, `Runtime`, `HomeLock`) (CA-2, CA-7, DR-305). The pure planner returns one `Plan` that `plan`, `apply`, the journal, the consent check and dry runs all use (DR-306). Shared pure rules (render rules, citation classifier, manifest reader, character counter, the one `yaml` wrapper and its vendored copy) live in `contracts/lib/` and are imported by both the installer and the build tool (DR-304).
+Rules on top of the table: only `src/CompositionRoot.ts` imports adapters and composers; no composer imports an adapter; no layer imports a composer (MOD-11). Domain and application never touch the file system, network, clock or process environment; they reach them through ports (`FileSystem`, `Links`, `Git`, `Clock`, `Environment`, `Terminal`, `Runtime`, `HomeLock`) (CA-2, CA-7, DR-305). The pure planner returns one `Plan` that `plan`, `apply`, the journal, the consent check and dry runs all use (DR-306). Paradigm: `installers/core` and `contracts/lib` are **functional-pipeline@1** (V, G4): data is immutable, each use case is a pipeline of pure functions, and effects stay in the infrastructure layer. Imports across modules use `package.json` `imports` aliases (`#` prefix), because the code has no build step (TSN-15); erasable TypeScript syntax only, so no `enum` and no constructor parameter properties (TSN-20). Shared pure rules (render rules, citation classifier, manifest reader, character counter, the one `yaml` wrapper and its vendored copy) live in `contracts/lib/` and are imported by both the installer and the build tool (DR-304).
 
 ## 5. Data
 
@@ -130,13 +141,15 @@ Rules on top of the table: only `src/CompositionRoot.mjs` imports adapters and c
 
 | Dependency | Kind | Used for | Doc |
 |---|---|---|---|
-| GitHub (git over `https` or `ssh`) | git remote | Fetching `git` sources; citation targets; CI | _none yet: phase 2 adds docs/integrations/github.md_ |
-| `git` program ≥ 2.50.1 | local program | Clone, fetch, `rev-parse` for `git` sources | _none yet: phase 2 adds docs/integrations/git.md_ |
-| Node.js ≥ 18 | runtime | Installer core, build tool, validators | none |
-| Claude Code user folder (`~/.claude/`) | agent configuration files | Import lines in `CLAUDE.md`, merged hooks in `settings.json`, skills and agents | _none yet: phase 5 adds docs/integrations/claude-code.md_ |
-| Copilot CLI and VS Code (`~/.copilot/`, `~/.agents/skills/`) | agent configuration files | Instruction links, routes file, hook file, agents, skills | _none yet: phase 5 adds docs/integrations/copilot.md_ |
-| Codex (`~/.codex/`) | agent configuration files | `AGENTS.md`, `hooks.json`, agents | _none yet: phase 5 adds docs/integrations/codex.md_ |
-| `yaml` 2.9.1 (vendored) | library | Reading and editing YAML with comments kept | none |
+| `github` | git remote over `https` or `ssh` | Fetching `git` sources; citation targets; CI | _none yet: phase 2 adds docs/integrations/github.md_ |
+| `git` | local program, version 2.50.1 or later | Clone, fetch, `rev-parse` for `git` sources | _none yet: phase 2 adds docs/integrations/git.md_ |
+| `nodejs` | runtime, Node 24.12 or later (the latest Node 24) | Runs the installer core, build tool and validators; TypeScript is run directly by type stripping, with no build step | none |
+| `claude-code` | agent configuration files (`~/.claude/`) | Import lines in `CLAUDE.md`, merged hooks in `settings.json`, skills and agents | _none yet: phase 5 adds docs/integrations/claude-code.md_ |
+| `copilot` | agent configuration files (`~/.copilot/`, `~/.agents/skills/`; Copilot CLI and VS Code) | Instruction links, routes file, hook file, agents, skills | _none yet: phase 5 adds docs/integrations/copilot.md_ |
+| `codex` | agent configuration files (`~/.codex/`) | `AGENTS.md`, `hooks.json`, agents | _none yet: phase 5 adds docs/integrations/codex.md_ |
+| `yaml` | library, version 2.9.1 (vendored) | Reading and editing YAML with comments kept | none |
+
+The first cell of each row is the id a task uses in `touches: integration:<id>` (letters, digits, `-`, `_`); the integration doc for a row has `service: <id>` and lives at `docs/integrations/<id>.md`.
 
 ## 7. Cross-cutting concerns
 
@@ -154,12 +167,20 @@ Rules on top of the table: only `src/CompositionRoot.mjs` imports adapters and c
 | Id | Topic | Where |
 |---|---|---|
 | DR-001 | Risk tier HIGH | `specs/022-repo-split/research.md` (a different DR-001 exists in specs/001 and specs/009) |
-| DR-101 | Runtime language and Node 18 floor | `specs/022-repo-split/research.md` |
+| DR-101 | Runtime language (original choice) (superseded by DR-601) | `specs/022-repo-split/research.md` |
 | DR-102 | Vendored YAML library | `specs/022-repo-split/research.md` |
 | DR-105 | Source adapters and links | `specs/022-repo-split/research.md` |
-| DR-107 | Installer shims | `specs/022-repo-split/research.md` |
-| DR-108 | Toolchain | `specs/022-repo-split/research.md` |
-| DR-109 | Check command and CI per repo | `specs/022-repo-split/research.md` |
+| DR-107 | Installer shims (superseded by DR-602) | `specs/022-repo-split/research.md` |
+| DR-108 | Toolchain (superseded by DR-603) | `specs/022-repo-split/research.md` |
+| DR-109 | Check command and CI per repo (superseded by DR-604) | `specs/022-repo-split/research.md` |
+| DR-601 | Language and runtime for the runtime code | `specs/022-repo-split/research.md` |
+| DR-602 | Entry points `install.sh` and `install.ps1` | `specs/022-repo-split/research.md` |
+| DR-603 | Toolchain for agent-config | `specs/022-repo-split/research.md` |
+| DR-604 | Check command for each repo | `specs/022-repo-split/research.md` |
+| DR-605 | Continuous integration without a Node 18 job | `specs/022-repo-split/research.md` |
+| DR-606 | YAML parser limits for `yaml` 2.9.1 | `specs/022-repo-split/research.md` |
+| PDM-installers-core | Paradigm for the installer core (`installers/core`) | `specs/022-repo-split/research.md` |
+| PDM-contracts-lib | Paradigm for the shared pure rules (`contracts/lib`) | `specs/022-repo-split/research.md` |
 | DR-202 | Home, store and atomic switch | `specs/022-repo-split/research.md` |
 | DR-204 | Compatibility links | `specs/022-repo-split/research.md` |
 | DR-301 | Architecture pattern | `specs/022-repo-split/research.md` |
@@ -192,8 +213,8 @@ Rules on top of the table: only `src/CompositionRoot.mjs` imports adapters and c
 ## 10. Known gaps / out of scope
 
 - `contracts/`, `installers/core/`, `home/`, `adapters/`, `agents/` do not exist yet; §4's planned block describes them (DR-309).
-- The `.mjs` tools have no format, lint or typecheck configuration; DR-108 adds it for new code in phase 0, and the stack's lint baseline versus legacy tools is G3 question 1 (research C-14).
-- `installers/` is bash and PowerShell today; its `stack` records the decided Node core (DR-101).
+- The legacy `.mjs` tools have no format, lint or typecheck configuration; the toolchain record (DR-108 as superseded by N-1) adds it for new code in phase 0, and the constitution exempts legacy tools until each is rewritten (G3 question 1 part d, research C-14; plan amendment P-3).
+- `installers/` is bash and PowerShell today; its `stack` records the decided core, TypeScript on Node 24.12 or later (DR-101 as superseded by N-1). `installer-core`, `contracts-lib`, `contracts-tools` and `contracts-schemas` are in the planned block of §3 until their folders exist.
 - Integration docs for GitHub, git and the three agents are written in phases 2 and 5 (§6).
-- Paradigm for `installers/core` is not chosen yet (engineering, research U-2); the constitution default is `none`.
+- Paradigm: V chose functional-pipeline@1 for `installers/core` and `contracts/lib` (G4); the per-tier decision record is unlisted need U-2 (task T003). Other components keep the constitution default, `none`.
 - Out of scope (spec): `archive` sources, an MCP server for the KB, a database-only knowledge store, multi-user publishing, splitting agent-foundry or `contracts/` into their own repos.

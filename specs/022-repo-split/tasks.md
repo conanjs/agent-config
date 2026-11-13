@@ -1,6 +1,6 @@
 # Tasks: agent-config as a motherboard of replaceable components
 
-**Input**: `specs/022-repo-split/` — `spec.md` (G2 approved 2026-11-13), `plan.md`, `research.md`, `data-model.md`, `contracts/`, `decisions/`. Run R-001, phase P5. Risk tier **HIGH** (DR-001): every task gets a security review at P6, and security signs off before G5.
+**Input**: `specs/022-repo-split/` — `spec.md` (G2 approved 2026-11-13), `plan.md`, `research.md`, `data-model.md`, `contracts/`, `decisions/`. Run R-001, phase P5. Risk tier **HIGH** (DR-001): at P6 the `security` role reviews only the tasks that implement the nine blocker mitigations (tagged `[Sec]`, G4-1); every task is reviewed by engineering and qa; security signs off the blocker tasks of each phase before G5.
 
 **G3 approval** (`approve G3 R-001`, 2026-11-13): every default in plan.md "Questions for V at G3" except question 1. V's overrides, applied by the tasks of Phase A:
 
@@ -18,6 +18,7 @@
 - **[P]**: no shared file with any other `[P]` task and no `requires:` on another `[P]` task. Up to 4 `[P]` tasks run at once (constitution budgets).
 - **(path)**: the primary file or folder the task writes. A path that starts with `agent-companies/`, `agent-knowledge/` or `agentic-sdlc-repo/` is in that new repo, a sibling checkout, not in agent-config.
 - **Dept and Exec**: `[Eng]` or `[QA]`; `[llm]` is a role instance in execute mode, `[script]` runs the profile checks exactly as declared.
+- **[Sec]**: after `[Exec]`; the task implements one of the nine blocker mitigations (M-01, M-02, M-03, M-04, M-05, M-09, M-11, M-14, M-18), so the `security` role reviews it at P6 in addition to engineering and qa (G4-1). Scenario, mutation-proof and amendment tasks carry no tag.
 - **touches**: `none` on every task. Tasks that call git, GitHub or the agent folders cannot name an integration yet, because section 6 of `docs/architecture.md` has no id-safe dependency names. The Phase A architecture task adds them; the planner then updates `touches` before G4.
 - **procedure**: `none` on every task. The one catalog entry, `typescript-node/add-port-and-adapter`, allows paths under `src/` of the component folder, and the installer core lives at `installers/core/src/`, which the component `installers` does not cover. G4 should split the component (see the analysis report) before a port task can use the procedure.
 - **refs**: only the stack reference topics that match the task, and contract sketches. A reference topic outside this list is reported in `unlisted_needs`.
@@ -48,76 +49,91 @@ No task line is written for these, because only V can do them. A phase does not 
 
 **Checkpoint**: no phase 0 task starts until the amendment gate (the last task of this phase) passes.
 
-- [ ] T001 N-1 Node override: add decision records that supersede DR-101, DR-107, DR-108, DR-109 and the Node 18 job of DR-206, and mark conflict C-8 moot. Content: latest Node 24 from 24.12 only, TypeScript run directly by Node type stripping with erasable syntax and .ts import specifiers, vitest for unit tests, one lint baseline for new code, aliases by package.json imports because there is no build step, no Node 18 floor job. Each record lists rejected options and says Decided by human (specs/022-repo-split/research.md)  [Eng] [llm]
+- [x] T001 N-1 Node override: add decision records that supersede DR-101, DR-107, DR-108, DR-109 and the Node 18 job of DR-206, and mark conflict C-8 moot. Content: latest Node 24 from 24.12 only, TypeScript run directly by Node type stripping with erasable syntax and .ts import specifiers, vitest for unit tests, one lint baseline for new code, aliases by package.json imports because there is no build step, no Node 18 floor job. Each record lists rejected options and says Decided by human (specs/022-repo-split/research.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T002 S-12 add a decision record with the YAML parser limits for yaml 2.9.1, checked against the library documentation: no custom tags, alias limit, 256 KiB cap per file, and the exact option names; clears unlisted need U-1 and backs M-17 (specs/022-repo-split/research.md)  [Eng] [llm]
+- [x] T002 S-12 add a decision record with the YAML parser limits for yaml 2.9.1, checked against the library documentation: no custom tags, alias limit, 256 KiB cap per file, and the exact option names; clears unlisted need U-1 and backs M-17 (specs/022-repo-split/research.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T001
-- [ ] T003 U-2 walk the paradigm tree for installers/core and contracts/lib and record the choice. The record must state that Node type stripping rejects constructor parameter properties, so a class-modeled choice needs explicit field declarations, and must name the paradigm for each tier. This is unlisted need U-2 from the plan, added here because every code task depends on it (specs/022-repo-split/research.md)  [Eng] [llm]
+- [x] T003 U-2 walk the paradigm tree for installers/core and contracts/lib and record the choice. The record must state that Node type stripping rejects constructor parameter properties, so a class-modeled choice needs explicit field declarations, and must name the paradigm for each tier. This is unlisted need U-2 from the plan, added here because every code task depends on it (specs/022-repo-split/research.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T002
-- [ ] T004 N-1 Node override: amend spec.md assumption A-2 to the latest Node 24 from 24.12, and the AC-5.9 example to a runtime older than 24.12 reported by a replaceable node command; no Node 18 text remains (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T004 N-1 Node override: amend spec.md assumption A-2 to the latest Node 24 from 24.12, and the AC-5.9 example to a runtime older than 24.12 reported by a replaceable node command; no Node 18 text remains (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T005 S-1 add AC-4.6 under US4: install exits 10 with a privileged changes need that lists every new or changed hook, MCP service, status line, route and skill or agent text in full with component and commit, writes nothing, and approval records the hash of the approved set; add AC-12.8 under US12: the session-start and post-merge hooks never change the privileged set; adjust FR-016 and FR-039 (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T005 S-1 add AC-4.6 under US4: install exits 10 with a privileged changes need that lists every new or changed hook, MCP service, status line, route and skill or agent text in full with component and commit, writes nothing, and approval records the hash of the approved set; add AC-12.8 under US12: the session-start and post-merge hooks never change the privileged set; adjust FR-016 and FR-039 (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T004
-- [ ] T006 S-2 change AC-3.1, FR-020 and FR-028 so install checks out the SHA in the lock; add AC-3.9: install --update with an optional name advances a git source and prints the commit range; add AC-3.10: a locked tag that now resolves to another SHA exits 1 with tag moved (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T006 S-2 change AC-3.1, FR-020 and FR-028 so install checks out the SHA in the lock; add AC-3.9: install --update with an optional name advances a git source and prints the commit range; add AC-3.10: a locked tag that now resolves to another SHA exits 1 with tag moved (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T005
-- [ ] T007 S-3 amend FR-019: a source URL with a user-info part fails validation naming the component only, and every report redacts user-info and token query parts (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T007 S-3 amend FR-019: a source URL with a user-info part fails validation naming the component only, and every report redacts user-info and token query parts (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T006
-- [ ] T008 S-4 amend AC-6.1 and FR-025: set refuses names containing TOKEN, SECRET, PASSWORD, APIKEY or API_KEY and values with common token prefixes; variables are public values (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T008 S-4 amend AC-6.1 and FR-025: set refuses names containing TOKEN, SECRET, PASSWORD, APIKEY or API_KEY and values with common token prefixes; variables are public values (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T007
-- [ ] T009 S-5 amend AC-4.5 so a suggested source is labelled suggested by the component, unverified, and never printed as a ready command; add AC-4.7: home confirmation and privileged approval need an interactive terminal, else exit 10, and amend AC-2.1 and AC-2.5 to match; add a requirement next to FR-048 with AC-4.8: one core line says agents never run add, use or an approval from a NEEDS report without V approval in chat (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T009 S-5 amend AC-4.5 so a suggested source is labelled suggested by the component, unverified, and never printed as a ready command; add AC-4.7: home confirmation and privileged approval need an interactive terminal, else exit 10, and amend AC-2.1 and AC-2.5 to match; add a requirement next to FR-048 with AC-4.8: one core line says agents never run add, use or an approval from a NEEDS report without V approval in chat (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T008
-- [ ] T010 S-6 amend the Edge Cases line on hooks for agents not installed, AC-7.5 and AC-8.3: doctor warns only for agents absent from the machine and fails on a merged hook whose command does not resolve; retired refuses to remove a compatibility link that a merged hook command uses (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T010 S-6 amend the Edge Cases line on hooks for agents not installed, AC-7.5 and AC-8.3: doctor warns only for agents absent from the machine and fails on a merged hook whose command does not resolve; retired refuses to remove a compatibility link that a merged hook command uses (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T009
-- [ ] T011 S-7 amend AC-7.5: add the doctor fault of a symlink in a linked path source whose real path leaves the component root (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T011 S-7 amend AC-7.5: add the doctor fault of a symlink in a linked path source whose real path leaves the component root (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T010
-- [ ] T012 S-8 clarify FR-004 and FR-005: ids match the pattern for lowercase letters, digits and hyphens up to 64 characters; path fields are relative with no .. segment, drive letter, backslash or NUL (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T012 S-8 clarify FR-004 and FR-005: ids match the pattern for lowercase letters, digits and hyphens up to 64 characters; path fields are relative with no .. segment, drive letter, backslash or NUL (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T011
-- [ ] T013 S-9 amend AC-7.3: the home, the backups folder and every backup are owner-only, and doctor warns otherwise (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T013 S-9 amend AC-7.3: the home, the backups folder and every backup are owner-only, and doctor warns otherwise (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T012
-- [ ] T014 S-10 amend AC-12.3: the merge touches only installer-owned hooks entries and the core status line; an unparsable file exits 1 writing nothing; the file hash is re-checked before the rename (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T014 S-10 amend AC-12.3: the merge touches only installer-owned hooks entries and the core status line; an unparsable file exits 1 writing nothing; the file hash is re-checked before the rename (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T013
-- [ ] T015 S-11 number the 14 existing Edge Cases EDGE-1 to EDGE-14 in their current order so the coverage check can read them, and add an Edge Case with id EDGE-15: concurrent runs use one home-wide lock and a second run waits or exits 1 naming the lock (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T015 S-11 number the 14 existing Edge Cases EDGE-1 to EDGE-14 in their current order so the coverage check can read them, and add an Edge Case with id EDGE-15: concurrent runs use one home-wide lock and a second run waits or exits 1 naming the lock (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T014
-- [ ] T016 D-1 amend AC-7.6 and FR-030: uninstall with restore puts back every item in the newest backup manifest that the install replaced (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T016 D-1 amend AC-7.6 and FR-030: uninstall with restore puts back every item in the newest backup manifest that the install replaced (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T015
-- [ ] T017 D-2 amend FR-035: install.sh with legacy and install.ps1 with Legacy stay available through phase 5 plus one tag (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T017 D-2 amend FR-035: install.sh with legacy and install.ps1 with Legacy stay available through phase 5 plus one tag (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T016
-- [ ] T018 D-3 amend AC-7.3 and FR-026: backups also cover V two local files before set, add and use rewrite them (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T018 D-3 amend AC-7.3 and FR-026: backups also cover V two local files before set, add and use rewrite them (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T017
-- [ ] T019 D-4 amend FR-014: the home also holds store, install.lock, the journal install-state.pending.json and install-log.jsonl (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T019 D-4 amend FR-014: the home also holds store, install.lock, the journal install-state.pending.json and install-log.jsonl (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T018
-- [ ] T020 D-5 amend the AC-7.5 warnings: doctor also prints references to old agent-home paths found in agent config files, backup count and size, and degraded Windows links (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T020 D-5 amend the AC-7.5 warnings: doctor also prints references to old agent-home paths found in agent config files, backup count and size, and degraded Windows links (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T019
-- [ ] T021 A-1 amend AC-1.6 and AC-9.1: the baseline and the zero target cover the whole agent-knowledge component, 123 lines in 73 files instead of 109 in 67 (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T021 A-1 amend AC-1.6 and AC-9.1: the baseline and the zero target cover the whole agent-knowledge component, 123 lines in 73 files instead of 109 in 67 (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T020
-- [ ] T022 A-2 amend AC-13.4 and FR-040: add the 42 AGENT_HOME lines in 11 files of the two frameworks to the phase 6 conversion (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T022 A-2 amend AC-13.4 and FR-040: add the 42 AGENT_HOME lines in 11 files of the two frameworks to the phase 6 conversion (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T021
-- [ ] T023 A-3 amend FR-001 and AC-1.1: fourteen contracts become fifteen, adding framework/v1 (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T023 A-3 amend FR-001 and AC-1.1: fourteen contracts become fifteen, adding framework/v1 (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T022
-- [ ] T024 A-6 amend FR-014: add the core locations instructions, patterns, procedures, references, atlas, tracker, frameworks/agent-foundry and the global-variables.md link (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T024 A-6 amend FR-014: add the core locations instructions, patterns, procedures, references, atlas, tracker, frameworks/agent-foundry and the global-variables.md link (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T023
-- [ ] T025 P-2 amend FR-044 wording: each consumer check runs the shared build cite (specs/022-repo-split/spec.md)  [Eng] [llm]
+- [x] T025 P-2 amend FR-044 wording: each consumer check runs the shared build cite (specs/022-repo-split/spec.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T024
-- [ ] T026 A-4 amend the blueprint phases: the minimal routes renderer moves into phase 3, per-entry skill and agent targets into phase 4, and the 4 SDLC procedures move to agentic-sdlc in phase 4 (specs/022-repo-split/blueprint.md)  [Eng] [llm]
+- [x] T026 A-4 amend the blueprint phases: the minimal routes renderer moves into phase 3, per-entry skill and agent targets into phase 4, and the 4 SDLC procedures move to agentic-sdlc in phase 4 (specs/022-repo-split/blueprint.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T027 A-5 amend the blueprint contract table: the slots/v1 row loses count, and the knowledge-provider/v1 row loses the no-other-component-path rule and the companies mount (specs/022-repo-split/blueprint.md)  [Eng] [llm]
+- [x] T027 A-5 amend the blueprint contract table: the slots/v1 row loses count, and the knowledge-provider/v1 row loses the no-other-component-path rule and the companies mount (specs/022-repo-split/blueprint.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T026
-- [ ] T028 N-1 Node override: replace node >=18 in the blueprint dependency row and the Node on every machine row by the latest Node 24 from 24.12 (specs/022-repo-split/blueprint.md)  [Eng] [llm]
+- [x] T028 N-1 Node override: replace node >=18 in the blueprint dependency row and the Node on every machine row by the latest Node 24 from 24.12 (specs/022-repo-split/blueprint.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T027
-- [ ] T029 [P] P-1 amend the security record M-01 phase column: consent for routes lands in phase 3 and for skill and agent text in phase 4 (specs/022-repo-split/decisions/security.md)  [Eng] [llm]
+- [x] T029 [P] P-1 amend the security record M-01 phase column: consent for routes lands in phase 3 and for skill and agent text in phase 4 (specs/022-repo-split/decisions/security.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T030 [P] P-3 record in the constitution style deviations that legacy .mjs tools are exempt from the lint baseline until each is rewritten, and say what rewritten means so touching one line does not trigger the full baseline (.specify/memory/constitution.md)  [Eng] [llm]
+- [x] T030 [P] P-3 record in the constitution style deviations that legacy .mjs tools are exempt from the lint baseline until each is rewritten, and say what rewritten means so touching one line does not trigger the full baseline (.specify/memory/constitution.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T031 [P] N-1 Node override: update plan.md technical context, constraints, installer core description, project structure from .mjs to .ts, phase 0 and 2 content, the CI paragraph without the Node 18 job, the unconfirmed list, and mark question 1 parts a and b as overridden by V (specs/022-repo-split/plan.md)  [Eng] [llm]
+- [x] T031 [P] N-1 Node override: update plan.md technical context, constraints, installer core description, project structure from .mjs to .ts, phase 0 and 2 content, the CI paragraph without the Node 18 job, the unconfirmed list, and mark question 1 parts a and b as overridden by V (specs/022-repo-split/plan.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T032 [P] N-1 Node override: change the depends.runtime example in the data model to node >=24.12 (specs/022-repo-split/data-model.md)  [Eng] [llm]
+- [x] T032 [P] N-1 Node override: change the depends.runtime example in the data model to node >=24.12 (specs/022-repo-split/data-model.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T033 [P] N-1 Node override: change node >=18 in the component contract sketch and the shim and main.mjs lines in the installer interface sketch to Node 24.12 and main.ts. V list did not name the contract sketches but they hold Node 18 text (specs/022-repo-split/contracts)  [Eng] [llm]
+- [x] T033 [P] N-1 Node override: change node >=18 in the component contract sketch and the shim and main.mjs lines in the installer interface sketch to Node 24.12 and main.ts. V list did not name the contract sketches but they hold Node 18 text (specs/022-repo-split/contracts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T034 [P] N-1 Node override: update docs/architecture.md section 3 installers note, section 4 CompositionRoot.mjs to .ts, section 6 Node row to 24.12 or later, section 8 decision rows for the superseding records, section 10 gaps; give section 6 dependency cells id-safe names so tasks can use touches (docs/architecture.md)  [Eng] [llm]
+- [x] T034 [P] N-1 Node override: update docs/architecture.md section 3 installers note, section 4 CompositionRoot.mjs to .ts, section 6 Node row to 24.12 or later, section 8 decision rows for the superseding records, section 10 gaps; give section 6 dependency cells id-safe names so tasks can use touches (docs/architecture.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
-- [ ] T035 Amendment gate: run validate-project and an id extractor over the amended files. Pass when every reserved id exists in spec.md AC-3.9, AC-3.10, AC-4.6, AC-4.7, AC-4.8, AC-12.8 and EDGE-15, no Node 18 text remains in spec, blueprint, plan, research, data model, architecture and contract sketches, and validate-project names no failure under specs/022 (specs/022-repo-split)  [QA] [script]
+- [x] T035 Amendment gate: run validate-project and an id extractor over the amended files. Pass when every reserved id exists in spec.md AC-3.9, AC-3.10, AC-4.6, AC-4.7, AC-4.8, AC-12.8 and EDGE-15, no Node 18 text remains in spec, blueprint, plan, research, data model, architecture and contract sketches, and validate-project names no failure under specs/022 (specs/022-repo-split)  [QA] [script]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019, T020, T021, T022, T023, T024, T025, T026, T027, T028, T029, T030, T031, T032, T033, T034
+
+**V's G4 answers** (all defaults, applied after the gate as extra amendments; T257 to T262 are already done):
+
+- [x] T257 G4-1 security review only for the nine blocker-mitigation tasks: plan.md Security and Phase table say so; the tasks that implement M-01, M-02, M-03, M-04, M-05, M-09, M-11, M-14 and M-18 carry the [Sec] tag (specs/022-repo-split/plan.md)  [Eng] [llm]
+      touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
+- [x] T258 G4-2 amend AC-8.6: in each phase the core text agents load is compared by content hash with the hash recorded at the end of the previous phase, a difference only when the pull request names the core change (specs/022-repo-split/spec.md)  [Eng] [llm]
+      touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
+- [x] T259 G4-3 functional-pipeline paradigm for installers/core and contracts/lib: decision records PDM-installers-core and PDM-contracts-lib, the plan Language and Paradigm rows, the paradigm in docs/architecture.md (specs/022-repo-split/research.md)  [Eng] [llm]
+      touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
+- [x] T260 G4-4 add AC-12.9: the guard hook with no Node 24.12 or later denies in a folder that has .specify/runs and allows elsewhere (specs/022-repo-split/spec.md)  [Eng] [llm]
+      touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
+- [x] T261 G4-5 conversion order: amend FR-032 and A-15 and the plan phase 5 and 6 rows so the 484 hard-coded lines are converted in phase 5 after rendering, and knowledge files go straight to their final form in phase 6 (specs/022-repo-split/spec.md)  [Eng] [llm]
+      touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
+- [x] T262 G4-6 installer-core as its own component in docs/architecture.md so tasks can name installers/core/ and use the typescript-node procedures, with contracts-lib, contracts-tools and contracts-schemas in the planned block (docs/architecture.md)  [Eng] [llm]
+      touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: none
 
 ## Phase 0: Contracts and fitness (US1, nothing installed changes)
 
@@ -163,7 +179,7 @@ No task line is written for these, because only V can do them. A phase does not 
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T052
 - [ ] T054 [US1] The one yaml wrapper over yaml 2.9.1 vendored and byte-compared with the lockfile, with the M-17 limits: no custom tags, alias limit, 256 KiB cap per file. Unit tests with hostile files (contracts/lib/yaml.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T045, T041, T002
-- [ ] T055 [US1] Tolerant manifest and list reader: unknown keys warn, count and mounts rejected with the replacement named, ids and path fields checked against the M-03 rules, current and previous major accepted. Unit tests table driven (contracts/lib/reader.ts)  [Eng] [llm]
+- [ ] T055 [US1] Tolerant manifest and list reader: unknown keys warn, count and mounts rejected with the replacement named, ids and path fields checked against the M-03 rules, current and previous major accepted. Unit tests table driven (contracts/lib/reader.ts)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T054
 - [ ] T056 [US1] Slot, location and citation classifier: longest location prefix wins, a bare relative path is the component own file, a path under no location fails naming it. One shared rule table fixture used later by the dry run, build cite and the renderer (contracts/lib/citations.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T055
@@ -327,25 +343,25 @@ Blocker mitigations in this phase: M-01 mechanism, M-02, M-03, M-04, M-05, M-11,
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T118
 - [ ] T129 [US2] Installer core package: package.json with engines >=24.12 <25 and the imports map, tsconfig, four-layer folders per module with keep files, vitest include for src test files (installers/core)  [Eng] [llm]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/js-runtime/subpath-imports.md  ·  procedure: none  ·  hot-path: no  ·  requires: T119, T120, T121, T122, T123, T124, T125, T126, T127, T128, T003, T040
-- [ ] T130 [US4] Shared module, domain neutral only: M-03 path containment and name rules, hashing, redaction of user-info and token query parts M-07, exit codes 0 10 1 2, the report model and the one message catalog TR-5. Unit tests with negatives (installers/core/src/modules/shared)  [Eng] [llm]
+- [ ] T130 [US4] Shared module, domain neutral only: M-03 path containment and name rules, hashing, redaction of user-info and token query parts M-07, exit codes 0 10 1 2, the report model and the one message catalog TR-5. Unit tests with negatives (installers/core/src/modules/shared)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T129, T055
-- [ ] T131 [US3] Manifests module: read and validate component.yaml, both lists and the slots file through contracts/lib, name and path rules M-03, credentials in a source URL refused M-07, archive skipped with the exact text (installers/core/src/modules/manifests)  [Eng] [llm]
+- [ ] T131 [US3] Manifests module: read and validate component.yaml, both lists and the slots file through contracts/lib, name and path rules M-03, credentials in a source URL refused M-07, archive skipped with the exact text (installers/core/src/modules/manifests)  [Eng] [llm] [Sec]
       touches: none  ·  refs: specs/022-repo-split/contracts/installer-cli.md  ·  procedure: none  ·  hot-path: no  ·  requires: T130
 - [ ] T132 [US7] State module: components.lock, install-state.json, journal with interrupted-run restore, home-wide install.lock with a 10 minute stale timeout M-12, backups with manifest including V two local files and owner-only permissions M-10, install-log.jsonl rotated at 1 MB M-16, store pruning to current and previous. FileSystem, Links and HomeLock ports; temp file plus rename; Windows link ladder (installers/core/src/modules/state)  [Eng] [llm]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/operations/structured-logging.md  ·  procedure: none  ·  hot-path: no  ·  requires: T131
-- [ ] T133 [US3] Sources module: path adapter linked live, git adapter with managed clone and SHA in the lock, core.symlinks off M-04, no shell and dash refusal and allowed protocols and no submodules and timeouts and git 2.50.1 check M-05, checkout of the locked SHA and tag moved exit M-02, archive refused. Git port with a real adapter run against local bare repos (installers/core/src/modules/sources)  [Eng] [llm]
+- [ ] T133 [US3] Sources module: path adapter linked live, git adapter with managed clone and SHA in the lock, core.symlinks off M-04, no shell and dash refusal and allowed protocols and no submodules and timeouts and git 2.50.1 check M-05, checkout of the locked SHA and tag moved exit M-02, archive refused. Git port with a real adapter run against local bare repos (installers/core/src/modules/sources)  [Eng] [llm] [Sec]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/js-runtime/abort-signal.md  ·  procedure: none  ·  hot-path: no  ·  requires: T132
 - [ ] T134 [US5] Resolution module, pure: reuse a filled slot, take the default, else a need; recursion, cycles printed in order, majors N and N-1, exports against citations, slot counts, fixed-point fallback DR-418, components needs before variables needs. Unit tables (installers/core/src/modules/resolution)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T131
-- [ ] T135 [US6] Variables module: declarations, values, set, closest-name suggestions, detect proposals that are declarative only M-18, refusal of secret-like names and values M-08, same name with two descriptions fails, import of existing values DR-414 (installers/core/src/modules/variables)  [Eng] [llm]
+- [ ] T135 [US6] Variables module: declarations, values, set, closest-name suggestions, detect proposals that are declarative only M-18, refusal of secret-like names and values M-08, same name with two descriptions fails, import of existing values DR-414 (installers/core/src/modules/variables)  [Eng] [llm] [Sec]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/operations/config-at-startup.md  ·  procedure: none  ·  hot-path: no  ·  requires: T130
-- [ ] T136 [US8] Wiring module, phase 2 part: compatibility links that never replace Copilot own folders, retired that removes only the installer own link and refuses one a merged hook uses M-14, and the privileged set computation with its diff against install-state for the M-01 consent need (installers/core/src/modules/wiring)  [Eng] [llm]
+- [ ] T136 [US8] Wiring module, phase 2 part: compatibility links that never replace Copilot own folders, retired that removes only the installer own link and refuses one a merged hook uses M-14, and the privileged set computation with its diff against install-state for the M-01 consent need (installers/core/src/modules/wiring)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T132, T134
 - [ ] T137 [US6] Rendering module, phase 2 part: global-variables.md with one row per variable of each enabled component, and generated/index.md (installers/core/src/modules/rendering)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T135, T131
-- [ ] T138 [US4] Commands install and plan on one pipeline read, resolve, plan, apply, report: staged trees validated before any switch, journaled switch, needs report ordered home, components, variables, privileged, exit 10 with nothing written, update option with commit range, interactive-only confirmation M-11, install-log line (installers/core/src/modules/commands/application/install)  [Eng] [llm]
+- [ ] T138 [US4] Commands install and plan on one pipeline read, resolve, plan, apply, report: staged trees validated before any switch, journaled switch, needs report ordered home, components, variables, privileged, exit 10 with nothing written, update option with commit range, interactive-only confirmation M-11, install-log line (installers/core/src/modules/commands/application/install)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T133, T134, T135, T136, T137
-- [ ] T139 [US7] Command doctor: the faults and warnings of AC-7.5 with the S-6, S-7, S-9 and D-5 changes, repeatable output, journal restore, one finding per fault with its own message (installers/core/src/modules/commands/application/doctor)  [Eng] [llm]
+- [ ] T139 [US7] Command doctor: the faults and warnings of AC-7.5 with the S-6, S-7, S-9 and D-5 changes, repeatable output, journal restore, one finding per fault with its own message (installers/core/src/modules/commands/application/doctor)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T138
 - [ ] T140 [US3] Commands set, add, use and init-component: backup of the local files first, secret refusal, starter component.yaml that passes the schema check and refusal to overwrite (installers/core/src/modules/commands/application/edit)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T138
@@ -390,7 +406,7 @@ Blocker mitigations in this phase: M-01 mechanism, M-02, M-03, M-04, M-05, M-11,
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T156
 - [ ] T158 [P] [US10] Scenarios for the minimal routes renderer: the Copilot routes file with applyTo of all files, one Claude import line, the Codex AGENTS.md as core plus routes below 32 KiB, company routes added and removed with the entry, and M-01 consent when a route is new or changed (tests/installer/routes.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T156
-- [ ] T159 [US10] Minimal routes renderer in wiring and rendering: generate the three agent route forms from component routes, route text in the privileged set with consent M-01, no write outside the agent folders (installers/core/src/modules/wiring/application/routes)  [Eng] [llm]
+- [ ] T159 [US10] Minimal routes renderer in wiring and rendering: generate the three agent route forms from component routes, route text in the privileged set with consent M-01, no write outside the agent folders (installers/core/src/modules/wiring/application/routes)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T158, T116
 - [ ] T160 [US10] agent-companies component.yaml filling company-knowledge-storage with the company variable OTS_REPOS_ROOT, its routes and its repository URL (agent-companies/component.yaml)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T157, T159
@@ -439,11 +455,11 @@ Agent behaviour items P4-22, P4-26a and P4-26d must be answered before this phas
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T171, T172, T173, T068
 - [ ] T179 [US11] Copilot adapter field list including infer false and disable-model-invocation (adapters/copilot/fields.yaml)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T171, T172, T173, T068
-- [ ] T180 [US11] Build subcommand: field mapper using verified fields only, auto-delegate mapping, include inliner contained to the component root M-03, symlink refusal M-04, stamp of source revision and adapter version, deterministic output, duplicate skill name fails, runs only the pinned tool and no component script M-18 (contracts/tools/build-targets.ts)  [Eng] [llm]
+- [ ] T180 [US11] Build subcommand: field mapper using verified fields only, auto-delegate mapping, include inliner contained to the component root M-03, symlink refusal M-04, stamp of source revision and adapter version, deterministic output, duplicate skill name fails, runs only the pinned tool and no component script M-18 (contracts/tools/build-targets.ts)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T174, T175, T177, T178, T179, T077, T066, T067
 - [ ] T181 [US11] Per-component idle-cost ceiling check and the Claude description total above 15,000 tokens warning, on the rendered-form text rules from the shared module (contracts/tools/budget.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T180, T075
-- [ ] T182 [US11] Wiring: link built output entry by entry into the skill folders and the three agent folders, leave skills synced from elsewhere alone, skill and agent text in the privileged set M-01, contained to the home and the named agent folder M-03 (installers/core/src/modules/wiring/application/targets)  [Eng] [llm]
+- [ ] T182 [US11] Wiring: link built output entry by entry into the skill folders and the three agent folders, leave skills synced from elsewhere alone, skill and agent text in the privileged set M-01, contained to the home and the named agent folder M-03 (installers/core/src/modules/wiring/application/targets)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T180, T159
 - [ ] T183 [US11] Doctor: fail on a stamp naming a source revision or adapter major that no longer matches and keep the previous output linked (installers/core/src/modules/commands/application/doctor)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T182, T139
@@ -492,9 +508,11 @@ Blocker mitigations: M-01 for hooks, services and status line, M-03, M-04, M-09,
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T194
 - [ ] T202 [P] [US16] Scenario for SC-004: the rendered always-loaded size per agent is at most the phase 0 baseline everywhere, and the renderer and the dry run use the same rule module so the two numbers stay comparable (tests/baseline/phase5.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T194
-- [ ] T203 [P] [US12] Scenarios for the G3 default on the guard when no Node 24.12 is found: deny where a .specify/runs folder exists, allow elsewhere, for each of the three agents hook output shapes (tests/workflow-graph/no-node.feature)  [QA] [llm]
+- [ ] T203 [P] [US12] Scenario AC-12.9, the G3 default on the guard when no Node 24.12 is found: deny where a .specify/runs folder exists, allow elsewhere, for each of the three agents hook output shapes (tests/workflow-graph/no-node.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T194
-- [ ] T204 [US16] Renderer: copy each component that cites another into generated/<component> using the shared render rules, citation text real absolute path and target relative, generated-from line after front matter, read-only, built skills and agents rendered after the build, the knowledge base left linked, symlink and traversal refusal M-03 M-04, load paths per DR-307, store trees (installers/core/src/modules/rendering/application/render)  [Eng] [llm]
+- [ ] T263 [US12] Implement AC-12.9: when the guard wrapper finds no Node 24.12 or later, it denies tool calls only in a folder that has .specify/runs and allows elsewhere, superseding spec 019 D6 for that case; T203 must pass (copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh)  [Eng] [llm]
+      touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T203
+- [ ] T204 [US16] Renderer: copy each component that cites another into generated/<component> using the shared render rules, citation text real absolute path and target relative, generated-from line after front matter, read-only, built skills and agents rendered after the build, the knowledge base left linked, symlink and traversal refusal M-03 M-04, load paths per DR-307, store trees (installers/core/src/modules/rendering/application/render)  [Eng] [llm] [Sec]
       touches: none  ·  refs: specs/022-repo-split/contracts/rendered-copy-v1.md  ·  procedure: none  ·  hot-path: yes  ·  requires: T198, T202, T195, T196, T197, T182, T057
 - [ ] T205 [US16] The rerender command for the session-start hook: only changed components, detection by file times or by reading the head file and never git status M-06, only tries the lock M-12, no network and a 5 second budget and old copy kept on timeout M-13, one machine readable result line TR-8, exit 0 always, never changes the privileged set (installers/core/src/modules/commands/application/rerender)  [Eng] [llm]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/js-runtime/promise-rejections.md  ·  procedure: none  ·  hot-path: yes  ·  requires: T204, T200
@@ -502,9 +520,9 @@ Blocker mitigations: M-01 for hooks, services and status line, M-03, M-04, M-09,
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T204, T199, T159
 - [ ] T207 [US12] One tested quoting function for bash and one for PowerShell with a home containing a space, dollar, backtick, single and double quote, refusing a newline or NUL M-15 (installers/core/src/modules/shared/application/quoting)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T200, T130
-- [ ] T208 [US12] Hooks merge, services and status line: only installer-owned entries under hooks and the core status line recorded in install-state, a component can add no other key M-09, unparsable file exits 1 writing nothing, temp file plus rename after re-reading the hash, backup first, same rules for the Codex and Copilot hook files, merged commands use the real home path M-14, MCP services registered and removed, everything in the privileged set M-01 (installers/core/src/modules/wiring/application/hooks)  [Eng] [llm]
+- [ ] T208 [US12] Hooks merge, services and status line: only installer-owned entries under hooks and the core status line recorded in install-state, a component can add no other key M-09, unparsable file exits 1 writing nothing, temp file plus rename after re-reading the hash, backup first, same rules for the Codex and Copilot hook files, merged commands use the real home path M-14, MCP services registered and removed, everything in the privileged set M-01 (installers/core/src/modules/wiring/application/hooks)  [Eng] [llm] [Sec]
       touches: none  ·  refs: specs/022-repo-split/contracts/routes-hooks-variables-v1.md  ·  procedure: none  ·  hot-path: no  ·  requires: T206, T207
-- [ ] T209 [US12] Doctor drift and budget checks: rendered differs from a fresh render naming the source to edit, writable rendered file, hash mismatch of generated files, merged hook command that does not resolve fails and a missing agent only warns, total idle-cost per target naming the largest contributors, old agent-home paths, backup size and degraded Windows links (installers/core/src/modules/commands/application/doctor)  [Eng] [llm]
+- [ ] T209 [US12] Doctor drift and budget checks: rendered differs from a fresh render naming the source to edit, writable rendered file, hash mismatch of generated files, merged hook command that does not resolve fails and a missing agent only warns, total idle-cost per target naming the largest contributors, old agent-home paths, backup size and degraded Windows links (installers/core/src/modules/commands/application/doctor)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T208, T183
 - [ ] T210 [US12] Guard wrapper: when no Node 24.12 or later is found, deny the tool call only where a .specify/runs folder exists and allow elsewhere, with the right empty or deny output for each agent (copilot/frameworks/agentic-sdlc/tools/workflow-graph/workflow-graph-hook.sh)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T203
@@ -603,7 +621,7 @@ Blocker mitigations: M-01 for hooks, services and status line, M-03, M-04, M-09,
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T247
 - [ ] T250 [US15] repo-layout becomes blocking and the check entry is renamed check.sh (contracts/tools/layout.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T248, T249
-- [ ] T251 [US15] Retire the compatibility links in a separate release once the evidence holds, through retired with the M-14 guard that refuses a link a merged hook uses (installers/core/src/modules/wiring/application/retire)  [Eng] [llm]
+- [ ] T251 [US15] Retire the compatibility links in a separate release once the evidence holds, through retired with the M-14 guard that refuses a link a merged hook uses (installers/core/src/modules/wiring/application/retire)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T250
 - [ ] T252 [US15] Mutation proof QB-7 for the layout check and the retired guard; record in research.md (specs/022-repo-split/research.md)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T251, T244
@@ -733,6 +751,7 @@ One scenario per acceptance criterion; the title of each scenario starts with it
 | AC-12.6 | T199 (5) |
 | AC-12.7 | T199 (5) |
 | AC-12.8 | T199 (5) |
+| AC-12.9 | T203, T263 (5) |
 | AC-13.1 | T222 (6) |
 | AC-13.2 | T222 (6) |
 | AC-13.3 | T222 (6) |
@@ -811,7 +830,7 @@ One scenario per acceptance criterion; the title of each scenario starts with it
 
 ## Notes
 
-- Every task gets security review at P6 (risk tier HIGH). Blocker mitigations: M-01, M-02, M-03, M-04, M-05, M-09, M-11, M-14, M-18; each has a negative scenario task before its code (security.feature files in phases 2 and 5).
+- Security review at P6 (risk tier HIGH) is limited to the `[Sec]` tasks, those that implement a blocker mitigation (G4-1); every other task gets engineering and qa review. Blocker mitigations: M-01, M-02, M-03, M-04, M-05, M-09, M-11, M-14, M-18; each has a negative scenario task before its code (security.feature files in phases 2 and 5).
 - Sibling-repo tasks (phases 3, 6, 7) are written here because spec 022 owns them; they run in the new repo checkout.
 - Commit after each task or logical group; a changed requirement changes its scenario in the same commit (constitution IV).
 - A scenario that must change because its own criterion changed is named in the pull request (QB-5).

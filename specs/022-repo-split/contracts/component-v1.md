@@ -37,7 +37,7 @@ depends:
       contract: company-kb/v1
       required: false
   runtime:
-    node: ">=18"                         # checked before apply (AC-5.9); the installer adds git >=2.50.1 for git sources (M-05)
+    node: ">=24.12"                      # checked before apply (AC-5.9); the installer adds git >=2.50.1 for git sources (M-05)
 routes:                                  # routes/v1 entries; privileged
   - id: agentic-sdlc
     when: "The project has a .specify/ folder, or the user asks to run the agentic SDLC"

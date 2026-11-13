@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-13
 
-**Status**: Draft (attempt 2 of 3, reworked for `changes G2 R-001`), awaiting G2
+**Status**: Draft (attempt 2 of 3, reworked for `changes G2 R-001`); amended 2026-11-13 for the plan's G3 amendments (S-1 to S-11, D-1 to D-5, A-1 to A-3, A-6, P-2, N-1) and V's G4 answers (G4-2, G4-4, G4-5)
 
 **Input**: Approved blueprint `specs/022-repo-split/blueprint.md` (G0 approved 2026-11-12, amended 2026-11-13; G2 feedback folded in 2026-11-13). V, 2026-11-11: "Every part is a replaceable component, like the cards in a computer: agent-config stays compact and talks to the others only through configuration files."
 
@@ -21,7 +21,7 @@ Today `agent-config` holds eleven kinds of content in one repo: the knowledge ba
 
 | Problem | Evidence |
 |---|---|
-| The knowledge base and the SDLC framework cite each other | 109 lines in 67 knowledge files mention the framework; the framework has 91 cells citing the knowledge base |
+| The knowledge base and the SDLC framework cite each other | 109 lines in 67 knowledge files (measured 2026-11-11; 123 in 73 counting the two frameworks, AC-1.6) mention the framework; the framework has 91 cells citing the knowledge base |
 | Company knowledge ships with everything, though it is read only while working on that company's repos | `copilot/companies/ots` (22 files), company repo names in the core instructions and a company row in `global-variables.md` |
 | Agents resolve placeholders by hand | 445 lines use `{{AGENT_HOME}}`; every agent must look up the variables file and substitute, and a link to GitHub invites an agent to fetch what it should read locally |
 | Adding a platform edits many places | At least 3 files outside any platform folder change per new platform |
@@ -45,12 +45,12 @@ V can read, for every connection between parts, one contract that says who owns 
 
 **Acceptance Scenarios**:
 
-1. **AC-1.1** **Given** the contracts index, **When** V looks up each of the fourteen contracts (`slots/v1`, `component/v1`, the component lists with lock, `knowledge-provider/v1`, `company-kb/v1`, rendered copies, generated routes, `skill-source/v1`, `agent-source/v1`, adapter field files, build and checks, `repo-layout/v1`, hooks, variables), **Then** each has an owner, its consumers, a versioning rule and a stated behaviour when the contract is missing or stale on a machine.
+1. **AC-1.1** **Given** the contracts index, **When** V looks up each of the fifteen contracts (`slots/v1`, `component/v1`, the component lists with lock, `knowledge-provider/v1`, `company-kb/v1`, `framework/v1`, rendered copies, generated routes, `skill-source/v1`, `agent-source/v1`, adapter field files, build and checks, `repo-layout/v1`, hooks, variables), **Then** each has an owner, its consumers, a versioning rule and a stated behaviour when the contract is missing or stale on a machine.
 2. **AC-1.2** **Given** shipped valid example files for `slots/v1`, `component/v1`, the public component list, the local component list and the lock, **When** the schema check runs, **Then** all five pass; **And Given** a copy of the `component/v1` example with an extra key `colour: blue`, **Then** the check passes with one warning naming the key (tolerant reader).
 3. **AC-1.3** **Given** a `slots/v1` file that still uses `count: 0..1` or `mounts:`, **When** the schema check runs, **Then** it fails and the message names the key and the replacement (`required` + `multiple`, `locations`).
 4. **AC-1.4** **Given** the three starting slots, **When** V reads `slots/v1`, **Then** `knowledge-storage` is `required: false, multiple: false` with contract `knowledge-provider/v1`; `company-knowledge-storage` is `required: false, multiple: true` with `company-kb/v1`; `framework` is `required: false, multiple: true`, per project, with `framework/v1`; and a slot whose `contract` is a list of two contracts validates.
 5. **AC-1.5** **Given** the constitution, **When** V reads principle I, **Then** it says the source is single and the per-platform files are generated, the version is `2.0.0`, the amendment is dated and states the change, and `scripts/check-docs.sh` passes.
-6. **AC-1.6** **Given** the architecture map, **When** a fixture adds the edge "knowledge area depends on agentic-sdlc", **Then** the fitness check fails and names the edge; **And Given** the real tree, **Then** the current violation counts (109 mention lines in 67 files; the checks that read another area's files) are recorded as a baseline and the check fails if any count rises.
+6. **AC-1.6** **Given** the architecture map, **When** a fixture adds the edge "knowledge area depends on agentic-sdlc", **Then** the fitness check fails and names the edge; **And Given** the real tree, **Then** the current violation counts (123 mention lines in 73 files, counted over the whole agent-knowledge component, that is the knowledge base and its two frameworks; the checks that read another area's files) are recorded as a baseline and the check fails if any count rises.
 7. **AC-1.7** **Given** the baseline file, **When** V opens it, **Then** it holds for Claude Code, Copilot CLI and Codex the always-loaded size in characters (and a token estimate marked as an estimate), the measurement method, the tool version and the date, the count of `{{AGENT_HOME}}` lines in the files that agent loads at session start, and the Claude Code skill-list figure with its `sdlc-*` share; **And** each size is measured on the text as it would look rendered (C-4, A-28): a dry run swaps every `{{AGENT_HOME}}` and `~/.copilot` agent-home path for the real path and adds the generated-from line, in memory only, writing nothing.
 8. **AC-1.8** **Given** the `knowledge-provider/v1` and rendered-copies contracts, **When** V reads their worked examples, **Then** each shows one citation in both forms: the source form (link text `{{AGENT_HOME}}/knowledge/x.md`, target a GitHub address) and the rendered form on Mac (`/Users/v/.agent-config/knowledge/x.md`) and Windows (`C:\Users\v\.agent-config\knowledge\x.md`), each with the relative target `../../knowledge/x.md` for a copy at `generated/<component>/foo.md`.
 9. **AC-1.9** **Given** phase 0 merged, **When** V compares the install plan of the old installers before and after, **Then** the difference is empty.
@@ -67,11 +67,11 @@ V runs one install command. It names the agent home, asks V to confirm it, and w
 
 **Acceptance Scenarios**:
 
-1. **AC-2.1** **Given** a Mac or Linux account with no home and no override, **When** V runs `install`, **Then** the report states the home as `~/.agent-config`, lists it as a need to confirm, exits 10 and changes nothing on disk (no folder created, no agent file touched).
+1. **AC-2.1** **Given** a Mac or Linux account with no home and no override, **When** V runs `install`, **Then** the report states the home as `~/.agent-config`, lists it as a need to confirm, exits 10 and changes nothing on disk (no folder created, no agent file touched); **And** the confirmation is accepted only from an interactive terminal (AC-4.7).
 2. **AC-2.2** **Given** a Windows account with no override, **When** V runs `install`, **Then** the stated home is `%USERPROFILE%\.agent-config`, not `%APPDATA%`.
 3. **AC-2.3** **Given** `AGENT_CONFIG_HOME=/data/ac` and no confirmation, **When** V runs `install`, **Then** the report states `/data/ac` as the home.
 4. **AC-2.4** **Given** V confirmed the home on an earlier run, **When** V runs `install` again, **Then** the report still states the home on its first line, asks for no confirmation, and proceeds.
-5. **AC-2.5** **Given** a confirmed home and `AGENT_CONFIG_HOME` changed to a new location, **When** V runs `install`, **Then** the report states both the recorded and the new home, asks V to confirm the move, and exits 10 without writing.
+5. **AC-2.5** **Given** a confirmed home and `AGENT_CONFIG_HOME` changed to a new location, **When** V runs `install`, **Then** the report states both the recorded and the new home, asks V to confirm the move, and exits 10 without writing; **And** the confirmation is accepted only from an interactive terminal (AC-4.7).
 
 ---
 
@@ -85,7 +85,7 @@ V keeps the public default list in agent-config and a private local list beside 
 
 **Acceptance Scenarios**:
 
-1. **AC-3.1** **Given** a default list entry `{name: agent-knowledge, source: git URL + ref}` and no local entry, **When** V runs `install` with everything confirmed, **Then** a managed clone appears under `components/agent-knowledge/`, the lock records its commit SHA, and the slot location is linked from the home.
+1. **AC-3.1** **Given** a default list entry `{name: agent-knowledge, source: git URL + ref}` and no local entry, **When** V runs `install` with everything confirmed, **Then** a managed clone appears under `components/agent-knowledge/` checked out at the commit SHA the lock holds (on a first install, the commit the ref resolves to, which the lock then records), and the slot location is linked from the home; **And** a later plain `install` never moves a `git` source to a newer commit.
 2. **AC-3.2** **Given** a local entry for the same name with a `path` source, **When** V runs `install`, **Then** the local entry wins, the home links to that folder live (no copy), the lock records `live`, and `doctor` prints "not version-controlled" as a warning (exit 0).
 3. **AC-3.3** **Given** a `path` source whose folder is missing, **When** V runs `install`, **Then** it exits 1, names the folder, and leaves every earlier link untouched; **And** `doctor` fails with the same message.
 4. **AC-3.4** **Given** a `git` source that cannot be fetched, **When** V runs `install`, **Then** the previously linked version stays linked, the exit code is 1, and the message names the component and the source.
@@ -93,6 +93,8 @@ V keeps the public default list in agent-config and a private local list beside 
 6. **AC-3.6** **Given** an empty folder `~/x`, **When** V runs `init-component ~/x`, **Then** a starter `component.yaml` that passes the schema check is written; **And Given** a `component.yaml` already there, **Then** the command refuses, changes nothing and says why.
 7. **AC-3.7** **Given** a source of type `archive` in a list, **When** V runs `install`, **Then** that component is skipped with the message "source type archive not supported in this release" and the exit code is 1 only if the component was required by another.
 8. **AC-3.8** **Given** the repo's checks, **When** `components.local.yaml` or `variables.local.yaml` lies inside a tracked path or is staged, **Then** the check fails naming the file; **And Given** the local list holding a `path` source, **Then** the public list is unchanged.
+9. **AC-3.9** **Given** a locked `git` source whose ref has new commits, **When** V runs `install --update` (all `git` sources) or `install --update <name>` (one), **Then** each named source advances to the commit its ref now resolves to, the lock records it, and the report prints the commit range (`<old>..<new>`) and, through AC-4.6, any privileged change; **And Given** the same run without `--update`, **Then** nothing advances.
+10. **AC-3.10** **Given** a locked tag that now resolves to a different SHA than the lock holds, **When** V runs `install`, **Then** it exits 1 with the message "tag moved" naming the component, the tag, the locked SHA and the new SHA, and changes nothing.
 
 ---
 
@@ -110,7 +112,10 @@ When the installer needs something only V can supply, it prints everything it ne
 2. **AC-4.2** **Given** components are satisfied but a variable has no value, **When** V runs `install`, **Then** the report has a "variables" need listing each variable, its description and the component that defines it, the exit code is 10, and nothing changed; **And** components needs are always reported before variables needs.
 3. **AC-4.3** **Given** `--json`, **When** the same run happens, **Then** standard output is one JSON document with the status, the exit code and the list of needs, and standard error carries no JSON.
 4. **AC-4.4** **Given** a successful run, **Then** the exit code is 0; **Given** any failed check, **Then** it is 1; **Given** an unknown command or flag, **Then** it is 2 with a usage line (assumption A-8).
-5. **AC-4.5** **Given** a component only suggests a source in its `component.yaml` (for example "install github.com/x/y"), **When** V runs `install`, **Then** nothing is fetched from it and the suggestion appears in the report as a need V may act on with `add`.
+5. **AC-4.5** **Given** a component only suggests a source in its `component.yaml` (for example "install github.com/x/y"), **When** V runs `install`, **Then** nothing is fetched from it and the suggestion appears in the report as a need labelled "suggested by `<component>`, unverified", never printed as a ready-to-run command; V may act on it with `add` after checking it.
+6. **AC-4.6** **Given** a component whose hook, MCP service, status line, route, or skill or agent text is new or changed against `install-state.json`, **When** V runs `install`, **Then** it exits 10 with a "privileged changes" need that lists every such entry in full (hook with event, matcher and command; service; status line; route; skill or agent text) with its component and commit, writes nothing, and names the command that approves; **And** approving records the hash of the approved set, so the same set needs no second approval.
+7. **AC-4.7** **Given** no interactive terminal (standard input or output is not a terminal), **When** `install` needs V's confirmation of the home (AC-2.1, AC-2.5) or V's approval of privileged changes (AC-4.6), **Then** it exits 10 and states that an interactive terminal is needed; it never accepts the confirmation or approval from a pipe, a file or an environment variable.
+8. **AC-4.8** **Given** the core instructions, **Then** one line says that agents never run `add`, `use` or an approval from a needs report without V's approval in chat (FR-050).
 
 ---
 
@@ -132,7 +137,7 @@ A component says "I need a `knowledge-storage` that offers contract `knowledge-p
 6. **AC-5.6** **Given** a consumer citing `{{AGENT_HOME}}/knowledge/a/b.md` that is not in the provider's `provides.exports`, **When** V runs `install`, **Then** it exits 1 naming the consumer file, the citation and the provider.
 7. **AC-5.7** **Given** a second provider for a slot that allows one (`multiple: false`), **When** V runs `install`, **Then** it exits 1 naming both providers and the command (`use`) that picks one; **And** a `multiple: true` slot accepts both, each in its own location.
 8. **AC-5.8** **Given** a component naming a slot absent from `slots/v1`, **When** V runs `install`, **Then** only that component is skipped, with a warning, and the others install.
-9. **AC-5.9** **Given** a component with `runtime: node >=18` on a machine with an older version, **When** V runs `install`, **Then** it exits 1 naming the requirement, the found version and the component.
+9. **AC-5.9** **Given** a component with `runtime: node >=24.12` on a machine whose runtime is older than 24.12 (the version is reported by a replaceable node command, for example one that prints `v24.11.0`), **When** V runs `install`, **Then** it exits 1 naming the requirement, the found version and the component.
 10. **AC-5.10** **Given** a citation of another component written in a source repo as a Markdown link with text `{{AGENT_HOME}}/<location>/<path>`, **When** the check runs, **Then** the longest matching slot location classifies it; **And Given** a bare relative path, **Then** it is read as that component's own file; **And Given** `{{AGENT_HOME}}/<unknown>/x.md` matching no slot location, **Then** the check fails naming the path.
 
 ---
@@ -147,7 +152,7 @@ Each component declares the variables its docs use; V sets values once; the inst
 
 **Acceptance Scenarios**:
 
-1. **AC-6.1** **Given** agent-config declares `AGENT_HOME`, `AGENT_CONFIG_REPO` and `LANGUAGE`, **When** V runs `set LANGUAGE=English`, **Then** the value is stored in V's private variables file and the next `install` renders it.
+1. **AC-6.1** **Given** agent-config declares `AGENT_HOME`, `AGENT_CONFIG_REPO` and `LANGUAGE`, **When** V runs `set LANGUAGE=English`, **Then** the value is stored in V's private variables file and the next `install` renders it; **And Given** `set` with a name containing `TOKEN`, `SECRET`, `PASSWORD`, `APIKEY` or `API_KEY`, or a value starting with a common token prefix (`ghp_`, `github_pat_`, `sk-`, `AKIA`, `xox`), **Then** it exits 1 naming the rule and stores nothing, because variables are public values that every agent reads.
 2. **AC-6.2** **Given** two enabled components that declare 3 and 1 variables, **When** `install` ends, **Then** the rendered `global-variables.md` under the home's `generated/` folder has exactly 4 rows plus `AGENT_HOME`, each with value and description, and no row for a disabled component's variable.
 3. **AC-6.3** **Given** `set NAME=value` where `NAME` no enabled component declares, **When** V runs it, **Then** it exits 1 and names the declared variables closest to `NAME`.
 4. **AC-6.4** **Given** a variable with a detect rule that finds a value, **When** `install` needs it, **Then** the value is shown as a proposal in the needs report; it is used only after V runs `set`.
@@ -166,10 +171,10 @@ Each component declares the variables its docs use; V sets values once; the inst
 
 1. **AC-7.1** **Given** a completed install, **When** V runs `install` again with no input changed, **Then** it reports "no changes", exit 0, and rewrites no file whose content is identical.
 2. **AC-7.2** **Given** a new version fails any check (schema, cycle, exports, budget, render), **When** V runs `install`, **Then** the previous version of every component stays linked and the report names the failing check.
-3. **AC-7.3** **Given** a real file or folder sits where the installer must link (for example a real `~/.copilot/knowledge`), **When** V runs `install`, **Then** it is copied to `~/.agent-config-backups/<timestamp>/` (Windows: `%USERPROFILE%\.agent-config-backups\<timestamp>\`) before it is replaced, and the report names the backup.
+3. **AC-7.3** **Given** a real file or folder sits where the installer must link (for example a real `~/.copilot/knowledge`), **When** V runs `install`, **Then** it is copied to `~/.agent-config-backups/<timestamp>/` (Windows: `%USERPROFILE%\.agent-config-backups\<timestamp>\`) before it is replaced, and the report names the backup; **And** the home, the backups folder and every backup are readable by their owner only (on Windows, the user's own access list with inheritance off, A-30), and `doctor` warns otherwise; **And** V's two local files (`components.local.yaml`, `variables.local.yaml`) are backed up the same way before `set`, `add` or `use` rewrites them.
 4. **AC-7.4** **Given** any install, **When** V runs `plan`, **Then** the report lists each link and generated file that would change, and nothing under the home or any agent folder changes.
-5. **AC-7.5** **Given** a healthy install, **When** V runs `doctor`, **Then** it exits 0; **And** for each of these faults it exits 1 and names the item: a link whose target is gone, a generated or rendered file whose hash differs from `install-state.json`, a rendered copy that differs from a fresh render (it names the source file to edit), a rendered file that is writable, a lock entry with no source, a component without a valid manifest, a missing required variable, a citation that no longer resolves, a missing `path` source; **And** warnings (exit 0) cover not-version-controlled path sources and compatibility links still present.
-6. **AC-7.6** **Given** an install, **When** V runs `uninstall`, **Then** every link and generated file listed in `install-state.json` is removed if it still matches its recorded hash, read-only rendered files included; a file V edited is left and listed; a `path` source folder, `components.local.yaml` and `variables.local.yaml` are never deleted; backups remain.
+5. **AC-7.5** **Given** a healthy install, **When** V runs `doctor`, **Then** it exits 0; **And** for each of these faults it exits 1 and names the item: a link whose target is gone, a generated or rendered file whose hash differs from `install-state.json`, a rendered copy that differs from a fresh render (it names the source file to edit), a rendered file that is writable, a lock entry with no source, a component without a valid manifest, a missing required variable, a citation that no longer resolves, a missing `path` source, a merged hook whose command does not resolve, a symlink inside a linked `path` source whose real path leaves the component root; **And** warnings (exit 0) cover not-version-controlled path sources, compatibility links still present, a hook for an agent absent from the machine, the home, the backups folder or a backup readable by others (AC-7.3), references to old agent-home paths found in agent config files, the count and total size of backups, and degraded Windows links (a junction or a copy where a symbolic link was not possible).
+6. **AC-7.6** **Given** an install, **When** V runs `uninstall`, **Then** every link and generated file listed in `install-state.json` is removed if it still matches its recorded hash, read-only rendered files included; a file V edited is left and listed; a `path` source folder, `components.local.yaml` and `variables.local.yaml` are never deleted; backups remain; **And Given** `uninstall` with restore, **Then** it puts back every item in the newest backup manifest that the install replaced, and leaves what the manifest does not list.
 7. **AC-7.7** **Given** `plan` or `doctor` run twice in a row, **Then** both runs print the same report.
 
 ---
@@ -184,10 +189,10 @@ Each component declares the variables its docs use; V sets values once; the inst
 
 1. **AC-8.1** **Given** compatibility links are on, **When** V opens `~/.copilot/knowledge/index.md` and `{{AGENT_HOME}}/knowledge/index.md`, **Then** both show the same file; the same holds for `companies`, `frameworks`, `patterns`, `references`, `procedures`, `instructions/core.instructions.md` and `global-variables.md`.
 2. **AC-8.2** **Given** Copilot's own folders (its instructions, hooks and agents folders under `~/.copilot`), **When** install ends, **Then** they are not replaced by compatibility links.
-3. **AC-8.3** **Given** a compatibility link listed under `retired:` for the release that removes it, **When** V runs `install`, **Then** the link is removed only if it is still the installer's own link; a real file at that path is left and reported.
+3. **AC-8.3** **Given** a compatibility link listed under `retired:` for the release that removes it, **When** V runs `install`, **Then** the link is removed only if it is still the installer's own link and no merged hook command uses it (a link a hook command still uses is kept and reported); a real file at that path is left and reported.
 4. **AC-8.4** **Given** the tracked files, **When** the sorting check runs, **Then** each of the 484 hard-coded `~/.copilot` lines (131 files, count of 2026-11-11) is classified as agent-home content (to become `{{AGENT_HOME}}`) or a Copilot-own path (kept, on a named allow-list); a new hard-coded agent-home line fails the check.
 5. **AC-8.5** **Given** the 445 existing `{{AGENT_HOME}}` lines, **When** the home moves in phase 2, **Then** none of them is edited by that phase and all resolve against the new home; **And** the link targets that `--write` adds to cross-component citations in later phases (AC-9.5) are the only edits to those lines.
-6. **AC-8.6** **Given** each agent (Claude Code, Copilot CLI, Codex) started after install, **Then** until phase 5 it loads the same core instructions it loaded just before the move (compared by content hash of the text it receives); from phase 5 the comparison is with the rendered text (AC-16.1).
+6. **AC-8.6** **Given** each agent (Claude Code, Copilot CLI, Codex) started after install, **Then** in each phase the core text it loads is compared by content hash with the hash recorded at the end of the previous phase; a difference is allowed only when that phase's pull request names the core change that caused it, and the new hash is recorded for the next phase; from phase 5 the hash is of the rendered text (AC-16.1).
 
 ---
 
@@ -199,7 +204,7 @@ Each component declares the variables its docs use; V sets values once; the inst
 
 **Acceptance Scenarios**:
 
-1. **AC-9.1** **Given** the knowledge area, **When** the fitness check runs, **Then** it finds 0 mentions of `agentic-sdlc` (the baseline of 109 lines goes to 0) and the check is on for good.
+1. **AC-9.1** **Given** the knowledge area, **When** the fitness check runs, **Then** it finds 0 mentions of `agentic-sdlc` across the whole agent-knowledge component (the baseline of 123 lines in 73 files goes to 0) and the check is on for good.
 2. **AC-9.2** **Given** the knowledge framework, **Then** it no longer requires "Used by" sections and the knowledge validator contains no backlink scan; **And Given** a doc that still has a "Used by" table, **Then** it is ignored without error.
 3. **AC-9.3** **Given** the SDLC framework's validator run with the knowledge root and the adapter map as arguments, **When** a citation does not resolve, **Then** it fails naming the citing file and the missing path; **And** with no hard-coded repo folder names.
 4. **AC-9.4** **Given** the knowledge validator, **Then** it reads only the knowledge area and never a company folder; **And** the former deny-list check that read `companies/*/repos` no longer exists.
@@ -257,11 +262,13 @@ Each component declares the variables its docs use; V sets values once; the inst
 
 1. **AC-12.1** **Given** an install, **Then** Claude Code's user file holds exactly 2 import lines owned by the installer, Copilot has the routes file with `applyTo: "**"` plus linked instruction files, and Codex has `~/.codex/AGENTS.md` and `~/.codex/hooks.json` generated or linked from the home's `generated/codex/`.
 2. **AC-12.2** **Given** the rendered Codex `AGENTS.md`, **Then** its size is below 32 KiB or the install exits 1 naming the size.
-3. **AC-12.3** **Given** V's existing keys in `~/.claude/settings.json`, **When** hooks are merged, **Then** every key V set is preserved and only the installer's hook entries are added or changed; the original is backed up first.
+3. **AC-12.3** **Given** V's existing keys in `~/.claude/settings.json`, **When** hooks are merged, **Then** every key V set is preserved and the merge touches only installer-owned entries under `hooks` and the core's status line (a component can contribute no other key); the original is backed up first; **And Given** a settings file that does not parse, **Then** `install` exits 1 and writes nothing; **And** the file's hash is checked again just before it is replaced, and a change since it was read fails the run with the file untouched. The same holds for the Codex and Copilot hook files.
 4. **AC-12.4** **Given** the two skill targets, **Then** built skills appear in `~/.claude/skills` and `~/.agents/skills` linked entry by entry to the rendered skills under `generated/`, and skills synced from elsewhere into those folders are left alone.
 5. **AC-12.5** **Given** core text changed and Codex's file not re-rendered, **When** V runs `doctor`, **Then** it fails on the hash mismatch; **And** a post-merge hook and the session-start hook (AC-16.8) re-render it.
 6. **AC-12.6** **Given** all enabled components, **When** `install` or `doctor` totals their declared `idle-cost` per target, measured on the rendered text the agent receives (C-4, A-28), **Then** a total over the target's ceiling fails and names the largest contributors.
 7. **AC-12.7** **Given** a component providing a service (for example an MCP server), **Then** it is registered for each agent at install and removed by `uninstall`.
+8. **AC-12.8** **Given** the session-start hook (AC-16.8) or a post-merge hook running after a source changed, **Then** it re-renders content only: the privileged set (hooks, services, status line, routes, skill and agent text, AC-4.6) is unchanged, a change that needs approval stays pending, and `doctor` reports it.
+9. **AC-12.9** **Given** the guard hook finds no Node 24.12 or later, **When** a tool call arrives, **Then** it denies the call in a folder that has `.specify/runs` and allows it elsewhere (this supersedes spec 019 D6 for that case).
 
 ---
 
@@ -276,7 +283,7 @@ Each component declares the variables its docs use; V sets values once; the inst
 1. **AC-13.1** **Given** a checkout of the KB repo only, **When** its check command runs, **Then** it passes.
 2. **AC-13.2** **Given** the KB's `component.yaml`, **Then** it lists every citable doc (41 today) in `provides.exports`; removing or renaming one without a major version bump fails the KB's check.
 3. **AC-13.3** **Given** a consumer citing an export, **When** the consumer's validator runs, **Then** it checks the citation against the provider's export list; a missing one fails.
-4. **AC-13.4** **Given** the KB's 20 `{{AGENT_HOME}}` lines in 10 files, **Then** 9 are relative links inside the KB and 11 are plain words, and a check forbids new ones.
+4. **AC-13.4** **Given** the KB's 20 `{{AGENT_HOME}}` lines in 10 files, **Then** 9 are relative links inside the KB and 11 are plain words, and a check forbids new ones; **And Given** the 42 `{{AGENT_HOME}}` lines in 11 files of the two frameworks (agentic-sdlc and the knowledge framework), **Then** they are converted in the same phase (citation links or plain words), and the same check forbids new ones.
 5. **AC-13.5** **Given** a non-legacy KB doc, **Then** every relative Markdown link in the whole body, fenced code skipped, resolves and stays inside the KB, `{{AGENT_HOME}}` appears nowhere, and a code span naming a KB doc is a warning; **And** a legacy doc (no `schema:` key) produces warnings only.
 6. **AC-13.6** **Given** constitution principle III and the `review-docs` procedure, **Then** neither names `copilot/knowledge`.
 7. **AC-13.7** **Given** a moved exported doc, **Then** a stub stays at the old path for one release.
@@ -338,20 +345,21 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 
 ### Edge Cases
 
-- The home folder exists but belongs to another tool or holds unmanaged files: install adds only what it records; unmanaged files stay (AC-7.3 covers real files at link targets).
-- Two machines (Mac and Windows) with different homes: lists and variables are per machine; nothing machine-specific is committed.
-- Windows account that cannot create links: install exits 1 with a message naming the cause, having changed nothing. (Link kind is a plan matter.)
-- Interrupted install (power loss, Ctrl-C): the next `install` completes or restores; `doctor` reports half-states.
-- Local list names a component also in the public list with a different source: local wins, shown in `plan`.
-- Component removed from both lists: its links are removed on the next install; a managed clone is removed; a `path` folder is never touched.
-- A hand-written `depends.docs` that disagrees with citations: the check fails and prints the generated value (FR-017).
-- A component shipping a hook for an agent that is not installed: skipped, `doctor` warns only.
-- Network down on a rerun with all git sources already acquired and unchanged refs: install succeeds from the lock where no fetch is needed; any needed fetch fails per AC-3.4.
-- Two components ask the same variable name with different descriptions: install fails naming both.
-- A home path with spaces or non-ASCII characters (a user name such as `Vinh Do`): the link text shows the real path; the relative target stays a valid Markdown target (spaces encoded) and resolves.
-- A source changes while a session is open: the copy refreshes at the next session start or `install`, not mid-session.
-- A provider with no `repository` URL (for example a `path` source never pushed): citations of it fail the consumer's check (AC-9.7).
-- Two machines: rendered copies hold the user name in real paths and exist only under each machine's home; no repo tracks them (AC-16.10).
+- **EDGE-1** The home folder exists but belongs to another tool or holds unmanaged files: install adds only what it records; unmanaged files stay (AC-7.3 covers real files at link targets).
+- **EDGE-2** Two machines (Mac and Windows) with different homes: lists and variables are per machine; nothing machine-specific is committed.
+- **EDGE-3** Windows account that cannot create links: install exits 1 with a message naming the cause, having changed nothing. (Link kind is a plan matter.)
+- **EDGE-4** Interrupted install (power loss, Ctrl-C): the next `install` completes or restores; `doctor` reports half-states.
+- **EDGE-5** Local list names a component also in the public list with a different source: local wins, shown in `plan`.
+- **EDGE-6** Component removed from both lists: its links are removed on the next install; a managed clone is removed; a `path` folder is never touched.
+- **EDGE-7** A hand-written `depends.docs` that disagrees with citations: the check fails and prints the generated value (FR-017).
+- **EDGE-8** A component shipping a hook for an agent that is absent from the machine: skipped, `doctor` warns only; a merged hook whose command does not resolve is a `doctor` failure for any agent (AC-7.5).
+- **EDGE-9** Network down on a rerun with all git sources already acquired and unchanged refs: install succeeds from the lock where no fetch is needed; any needed fetch fails per AC-3.4.
+- **EDGE-10** Two components ask the same variable name with different descriptions: install fails naming both.
+- **EDGE-11** A home path with spaces or non-ASCII characters (a user name such as `Vinh Do`): the link text shows the real path; the relative target stays a valid Markdown target (spaces encoded) and resolves.
+- **EDGE-12** A source changes while a session is open: the copy refreshes at the next session start or `install`, not mid-session.
+- **EDGE-13** A provider with no `repository` URL (for example a `path` source never pushed): citations of it fail the consumer's check (AC-9.7).
+- **EDGE-14** Two machines: rendered copies hold the user name in real paths and exist only under each machine's home; no repo tracks them (AC-16.10).
+- **EDGE-15** Concurrent runs (two terminals, or a session-start re-render during an install): one home-wide lock serves `install`, `uninstall` and the re-render hook; a second command waits or exits 1 naming the lock, and the re-render hook only tries and skips; a lock older than the stale timeout is taken over.
 
 ## Requirements *(mandatory)*
 
@@ -359,11 +367,11 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 
 **Phase 0 (US1)**
 
-- **FR-001**: Each of the fourteen contracts MUST be documented with owner, consumers, versioning rule and behaviour when missing or stale (AC-1.1).
+- **FR-001**: Each of the fifteen contracts (the fourteen of the blueprint plus `framework/v1`) MUST be documented with owner, consumers, versioning rule and behaviour when missing or stale (AC-1.1).
 - **FR-002**: Machine-checkable schemas MUST exist for `slots/v1`, `component/v1`, the public component list, the local component list and the lock (AC-1.2).
 - **FR-003**: `slots/v1` MUST use `required`, `multiple`, `locations` (named parts such as `content`, `framework`) and allow `contract` to be a list; the old keys `count` and `mounts` MUST be rejected with a message naming the replacement (AC-1.3, AC-1.4).
-- **FR-004**: `component/v1` MUST carry `name`, `version`, `slot`, `repository` (the provider's URL, used to generate citation targets), `provides` (contract, `index`, `exports`, optional `services`), `depends` (slot + contract major, runtimes, generated `docs`), the locations it supplies, `routes`, `hooks`, `variables`, `scope`, `idle-cost` (characters per target) (AC-1.2).
-- **FR-005**: Readers MUST warn on unknown keys and skip only the component that uses an unsupported slot or major (AC-1.2, AC-5.8).
+- **FR-004**: `component/v1` MUST carry `name`, `version`, `slot`, `repository` (the provider's URL, used to generate citation targets), `provides` (contract, `index`, `exports`, optional `services`), `depends` (slot + contract major, runtimes, generated `docs`), the locations it supplies, `routes`, `hooks`, `variables`, `scope`, `idle-cost` (characters per target); component, skill, agent, route and hook ids MUST match the pattern `^[a-z0-9][a-z0-9-]{0,63}$` (lowercase letters, digits and hyphens, at most 64 characters, starting with a letter or digit) (AC-1.2).
+- **FR-005**: Readers MUST warn on unknown keys and skip only the component that uses an unsupported slot or major; they MUST reject a path field that is not relative or that holds a `..` segment, a drive letter, a backslash or a NUL character, naming the field (AC-1.2, AC-5.8).
 - **FR-006**: Contract versions MUST be pinned by major only; readers MUST accept the current and previous major (AC-5.5).
 - **FR-007**: Constitution principle I MUST be amended to "one source, generated per platform" as version 2.0.0 (AC-1.5).
 - **FR-008**: The architecture map MUST list the four components and their allowed edges, forbid knowledge → agentic-sdlc, knowledge → companies and contracts → any component, and the fitness check MUST fail on a new violation against a recorded baseline (AC-1.6).
@@ -375,44 +383,45 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 **Phase 2 (US2 to US8)**
 
 - **FR-013**: The agent home MUST be `~/.agent-config` (Mac, Linux) or `%USERPROFILE%\.agent-config` (Windows), moved by `AGENT_CONFIG_HOME`, stated on every run, confirmed by V on the first run and on a move, with nothing written before confirmation (AC-2.1 to AC-2.5).
-- **FR-014**: The home MUST contain `core/`, `knowledge/`, `frameworks/<name>/`, `companies/` (links to source folders), `components/<name>/` (managed clones), `generated/` (every installer-written file and every rendered copy, rebuilt each install), `components.local.yaml`, `variables.local.yaml`, `components.lock` and `install-state.json` (AC-3.1, AC-6.2, AC-7.6).
+- **FR-014**: The home MUST contain `core/` and the other core locations `instructions/`, `patterns/`, `procedures/`, `references/`, `atlas/`, `tracker/` and `frameworks/agent-foundry/`; `knowledge/`, `frameworks/<name>/`, `companies/` (links to source folders), `components/<name>/` (managed clones), `store/` (one immutable tree per installed version), `generated/` (every installer-written file and every rendered copy, rebuilt each install), the link `global-variables.md` (to `generated/global-variables.md`), `components.local.yaml`, `variables.local.yaml`, `components.lock`, `install-state.json`, `install.lock`, the journal `install-state.pending.json` and `install-log.jsonl` (AC-3.1, AC-6.2, AC-7.6).
 - **FR-015**: Every file the installer places MUST be one of three classes, recorded with its hash in `install-state.json`: linked (the knowledge base; source edits show at once), rendered (a copy of a component that cites another, with real paths, read-only; built skills and agents are rendered after the build), generated (machine-specific files: routes, `global-variables.md`, Codex `AGENTS.md`, merged hooks) (AC-7.5, AC-7.6, AC-16.1).
-- **FR-016**: The installer MUST run read → resolve → plan → apply → report; `plan` MUST write nothing under the home or any agent folder; exit codes MUST be 0 done, 10 needs input (with a needs report and no change), 1 failed, 2 usage error; `--json` MUST put one JSON document on standard output (AC-4.1 to AC-4.4, AC-7.4).
+- **FR-016**: The installer MUST run read → resolve → plan → apply → report; `plan` MUST write nothing under the home or any agent folder; exit codes MUST be 0 done, 10 needs input (with a needs report and no change; this includes a home confirmation and privileged changes, AC-4.6, AC-4.7), 1 failed, 2 usage error; `--json` MUST put one JSON document on standard output (AC-4.1 to AC-4.4, AC-7.4).
 - **FR-017**: `depends.docs` MUST be generated from citations; a hand-written value that differs MUST fail the check and print the generated one (Edge Cases).
 - **FR-018**: The needs report MUST list component needs before variable needs, each with the exact command that satisfies it (AC-4.1, AC-4.2).
-- **FR-019**: The installer MUST read the public list and the local list and merge by name with the local entry winning; the local list and the variables file MUST never lie inside a tracked path (AC-3.2, AC-3.8).
-- **FR-020**: A source adapter MUST exist for `git` (managed clone, lock holds SHA) and `path` (live link, lock holds `live`, `doctor` warns); each has check, acquire and version steps (AC-3.1 to AC-3.4).
+- **FR-019**: The installer MUST read the public list and the local list and merge by name with the local entry winning; the local list and the variables file MUST never lie inside a tracked path; a source URL with a user-info part (`user:password@host`) MUST fail validation naming the component only, and every report MUST redact user-info and token-bearing query parts of a source URL (AC-3.2, AC-3.8).
+- **FR-020**: A source adapter MUST exist for `git` (managed clone checked out at the SHA the lock holds, which only `install --update` advances; a locked tag that resolves elsewhere fails, AC-3.10) and `path` (live link, lock holds `live`, `doctor` warns); each has check, acquire and version steps (AC-3.1 to AC-3.4).
 - **FR-021**: A component MUST need nothing but a folder with a valid `component.yaml`; `init-component <path>` MUST write a valid starter and refuse to overwrite (AC-3.5, AC-3.6).
 - **FR-022**: Resolution MUST reuse a filled slot, else take agent-config's default, else report a need; it MUST resolve recursively and check cycles, contract versions, cited docs against exports and slot counts; it MUST NOT fetch a source that only a component suggested (AC-4.5, AC-5.1 to AC-5.8).
 - **FR-023**: A citation of another component MUST be written in a source repo as a Markdown link whose text is `{{AGENT_HOME}}/<location>/<path>`; classification is by the longest matching location prefix; a path under no location fails; a bare relative path is the component's own (AC-5.10).
 - **FR-024**: Declared runtimes MUST be checked before apply (AC-5.9).
-- **FR-025**: Variables MUST be declared in the `component.yaml` of the component whose docs use them (`AGENT_HOME`, `AGENT_CONFIG_REPO`, `LANGUAGE` in agent-config; `REFERENCE_REPOS_ROOT` in agentic-sdlc; `OTS_REPOS_ROOT` in agent-companies; none in the KB); values live in `variables.local.yaml`; `set NAME=value` stores them; a compact `global-variables.md` MUST be rendered into `generated/` with a row per variable of each enabled component; the core MUST define `{{AGENT_HOME}}` in one line (AC-6.1 to AC-6.6).
-- **FR-026**: Apply MUST acquire into staging and switch only after every check passes; a failure keeps the previous links; a rerun with unchanged input MUST rewrite no identical file; anything replaced MUST first be backed up under `~/.agent-config-backups/<timestamp>/` (AC-7.1 to AC-7.3).
+- **FR-025**: Variables MUST be declared in the `component.yaml` of the component whose docs use them (`AGENT_HOME`, `AGENT_CONFIG_REPO`, `LANGUAGE` in agent-config; `REFERENCE_REPOS_ROOT` in agentic-sdlc; `OTS_REPOS_ROOT` in agent-companies; none in the KB); values live in `variables.local.yaml`; `set NAME=value` stores them and refuses secret-like names and values (AC-6.1); a compact `global-variables.md` MUST be rendered into `generated/` with a row per variable of each enabled component; the core MUST define `{{AGENT_HOME}}` in one line (AC-6.1 to AC-6.6).
+- **FR-026**: Apply MUST acquire into staging and switch only after every check passes; a failure keeps the previous links; a rerun with unchanged input MUST rewrite no identical file; anything replaced MUST first be backed up under `~/.agent-config-backups/<timestamp>/`, which includes V's two local files before `set`, `add` or `use` rewrites them (AC-7.1 to AC-7.3).
 - **FR-027**: Shared folders MUST be linked per entry, never replaced as a whole (AC-12.4).
-- **FR-028**: The commands `install`, `set`, `add`, `use`, `init-component`, `plan`, `doctor` and `uninstall` MUST exist; `add` appends a component to the local list, `use` overrides an existing component's source by name (assumption A-9) (AC-3.2, AC-5.7).
+- **FR-028**: The commands `install` (with `--update [<name>]`, which alone advances `git` sources, AC-3.9), `set`, `add`, `use`, `init-component`, `plan`, `doctor` and `uninstall` MUST exist; `add` appends a component to the local list, `use` overrides an existing component's source by name (assumption A-9) (AC-3.2, AC-5.7).
 - **FR-029**: `doctor` MUST fail on the faults and warn on the conditions in AC-7.5 and be repeatable (AC-7.5, AC-7.7, AC-16.6).
-- **FR-030**: `uninstall` MUST remove only what `install-state.json` records and still matches (read-only rendered files included), leaving edited files, `path` source folders and V's two local files (AC-7.6).
+- **FR-030**: `uninstall` MUST remove only what `install-state.json` records and still matches (read-only rendered files included), leaving edited files, `path` source folders and V's two local files; with restore it MUST also put back every item the newest backup manifest lists as replaced by the install (AC-7.6).
 - **FR-031**: Compatibility links MUST keep every pre-move `~/.copilot/…` agent-home path resolving for one release, MUST NOT replace Copilot's own folders, and MUST be removed through `retired:` only when still the installer's own link (AC-8.1 to AC-8.3).
-- **FR-032**: The 484 hard-coded `~/.copilot` lines MUST be classified and the agent-home ones converted to `{{AGENT_HOME}}` before the links are retired; a check MUST forbid new ones; the 445 existing `{{AGENT_HOME}}` lines MUST need no edit (AC-8.4, AC-8.5).
+- **FR-032**: The 484 hard-coded `~/.copilot` lines MUST be classified (AC-8.4); the agent-home ones outside the knowledge files MUST be converted to `{{AGENT_HOME}}` in phase 5, after rendering exists, and before the links are retired; the knowledge files go straight to their final form in phase 6 (AC-13.4) and are not converted twice; a check MUST forbid new ones; the 445 existing `{{AGENT_HOME}}` lines MUST need no edit (AC-8.4, AC-8.5).
 - **FR-033**: One install command per machine MUST work with the same steps on Mac and Windows (`install.sh`, `install.ps1`) (AC-2.1, AC-2.2).
 - **FR-034**: Components MUST NOT be installed through a package manager; a package manager MAY be used inside a repo for that repo's own dev tooling (AC-3.1).
-- **FR-035**: Until phase 5, the existing installers MUST keep wiring the agent folders, now pointing at the new home (AC-8.6).
+- **FR-035**: Until phase 5, the existing installers MUST keep wiring the agent folders, now pointing at the new home (AC-8.6); `install.sh --legacy` and `install.ps1 -Legacy` MUST stay available through phase 5 plus one tag, as the way back.
 
 **Phase 1, 3 to 8**
 
 - **FR-036** (phase 1): The knowledge area MUST contain 0 mentions of `agentic-sdlc`, its "Used by" rule and backlink scan MUST be gone, no knowledge check may read a company folder, and the SDLC validator MUST take the knowledge root and adapter map as arguments (AC-9.1 to AC-9.4).
 - **FR-037** (phase 3): Company content, company repo names and the company variable MUST live in the public `agent-companies` repo with its history; the core instructions and the variables source MUST name no company (AC-10.1 to AC-10.4, AC-10.6).
 - **FR-038** (phase 4): Skills and agents MUST have one source each, built at install per target with verified fields, stamped, checked for stamp drift and budget-checked (AC-11.1 to AC-11.9).
-- **FR-039** (phase 5): Routes, the two skill targets, merged hooks, registered services and the total budget MUST be installed as stated in AC-12.1 to AC-12.7, pointing at rendered copies; agent folders hold only pointers and discovered files.
-- **FR-040**: The KB repo MUST pass its own checks alone, export its citable docs, and follow the in-storage link rules, with legacy docs warning only (AC-13.1 to AC-13.8).
+- **FR-039** (phase 5): Routes, the two skill targets, merged hooks, registered services and the total budget MUST be installed as stated in AC-12.1 to AC-12.7, pointing at rendered copies; agent folders hold only pointers and discovered files; no hook, service, status line, route or skill or agent text is added or changed without the approval of AC-4.6, and the session-start and post-merge hooks never change that privileged set (AC-12.8).
+- **FR-040**: The KB repo MUST pass its own checks alone, export its citable docs, and follow the in-storage link rules, with legacy docs warning only; the 42 `{{AGENT_HOME}}` lines of the two frameworks MUST be converted in the same phase (AC-13.1 to AC-13.8).
 - **FR-041**: The SDLC repo MUST be tagged, pinned by tag, and enabled per project (AC-14.1 to AC-14.4).
 - **FR-042**: Phase 8 MUST change only mapping sources (AC-15.1 to AC-15.3).
 - **FR-043**: Each phase MUST end with the repo checks green before and after, and install plus `doctor` passing on Mac and Windows.
-- **FR-044** (phase 1 onward): Each consumer's validator MUST generate, with `--write`, the target of every cross-component citation as the GitHub address of the cited file in the provider's `repository`; it MUST fail on a missing or stale target and on a provider with no `repository` (AC-9.5 to AC-9.7).
+- **FR-044** (phase 1 onward): Each consumer's check, running the shared `build cite`, MUST generate, with `--write`, the target of every cross-component citation as the GitHub address of the cited file in the provider's `repository`; it MUST fail on a missing or stale target and on a provider with no `repository` (AC-9.5 to AC-9.7).
 - **FR-045** (phase 5): The installer MUST render every component whose files cite another (core, agentic-sdlc, agent-companies, built skills and agents) into `generated/<component>/`; in each copy a citation's link text MUST be the real absolute path on that machine and its target the relative path to the cited file; routes, instruction links and skill folders MUST point at the copies; the knowledge base MUST stay linked; a rendered file MUST hold 0 `{{AGENT_HOME}}` path placeholders apart from the allow-list; no repo may track a rendered copy (AC-16.1 to AC-16.3, AC-16.5, AC-16.10).
 - **FR-046** (phase 5): Every rendered file MUST carry the generated-from line, `generated/index.md` MUST explain the mechanism once, and rendered files MUST be written read-only; `doctor` MUST report a copy that differs from a fresh render or is writable; a session-start hook MUST re-render a component whose source changed, keep the old copy on failure and never block the session (AC-16.4, AC-16.6 to AC-16.9).
 - **FR-047** (phase 4): Skills and agents MUST be built at install and then rendered; build output MUST never be committed; each provider's CI MUST prove the build and the per-component budget (AC-11.1, AC-11.9, AC-16.10).
 - **FR-048** (phase 1): The core's `{{VAR}}` rule MUST say to resolve from `global-variables.md` and to read the resolved file locally, never fetch it; the core MUST NOT contain a "read the link text" line (AC-9.8).
+- **FR-050** (phase 1): The core instructions MUST carry one line saying that agents never run `add`, `use` or an approval taken from a needs report without V's approval in chat (AC-4.8); needs items that come from component text MUST be labelled as suggestions and never printed as ready commands (AC-4.5).
 - **FR-049** (phase 3): The company KB MUST stay public; there MUST be no deny-list, privacy audit or history rewrite (AC-10.5).
 
 ### Key Entities
@@ -485,6 +494,8 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 | Rendered-copy guards, all three (G2) | FR-046, AC-16.4, AC-16.6 to AC-16.9, AC-7.5, AC-7.6 |
 | Defaults: repo names, compatibility links (G2) | A-12, A-16 |
 | Goal G13 | SC-015 |
+| Plan amendments for G3 (security S-1 to S-11, devops D-1 to D-5, architecture A-1 to A-3 and A-6, P-2, N-1) | AC-4.6 to AC-4.8, AC-3.9, AC-3.10, AC-12.8, EDGE-15, FR-050, and the amended AC-1.1, AC-1.6, AC-3.1, AC-4.5, AC-5.9, AC-6.1, AC-7.3, AC-7.5, AC-7.6, AC-8.3, AC-9.1, AC-12.3, AC-13.4, FR-001, FR-004, FR-005, FR-014, FR-016, FR-019, FR-020, FR-025, FR-026, FR-028, FR-030, FR-035, FR-039, FR-040, FR-044 |
+| V's G4 answers (G4-2, G4-4, G4-5) | AC-8.6, AC-12.9, FR-032, A-15 |
 
 ## Out of Scope
 
@@ -504,7 +515,7 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 ## Assumptions
 
 - **A-1** V is the only maintainer and user; no outside consumer pins these repos.
-- **A-2** Node 18 or later is present on every machine (the tracker hook already requires it); the spec states it as a declared runtime, not a design.
+- **A-2** The latest Node 24 release, from 24.12 onward, is present on every machine (the guard hook of spec 019 already requires 24.12); the spec states it as a declared runtime, not a design.
 - **A-3** The local lists and variable file live in the agent home, not under `~/.copilot`; the blueprint's contract table still shows the old path and is read as amended on 2026-11-13.
 - **A-4** The contract table's component `mounts` field is read as "the locations of the slot that this component supplies, each with its folder" (the slot's `locations` replaced `mounts`); the plan fixes the field name.
 - **A-5** Content repos follow `main`, recorded by SHA in the lock; agentic-sdlc pins a tag.
@@ -517,7 +528,7 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 - **A-12** "One release" means until the next tagged agent-config release after the one that adds the links (V's default at G2: compatibility links stay until the next tagged agent-config release).
 - **A-13** Per-project enablement of agentic-sdlc uses links kept out of version control (blueprint open question 3 default); phase 7 may amend.
 - **A-14** Whether Codex reads a linked `~/.codex/AGENTS.md` and `hooks.json` like real files, and how read permissions treat the linked home, are unconfirmed (P4); the spec requires only that Codex receives the current text.
-- **A-15** Between phases the old installers keep working (FR-035); the exact order of the 484-line sorting relative to phase 2 is the plan's, but it precedes link retirement.
+- **A-15** Between phases the old installers keep working (FR-035); the 484 `~/.copilot` lines are converted in phase 5, after rendering exists (V's G4 answer), and knowledge files go straight to their final form in phase 6; all of it precedes link retirement.
 - **A-16** Repo names are `agent-knowledge`, `agent-companies` and `agentic-sdlc` (V's default at G2); renaming later changes only list entries.
 - **A-17** `agent-companies` is public, so it may be listed in the public or the local list; a clone uses V's credentials if the host asks for them.
 - **A-18** Unconfirmed, a P4 check on Codex with a cheap model: whether Codex has a session-start hook that can re-render (Claude Code and Copilot CLI have one, per the blueprint). Until confirmed, AC-16.8 requires the hook only for those two and `doctor` catches the rest.
@@ -531,6 +542,9 @@ Every component that cites another is copied at install into `{{AGENT_HOME}}/gen
 - **A-26** The other unconfirmed items in the blueprint's assumptions are P4 checks on Codex and Copilot CLI with a cheap model, not spec criteria: Codex accepting Copilot-only skill fields, Copilot CLI applying `applyTo` to user instructions, VS Code's Local harness not reading `~/.copilot`, and whether a skill with `disable-model-invocation` costs nothing in Copilot's list.
 - **A-27** From phase 5, `{{AGENT_HOME}}/companies/` and `{{AGENT_HOME}}/frameworks/<name>/` must show the rendered files of agent-companies and agentic-sdlc (the plan decides whether the path links to the copy or the copy sits there); `{{AGENT_HOME}}/knowledge/` links to the source because the knowledge base is not rendered. AC-10.3 needs only that `index.md` resolves.
 - **A-28** (C-4, V's choice at G2, 2026-11-13: "rendered both") The G4 baseline and every later size are measured on rendered text, so the fixed cost of rendering sits inside the baseline and G4 catches only real growth. Before phase 5 the baseline comes from a dry run that renders in memory; the phase-5 renderer MUST apply the same path swap and generated-from line, and its tests reuse the dry run's rules so the two numbers stay comparable. Estimate for the core today: 4,511 characters as written, about 4,950 rendered.
+- **A-29** The privileged set is every hook (event, matcher, command), MCP service, status line, route and skill or agent text a component contributes; ordinary doc content changes without consent and is loaded as context (the plan's accepted risks AR-1 to AR-3, decided by V).
+- **A-30** "Owner-only" means folder mode `0700` and file mode `0600` on Mac and Linux, and the user's own access list with inheritance off on Windows.
+- **A-31** An interactive terminal means both standard input and standard output are terminals; no flag or environment variable stands in for one.
 
 ## Clarifications for G2 (max 3, ranked by impact)
 
@@ -540,8 +554,8 @@ C-1 (company KB public), C-2 (repo names), C-3 (compatibility-link length) and C
 ## Self-check (SPEC rules)
 
 - No implementation choices beyond the interface V sees (SPEC-1): the terms "git", "path", `--write` and the field names are interface; no language or library appears except the declared runtime.
-- Every story has priority, rationale, an independent test and 5 to 10 scenarios with at least one failure case (SPEC-2, SPEC-3, SPEC-8); Story 16 is new.
+- Every story has priority, rationale, an independent test and 5 to 10 scenarios with at least one failure case (SPEC-2, SPEC-3, SPEC-8); Story 16 is new; the 14 edge cases are numbered EDGE-1 to EDGE-14 and EDGE-15 is added, so the coverage check can read them.
 - Every FR traces to a story; every story has an FR. Phases 1 and 3 to 8 are at outcome depth by design.
-- No clarification marker left (SPEC-7); assumptions A-1 to A-28 recorded (SPEC-6).
+- No clarification marker left (SPEC-7); assumptions A-1 to A-31 recorded (SPEC-6).
 - Success criteria SC-001 to SC-015 give each live goal G1 to G13 a number and a check; G6 is dropped (SPEC-5, SPEC-11).
 - Out of scope listed (SPEC-9); terms defined once (SPEC-10).

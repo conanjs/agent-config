@@ -1,3 +1,11 @@
+<!--
+Sync Impact Report
+Version: 1.0.0 -> 1.1.0 (MINOR: a new style-deviation entry)
+Added: style deviation for legacy .mjs tools (lint-baseline exemption until rewritten), with the meaning of "rewritten".
+Templates needing updates: none.
+Later: specs/022-repo-split task T084 makes the MAJOR 2.0.0 amendment to principle I.
+-->
+
 # Constitution: agent-config
 
 ## Core Principles
@@ -37,7 +45,7 @@ When more than one design is valid, the docs keep every option with a default an
 
 This constitution outranks other practices in this repo. An amendment is a pull request that states the change and bumps the version: MAJOR for removing or redefining a principle, MINOR for a new principle or section, PATCH for wording. Reviews check that a change follows the principles above.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-10-29
+**Version**: 1.1.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-11-13
 
 ## Agentic SDLC: defaults
 
@@ -46,7 +54,13 @@ This constitution outranks other practices in this repo. An amendment is a pull 
 
 ## Agentic SDLC: style deviations
 
-> _Framework defaults apply._
+> _Framework defaults apply, except for the entry below._
+
+- **Legacy `.mjs` tools and the lint baseline:** the stack's lint baseline applies to new code. A legacy `.mjs` tool (one that exists before spec 022) is exempt from it until that tool is rewritten.
+  - **Rewritten** means a change replaces the tool's main flow or more than half of its lines, or moves it into a new module structure (for example the installer core).
+  - **Not rewritten:** fixing a bug, adding a rule or a message, or editing any number of lines inside the existing structure. Touching a line never triggers the full baseline.
+  - The unit-size and complexity limits under "defaults" still apply to the lines a change adds or edits.
+  - Example: adding one check to `validate-knowledge.mjs` keeps the exemption; replacing its pipeline with the new reader and plan stages ends it, and the whole file then meets the baseline.
 
 ## Agentic SDLC: budgets
 
