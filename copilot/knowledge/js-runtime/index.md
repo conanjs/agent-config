@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: js-runtime
-last-updated: 2026-11-03
+last-updated: 2026-11-13
 ---
 
 # JavaScript runtime internals
@@ -22,6 +22,8 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [worker-thread-pools.md](worker-thread-pools.md) | concept | piscina task dispatch, `availableParallelism()` under a container CPU limit, measured worker sizing, and pool statistics that mislead | verified |
 | [node-worker-default-heap-limit.md](node-worker-default-heap-limit.md) | concept | The heap limit a Node.js worker gets without `resourceLimits` in a memory-limited container: `clamp(limit ÷ 2, 256 MiB, 2 GiB)` per worker, why several workers can still get the container OOM-killed, measured at 11 limits | verified |
 | [piscina-queue-size.md](piscina-queue-size.md) | concept | What piscina's `queueSize` counts (waiting tasks only, minus starting workers), why `maxQueue` is not enforced for tasks with an `AbortSignal`, and how `needsDrain` and `'drain'` really behave, measured on 5.3.2 | verified |
+| [atomic-symlink-swap.md](atomic-symlink-swap.md) | reference | Replacing a directory symlink in one step with `fs.renameSync` (macOS, measured); Windows untested | verified |
+| [yaml-comment-round-trip.md](yaml-comment-round-trip.md) | reference | `yaml` 2.9.1 keeps comments when a tool rewrites a hand-edited file, but not inline-comment spacing (measured) | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 
 ## References
