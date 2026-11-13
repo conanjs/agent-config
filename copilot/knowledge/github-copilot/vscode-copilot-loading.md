@@ -25,10 +25,11 @@ GitHub Copilot in VS Code as documented on 2026-11-11, plus what a VS Code sessi
 
 | Harness | What runs | Evidence |
 |---|---|---|
-| Copilot | The Copilot SDK in VS Code's Agent Host: the shared runtime of GitHub Copilot products, including Copilot CLI | ✅[^har] |
-| Local | VS Code's built-in harness in the extension host; the Agent Skills page's location table labels it "Local (deprecated)" (read 2026-11-13) | ✅[^har][^sk] |
+| Copilot | The Copilot SDK in VS Code's Agent Host: the shared runtime of GitHub Copilot products. The SDK (GitHub, generally available, 6 languages) "exposes the same engine behind Copilot CLI" and by default drives a Copilot CLI child process in server mode over JSON-RPC; whether VS Code bundles that CLI is not stated | ✅[^har][^sdk] |
+| Local | VS Code's built-in harness in the extension host; deprecated and to be removed by February 2027 (read 2026-11-13) | ✅[^har][^sk] |
 | Claude | The Anthropic Claude Agent SDK, using Claude project configuration | ✅[^har] |
 | Codex | OpenAI Codex, through its extension or the experimental Agent Host integration | ✅[^har] |
+| Cloud | Not a separate harness: the Copilot harness run in a managed cloud environment (experimental) | ✅[^har] |
 
 ### Instructions
 
@@ -82,7 +83,7 @@ GitHub Copilot in VS Code as documented on 2026-11-11, plus what a VS Code sessi
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 24 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-13
+- Verified: 25 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-13
 
 ## References
 - [Choose an agent harness](https://code.visualstudio.com/docs/agents/run/agent-harnesses) — Microsoft, living, read 2026-11-11. Backs: Harnesses. [^har]
@@ -93,6 +94,7 @@ GitHub Copilot in VS Code as documented on 2026-11-11, plus what a VS Code sessi
 - [Use memory with agents in VS Code](https://code.visualstudio.com/docs/agents/run/memory) — Microsoft, living, read 2026-11-11. Backs: memory. [^mem]
 - [GitHub Copilot CLI command reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference) — GitHub, living, read 2026-11-11. Backs: `~/.agents/skills/` as a personal skill location; CLI custom agents. [^ghref]
 - [About agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) — GitHub, living, read 2026-11-13. Backs: personal skills in `~/.copilot/skills` or `~/.agents/skills`; locations depend on the surface; VS Code agent mode as a surface. [^ghsk]
+- [GitHub Copilot SDK](https://github.com/github/copilot-sdk) — GitHub, living, read 2026-11-13. Backs: same engine as Copilot CLI, CLI in server mode over JSON-RPC by default, languages, general availability. [^sdk]
 - `~/.copilot/session-state/8ca39f25-5e37-4708-922b-87bcfbfd8ccd/events.jsonl` — local VS Code session log, 2026-11-10, searched 2026-11-13: `skill.context_delivered_ref` for `chrome-browser` with base directory under `~/.agents/skills/synced/`; `userPromptSubmitted` hooks. [^log]
 - `mapping.yaml` — links `skills/` to `~/.agents/skills` and `~/.claude/skills`.
 
