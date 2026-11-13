@@ -128,6 +128,7 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/021-interface-catalog/spec.md`](../../../../specs/021-interface-catalog/spec.md)
 - [`specs/021-interface-catalog/tasks.md`](../../../../specs/021-interface-catalog/tasks.md)
 - [`specs/022-repo-split/blueprint.md`](../../../../specs/022-repo-split/blueprint.md)
+- [`specs/022-repo-split/spec.md`](../../../../specs/022-repo-split/spec.md)
 - [`specs/README.md`](../../../../specs/README.md)
 
 ## Proposals (legacy)
