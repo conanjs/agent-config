@@ -1,0 +1,5 @@
+schema: components-list/v1
+local: false
+components:
+  - name: Bad_Name
+    source: { type: path, path: ~/x }

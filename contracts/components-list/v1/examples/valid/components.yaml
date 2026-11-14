@@ -1,0 +1,10 @@
+# components.yaml (public): name and source only; the slot comes from each component.yaml
+schema: components-list/v1
+local: false
+components:
+  - name: agent-knowledge
+    source: { type: git, url: 'https://github.com/conanjs/agent-knowledge.git', ref: main }
+  - name: agentic-sdlc
+    source: { type: git, url: 'https://github.com/conanjs/agentic-sdlc.git', ref: v1.0.0 } # a tag (A-5)
+  - name: agent-companies
+    source: { type: git, url: 'https://github.com/conanjs/agent-companies.git', ref: main }

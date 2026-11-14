@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/contracts/skill-source/v1/schema.json",
+  "title": "skill-source/v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "skill-source/v1"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "enum": ["claude", "agents"]
+      },
+      "minItems": 1
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "platforms": {
+      "type": "object",
+      "propertyNames": {
+        "enum": ["claude", "agents"]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "includes": {
+      "type": "boolean"
+    }
+  },
+  "required": ["schema", "name", "description", "targets"]
+}

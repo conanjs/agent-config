@@ -1,0 +1,10 @@
+schema: skill-source/v1
+name: review-docs
+description: 'Review knowledge docs and procedures before committing.'
+targets: [claude, agents]
+metadata: { owner: agent-config }
+fields: {}
+platforms:
+  claude: { allowed-tools: [Read, Grep, Bash] }
+  agents: {}
+includes: true

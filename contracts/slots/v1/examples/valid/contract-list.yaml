@@ -1,0 +1,9 @@
+schema: slots/v1
+slots:
+  - name: company-knowledge-storage
+    contract: [company-kb/v1, knowledge-provider/v1]
+    required: false
+    multiple: true
+    scope: global
+    locations:
+      - { name: content, mount: companies, shared: true, index: generated }

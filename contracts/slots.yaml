@@ -1,0 +1,41 @@
+schema: slots/v1
+slots:
+  - name: core
+    reserved: true # filled only by agent-config's own component.yaml; a list entry naming it is an error
+    contract: component/v1 # core's surface is its provides.exports
+    required: true
+    multiple: false
+    scope: global
+    locations: # mounts are relative to {{AGENT_HOME}}; they keep the 445 existing lines resolving (AC-8.5)
+      - { name: core, mount: core }
+      - { name: instructions, mount: instructions }
+      - { name: patterns, mount: patterns }
+      - { name: procedures, mount: procedures }
+      - { name: references, mount: references }
+      - { name: atlas, mount: atlas }
+      - { name: tracker, mount: tracker }
+      - { name: agent-foundry, mount: frameworks/agent-foundry }
+  - name: knowledge-storage
+    contract: knowledge-provider/v1 # a string or a list; a list means the filler offers ALL of them
+    required: false
+    multiple: false
+    scope: global
+    self-contained: true # fillers cite no other component (DR-404); atlas and build cite enforce it
+    locations:
+      - { name: content, mount: knowledge, index: provided } # index.md at its root
+      - { name: framework, mount: frameworks/knowledge }
+      - { name: company-kb-framework, mount: frameworks/company-kb, required: false } # required when the filler offers company-kb/v1
+  - name: company-knowledge-storage
+    contract: [company-kb/v1, knowledge-provider/v1]
+    required: false
+    multiple: true
+    scope: global
+    locations:
+      - { name: content, mount: companies, shared: true, index: generated } # entries such as ots/ linked one by one; each has its own index.md
+  - name: framework
+    contract: framework/v1
+    required: false
+    multiple: true
+    scope: per-project # files live in the home; skills, agents and routes appear only where enabled
+    locations:
+      - { name: framework, mount: 'frameworks/{component}' }

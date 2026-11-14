@@ -1,0 +1,6 @@
+schema: skill-source/v1
+name: review-docs
+description: x
+targets: [claude]
+platforms:
+  copilot: { allowed-tools: [Read] }

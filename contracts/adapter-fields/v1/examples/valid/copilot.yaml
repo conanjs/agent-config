@@ -1,0 +1,16 @@
+schema: adapter-fields/v1
+adapter: copilot
+version: 1
+targets:
+  agents: { folder: ~/.copilot/agents, file: '{name}.agent.md', link: per-entry }
+  skills: { folder: ~/.agents/skills, file: SKILL.md, link: per-entry }
+fields:
+  - name: infer
+    applies-to: agent
+    from: { auto-delegate: false }
+    source: https://docs.github.com/en/copilot/reference/custom-agents-configuration
+    verified: 2026-11-10
+    enforced: true
+events:
+  session-start: sessionStart
+  pre-tool: preToolUse

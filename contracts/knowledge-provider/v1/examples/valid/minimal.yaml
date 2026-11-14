@@ -1,0 +1,7 @@
+schema: knowledge-provider/v1
+slot: company-knowledge-storage
+repository: https://github.com/conanjs/agent-companies
+locations:
+  content: companies
+index: index.md
+exports: [ots/index.md]

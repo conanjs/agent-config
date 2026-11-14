@@ -149,7 +149,6 @@ Feature: Schema check of the contract files
 
   # ---- AC-1.4 ----------------------------------------------------------------------------------------
 
-  @pending @T058
   Scenario: AC-1.4 In the shipped slots file knowledge-storage is optional and single, with knowledge-provider/v1
     Then the slot "knowledge-storage" of "contracts/slots.yaml" has "required" equal to "false"
     And the slot "knowledge-storage" of "contracts/slots.yaml" has "multiple" equal to "false"
@@ -158,20 +157,17 @@ Feature: Schema check of the contract files
   # Spec AC-1.4 says company-knowledge-storage has contract company-kb/v1 alone, but specs/022-repo-split/contracts/slots-v1.md
   # (the sketch) gives the list [company-kb/v1, knowledge-provider/v1]. The two disagree. Until the spec is aligned this
   # scenario accepts either: it checks only that the slot offers company-kb/v1.
-  @pending @T058
   Scenario: AC-1.4 In the shipped slots file company-knowledge-storage is optional and multiple, and offers company-kb/v1
     Then the slot "company-knowledge-storage" of "contracts/slots.yaml" has "required" equal to "false"
     And the slot "company-knowledge-storage" of "contracts/slots.yaml" has "multiple" equal to "true"
     And the slot "company-knowledge-storage" of "contracts/slots.yaml" offers the contract "company-kb/v1"
 
-  @pending @T058
   Scenario: AC-1.4 In the shipped slots file framework is optional and multiple, per project, with framework/v1
     Then the slot "framework" of "contracts/slots.yaml" has "required" equal to "false"
     And the slot "framework" of "contracts/slots.yaml" has "multiple" equal to "true"
     And the slot "framework" of "contracts/slots.yaml" has "scope" equal to "\"per-project\""
     And the slot "framework" of "contracts/slots.yaml" has "contract" equal to "\"framework/v1\""
 
-  @pending @T058
   Scenario: AC-1.4 The shipped slots file has the reserved core slot and the three starting slots
     Then the slots file "contracts/slots.yaml" has the slot "core"
     And the slots file "contracts/slots.yaml" has the slot "knowledge-storage"

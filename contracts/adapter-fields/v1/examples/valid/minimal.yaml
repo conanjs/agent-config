@@ -1,0 +1,6 @@
+schema: adapter-fields/v1
+adapter: codex
+version: 1
+targets:
+  agents: { folder: ~/.codex/agents, file: '{name}.toml', link: per-entry }
+fields: []

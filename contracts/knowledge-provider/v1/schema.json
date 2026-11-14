@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/contracts/knowledge-provider/v1/schema.json",
+  "title": "knowledge-provider/v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "knowledge-provider/v1"
+    },
+    "slot": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^https://github\\.com/[A-Za-z0-9][A-Za-z0-9-]{0,38}/(?!(?:\\.*\\.git|\\.+)$)[A-Za-z0-9._-]{1,100}$"
+    },
+    "locations": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))[\\s\\S]+$"
+        }
+      },
+      "required": ["content"]
+    },
+    "index": {
+      "type": "string",
+      "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))[\\s\\S]+$"
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))[\\s\\S]+$"
+      },
+      "minItems": 1
+    },
+    "self-contained": {
+      "type": "boolean"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))[\\s\\S]+$"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "^\\{\\{AGENT_HOME\\}\\}/(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))[\\s\\S]+$"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^https://github\\.com/[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}/blob/[A-Za-z0-9_.][A-Za-z0-9_.+@-]*/(?!(?:[\\s\\S]*/)?\\.\\.?(?:/|$))[A-Za-z0-9._/-]+$"
+          }
+        },
+        "required": ["file", "text", "target"]
+      }
+    }
+  },
+  "required": ["schema", "slot", "repository", "locations", "index", "exports"]
+}

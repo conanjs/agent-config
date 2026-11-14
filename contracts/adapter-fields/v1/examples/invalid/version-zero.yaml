@@ -1,0 +1,6 @@
+schema: adapter-fields/v1
+adapter: copilot
+version: 0
+targets:
+  agents: { folder: ~/.copilot/agents, file: '{name}.agent.md', link: per-entry }
+fields: []

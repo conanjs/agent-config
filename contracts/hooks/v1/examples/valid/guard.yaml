@@ -1,0 +1,12 @@
+schema: hooks/v1
+hooks:
+  - id: workflow-graph-guard
+    event: pre-tool
+    agents: [claude-code, copilot-cli, codex]
+    command: node {{AGENT_HOME}}/frameworks/agentic-sdlc/tools/workflow-graph/cli.mjs guard
+    matcher: null
+  - id: re-render
+    event: session-start
+    agents: [claude-code]
+    command: node {{AGENT_HOME}}/core/tools/render.mjs --quiet
+    matcher: startup

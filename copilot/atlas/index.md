@@ -27,7 +27,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (10 files)
   - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (171 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (179 files)
-  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (117 files)
+  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (345 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
   - [Source](map/reference-typescript-node/ref-src.md) — The composition root, module composers and the four layers of each module
@@ -107,6 +107,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Checks, hooks and CI](map/agent-config/tooling.md#repo-check) | Repo tooling | `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` | — | `README.md` | — | — | — |
 | [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs}` | — | `README.md` | — | — | — |
 | [Contract library and tools](map/agent-config/tooling.md#contract-code) | Repo tooling | `contracts/{lib,tools}/**/*.ts` | — | — | tsc, eslint, vitest | `tests/contracts/schemas.feature` | — |
+| [Contracts](map/agent-config/tooling.md#contract) | Repo tooling | `contracts/{slots.yaml,index.md,README.md,*/v1/**}` | — | `contracts/index.md` | vitest parity test, check-schemas | `tests/contracts/schemas.feature` | — |
 | [Vendored yaml library](map/agent-config/tooling.md#vendored-yaml) | Repo tooling | `contracts/lib/vendor/yaml/**` | — | — | vitest (contracts/lib/yaml.test.ts) | — | — |
 | [GitHub repo templates](map/agent-config/templates.md#template) | Templates | `templates/**` | — | `copilot/procedures/init-github-governance.procedure.md` | — | — | — |
 | [Composition root and entry point](map/reference-typescript-node/ref-src.md#ref-composition) | Source | `src/{CompositionRoot,main}.ts` | — | `docs/architecture.md` | lint (MOD-11 zones) | `test/integration/documents.int.test.ts` | — |

@@ -1,0 +1,6 @@
+schema: repo-layout/v1
+required: [README.md]
+missing-message: 'missing required entry {path}'
+forbidden:
+  - rule: no-large-files
+    message: 'file too large: {path}'

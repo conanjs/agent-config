@@ -1,0 +1,15 @@
+# {{AGENT_HOME}}/components.local.yaml (written only by V, `add` or `use`; backed up before each rewrite, A-D3)
+schema: components-list/v1
+local: true
+components:
+  - name: agent-knowledge # a known name: overrides its source
+    source: { type: path, path: ~/workspace/agent-knowledge } # live link; the lock records live
+  - name: my-notes # a new name: adds a component
+    source: { type: git, url: 'ssh://git@github.com/conanjs/my-notes.git', ref: main }
+  - name: my-archive # recognised, refused in this release (AC-3.7)
+    source:
+      {
+        type: archive,
+        url: 'https://example.invalid/n.tgz',
+        sha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      }

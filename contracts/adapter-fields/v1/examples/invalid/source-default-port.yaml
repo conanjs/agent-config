@@ -1,0 +1,11 @@
+schema: adapter-fields/v1
+adapter: copilot
+version: 1
+targets:
+  agents: { folder: ~/.copilot/agents, file: '{name}.agent.md', link: per-entry }
+fields:
+  - name: infer
+    applies-to: agent
+    from: { auto-delegate: false }
+    source: https://docs.github.com:443/en/copilot
+    verified: 2026-11-10

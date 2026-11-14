@@ -1,0 +1,6 @@
+schema: repo-layout/v1
+required: []
+missing-message: 'missing required entry {path}'
+forbidden:
+  - rule: generated-from-line
+    message: 'tracked file starts with the generated-from line: {path}'

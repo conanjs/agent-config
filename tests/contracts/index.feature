@@ -19,7 +19,6 @@ Feature: Contracts index and worked examples
 
   # ---- AC-1.1 ----------------------------------------------------------------------------------------
 
-  @pending @T074
   Scenario Outline: AC-1.1 The shipped index has a row for the contract <contract>
     Then the repository file "contracts/index.md" has a line matching "^\| <contract>\b"
 
@@ -40,7 +39,6 @@ Feature: Contracts index and worked examples
       | hooks/v1           |
       | variables/v1       |
 
-  @pending @T074
   Scenario: AC-1.1 The shipped index has one shared row for the component list and the lock
     Then the repository file "contracts/index.md" has a line matching "^\| components-list/v1\b.*components-lock/v1"
 
@@ -83,7 +81,7 @@ Feature: Contracts index and worked examples
   # One citation of x.md, in a copy at generated/<component>/foo.md, shown in the source form and in the rendered form
   # on Mac and on Windows; the rendered target is the relative path ../../knowledge/x.md on both.
 
-  @pending @T062 @T064
+  @T062 @T064
   Scenario Outline: AC-1.8 The worked example in <file> shows <form>
     Then the repository file "<file>" has a line containing "<text>"
 
