@@ -8,26 +8,33 @@ Up: [Atlas](../../index.md) › agent-config
 
 ## Shared steps
 
-<a id="test-support"></a>The World, the tool registry and the steps every feature uses
+<a id="test-support"></a>The World, the tool registry, its type declarations and the steps every feature uses
 
-Where: `tests/support/*.mjs` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
+Where: `tests/support/*.{mjs,ts,d.mts}` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
 
+- [`tests/support/os-steps.ts`](../../../../tests/support/os-steps.ts)
 - [`tests/support/steps.mjs`](../../../../tests/support/steps.mjs)
+- [`tests/support/tools.d.mts`](../../../../tests/support/tools.d.mts)
 - [`tests/support/tools.mjs`](../../../../tests/support/tools.mjs)
+- [`tests/support/tools.ts`](../../../../tests/support/tools.ts)
 - [`tests/support/world.mjs`](../../../../tests/support/world.mjs)
 
 ## Features
 
 <a id="test-feature"></a>One feature file and one tool entry per tool under test
 
-Where: `tests/*/{*.feature,tool.mjs}` · Schema: — · Index: — · Checked by: cucumber-js · Scenarios: — · Installed to: —
+Where: `tests/*/{*.feature,tool.mjs,tool.ts}` · Schema: — · Index: — · Checked by: cucumber-js · Scenarios: — · Installed to: —
 
 - [`tests/atlas/atlas.feature`](../../../../tests/atlas/atlas.feature)
 - [`tests/atlas/tool.mjs`](../../../../tests/atlas/tool.mjs)
+- [`tests/cucumber-config/cucumber-config.feature`](../../../../tests/cucumber-config/cucumber-config.feature)
+- [`tests/cucumber-config/tool.ts`](../../../../tests/cucumber-config/tool.ts)
 - [`tests/efficiency-audit/efficiency-audit.feature`](../../../../tests/efficiency-audit/efficiency-audit.feature)
 - [`tests/efficiency-audit/tool.mjs`](../../../../tests/efficiency-audit/tool.mjs)
 - [`tests/installers/installers.feature`](../../../../tests/installers/installers.feature)
 - [`tests/installers/tool.mjs`](../../../../tests/installers/tool.mjs)
+- [`tests/tools-support/tool.ts`](../../../../tests/tools-support/tool.ts)
+- [`tests/tools-support/tools-support.feature`](../../../../tests/tools-support/tools-support.feature)
 - [`tests/tracker/tool.mjs`](../../../../tests/tracker/tool.mjs)
 - [`tests/tracker/tracker.feature`](../../../../tests/tracker/tracker.feature)
 - [`tests/turn-tokens/tool.mjs`](../../../../tests/turn-tokens/tool.mjs)
@@ -45,11 +52,11 @@ Where: `tests/*/{*.feature,tool.mjs}` · Schema: — · Index: — · Checked by
 - [`tests/workflow-graph/tool.mjs`](../../../../tests/workflow-graph/tool.mjs)
 - [`tests/workflow-graph/workflow-graph.feature`](../../../../tests/workflow-graph/workflow-graph.feature)
 
-## Fixtures
+## Fixtures and golden files
 
-<a id="test-fixture"></a>The smallest valid input tree per tool, copied fresh for every scenario
+<a id="test-fixture"></a>The smallest valid input tree per tool, copied fresh for every scenario, and recorded golden plans
 
-Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
+Where: `tests/*/{fixtures,golden}/**` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
 
 - [`tests/atlas/fixtures/base/README.md`](../../../../tests/atlas/fixtures/base/README.md)
 - [`tests/atlas/fixtures/base/copilot/atlas/atlas.yaml`](../../../../tests/atlas/fixtures/base/copilot/atlas/atlas.yaml)
@@ -75,6 +82,11 @@ Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · 
 - [`tests/installers/fixtures/base/repo/copilot/knowledge/index.md`](../../../../tests/installers/fixtures/base/repo/copilot/knowledge/index.md)
 - [`tests/installers/fixtures/base/repo/mapping.yaml`](../../../../tests/installers/fixtures/base/repo/mapping.yaml)
 - [`tests/installers/fixtures/base/repo/skills/demo/SKILL.md`](../../../../tests/installers/fixtures/base/repo/skills/demo/SKILL.md)
+- [`tests/installers/golden/posix/darwin.txt`](../../../../tests/installers/golden/posix/darwin.txt)
+- [`tests/installers/golden/posix/linux.txt`](../../../../tests/installers/golden/posix/linux.txt)
+- [`tests/installers/golden/posix/plan.sh`](../../../../tests/installers/golden/posix/plan.sh)
+- [`tests/tools-support/fixtures/base/bin/probe.mjs`](../../../../tests/tools-support/fixtures/base/bin/probe.mjs)
+- [`tests/tools-support/fixtures/base/bin/probe.sh`](../../../../tests/tools-support/fixtures/base/bin/probe.sh)
 - [`tests/tracker/fixtures/base/TRACKER.md`](../../../../tests/tracker/fixtures/base/TRACKER.md)
 - [`tests/turn-tokens/fixtures/base/claude-home/projects/p/s1.jsonl`](../../../../tests/turn-tokens/fixtures/base/claude-home/projects/p/s1.jsonl)
 - [`tests/turn-tokens/fixtures/base/claude-home/projects/p/s1/subagents/agent-a0.jsonl`](../../../../tests/turn-tokens/fixtures/base/claude-home/projects/p/s1/subagents/agent-a0.jsonl)

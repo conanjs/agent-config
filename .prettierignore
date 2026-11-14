@@ -1,0 +1,26 @@
+# Prettier checks only the new TypeScript tiers of spec 022 and their root configs.
+# Legacy Markdown, YAML, JSON and .mjs files are out of scope (constitution P-3 exemption).
+/*
+!/contracts/
+!/installers/
+/installers/*
+!/installers/core/
+!/scripts/
+/scripts/*
+!/scripts/*.ts
+!/tests/
+/tests/*
+!/tests/support/
+/tests/support/*
+!/tests/*/
+/tests/*/*
+!/tests/*/tool.ts
+!/tests/support/*.ts
+!/tests/support/*.d.mts
+!/tsconfig.json
+!/vitest.config.ts
+!/package.json
+!/.prettierrc.json
+**/node_modules/
+**/vendor/
+pnpm-lock.yaml

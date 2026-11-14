@@ -23,14 +23,18 @@ Where: `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` · Schema: 
 
 ## Node setup
 
-<a id="test-setup"></a>Node 24, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, and the git and search ignore rules
+<a id="test-setup"></a>Node 24.12+, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, the TypeScript, vitest and prettier configs of the new tiers, and the git and search ignore rules
 
-Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,.nvmrc,.gitignore,.ignore}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
+Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
 
 - [`.gitignore`](../../../../.gitignore)
 - [`.ignore`](../../../../.ignore)
 - [`.nvmrc`](../../../../.nvmrc)
+- [`.prettierignore`](../../../../.prettierignore)
+- [`.prettierrc.json`](../../../../.prettierrc.json)
 - [`cucumber.mjs`](../../../../cucumber.mjs)
 - [`package.json`](../../../../package.json)
 - [`pnpm-lock.yaml`](../../../../pnpm-lock.yaml)
 - [`pnpm-workspace.yaml`](../../../../pnpm-workspace.yaml)
+- [`tsconfig.json`](../../../../tsconfig.json)
+- [`vitest.config.ts`](../../../../vitest.config.ts)

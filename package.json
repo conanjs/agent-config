@@ -5,14 +5,30 @@
   "description": "Agent configuration, frameworks and knowledge; package.json exists only for the tool tests (specs/003).",
   "type": "module",
   "engines": {
-    "node": ">=24 <25"
+    "node": ">=24.12 <25"
   },
   "packageManager": "pnpm@12.15.0",
   "scripts": {
     "test": "cucumber-js",
-    "check": "scripts/check-docs.sh"
+    "check": "scripts/check-docs.sh",
+    "format": "prettier --check .",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test:unit": "vitest run"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "~13.3.0"
+    "@cucumber/cucumber": "~13.3.0",
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.19.2",
+    "ajv": "8.20.0",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-import-x": "4.17.1",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.0.5",
+    "yaml": "2.9.1"
   }
 }
