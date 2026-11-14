@@ -26,6 +26,9 @@ jobs:
       run:
         shell: bash # Git Bash on the Windows runner, so every step is the same script on all three
     steps:
+      # Keep LF line endings on Windows: the scenarios and generated pages compare bytes, and the repo has no .gitattributes.
+      - name: Check out with LF line endings
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
