@@ -1,7 +1,8 @@
 // The tolerant reader of the contract files (specs/022 T055, FR-004, FR-005, CON-10, M-03, M-17). The installer, `build`,
 // doctor and every provider's CI read `slots.yaml`, `component.yaml`, the two component lists and the lock through
 // `readContract`, and the schema.json of each contract is held to the same verdicts by the parity test (DR-103).
-import { type ContractDefinition, contractDefinitions } from './contract-shapes.ts';
+import { contractDefinitions } from './contract-registry.ts';
+import type { ContractDefinition } from './contract-shapes.ts';
 import { DOCUMENT_FIELD, type Finding, type ReadResult, checkShape } from './shape.ts';
 import { MAX_YAML_BYTES, readYaml, type YamlFinding } from './yaml.ts';
 

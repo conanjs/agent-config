@@ -1,6 +1,7 @@
 // The shape of each contract file the reader knows (specs/022 T055): slots/v1, component/v1, components-list/v1 and
-// components-lock/v1, from the sketches in specs/022-repo-split/contracts/ and the entities in data-model.md. A contract added
-// later (T062 onward) adds its table here and its name to `contractDefinitions`; the reader itself does not change.
+// components-lock/v1, from the sketches in specs/022-repo-split/contracts/ and the entities in data-model.md. Contracts added
+// later live in contract-shapes-content.ts (T062 to T064, T066 to T068) and contract-shapes-tooling.ts (T065, T069 to T073);
+// contract-registry.ts joins the three tables, and the reader itself does not change.
 import { type Finding, type Shape, idShape, shapes, within } from './shape.ts';
 import {
   githubUrlProblem,
@@ -14,16 +15,21 @@ import {
 const { text, flag, checked, matching, choice, list, map, nullable, either, object, tagged, whole } = shapes;
 const { required, optional } = shapes;
 
-const path = checked(relativePathProblem);
-const contractName = matching(
+/** A relative path inside a component, checked by the M-03 path rules. */
+export const path = checked(relativePathProblem);
+/** A contract id such as `component/v1`: a contract name, a slash and a major. */
+export const contractName = matching(
   /^[a-z0-9][a-z0-9-]*\/v[1-9][0-9]*$/,
   'must look like name/v1: a contract name, /v, a major number',
 );
-const scope = choice('global', 'per-project');
-const schemaKey = required(text);
+/** Where a slot applies: once for the whole home, or once per project. */
+export const scope = choice('global', 'per-project');
+/** The `schema:` key every contract file starts with, naming its contract and major. */
+export const schemaKey = required(text);
 
 // M-05: a branch or tag name never starts with -, so git cannot read it as an option; no whitespace or control character.
-const refName = matching(
+/** A git ref or tag name that cannot start with a dash (M-05). */
+export const refName = matching(
   /^[A-Za-z0-9_.][A-Za-z0-9_./+@-]*$/,
   'must be a branch or tag name, not starting with - (M-05)',
 );
@@ -41,7 +47,8 @@ const archiveSource = object({
 });
 
 /** The sources of a list entry and of a lock entry (CL-3, CL-4, M-05, M-07). */
-const source = tagged('type', {
+/** Where a component comes from: a git clone, an archive or a local path, by its `type`. */
+export const source = tagged('type', {
   git: gitSource,
   path: object({ type: required(text), path: required(checked(localPathProblem)) }),
   archive: archiveSource,
@@ -52,7 +59,8 @@ const suggestedSource = tagged('type', { git: gitSource, archive: archiveSource 
 
 // ---- slots/v1 (slots-v1.md, data-model "Slot") ----------------------------------------------------------
 
-const location = object({
+/** One location of a slot: its name and where it is mounted in the home. */
+export const location = object({
   name: required(idShape),
   mount: required(path),
   required: optional(flag),
@@ -60,7 +68,8 @@ const location = object({
   index: optional(choice('provided', 'generated')),
 });
 
-const slot = object(
+/** One slot of slots.yaml: its name, contract, how many components fill it and its locations. */
+export const slot = object(
   {
     name: required(idShape),
     reserved: optional(flag),
@@ -98,14 +107,16 @@ const slotDependency = object({
   suggest: optional(object({ source: required(suggestedSource) })),
 });
 
-const route = object({
+/** One route a component offers: an id and the file an agent reads for it. */
+export const route = object({
   id: required(idShape),
   when: required(text),
   read: required(path),
   'before-writing': optional(path),
 });
 
-const hook = object({
+/** One hook a component asks the installer to wire: an id, its event and its command. */
+export const hook = object({
   id: required(idShape),
   event: required(choice('session-start', 'pre-tool', 'prompt-submit', 'stop')),
   agents: optional(list(choice('claude-code', 'copilot-cli', 'codex'))),
@@ -119,7 +130,8 @@ const detect = tagged('kind', {
   'dir-exists': object({ kind: required(text), candidates: required(list(checked(homeRelativePathProblem), 1)) }),
 });
 
-const variable = object({
+/** One public variable a component offers, with how the installer detects its value. */
+export const variable = object({
   name: required(matching(/^[A-Z][A-Z0-9_]*$/, 'must be upper snake case, such as REFERENCE_REPOS_ROOT')),
   description: required(text),
   required: optional(flag),
@@ -241,8 +253,8 @@ export interface ContractDefinition {
   readonly majors: Readonly<Record<number, Shape>>;
 }
 
-/** The contracts the reader knows, by name. */
-export const contractDefinitions: Readonly<Record<string, ContractDefinition>> = {
+/** The core contracts: slots, component, components-list and components-lock (T058 to T061). */
+export const coreContracts: Readonly<Record<string, ContractDefinition>> = {
   slots: { format: 'yaml', majors: { 1: slotsV1 } },
   component: { format: 'yaml', majors: { 1: componentV1 } },
   'components-list': { format: 'yaml', majors: { 1: componentsListV1 } },

@@ -27,7 +27,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (10 files)
   - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (171 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (179 files)
-  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (113 files)
+  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (117 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
   - [Source](map/reference-typescript-node/ref-src.md) — The composition root, module composers and the four layers of each module
