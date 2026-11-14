@@ -1,0 +1,48 @@
+# The reviewed exemption list of the coverage check (specs/022 QB-2, plan.md "Exemption list", decisions/qa.md section 8).
+# An id on this list needs no scenario. Each entry names what is automated, why the rest cannot be, and the manual
+# check that replaces it. scripts/check-ac-coverage.ts rejects an entry with no reason or no manual replacement,
+# and an entry whose id is not in specs/022-repo-split/spec.md.
+schema: ac-exemptions/v1
+exemptions:
+  - id: AC-8.6
+    automated-part: The files each agent would receive are hashed before and after phase 2, and their paths resolve.
+    reason: Whether an agent actually loads that text is behaviour of Claude Code, Copilot CLI and Codex, which a deterministic test cannot drive (QB-4).
+    replacement: Protocol items P4-14 and P4-26b (decisions/qa.md section 9), then step 5 of the real-machine checklist (section 6); Claude Code only with V's go-ahead.
+  - id: SC-002
+    automated-part: The files each agent would receive are hashed, and the knowledge and companies index paths resolve for all three agents.
+    reason: The success criterion is that the three agents resolve the index, and an agent's resolving is not observable from a scenario.
+    replacement: Protocol items P4-14 and P4-26b, then step 5 of the real-machine checklist; Claude Code only with V's go-ahead.
+  - id: AC-12.1
+    automated-part: File contents and link targets of the Claude Code user file, the Copilot routes file and the Codex files.
+    reason: That each agent reads those files at start is agent behaviour, not file content.
+    replacement: Protocol items P4-14 and P4-26b, then step 5 of the real-machine checklist; Claude Code only with V's go-ahead.
+  - id: AC-14.2
+    automated-part: The skill-list size in characters, computed for a project with the framework and for one without.
+    reason: The token figure (824 of 9,900 tokens on 2026-11-11) is a Claude Code measurement, and the unit of the budget is characters (A-7).
+    replacement: Re-measure by hand with /context at phase 7, only if V approves a Claude Code run, and record it beside the baseline.
+  - id: AC-16.8
+    automated-part: The session-start hook command's behaviour for Claude Code and Copilot CLI (TR-8), run as a process on a temporary home.
+    reason: Whether Codex runs a session-start hook is unconfirmed (A-18), and a test cannot start Codex.
+    replacement: Protocol item P4-18 on Codex with a cheap model, with V trusting the hook in /hooks; until it is confirmed, doctor reports a stale Codex copy.
+  - id: AC-2.2
+    automated-part: The home chooser as a pure function with the platform injected, so the Windows form is asserted on every OS.
+    reason: Only a real Windows account shows that the stated home is %USERPROFILE%\.agent-config and not %APPDATA%.
+    replacement: The Windows runner of installer.yml on every pull request, plus a real Windows account by hand once per phase (decisions/qa.md section 6, step 6).
+  - id: AC-7.3
+    automated-part: The backup, the report naming the backup and owner-only permissions on Mac and Linux; the Windows form through the injected platform.
+    reason: Owner-only access lists with inheritance off (A-30) and a real file in a link's place behave on a real Windows account in ways a runner may not reproduce.
+    replacement: The Windows runner of installer.yml, plus a real Windows account by hand once per phase (decisions/qa.md section 6).
+  - id: AC-12.3
+    automated-part: The settings merge on a fixture file for each agent, including a file that does not parse and a file that changed since it was read.
+    reason: Merging into the user's real settings on a real Windows account cannot be reproduced on a throwaway home.
+    replacement: The Windows runner of installer.yml, plus a real Windows account by hand once per phase (decisions/qa.md section 6).
+  - id: A-19
+    automated-part: None.
+    reason: Whether VS Code's Markdown preview opens a relative ../x.md target on click needs a person using VS Code (A-19).
+    replacement: Protocol item P4-19, done by V by hand in VS Code before phase 5; the spec requires a valid relative target and a real-path text, not the click.
+  - id: SC-004
+    automated-part: The character figures against the phase-0 baseline, including the sdlc-* share in characters.
+    reason: Only the token figure (824 of 9,900 tokens for Claude Code) is manual; it is an estimate (A-7) from a Claude Code measurement.
+    replacement: Read the estimate-marked token figure beside the character figure at each gate and note any difference (decisions/qa.md section 8).
+# SC-015 is not listed: its spec row holds counts only (placeholders left, writable rendered files, files without a generated-from
+# line, tracked rendered files, stale citations), and every count is checked by a scenario, so no part needs a manual check.

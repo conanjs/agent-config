@@ -1,0 +1,17 @@
+# Stand-in architecture map for the fitness scenarios: components with the folders they own, the edges that are
+# allowed, and the edges that are forbidden (specs/022 AC-1.6, FR-008).
+components:
+  - { id: core, paths: [core], mention: "core/" }
+  - { id: knowledge, paths: [knowledge], mention: "knowledge/" }
+  - { id: companies, paths: [companies], mention: "companies/" }
+  - { id: agentic-sdlc, paths: [agentic-sdlc], mention: "agentic-sdlc" }
+  - { id: contracts, paths: [contracts], mention: "contracts/" }
+
+component-edges:
+  - { from: core, to: knowledge }
+  - { from: agentic-sdlc, to: knowledge }
+
+forbidden-edges:
+  - { from: knowledge, to: agentic-sdlc }
+  - { from: knowledge, to: companies }
+  - { from: contracts, to: "*" }

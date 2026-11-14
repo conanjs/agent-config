@@ -43,3 +43,11 @@ Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.j
 - [`pnpm-workspace.yaml`](../../../../pnpm-workspace.yaml)
 - [`tsconfig.json`](../../../../tsconfig.json)
 - [`vitest.config.ts`](../../../../vitest.config.ts)
+
+## Contract library and tools
+
+<a id="contract-code"></a>The shared contract reader, its parity test and the contract tools of specs/022 (TypeScript, run by Node type stripping)
+
+Where: `contracts/{lib,tools}/**/*.ts` · Schema: — · Index: — · Checked by: tsc, eslint, vitest · Scenarios: `tests/contracts/schemas.feature` · Installed to: —
+
+- [`contracts/lib/parity.test.ts`](../../../../contracts/lib/parity.test.ts)
