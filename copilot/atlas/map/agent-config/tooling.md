@@ -23,16 +23,21 @@ Where: `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` · Schema: 
 
 ## Node setup
 
-<a id="test-setup"></a>Node 24.12+, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, the TypeScript, vitest and prettier configs of the new tiers, and the git and search ignore rules
+<a id="test-setup"></a>Node 24.12+, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, the TypeScript, vitest, prettier and ESLint configs of the new tiers (the root config, the shared local doc rules, the contracts config), and the git and search ignore rules
 
-Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
+Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
 
 - [`.gitignore`](../../../../.gitignore)
 - [`.ignore`](../../../../.ignore)
 - [`.nvmrc`](../../../../.nvmrc)
 - [`.prettierignore`](../../../../.prettierignore)
 - [`.prettierrc.json`](../../../../.prettierrc.json)
+- [`contracts/eslint.config.mjs`](../../../../contracts/eslint.config.mjs)
 - [`cucumber.mjs`](../../../../cucumber.mjs)
+- [`eslint.config.mjs`](../../../../eslint.config.mjs)
+- [`eslint/local-docs.d.mts`](../../../../eslint/local-docs.d.mts)
+- [`eslint/local-docs.mjs`](../../../../eslint/local-docs.mjs)
+- [`eslint/local-docs.test.ts`](../../../../eslint/local-docs.test.ts)
 - [`package.json`](../../../../package.json)
 - [`pnpm-lock.yaml`](../../../../pnpm-lock.yaml)
 - [`pnpm-workspace.yaml`](../../../../pnpm-workspace.yaml)

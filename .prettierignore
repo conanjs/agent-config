@@ -5,6 +5,7 @@
 !/installers/
 /installers/*
 !/installers/core/
+!/installers/eslint.config.mjs
 !/scripts/
 /scripts/*
 !/scripts/*.ts
@@ -18,6 +19,8 @@
 !/tests/support/*.ts
 !/tests/support/*.d.mts
 !/tsconfig.json
+!/eslint.config.mjs
+!/eslint/
 !/vitest.config.ts
 !/package.json
 !/.prettierrc.json

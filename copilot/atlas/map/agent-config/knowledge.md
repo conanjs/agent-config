@@ -236,6 +236,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/js-runtime/atomic-symlink-swap.md`](../../../knowledge/js-runtime/atomic-symlink-swap.md)
 - [`copilot/knowledge/js-runtime/barrel-files.md`](../../../knowledge/js-runtime/barrel-files.md)
 - [`copilot/knowledge/js-runtime/enums-and-literal-unions.md`](../../../knowledge/js-runtime/enums-and-literal-unions.md)
+- [`copilot/knowledge/js-runtime/eslint-nested-config-lookup.md`](../../../knowledge/js-runtime/eslint-nested-config-lookup.md)
 - [`copilot/knowledge/js-runtime/node-worker-default-heap-limit.md`](../../../knowledge/js-runtime/node-worker-default-heap-limit.md)
 - [`copilot/knowledge/js-runtime/piscina-queue-size.md`](../../../knowledge/js-runtime/piscina-queue-size.md)
 - [`copilot/knowledge/js-runtime/private-fields.md`](../../../knowledge/js-runtime/private-fields.md)

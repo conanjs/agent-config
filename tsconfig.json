@@ -16,6 +16,7 @@
     "contracts/**/*.ts",
     "installers/core/**/*.ts",
     "scripts/**/*.ts",
+    "eslint/**/*.ts",
     "tests/support/**/*.ts",
     "tests/*/tool.ts",
     "vitest.config.ts"

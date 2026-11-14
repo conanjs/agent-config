@@ -24,6 +24,7 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [piscina-queue-size.md](piscina-queue-size.md) | concept | What piscina's `queueSize` counts (waiting tasks only, minus starting workers), why `maxQueue` is not enforced for tasks with an `AbortSignal`, and how `needsDrain` and `'drain'` really behave, measured on 5.3.2 | verified |
 | [atomic-symlink-swap.md](atomic-symlink-swap.md) | reference | Replacing a directory symlink in one step with `fs.renameSync` (macOS, measured); Windows untested | verified |
 | [yaml-comment-round-trip.md](yaml-comment-round-trip.md) | reference | `yaml` 2.9.1 keeps comments when a tool rewrites a hand-edited file, but not inline-comment spacing (measured) | verified |
+| [eslint-nested-config-lookup.md](eslint-nested-config-lookup.md) | reference | Which `eslint.config.*` ESLint 10 uses per file: own folder, then parents; one root `eslint .` runs nested configs (measured) | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 
 ## References

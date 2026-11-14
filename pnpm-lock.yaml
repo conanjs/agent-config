@@ -190,6 +190,12 @@ importers:
       eslint-plugin-import-x:
         specifier: 4.17.1
         version: 4.17.1(@typescript-eslint/utils@8.72.1(eslint@10.14.0(supports-color@11.0.0))(supports-color@11.0.0)(typescript@6.0.3))(eslint@10.14.0(supports-color@11.0.0))(supports-color@11.0.0)
+      eslint-plugin-jsdoc:
+        specifier: 65.4.2
+        version: 65.4.2(eslint@10.14.0(supports-color@11.0.0))(supports-color@11.0.0)(typescript@6.0.3)
+      eslint-plugin-tsdoc:
+        specifier: 0.5.4
+        version: 0.5.4(eslint@10.14.0(supports-color@11.0.0))(supports-color@11.0.0)(typescript@6.0.3)
       prettier:
         specifier: 3.9.10
         version: 3.9.10
