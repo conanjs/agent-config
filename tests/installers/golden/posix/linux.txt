@@ -1,0 +1,1 @@
+# install plan of installers/install.sh, os=linux, exit=1

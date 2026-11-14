@@ -4,6 +4,43 @@
 # A file belongs to the FIRST kind below whose `home` glob matches, so specific kinds come before general ones.
 # Owner: the coordinator role (copilot/frameworks/agentic-sdlc/agents/coordinator.md).
 
+# The architecture map of specs/022 (docs/architecture.md section 3, FR-008), read by scripts/check-fitness.ts. These three keys
+# sit BEFORE `repos:` on purpose: atlas.mjs files every flow line under the last of repos/areas/kinds/edges it saw, so lines
+# after `edges:` would be read as edges. Read them in this order:
+#   components       the four components and contracts: the folders each owns now, and `mention`, the text that counts as a
+#                    mention of it in another component's .md files; `mention-in` gives, per owner, a regular expression used
+#                    in place of that text (core cites agentic-sdlc and companies only by their {{AGENT_HOME}} paths, and a
+#                    placeholder such as companies/<co>/ is not a citation, A-24)
+#   component-edges  the allowed edges (an arrow means "may cite"); any component may conform to contracts
+#   forbidden-edges  a declared edge listed here fails the check; the counts of mentions that exist today are recorded in
+#                    docs/baselines/fitness.json and may fall but never rise (the wider rules of the architecture, such as
+#                    core -> agentic-sdlc and core -> companies, are held by those counts until their phase brings them to 0)
+#   check-files      which files count as checks that read another area's files (the repo names its validators validate*.mjs)
+# Not an edge: agentic-sdlc -> companies, an optional slot dependency with no document citations.
+components:
+  - { id: core, paths: [copilot/instructions, copilot/patterns, copilot/procedures, copilot/references, copilot/prompts, copilot/atlas, copilot/tracker, copilot/hooks, copilot/efficiency-audit, copilot/frameworks/agent-foundry, templates], mention: "{{AGENT_HOME}}/procedures/" }
+  - { id: knowledge, layer: agent-knowledge, paths: [copilot/knowledge, copilot/frameworks/knowledge, copilot/frameworks/company-kb], mention: "{{AGENT_HOME}}/knowledge/" }
+  - { id: companies, layer: agent-companies, paths: [copilot/companies], mention: "{{AGENT_HOME}}/companies/", mention-in: { core: '\{\{AGENT_HOME\}\}/companies/(?!<)' } }
+  - { id: agentic-sdlc, paths: [copilot/frameworks/agentic-sdlc], mention: "agentic-sdlc", mention-in: { core: '\{\{AGENT_HOME\}\}/frameworks/agentic-sdlc' } }
+  - { id: contracts, paths: [contracts], mention: "contracts/" }
+
+component-edges:
+  - { from: core, to: knowledge }
+  - { from: companies, to: knowledge }
+  - { from: agentic-sdlc, to: knowledge }
+  - { from: agentic-sdlc, to: core }
+  - { from: core, to: contracts }
+  - { from: knowledge, to: contracts }
+  - { from: companies, to: contracts }
+  - { from: agentic-sdlc, to: contracts }
+
+forbidden-edges:
+  - { from: knowledge, to: agentic-sdlc }
+  - { from: knowledge, to: companies }
+  - { from: contracts, to: "*" }
+
+check-files: ["check-*.mjs", "validate*.mjs"]
+
 repos:
   - { id: agent-config, root: ., ref: —, url: —, web: "https://github.com/conanjs/agent-config", title: "agent-config", summary: "Agent instructions, frameworks, knowledge, procedures, wrappers, skills and their installers" }
   - { id: reference-typescript-node, root: "{{REFERENCE_REPOS_ROOT}}/typescript-node", ref: v4.2.0, url: "https://github.com/conanjs/agentic-sdlc-reference-typescript-node/blob/v4.2.0", title: "typescript-node reference (feature-first)", summary: "The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md" }
@@ -106,12 +143,17 @@ kinds:
   - { id: installer, area: installers, home: "installers/**", title: "Installer scripts", summary: "install and uninstall for macOS/Linux (bash) and Windows (PowerShell)", schema: —, index: README.md, checked-by: —, tests: tests/installers/installers.feature, deploy: — }
   - { id: spec-kit, area: specs, home: "{.specify/**,.claude/skills/speckit-*/SKILL.md}", title: "Spec Kit setup", summary: "The constitution, templates and scripts, and the /speckit-* commands for Claude Code", schema: —, index: copilot/procedures/spec-driven-development.procedure.md, checked-by: —, tests: —, deploy: — }
   - { id: spec, area: specs, home: "specs/**", title: "Specs", summary: "One folder per change: spec, plan, research (decisions), tasks; specs/README.md lists them", schema: —, index: specs/README.md, checked-by: —, tests: —, deploy: — }
+  - { id: repo-architecture, area: specs, home: "docs/architecture.md", title: "Repo architecture", summary: "agent-config as motherboard and components: tiers, installer modules, dependency direction (written at P4 of spec 022)", schema: copilot/frameworks/agentic-sdlc/schemas/repo-architecture.schema.md, index: README.md, checked-by: "validate-project.mjs ARCH", tests: —, deploy: — }
   - { id: proposal, area: specs, home: "proposals/**", title: "Proposals (legacy)", summary: "Design notes written before Spec Kit was adopted; kept as they are", schema: —, index: proposals/README.md, checked-by: —, tests: —, deploy: — }
-  - { id: test-support, area: tests, home: "tests/support/*.mjs", title: "Shared steps", summary: "The World, the tool registry and the steps every feature uses", schema: —, index: —, checked-by: —, tests: —, deploy: — }
-  - { id: test-feature, area: tests, home: "tests/*/{*.feature,tool.mjs}", title: "Features", summary: "One feature file and one tool entry per tool under test", schema: —, index: —, checked-by: "cucumber-js", tests: —, deploy: — }
-  - { id: test-fixture, area: tests, home: "tests/*/fixtures/**", title: "Fixtures", summary: "The smallest valid input tree per tool, copied fresh for every scenario", schema: —, index: —, checked-by: —, tests: —, deploy: — }
-  - { id: repo-check, area: tooling, home: "{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}", title: "Checks, hooks and CI", summary: "check-docs.sh, the Claude Code and pre-commit hooks, the validate-docs workflow, issue and PR templates", schema: —, index: README.md, checked-by: —, tests: —, deploy: — }
-  - { id: test-setup, area: tooling, home: "{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,.nvmrc,.gitignore,.ignore}", title: "Node setup", summary: "Node 24, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, and the git and search ignore rules", schema: —, index: README.md, checked-by: —, tests: —, deploy: — }
+  - { id: test-support, area: tests, home: "tests/support/*.{mjs,ts,d.mts}", title: "Shared steps", summary: "The World, the tool registry, its type declarations and the steps every feature uses", schema: —, index: —, checked-by: —, tests: —, deploy: — }
+  - { id: test-feature, area: tests, home: "tests/*/{*.feature,tool.mjs,tool.ts,exemptions.yaml}", title: "Features", summary: "One feature file and one tool entry per tool under test, and the coverage exemption list", schema: —, index: —, checked-by: "cucumber-js", tests: —, deploy: — }
+  - { id: test-fixture, area: tests, home: "tests/*/{fixtures,golden}/**", title: "Fixtures and golden files", summary: "The smallest valid input tree per tool, copied fresh for every scenario, and recorded golden plans", schema: —, index: —, checked-by: —, tests: —, deploy: — }
+  - { id: repo-check, area: tooling, home: "{scripts/*.{sh,ts},.githooks/*,.github/**,.claude/settings.json}", title: "Checks, hooks and CI", summary: "check-docs.sh, the fitness check and the coverage check (TypeScript, run by Node type stripping) with their unit tests, the Claude Code and pre-commit hooks, the validate-docs workflow, issue and PR templates", schema: —, index: README.md, checked-by: "scenarios (fitness, coverage), tsc, vitest", tests: —, deploy: — }
+  - { id: baseline, area: tooling, home: "docs/baselines/*.json", title: "Recorded baselines", summary: "Counts recorded once with their method, tool version and date, that a check compares against and that may fall but never rise (the fitness counts; the always-loaded size)", schema: —, index: —, checked-by: "check-fitness.ts (fitness.json)", tests: tests/fitness/fitness.feature, deploy: — }
+  - { id: test-setup, area: tooling, home: "{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs,scripts/eslint.config.mjs,tests/eslint.config.mjs}", title: "Node setup", summary: "Node 24.12+, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, the TypeScript, vitest, prettier and ESLint configs of the new tiers (the root config, the shared local doc rules, the contracts config), and the git and search ignore rules", schema: —, index: README.md, checked-by: —, tests: —, deploy: — }
+  - { id: contract-code, area: tooling, home: "contracts/{lib,tools}/**/*.ts", title: "Contract library and tools", summary: "The shared contract reader, its parity test and the contract tools of specs/022 (TypeScript, run by Node type stripping)", schema: —, index: —, checked-by: "tsc, eslint, vitest", tests: tests/contracts/schemas.feature, deploy: — }
+  - { id: contract, area: tooling, home: "contracts/{slots.yaml,index.md,README.md,*/v1/**}", title: "Contracts", summary: "The fifteen versioned contracts between components (specs/022): each with its JSON Schema, README, valid and invalid examples, and the shipped slots list", schema: —, index: contracts/index.md, checked-by: "vitest parity test, check-schemas", tests: tests/contracts/schemas.feature, deploy: — }
+  - { id: vendored-yaml, area: tooling, home: "contracts/lib/vendor/yaml/**", title: "Vendored yaml library", summary: "A byte-for-byte copy of browser/dist of the locked yaml 2.9.1 package with its LICENSE and one type file; only contracts/lib/yaml.ts imports it (DR-102, DR-304); refreshed by pnpm vendor:yaml", schema: —, index: —, checked-by: "vitest (contracts/lib/yaml.test.ts)", tests: —, deploy: — }
   - { id: template, area: templates, home: "templates/**", title: "GitHub repo templates", summary: "CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CODEOWNERS and issue/PR templates for other repos", schema: —, index: copilot/procedures/init-github-governance.procedure.md, checked-by: —, tests: —, deploy: — }
   # ---- typescript-node reference, feature-first ----------------------------------------------------------
   - { id: ref-composition, area: ref-src, home: "src/{CompositionRoot,main}.ts", title: "Composition root and entry point", summary: "Chooses every adapter and hands each module its own (W2); main starts the process", schema: —, index: docs/architecture.md, checked-by: "lint (MOD-11 zones)", tests: test/integration/documents.int.test.ts, deploy: — }

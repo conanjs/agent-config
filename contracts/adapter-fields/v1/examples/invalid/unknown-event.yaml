@@ -1,0 +1,8 @@
+schema: adapter-fields/v1
+adapter: copilot
+version: 1
+targets:
+  agents: { folder: ~/.copilot/agents, file: '{name}.agent.md', link: per-entry }
+fields: []
+events:
+  on-save: onSave

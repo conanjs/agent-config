@@ -1,0 +1,41 @@
+# agent-config's own manifest: slot core, exports the docs other components cite (the full list comes from `build cite`).
+schema: component/v1
+name: agent-config
+version: 2.0.0
+slot: core
+scope: global
+contracts:
+  pin: 1
+locations:
+  core: core
+  instructions: instructions
+  patterns: patterns
+  procedures: procedures
+  references: references
+  atlas: atlas
+  tracker: tracker
+  agent-foundry: frameworks/agent-foundry
+provides:
+  contracts: [component/v1]
+  index: index.md
+  exports:
+    - atlas/schemas/atlas.schema.md
+    - patterns/maintained-variant.pattern.md
+    - procedures/procedure.schema.md
+    - global-variables.md
+  services:
+    - { kind: mcp, name: kb-search, command: node, args: [tools/kb-search.mjs] }
+variables:
+  - name: AGENT_CONFIG_REPO
+    description: Folder of the agent-config clone
+    required: true
+  - name: LANGUAGE
+    description: Language the agents answer in
+hooks:
+  - {
+      id: session-start,
+      event: session-start,
+      agents: [claude-code, codex],
+      command: 'node hooks/session-start.mjs',
+      matcher: null,
+    }

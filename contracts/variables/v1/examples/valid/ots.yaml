@@ -1,0 +1,15 @@
+schema: variables/v1
+variables:
+  - name: OTS_REPOS_ROOT
+    description: Folder that holds the OTS repos
+    required: true
+    detect:
+      kind: dir-exists
+      candidates: ['~/workspace/ots', '~/code/ots']
+  - name: LANGUAGE
+    description: Language the agents answer in
+  - name: REFERENCE_REPOS_ROOT
+    description: Folder that holds reference repositories
+    detect:
+      kind: env
+      name: REFERENCE_REPOS_ROOT

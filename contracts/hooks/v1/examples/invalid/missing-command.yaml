@@ -1,0 +1,4 @@
+schema: hooks/v1
+hooks:
+  - id: guard
+    event: pre-tool

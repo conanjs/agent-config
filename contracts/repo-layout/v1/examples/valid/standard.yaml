@@ -1,0 +1,26 @@
+schema: repo-layout/v1
+required:
+  [
+    README.md,
+    component.yaml,
+    AGENTS.md,
+    CHANGELOG.md,
+    INTERFACES.md,
+    catalog-info.yaml,
+    atlas.yaml,
+    scripts/check.sh,
+    tools/,
+    tests/,
+  ]
+required-if-content: [index.md]
+missing-message: 'missing required entry {path}'
+forbidden:
+  - rule: generated-from-line
+    message: 'tracked file starts with the generated-from line: {path}'
+  - rule: build-output-folder
+    message: 'tracked file lies in a build-output folder: {path}'
+    folders: [generated/, store/, dist/]
+exceptions:
+  agent-config:
+    - entry: scripts/check.sh
+      stand-in: scripts/check-docs.sh

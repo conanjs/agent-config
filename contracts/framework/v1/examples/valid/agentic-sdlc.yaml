@@ -1,0 +1,6 @@
+schema: framework/v1
+project-links: [.claude, .agents]
+validators:
+  - id: validate-sdlc
+    command: node tools/validate-sdlc/cli.mjs
+    arguments: [knowledge-area]

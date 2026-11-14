@@ -1,0 +1,5 @@
+schema: hooks/v1
+hooks:
+  - id: Guard Hook
+    event: pre-tool
+    command: node {{AGENT_HOME}}/guard.mjs

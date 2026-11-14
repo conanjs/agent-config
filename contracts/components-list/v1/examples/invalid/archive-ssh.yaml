@@ -1,0 +1,10 @@
+schema: components-list/v1
+local: false
+components:
+  - name: x
+    source:
+      {
+        type: archive,
+        url: 'ssh://example.invalid/n.tgz',
+        sha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      }

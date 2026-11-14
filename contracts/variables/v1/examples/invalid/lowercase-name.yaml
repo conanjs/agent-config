@@ -1,0 +1,4 @@
+schema: variables/v1
+variables:
+  - name: ots_repos_root
+    description: Folder that holds the OTS repos

@@ -1,0 +1,11 @@
+schema: knowledge-provider/v1
+slot: knowledge-storage
+repository: https://github.com/conanjs/agent-knowledge
+locations:
+  content: knowledge
+index: index.md
+exports: [x.md]
+citations:
+  - file: agentic-sdlc/foo.md
+    text: '{{AGENT_HOME}}/knowledge/x.md'
+    target: ../../knowledge/x.md

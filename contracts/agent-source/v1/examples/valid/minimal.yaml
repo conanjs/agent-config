@@ -1,0 +1,6 @@
+schema: agent-source/v1
+name: windows-software
+description: Install Windows software.
+model-tier: standard
+auto-delegate: true
+targets: [claude]

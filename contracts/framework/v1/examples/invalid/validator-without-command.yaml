@@ -1,0 +1,4 @@
+schema: framework/v1
+index: index.md
+validators:
+  - id: validate-sdlc

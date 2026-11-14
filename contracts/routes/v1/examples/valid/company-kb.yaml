@@ -1,0 +1,9 @@
+schema: routes/v1
+routes:
+  - id: company-kb
+    when: Working on a repo listed in a company KB, or the company is named
+    read: companies/index.md
+    before-writing: frameworks/company-kb/index.md
+  - id: knowledge
+    when: Looking up how a tool, framework or API behaves
+    read: knowledge/index.md

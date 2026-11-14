@@ -1,0 +1,10 @@
+schema: ac-exemptions/v1
+exemptions:
+  - id: AC-2.2
+    reason: Only a person on a real account can see this.
+    replacement: Check by hand once per phase.
+    automated-part: none
+  - id: A-19
+    reason: A viewer's click cannot be driven from a test.
+    replacement: Open the link by hand in the viewer.
+    automated-part: none

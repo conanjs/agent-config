@@ -1,0 +1,9 @@
+schema: slots/v1
+slots:
+  - name: knowledge-storage
+    contract: KnowledgeProvider
+    required: false
+    multiple: false
+    scope: global
+    locations:
+      - { name: content, mount: knowledge }

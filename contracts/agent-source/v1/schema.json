@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/contracts/agent-source/v1/schema.json",
+  "title": "agent-source/v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "agent-source/v1"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "model-tier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "auto-delegate": {
+      "type": "boolean"
+    },
+    "needs-project-instructions": {
+      "type": "boolean"
+    },
+    "preload": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+      }
+    },
+    "tools": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "array",
+          "items": {
+            "enum": ["read", "search", "edit", "shell"]
+          }
+        }
+      },
+      "required": ["intent"]
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "enum": ["claude", "copilot", "codex"]
+      },
+      "minItems": 1
+    },
+    "platforms": {
+      "type": "object",
+      "propertyNames": {
+        "enum": ["claude", "copilot", "codex"]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "required": ["schema", "name", "description", "model-tier", "auto-delegate", "targets"]
+}

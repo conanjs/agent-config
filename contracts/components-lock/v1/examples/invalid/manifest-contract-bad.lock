@@ -1,0 +1,16 @@
+{
+  "components": {
+    "agent-knowledge": {
+      "build": null,
+      "manifest": { "contracts": ["KnowledgeProvider", "company-kb/v1"], "slot": "knowledge-storage", "version": "1.2.0" },
+      "resolved": { "commit": "3f2a9c41d07be85a6c12f4e0b97d3a5c8e61f204" },
+      "source": { "ref": "main", "type": "git", "url": "https://github.com/conanjs/agent-knowledge.git" },
+      "store_id": "9a41c0d2e7f1"
+    },
+    "agentic-sdlc": {
+      "resolved": { "commit": "9c1d5e7a2b4f60813d9ce5a7b1f20486c3d7e951", "tag": "v1.0.0" },
+      "source": { "ref": "v1.0.0", "type": "git", "url": "https://github.com/conanjs/agentic-sdlc.git" }
+    }
+  },
+  "schema": "components-lock/v1"
+}

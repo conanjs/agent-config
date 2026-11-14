@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["Node ≥ 14.6 / 12.19", "TypeScript ≥ 4.7 (node16/nodenext/bundler resolution); tsconfig behaviour tested on 6.0.3"]
 last-verified: 2026-10-30
-last-updated: 2026-10-30
+last-updated: 2026-11-14
 tags: [subpath-imports, package-json, imports, aliases, module-resolution, tsconfig, extends]
 ---
 
@@ -113,5 +113,6 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 - `copilot/atlas/tools/atlas.mjs` — `--explain` applies How it works 7–13 to find which files import a `.ts` file (`specs/013-cross-repo-and-name-references/`, `specs/014-nested-tsconfig-and-shared-names/`).
 
 ## Related
+- `js-runtime/node-type-stripping.md`: what Node 24.12+ type stripping runs and rejects (tsconfig `paths` included)
 - `js-runtime/private-fields.md`
 - `code-documentation/doc-comments.md`

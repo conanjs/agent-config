@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/contracts/company-kb/v1/schema.json",
+  "title": "company-kb/v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "company-kb/v1"
+    },
+    "slot": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "layout": {
+      "enum": ["flat", "grouped"]
+    },
+    "companies": {
+      "type": "string",
+      "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))[\\s\\S]+$"
+    },
+    "schemas": {
+      "type": "string",
+      "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))[\\s\\S]+$"
+    },
+    "provider": {
+      "type": "object",
+      "properties": {
+        "slot": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "contract": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*/v[1-9][0-9]*$"
+        }
+      },
+      "required": ["slot", "contract"]
+    },
+    "check": {
+      "type": "object",
+      "properties": {
+        "provider-env": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "provider-argument": {
+          "type": "boolean"
+        }
+      },
+      "required": []
+    }
+  },
+  "required": ["schema", "slot", "layout", "companies", "schemas", "provider"]
+}

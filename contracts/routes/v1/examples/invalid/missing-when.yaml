@@ -1,0 +1,4 @@
+schema: routes/v1
+routes:
+  - id: company-kb
+    read: companies/index.md

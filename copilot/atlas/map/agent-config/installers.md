@@ -12,6 +12,7 @@ Up: [Atlas](../../index.md) › agent-config
 
 Where: `installers/**` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: `tests/installers/installers.feature` · Installed to: —
 
+- [`installers/eslint.config.mjs`](../../../../installers/eslint.config.mjs)
 - [`installers/install.ps1`](../../../../installers/install.ps1)
 - [`installers/install.sh`](../../../../installers/install.sh)
 - [`installers/lib/link-or-copy.ps1`](../../../../installers/lib/link-or-copy.ps1)

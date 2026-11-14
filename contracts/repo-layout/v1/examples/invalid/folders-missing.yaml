@@ -1,0 +1,6 @@
+schema: repo-layout/v1
+required: [README.md]
+missing-message: 'missing required entry {path}'
+forbidden:
+  - rule: build-output-folder
+    message: 'tracked file lies in a build-output folder: {path}'

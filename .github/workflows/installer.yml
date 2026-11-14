@@ -1,0 +1,59 @@
+# The installer on all three operating systems, each with a throwaway home (specs/022 T085, research.md DR-206 as
+# narrowed by DR-605: one matrix, no Node 18 job). Required checks on main from phase 2: "installer (macos)" and
+# "installer (windows)"; the job name below builds those names.
+name: installer
+on:
+  push:
+    branches: [main]
+  # No paths filter on pull_request: a required check from a skipped, path-filtered workflow stays "Pending" and
+  # blocks the merge (same reason as validate-docs.yml).
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  installer:
+    name: installer (${{ matrix.name }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ubuntu, runner: ubuntu-latest }
+          - { name: macos, runner: macos-latest }
+          - { name: windows, runner: windows-latest }
+    defaults:
+      run:
+        shell: bash # Git Bash on the Windows runner, so every step is the same script on all three
+    steps:
+      # Keep LF line endings on Windows: the scenarios and generated pages compare bytes, and the repo has no .gitattributes.
+      - name: Check out with LF line endings
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc # latest Node 24; no older Node is tested (DR-605)
+          package-manager-cache: false
+      - run: corepack enable && pnpm install --frozen-lockfile # pnpm version from package.json packageManager
+      - name: Use a throwaway home
+        # Set after the install so the package manager keeps its normal cache; every later step, the installer
+        # scenarios included, sees an empty home and never the runner's own.
+        run: |
+          home="$(mktemp -d "$RUNNER_TEMP/home.XXXXXX")"
+          echo "HOME=$home" >> "$GITHUB_ENV"
+          echo "USERPROFILE=$home" >> "$GITHUB_ENV"
+      - name: Validate, and run the tool and installer scenarios
+        run: scripts/check-docs.sh
+      # T037: the golden plan of install.ps1, recorded once on this runner and committed by V (tests/installers/golden/windows).
+      # The step runs when T037 has added its script; it writes the listing to $RUNNER_TEMP/golden-windows.txt.
+      - name: Record the golden install plan of install.ps1 (Windows)
+        if: matrix.name == 'windows' && hashFiles('tests/installers/golden/windows/plan.ps1') != ''
+        shell: pwsh
+        run: ./tests/installers/golden/windows/plan.ps1 > "$env:RUNNER_TEMP/golden-windows.txt"
+      - name: Upload the Windows golden plan
+        if: matrix.name == 'windows' && hashFiles('tests/installers/golden/windows/plan.ps1') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: golden-plan-windows
+          path: ${{ runner.temp }}/golden-windows.txt
+          if-no-files-found: error

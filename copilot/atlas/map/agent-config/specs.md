@@ -127,7 +127,36 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/021-interface-catalog/research.md`](../../../../specs/021-interface-catalog/research.md)
 - [`specs/021-interface-catalog/spec.md`](../../../../specs/021-interface-catalog/spec.md)
 - [`specs/021-interface-catalog/tasks.md`](../../../../specs/021-interface-catalog/tasks.md)
+- [`specs/022-repo-split/blueprint.md`](../../../../specs/022-repo-split/blueprint.md)
+- [`specs/022-repo-split/contracts/README.md`](../../../../specs/022-repo-split/contracts/README.md)
+- [`specs/022-repo-split/contracts/build-v1.md`](../../../../specs/022-repo-split/contracts/build-v1.md)
+- [`specs/022-repo-split/contracts/component-v1.md`](../../../../specs/022-repo-split/contracts/component-v1.md)
+- [`specs/022-repo-split/contracts/components-list-and-lock-v1.md`](../../../../specs/022-repo-split/contracts/components-list-and-lock-v1.md)
+- [`specs/022-repo-split/contracts/installer-cli.md`](../../../../specs/022-repo-split/contracts/installer-cli.md)
+- [`specs/022-repo-split/contracts/knowledge-provider-v1.md`](../../../../specs/022-repo-split/contracts/knowledge-provider-v1.md)
+- [`specs/022-repo-split/contracts/rendered-copy-v1.md`](../../../../specs/022-repo-split/contracts/rendered-copy-v1.md)
+- [`specs/022-repo-split/contracts/routes-hooks-variables-v1.md`](../../../../specs/022-repo-split/contracts/routes-hooks-variables-v1.md)
+- [`specs/022-repo-split/contracts/slots-v1.md`](../../../../specs/022-repo-split/contracts/slots-v1.md)
+- [`specs/022-repo-split/data-model.md`](../../../../specs/022-repo-split/data-model.md)
+- [`specs/022-repo-split/decisions/devops.md`](../../../../specs/022-repo-split/decisions/devops.md)
+- [`specs/022-repo-split/decisions/qa.md`](../../../../specs/022-repo-split/decisions/qa.md)
+- [`specs/022-repo-split/decisions/security.md`](../../../../specs/022-repo-split/decisions/security.md)
+- [`specs/022-repo-split/decisions/system-architecture.md`](../../../../specs/022-repo-split/decisions/system-architecture.md)
+- [`specs/022-repo-split/decisions/tech-stack.md`](../../../../specs/022-repo-split/decisions/tech-stack.md)
+- [`specs/022-repo-split/phase-0-exit.md`](../../../../specs/022-repo-split/phase-0-exit.md)
+- [`specs/022-repo-split/plan.md`](../../../../specs/022-repo-split/plan.md)
+- [`specs/022-repo-split/research.md`](../../../../specs/022-repo-split/research.md)
+- [`specs/022-repo-split/spec.md`](../../../../specs/022-repo-split/spec.md)
+- [`specs/022-repo-split/tasks.md`](../../../../specs/022-repo-split/tasks.md)
 - [`specs/README.md`](../../../../specs/README.md)
+
+## Repo architecture
+
+<a id="repo-architecture"></a>agent-config as motherboard and components: tiers, installer modules, dependency direction (written at P4 of spec 022)
+
+Where: `docs/architecture.md` · Schema: `copilot/frameworks/agentic-sdlc/schemas/repo-architecture.schema.md` · Index: `README.md` · Checked by: validate-project.mjs ARCH · Scenarios: — · Installed to: —
+
+- [`docs/architecture.md`](../../../../docs/architecture.md)
 
 ## Proposals (legacy)
 

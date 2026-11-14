@@ -1,0 +1,7 @@
+schema: agent-source/v1
+name: sdlc-qa
+description: x
+model-tier: top
+auto-delegate: false
+preload: ['Preset Skill']
+targets: [claude]

@@ -1,0 +1,5 @@
+schema: hooks/v1
+hooks:
+  - id: note-stop
+    event: stop
+    command: node {{AGENT_HOME}}/core/tools/note.mjs
