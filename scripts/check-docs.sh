@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # check-docs.sh — runs the repo's document validators (layer 1 of the doc guards): knowledge, procedures, agentic-sdlc,
-# agent-foundry, the atlas, this repo's TRACKER.md, the workflow graph tool (specs/019), then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
+# agent-foundry, the atlas, this repo's TRACKER.md, the workflow graph tool (specs/019), the spec 022 TypeScript tiers and their checks, then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
 # Used by .githooks/pre-commit, the Claude Code hook (.claude/settings.json) and CI (.github/workflows/validate-docs.yml).
 #
 # Usage: scripts/check-docs.sh   (network checks are separate: validate-knowledge.mjs --urls, validate-procedures.mjs --upstream)
@@ -41,5 +41,14 @@ wg="$root/copilot/frameworks/agentic-sdlc/tools/workflow-graph"
 "$node_bin" "$wg/src/main.ts" interfaces || status=1
 # The usage CLI's own lint, when installed (optional, 021 D45); `usage diff --breaking` joins once the tool has a release tag.
 if command -v usage >/dev/null 2>&1; then usage lint -W "$wg/interfaces/workflow-graph.usage.kdl" || status=1; else echo "check-docs: usage not installed; skipped usage lint (specs/021 D45)"; fi
+# Spec 022 (T086): the new TypeScript tiers (contracts/, installers/, eslint/, scripts/*.ts): format, lint, type check and unit
+# tests, run from source by Node 24.12+ type stripping; then the contract schema check over the shipped files, the fitness
+# check (fails only on a rise over docs/baselines/fitness.json), the coverage check for the delivered phases, and the
+# repo-layout check in report mode (lists findings, never fails until phase 1).
+(cd "$root" && "$node_bin" node_modules/prettier/bin/prettier.cjs --check --log-level warn . && "$node_bin" node_modules/eslint/bin/eslint.js . --max-warnings 0 && "$node_bin" node_modules/typescript/bin/tsc --noEmit -p tsconfig.json && "$node_bin" node_modules/vitest/vitest.mjs run --silent) || status=1
+schemas_out="$(cd "$root" && "$node_bin" contracts/tools/check-schemas.ts contracts/index.md contracts/slots.yaml contracts/*/v1/examples/valid/* 2>&1)" || { printf '%s\n' "$schemas_out" >&2; status=1; }
+(cd "$root" && "$node_bin" scripts/check-fitness.ts --root "$root") || status=1
+(cd "$root" && "$node_bin" scripts/check-ac-coverage.ts --root "$root" --delivered 0) || status=1
+(cd "$root" && "$node_bin" contracts/tools/build.ts layout --report --repo agent-config --root "$root") || status=1
 (cd "$root" && "$node_bin" "$cucumber") || status=1
 exit $status

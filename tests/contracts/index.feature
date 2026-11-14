@@ -42,20 +42,20 @@ Feature: Contracts index and worked examples
   Scenario: AC-1.1 The shipped index has one shared row for the component list and the lock
     Then the repository file "contracts/index.md" has a line matching "^\| components-list/v1\b.*components-lock/v1"
 
-  @pending @T054 @T055 @T074 @T078
+  @T054 @T055 @T074 @T078
   Scenario: AC-1.1 The shipped index has fifteen entries, each with owner, consumers, versioning rule and missing or stale behaviour
     When the tool runs with "contracts/index.md"
     Then it exits with 0
     And the check output has a line containing ": ok (15 contracts)"
     And the check output has no line containing "error"
 
-  @pending @T054 @T078
+  @T054 @T078
   Scenario: AC-1.1 The fixture index with fifteen complete entries passes, so the failures below come from the one change each makes
     When the tool runs with "{root}/index.md"
     Then it exits with 0
     And the check output has a line containing ": ok (15 contracts)"
 
-  @pending @T054 @T078
+  @T054 @T078
   Scenario Outline: AC-1.1 An index entry with no <field> fails, naming the contract and the field
     Given in "index.md", `<cell>` becomes ` `
     When the tool runs with "{root}/index.md"
@@ -70,7 +70,7 @@ Feature: Contracts index and worked examples
       | Versioning rule     | hooks/v1           | rule-hooks           |
       | Missing or stale    | build/v1           | stale-build          |
 
-  @pending @T054 @T078
+  @T054 @T078
   Scenario: AC-1.1 An index with only fourteen entries fails, naming the contract that is missing
     Given in "index.md", `\n| variables/v1 | owner-variables | consumers-variables | rule-variables | stale-variables |` becomes ``
     When the tool runs with "{root}/index.md"

@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["Node.js 24.22.1 on macOS (Darwin 25.1.0), tested 2026-11-13"]
 last-verified: 2026-11-13
-last-updated: 2026-11-13
+last-updated: 2026-11-14
 tags: [fs, rename, symlink, atomic, installer]
 ---
 
@@ -27,7 +27,7 @@ Node.js `fs.renameSync` used on symbolic links, measured on one Mac. An atomic s
 | What `rename` acts on | The link entry, not the folder it points at | ✅[^probe][^node] |
 
 ## Lookup notes
-- **Windows is not covered:** not tested here. Plan for remove-then-create there until a Windows run shows otherwise.
+- **Windows is not covered:** not tested here. Plan for remove-then-create there until a Windows run shows otherwise. What the Node docs and libuv source say about links, junctions and `rename` on Windows, and the five checks the Windows runner (spec 022 T085, job `installer (windows)`) must still make, are in [windows-home-links-and-modes.md](windows-home-links-and-modes.md).
 - Reproduce: `mkdir a b && ln -s a l && ln -s b t && node -e 'const fs=require("fs");fs.renameSync("t","l");console.log(fs.readlinkSync("l"))'` prints `b`.
 
 ## Takeaways
@@ -45,3 +45,4 @@ Node.js `fs.renameSync` used on symbolic links, measured on one Mac. An atomic s
 
 ## Related
 - [js-runtime index](index.md)
+- [windows-home-links-and-modes.md](windows-home-links-and-modes.md)

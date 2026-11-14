@@ -22,7 +22,7 @@
 # `<file>: error: <field>: <message>` and exit 1 (see tests/contracts/tool.ts). Those scenarios also name T069 and T078.
 # Pending: scenarios carry @pending and the tasks that make them pass (tests/support/pending.ts).
 
-@pending @T075 @T077
+@T075 @T077
 Feature: Always-loaded baseline, dry run
   The baseline is measured on the text as it would look rendered, in memory, and records how it was measured.
 

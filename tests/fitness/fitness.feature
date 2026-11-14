@@ -19,7 +19,7 @@
 #   a count below its baseline passes with exit 0; a usage error (unknown flag, no --root value) exits 2.
 # Pending: scenarios carry @pending and the tasks that make them pass (tests/support/pending.ts).
 
-@pending @T081
+@T081
 Feature: Architecture fitness check
   The check fails on an edge the architecture map forbids and on any count of crossing mentions that rises.
 

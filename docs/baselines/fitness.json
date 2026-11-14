@@ -1,0 +1,20 @@
+{
+  "counts": {
+    "knowledge-to-agentic-sdlc-lines": 117,
+    "knowledge-to-agentic-sdlc-files": 72,
+    "core-to-agentic-sdlc-lines": 20,
+    "core-to-companies-lines": 1,
+    "checks-reading-other-areas": 1
+  },
+  "method": "scripts/check-fitness.ts --measure on the working tree. A mention line is a line of a .md file under a component's paths (atlas.yaml components) that contains another component's mention text; core is scanned with its mention-in expressions, so core-to-agentic-sdlc counts {{AGENT_HOME}}/frameworks/agentic-sdlc paths and core-to-companies counts {{AGENT_HOME}}/companies/ paths that are not placeholders such as companies/<co>/. A check is a check-*.mjs or validate*.mjs file under a component's paths that mentions another component, counted once per file. The two kinds never share a file.",
+  "reconciliation": {
+    "note": "The spec's 123 lines in 73 files for knowledge to agentic-sdlc (DR-404, AC-1.6) is the sum of the two kinds: 117 lines in 72 .md files plus the 6 lines of the one check file, copilot/frameworks/knowledge/tools/validate-knowledge.mjs, which is counted under checks-reading-other-areas.",
+    "knowledge-to-agentic-sdlc-lines-including-checks": 123,
+    "knowledge-to-agentic-sdlc-files-including-checks": 73,
+    "knowledge-lines-in-checks": 6
+  },
+  "tool_version": "check-fitness.ts 1",
+  "node_version": "v24.22.1",
+  "commit": "dae2284 plus the uncommitted phase 0 work",
+  "date": "2026-11-14"
+}

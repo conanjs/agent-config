@@ -8,24 +8,39 @@ Up: [Atlas](../../index.md) › agent-config
 
 ## Checks, hooks and CI
 
-<a id="repo-check"></a>check-docs.sh, the Claude Code and pre-commit hooks, the validate-docs workflow, issue and PR templates
+<a id="repo-check"></a>check-docs.sh, the fitness check and the coverage check (TypeScript, run by Node type stripping) with their unit tests, the Claude Code and pre-commit hooks, the validate-docs workflow, issue and PR templates
 
-Where: `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
+Where: `{scripts/*.{sh,ts},.githooks/*,.github/**,.claude/settings.json}` · Schema: — · Index: `README.md` · Checked by: scenarios (fitness, coverage), tsc, vitest · Scenarios: — · Installed to: —
 
 - [`.claude/settings.json`](../../../../.claude/settings.json)
 - [`.githooks/pre-commit`](../../../../.githooks/pre-commit)
 - [`.github/ISSUE_TEMPLATE/bug_report.md`](../../../../.github/ISSUE_TEMPLATE/bug_report.md)
 - [`.github/ISSUE_TEMPLATE/feature_request.md`](../../../../.github/ISSUE_TEMPLATE/feature_request.md)
 - [`.github/PULL_REQUEST_TEMPLATE.md`](../../../../.github/PULL_REQUEST_TEMPLATE.md)
+- [`.github/workflows/installer.yml`](../../../../.github/workflows/installer.yml)
 - [`.github/workflows/validate-docs.yml`](../../../../.github/workflows/validate-docs.yml)
+- [`scripts/check-ac-coverage.test.ts`](../../../../scripts/check-ac-coverage.test.ts)
+- [`scripts/check-ac-coverage.ts`](../../../../scripts/check-ac-coverage.ts)
 - [`scripts/check-docs.sh`](../../../../scripts/check-docs.sh)
+- [`scripts/check-docs.test.ts`](../../../../scripts/check-docs.test.ts)
+- [`scripts/check-fitness.test.ts`](../../../../scripts/check-fitness.test.ts)
+- [`scripts/check-fitness.ts`](../../../../scripts/check-fitness.ts)
 - [`scripts/claude-doc-hook.sh`](../../../../scripts/claude-doc-hook.sh)
+
+## Recorded baselines
+
+<a id="baseline"></a>Counts recorded once with their method, tool version and date, that a check compares against and that may fall but never rise (the fitness counts; the always-loaded size)
+
+Where: `docs/baselines/*.json` · Schema: — · Index: — · Checked by: check-fitness.ts (fitness.json) · Scenarios: `tests/fitness/fitness.feature` · Installed to: —
+
+- [`docs/baselines/always-loaded.json`](../../../../docs/baselines/always-loaded.json)
+- [`docs/baselines/fitness.json`](../../../../docs/baselines/fitness.json)
 
 ## Node setup
 
 <a id="test-setup"></a>Node 24.12+, pnpm (one workspace package: the workflow-graph tool), Cucumber.js, the TypeScript, vitest, prettier and ESLint configs of the new tiers (the root config, the shared local doc rules, the contracts config), and the git and search ignore rules
 
-Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
+Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs,scripts/eslint.config.mjs,tests/eslint.config.mjs}` · Schema: — · Index: `README.md` · Checked by: — · Scenarios: — · Installed to: —
 
 - [`.gitignore`](../../../../.gitignore)
 - [`.ignore`](../../../../.ignore)
@@ -35,12 +50,15 @@ Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.j
 - [`contracts/eslint.config.mjs`](../../../../contracts/eslint.config.mjs)
 - [`cucumber.mjs`](../../../../cucumber.mjs)
 - [`eslint.config.mjs`](../../../../eslint.config.mjs)
+- [`eslint/baseline.mjs`](../../../../eslint/baseline.mjs)
 - [`eslint/local-docs.d.mts`](../../../../eslint/local-docs.d.mts)
 - [`eslint/local-docs.mjs`](../../../../eslint/local-docs.mjs)
 - [`eslint/local-docs.test.ts`](../../../../eslint/local-docs.test.ts)
 - [`package.json`](../../../../package.json)
 - [`pnpm-lock.yaml`](../../../../pnpm-lock.yaml)
 - [`pnpm-workspace.yaml`](../../../../pnpm-workspace.yaml)
+- [`scripts/eslint.config.mjs`](../../../../scripts/eslint.config.mjs)
+- [`tests/eslint.config.mjs`](../../../../tests/eslint.config.mjs)
 - [`tsconfig.json`](../../../../tsconfig.json)
 - [`vitest.config.ts`](../../../../vitest.config.ts)
 
@@ -69,6 +87,15 @@ Where: `contracts/{lib,tools}/**/*.ts` · Schema: — · Index: — · Checked b
 - [`contracts/lib/vendor/yaml/index.d.ts`](../../../../contracts/lib/vendor/yaml/index.d.ts)
 - [`contracts/lib/yaml.test.ts`](../../../../contracts/lib/yaml.test.ts)
 - [`contracts/lib/yaml.ts`](../../../../contracts/lib/yaml.ts)
+- [`contracts/tools/budget.test.ts`](../../../../contracts/tools/budget.test.ts)
+- [`contracts/tools/budget.ts`](../../../../contracts/tools/budget.ts)
+- [`contracts/tools/build.test.ts`](../../../../contracts/tools/build.test.ts)
+- [`contracts/tools/build.ts`](../../../../contracts/tools/build.ts)
+- [`contracts/tools/check-schemas.test.ts`](../../../../contracts/tools/check-schemas.test.ts)
+- [`contracts/tools/check-schemas.ts`](../../../../contracts/tools/check-schemas.ts)
+- [`contracts/tools/layout.test.ts`](../../../../contracts/tools/layout.test.ts)
+- [`contracts/tools/layout.ts`](../../../../contracts/tools/layout.ts)
+- [`contracts/tools/tool-io.ts`](../../../../contracts/tools/tool-io.ts)
 - [`contracts/tools/vendor-yaml.ts`](../../../../contracts/tools/vendor-yaml.ts)
 
 ## Contracts

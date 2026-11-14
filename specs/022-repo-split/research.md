@@ -708,6 +708,32 @@ Measured 2026-11-13 on Node.js v24.22.1 (macOS): a class with `constructor(priva
 - **Supersedes:** none
 - **Decided by:** human · **Approved at:** G4 (2026-11-13)
 
+## QB-7 mutation proof (T087)
+
+Each new phase 0 check was disabled, or the rule it enforces broken, in a temporary copy of the work tree outside the repository (a fresh `git init` of the copy, all `node_modules` copied). The unmutated copy gave `scripts/check-docs.sh` exit 0. After each change the named scenario or test was run, then the whole `scripts/check-docs.sh`; the copy was reset between runs. Node 24.22.1 on macOS, 2026-11-14. "Exit 1" is `check-docs.sh`; a check in report mode (layout) is meant to keep exit 0 on a finding, so its proof is that the scenarios fail and the finding appears.
+
+| Check | How disabled | What failed | check-docs | Date |
+|---|---|---|---|---|
+| Schema check (rule) | `shape.ts`: the moved-key rule (`count`, `mounts`) returns no finding | Scenarios "AC-1.3 A slots file that still uses count fails, naming the key and its replacement" and "...uses mounts..." (`tests/contracts/schemas.feature`); 3 unit tests of `reader.test.ts` | exit 1 | 2026-11-14 |
+| Schema check (shipped files) | `contracts/slots.yaml`: `scope: global` changed to `scope: bogus` | `check-schemas.ts` prints `contracts/slots.yaml: error: slots[0].scope: must be one of: global, per-project`, exit 1 | exit 1 | 2026-11-14 |
+| Fitness | `check-fitness.ts`: the rise comparison `current > recorded` made `false` | 5 scenarios "AC-1.6 One more mention/file/check ... is a rise and fails" (`tests/fitness/fitness.feature`); 2 unit tests of `check-fitness.test.ts` | exit 1 | 2026-11-14 |
+| Fitness (real tree) | `docs/baselines/fitness.json`: `core-to-agentic-sdlc-lines` 20 lowered to 19 | `FIT-2 core-to-agentic-sdlc-lines rose from 19 to 20`, exit 1 | exit 1 | 2026-11-14 |
+| Coverage | `check-ac-coverage.ts`: the uncovered ids are dropped from the findings | "QB-1 An acceptance criterion with no scenario fails and is named with its phase", "QB-1 A scenario for AC-1.1 does not cover AC-1.10", "QB-2 Removing an id from the exemption list makes it a failure" and 2 more; 3 unit tests of `check-ac-coverage.test.ts` | exit 1 | 2026-11-14 |
+| Coverage (real spec) | every `Scenario: AC-1.9` renamed `AC-1.99` | `QB-1 AC-1.9 has no scenario (phase 0)`, exit 1 | exit 1 | 2026-11-14 |
+| Layout (report mode) | `layout.ts`: the missing-entry filter returns nothing | 6 scenarios of `tests/repo-layout/layout.feature`, among them "FR-012 A missing required file is reported and is not fatal in report mode" and "FR-012 Every violation is listed, not only the first"; 4 unit tests of `layout.test.ts` | exit 1 (from the scenarios) | 2026-11-14 |
+| Layout (finding appears) | `rules.yaml`: a required entry `NOPE.md` added | `layout --report` prints `finding: missing required entry NOPE.md` and `repo-layout: 5 findings (report mode)`; exit 0 as designed | exit 0 for this step | 2026-11-14 |
+| Budget baseline | `budget.ts`: characters counted on the source text, without the swap and the generated-from line | "AC-1.7 The size is measured on the rendered text, so it is larger than the 149 characters written" (`tests/baseline/baseline.feature`); 1 unit test of `budget.test.ts` | exit 1 | 2026-11-14 |
+| Golden plan | `mapping.yaml`: target `~/.claude/CLAUDE.md` changed to `~/.claude/CHANGED.md` | "AC-1.9 The Mac plan equals the golden file darwin.txt" and "AC-1.9 A copy with an unchanged mapping still equals the golden file" (`tests/installers/golden.feature`) | exit 1 | 2026-11-14 |
+| Pending guard | `tasks.md`: T038 and T083 ticked, so every task a `@pending` scenario names is done | "QB-1 Every acceptance criterion of phase 0 in the real spec ..." fails with "@pending, but T083, T038, T045, ... are done in tasks.md: remove the tag"; with the guard line disabled the same ticks pass (control) | exit 1 | 2026-11-14 |
+| Parity test | `component/v1/schema.json`: the id pattern of `$defs/id` replaced by `.*` | `parity.test.ts` component/v1 `invalid/bad-name.yaml`, `bad-route-id.yaml`, `name-65-characters.yaml` | exit 1 | 2026-11-14 |
+| Format | `value-problems.ts`: extra spaces in one declaration | `prettier --check` names the file, exit 1 | exit 1 | 2026-11-14 |
+| Lint | `render-rules.ts`: a `debugger;` statement added | `eslint --max-warnings 0`: `no-debugger`, exit 1 | exit 1 | 2026-11-14 |
+| Typecheck | `render-rules.ts`: `const x: number = "x"` added | `tsc --noEmit`: `TS2322 Type 'string' is not assignable to type 'number'`, exit 2 (prettier also objected to the quote style in this line) | exit 1 | 2026-11-14 |
+
+Gaps this exercise found, not fixed here:
+- Removing the "is required" rule from the shape checker is caught by 13 unit tests of `reader.test.ts` and by no scenario: `tests/contracts/schemas.feature` has none for a missing required field. The unit tests satisfy QB-7, but a scenario would be the named proof.
+- A pending scenario also inherits the task tags of its feature (here `@T083` on `coverage.feature`), so the guard fires only when those are ticked too.
+
 ## References
 
 **Local artifacts:**

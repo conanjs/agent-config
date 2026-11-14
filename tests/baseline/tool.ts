@@ -2,7 +2,7 @@
 // The folder to read is passed as --root; the HOME of the run is the scenario's temporary home.
 import assert from 'node:assert/strict';
 import { Given, Then } from '@cucumber/cucumber';
-import { registerTool, repo } from '../support/tools.mjs';
+import { registerTool } from '../support/tools.mjs';
 import { scriptRunner, type ToolWorld } from '../support/tools.ts';
 
 const script = 'contracts/tools/build.ts';

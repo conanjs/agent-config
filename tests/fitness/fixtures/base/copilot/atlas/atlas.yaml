@@ -10,6 +10,7 @@ components:
 component-edges:
   - { from: core, to: knowledge }
   - { from: agentic-sdlc, to: knowledge }
+  - { from: core, to: agentic-sdlc }
 
 forbidden-edges:
   - { from: knowledge, to: agentic-sdlc }

@@ -19,7 +19,7 @@
 # Pending: scenarios carry @pending and the tasks that make them pass (tests/support/pending.ts).
 # Not covered here: the EDGE-<n> ids of T083, whose phase the spec does not state.
 
-@pending @T083
+@T083
 Feature: Acceptance-criterion coverage check
   The check reads the ids in spec.md and the scenario titles, and fails on an uncovered id of a delivered phase.
 
@@ -117,7 +117,7 @@ Feature: Acceptance-criterion coverage check
     Then it exits with 1
     And the output has the line "QB-2 exemption AC-2.2 has no manual replacement"
 
-  @T038 @T045 @T047 @T048 @T049 @T050 @T051 @T052 @T053
+  @pending @T038 @T045 @T047 @T048 @T049 @T050 @T051 @T052 @T053
   Scenario: QB-1 Every acceptance criterion of phase 0 in the real spec has a scenario or a valid exemption
     When the tool runs with "real --delivered 0"
     Then it exits with 0

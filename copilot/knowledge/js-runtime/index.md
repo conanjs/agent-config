@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: js-runtime
-last-updated: 2026-11-13
+last-updated: 2026-11-14
 ---
 
 # JavaScript runtime internals
@@ -22,7 +22,9 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [worker-thread-pools.md](worker-thread-pools.md) | concept | piscina task dispatch, `availableParallelism()` under a container CPU limit, measured worker sizing, and pool statistics that mislead | verified |
 | [node-worker-default-heap-limit.md](node-worker-default-heap-limit.md) | concept | The heap limit a Node.js worker gets without `resourceLimits` in a memory-limited container: `clamp(limit ÷ 2, 256 MiB, 2 GiB)` per worker, why several workers can still get the container OOM-killed, measured at 11 limits | verified |
 | [piscina-queue-size.md](piscina-queue-size.md) | concept | What piscina's `queueSize` counts (waiting tasks only, minus starting workers), why `maxQueue` is not enforced for tasks with an `AbortSignal`, and how `needsDrain` and `'drain'` really behave, measured on 5.3.2 | verified |
-| [atomic-symlink-swap.md](atomic-symlink-swap.md) | reference | Replacing a directory symlink in one step with `fs.renameSync` (macOS, measured); Windows untested | verified |
+| [node-type-stripping.md](node-type-stripping.md) | reference | Node 24.12+ type stripping: what runs, what fails (enum, namespace, parameter property, `<T>x`, type imports, tsconfig, node_modules) and the one warning text found, measured on 24.22.1 | verified |
+| [windows-home-links-and-modes.md](windows-home-links-and-modes.md) | reference | Windows in Node 24: `os.homedir()` reads `USERPROFILE`, symlink and junction types, `fs.rename` over a directory, `chmod` as a read-only switch (docs and libuv source; to be run on the Windows runner) | verified |
+| [atomic-symlink-swap.md](atomic-symlink-swap.md) | reference | Replacing a directory symlink in one step with `fs.renameSync` (macOS, measured); Windows untested, docs summarized in the Windows doc | verified |
 | [yaml-comment-round-trip.md](yaml-comment-round-trip.md) | reference | `yaml` 2.9.1 keeps comments when a tool rewrites a hand-edited file, but not inline-comment spacing (measured) | verified |
 | [eslint-nested-config-lookup.md](eslint-nested-config-lookup.md) | reference | Which `eslint.config.*` ESLint 10 uses per file: own folder, then parents; one root `eslint .` runs nested configs (measured) | verified |
 | [url-parser-differential-node-git.md](url-parser-differential-node-git.md) | reference | Node `URL` reads `\` as `/` and drops tabs and newlines, git does not: check the exact string (measured) | verified |

@@ -1,18 +1,18 @@
 <!--
 Sync Impact Report
-Version: 1.0.0 -> 1.1.0 (MINOR: a new style-deviation entry)
-Added: style deviation for legacy .mjs tools (lint-baseline exemption until rewritten), with the meaning of "rewritten".
+Version: 1.1.0 -> 2.0.0 (MAJOR: principle I is redefined from "agent files are thin wrappers" to "one source, with the per-platform files generated from it")
+Modified: principle I, "One source of truth" -> "One source, generated per platform" (specs/022-repo-split, AC-1.5, FR-007; rendering rules in research.md DR-406 and DR-607).
 Templates needing updates: none.
-Later: specs/022-repo-split task T084 makes the MAJOR 2.0.0 amendment to principle I.
+History: 1.0.0 -> 1.1.0 (MINOR: a new style-deviation entry for legacy .mjs tools, lint-baseline exemption until rewritten, with the meaning of "rewritten").
 -->
 
 # Constitution: agent-config
 
 ## Core Principles
 
-### I. One source of truth
+### I. One source, generated per platform
 
-Each fact, procedure and template lives in exactly one file. Agent-specific files (Claude, Copilot, Codex) are thin wrappers that point at the shared file (`copilot/patterns/shared-procedure-thin-wrapper.pattern.md`). Upstream tools such as Spec Kit are invoked, never vendored or copied in.
+Each fact, procedure and template lives in exactly one source file: the single source. The files a platform needs (Claude Code, Copilot, Codex) are generated per platform from that source, never written or edited by hand. A generated file names its source on its first line, is read-only, and is rebuilt when the source changes; agents load the rendered copies, with real paths. Until spec 022 delivers the build and the renderer, the agent files that exist today stay as they are. Upstream tools such as Spec Kit are invoked, never vendored or copied in.
 
 ### II. Typed and validated documents
 
@@ -45,7 +45,7 @@ When more than one design is valid, the docs keep every option with a default an
 
 This constitution outranks other practices in this repo. An amendment is a pull request that states the change and bumps the version: MAJOR for removing or redefining a principle, MINOR for a new principle or section, PATCH for wording. Reviews check that a change follows the principles above.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-11-13
+**Version**: 2.0.0 | **Ratified**: 2026-10-29 | **Last Amended**: 2026-11-14
 
 ## Agentic SDLC: defaults
 

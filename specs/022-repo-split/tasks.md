@@ -219,31 +219,31 @@ No task line is written for these, because only V can do them. A phase does not 
       touches: none  ·  refs: specs/022-repo-split/contracts/build-v1.md  ·  procedure: none  ·  hot-path: no  ·  requires: T055, T046, T047, T045
 - [x] T074 [US1] Contracts index listing the fifteen contracts with owner, consumers, versioning rule and missing or stale behaviour, and the install-report and install-state interfaces as in-repo interfaces (contracts/index.md)  [Eng] [llm]
       touches: none  ·  refs: specs/022-repo-split/contracts/README.md  ·  procedure: none  ·  hot-path: no  ·  requires: T058, T059, T060, T061, T062, T063, T064, T065, T066, T067, T068, T069, T070, T071, T072, T073
-- [ ] T075 [US1] Build tool skeleton with the budget subcommand and its baseline option as a dry run: swap rules and generated-from line applied in memory, writes nothing, reports per agent characters, token estimate marked estimate, method, tool version, date, AGENT_HOME line count and skill list figure (contracts/tools/budget.ts)  [Eng] [llm]
+- [x] T075 [US1] Build tool skeleton with the budget subcommand and its baseline option as a dry run: swap rules and generated-from line applied in memory, writes nothing, reports per agent characters, token estimate marked estimate, method, tool version, date, AGENT_HOME line count and skill list figure (contracts/tools/budget.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T057, T050, T069
-- [ ] T076 [US1] The layout subcommand in report mode: evaluates the repo-layout rules, lists findings, exits 0 (contracts/tools/layout.ts)  [Eng] [llm]
+- [x] T076 [US1] The layout subcommand in report mode: evaluates the repo-layout rules, lists findings, exits 0 (contracts/tools/layout.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T055, T051, T070
-- [ ] T077 [US1] Entry point build.ts dispatching the subcommands, usage error exit 2, honest help text (contracts/tools/build.ts)  [Eng] [llm]
+- [x] T077 [US1] Entry point build.ts dispatching the subcommands, usage error exit 2, honest help text (contracts/tools/build.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T075, T076
-- [ ] T078 [US1] Schema check command that runs the reader over example files and any file given, printing warnings and failures with exact messages; used by the scenarios and by check-docs (contracts/tools/check-schemas.ts)  [Eng] [llm]
+- [x] T078 [US1] Schema check command that runs the reader over example files and any file given, printing warnings and failures with exact messages; used by the scenarios and by check-docs (contracts/tools/check-schemas.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T055, T074
-- [ ] T079 [US1] Run the budget baseline once per agent and commit the recorded always-loaded baseline file with method, tool version and date (docs/baselines/always-loaded.json)  [Eng] [script]
+- [x] T079 [US1] Run the budget baseline once per agent and commit the recorded always-loaded baseline file with method, tool version and date (docs/baselines/always-loaded.json)  [Eng] [script]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T077, T050
-- [ ] T080 [US1] Atlas registry: the four components, allowed edges, forbidden edges knowledge to agentic-sdlc, knowledge to companies and contracts to any component, then regenerate the atlas pages (copilot/atlas/atlas.yaml)  [Eng] [llm]
+- [x] T080 [US1] Atlas registry: the four components, allowed edges, forbidden edges knowledge to agentic-sdlc, knowledge to companies and contracts to any component, then regenerate the atlas pages (copilot/atlas/atlas.yaml)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T049
-- [ ] T081 [US1] Fitness check script: edge diff against the architecture and atlas, recorded baselines of 123 lines in 73 files, core to agentic-sdlc 20 and core to companies 1 and the checks that read another area, fails only on a rise, names the edge. Unit tests (scripts/check-fitness.ts)  [Eng] [llm]
+- [x] T081 [US1] Fitness check script: edge diff against the architecture and atlas, recorded baselines of 123 lines in 73 files, core to agentic-sdlc 20 and core to companies 1 and the checks that read another area, fails only on a rise, names the edge. Unit tests (scripts/check-fitness.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T080, T040
-- [ ] T082 [US1] Record the fitness baseline counts with method, tool version and date (docs/baselines/fitness.json)  [Eng] [script]
+- [x] T082 [US1] Record the fitness baseline counts with method, tool version and date (docs/baselines/fitness.json)  [Eng] [script]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T081
-- [ ] T083 [US1] Coverage check QB-1: reads spec.md acceptance criteria and EDGE ids and the feature titles, reads the exemption list, fails on an uncovered id of a delivered phase. Unit tests (scripts/check-ac-coverage.ts)  [Eng] [llm]
+- [x] T083 [US1] Coverage check QB-1: reads spec.md acceptance criteria and EDGE ids and the feature titles, reads the exemption list, fails on an uncovered id of a delivered phase. Unit tests (scripts/check-ac-coverage.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T053, T040
-- [ ] T084 [US1] Amend constitution principle I to one source generated per platform, version 2.0.0 as a MAJOR amendment with date and stated change (.specify/memory/constitution.md)  [Eng] [llm]
+- [x] T084 [US1] Amend constitution principle I to one source generated per platform, version 2.0.0 as a MAJOR amendment with date and stated change (.specify/memory/constitution.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T048, T030
-- [ ] T085 [US1] Workflow installer.yml: Ubuntu, macOS and Windows with a throwaway home, Node from .nvmrc, no Node 18 job, read-only permissions, actions pinned to full commit SHAs, no secrets. This is delivery work done by engineering because only engineering and QA take part in this run (.github/workflows/installer.yml)  [Eng] [llm]
+- [x] T085 [US1] Workflow installer.yml: Ubuntu, macOS and Windows with a throwaway home, Node from .nvmrc, no Node 18 job, read-only permissions, actions pinned to full commit SHAs, no secrets. This is delivery work done by engineering because only engineering and QA take part in this run (.github/workflows/installer.yml)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T042
-- [ ] T086 [US1] Wire format, lint, typecheck, unit tests, schema check, fitness in report mode, coverage and layout report into the one check entry, and keep the old validators and scenarios running unchanged (scripts/check-docs.sh)  [Eng] [llm]
+- [x] T086 [US1] Wire format, lint, typecheck, unit tests, schema check, fitness in report mode, coverage and layout report into the one check entry, and keep the old validators and scenarios running unchanged (scripts/check-docs.sh)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T078, T081, T083, T077, T040
-- [ ] T087 [US1] Mutation proof QB-7 for each new phase 0 check: disable it and show that the named scenario fails; record the proof once in research.md (specs/022-repo-split/research.md)  [QA] [llm]
+- [x] T087 [US1] Mutation proof QB-7 for each new phase 0 check: disable it and show that the named scenario fails; record the proof once in research.md (specs/022-repo-split/research.md)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T086, T079, T082, T084, T038
 - [ ] T088 [US1] Measure the unit layer and the scenario layer run time per OS against the 60 second and 3 minute budgets QB-6 and write the measured figures into the constitution budgets section (.specify/memory/constitution.md)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T087, T085

@@ -16,7 +16,7 @@
 #   repo-layout: <n> findings (report mode)     report mode, exit 0 always
 # Pending: scenarios carry @pending and the tasks that make them pass (tests/support/pending.ts).
 
-@pending @T076 @T077
+@T076 @T077
 Feature: Repo layout check
   The check compares a repository's root with the required entries of repo-layout/v1.
 
