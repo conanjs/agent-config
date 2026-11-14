@@ -320,7 +320,7 @@ Feature: Always-loaded baseline, dry run
       --platform
       darwin
       """
-    Then line 1 of the output contains "copilot/instructions/x.md"
+    Then line 1 of the output is "Generated from `copilot/instructions/x.md`; edit that file, not this copy."
     And line 2 of the output is "First line of the source."
 
   Scenario: AC-1.7 Swap rule, generated-from line: with front matter it follows the closing line of the front matter
@@ -345,7 +345,7 @@ Feature: Always-loaded baseline, dry run
     Then line 1 of the output is "---"
     And line 2 of the output is "applyTo: \"**\""
     And line 3 of the output is "---"
-    And line 4 of the output contains "copilot/instructions/x.md"
+    And line 4 of the output is "Generated from `copilot/instructions/x.md`; edit that file, not this copy."
     And line 5 of the output is "First line of the source."
 
   Scenario: AC-1.7 Swap rule, idempotence: the same input gives byte-identical output twice

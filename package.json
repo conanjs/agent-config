@@ -4,6 +4,9 @@
   "private": true,
   "description": "Agent configuration, frameworks and knowledge; package.json exists only for the tool tests (specs/003).",
   "type": "module",
+  "imports": {
+    "#contracts/*.ts": "./contracts/*.ts"
+  },
   "engines": {
     "node": ">=24.12 <25"
   },
@@ -14,7 +17,8 @@
     "format": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "vendor:yaml": "node contracts/tools/vendor-yaml.ts"
   },
   "devDependencies": {
     "@cucumber/cucumber": "~13.3.0",

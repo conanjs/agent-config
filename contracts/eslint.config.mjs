@@ -149,6 +149,12 @@ export default defineConfig(
     },
   },
   {
+    // IMP-1 exception: the one wrapper reaches the vendored library below it with a relative path (DR-102); no alias is needed
+    // because nothing else may import the vendored folder. The effect-module restriction stays.
+    files: ['lib/yaml.ts'],
+    rules: { 'no-restricted-imports': ['error', { paths: noEffectImports }] },
+  },
+  {
     // Tests write wire values and long describe blocks on purpose; the other size and boundary rules stay on.
     files: ['**/*.test.ts'],
     rules: {

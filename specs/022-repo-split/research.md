@@ -16,7 +16,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 | DR-301 to DR-309 | architecture | this file | New in this run |
 | DR-401 to DR-418 | system-architecture | `decisions/system-architecture.md` §4 | "Contract facts" lines kept as an extra field |
 | DR-501 | qa | `decisions/qa.md` §1 to §3 | The QA file calls it `DR-QA-1`, which is not a valid record id; renumbered here |
-| DR-601 to DR-606, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm), engineering (parser limits) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
+| DR-601 to DR-608, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm, swap everywhere), engineering (parser limits), security (duplicate keys) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
 
 ## Conflicts between the role records, and how precedence resolves them
 
@@ -665,6 +665,28 @@ Measured 2026-11-13 on Node.js v24.22.1 (macOS): a class with `constructor(priva
 - **Confidence:** high (names read from the package and each effect measured; the 256 KiB figure is M-17's own number)
 - **Supersedes:** none
 - **Decided by:** engineering · **Approved at:** G4 (2026-11-13)
+
+## DR-607: The path swap applies everywhere, code blocks included (narrows DR-106)
+- **Tree path:** conflict between DR-106 ("a line scanner that skips fenced code") and AC-16.3 / RC-5 (0 `{{AGENT_HOME}}` path placeholders in a rendered file) → human decision.
+- **Criteria:** AC-16.3 and RC-5 (no placeholder left for an agent to resolve); T057 review (QA, 2026-11-14); FR-045 says a rendered file differs from its source only at citations and the added line, which this choice widens to every path placeholder.
+- **Options considered:** (A) swap `{{AGENT_HOME}}/<path>` and `~/.copilot/<path>` in link text, prose, code spans and code blocks alike; link targets are left for the renderer to set relative (A-20) | (B) skip fenced code, as DR-106 wrote
+- **Chosen:** (A) — `contracts/lib/render-rules.ts` `swapLine`, pinned by the unit test "a path in a code block is swapped too (RC-5)".
+- **Rejected:** (B) — a command in a code block would keep a placeholder the agent must resolve itself, against AC-16.3.
+- **Confidence:** high
+- **Supersedes:** none
+- **Narrows:** tech-stack DR-106: only its "skips fenced code" clause is replaced; the rest of DR-106 stands. FR-045's wording needs aligning with this (tracked).
+- **Decided by:** human · **Approved at:** P6 (2026-11-14)
+
+## DR-608: Duplicate keys are found in one pass, not by the library (narrows DR-606)
+- **Tree path:** security review of T054/T055 (M-17, T-17) → the wrapper keeps the library out of the duplicate-key check.
+- **Criteria:** M-17 and T-17 (denial of service under the 256 KiB cap); measured 2026-11-14 on Node.js v24.22.1 with `yaml` 2.9.1: with `uniqueKeys: true` a flat mapping of 20 000 keys took 1.08 s and 38 000 keys 4.16 s (0.11 s and 0.18 s with `false`), and the security role measured 27 s for a flow mapping under the cap (`copilot/knowledge/js-runtime/yaml-comment-round-trip.md`); the library also lets `1` and `"1"` both stand.
+- **Options considered:** (A) `uniqueKeys: false`, then one `visit` over every map with a set of each key's text form, giving `DUPLICATE_KEY` with its line and `NON_STRING_KEY` for a collection key | (B) keep `uniqueKeys: true` and cap the key count | (C) keep DR-606 as written
+- **Chosen:** (A) — `contracts/lib/yaml.ts` `keyFindings`, with unit tests for each key form and a full-size flow map.
+- **Rejected:** (B) — the cost still grows with the square of the keys below any cap; (C) — a hostile file stalls install, `doctor` and every provider's CI.
+- **Confidence:** high
+- **Supersedes:** none
+- **Narrows:** engineering DR-606: only its `uniqueKeys: true` default is replaced; the other limits of DR-606 stand.
+- **Decided by:** security, engineering · **Approved at:** P6 (2026-11-14)
 
 ## PDM-installers-core: Paradigm for the installer core (`installers/core`, clears unlisted need U-2)
 - **Tree path:** PDM-Q1 (greenfield: `installers/core` does not exist yet → NO) → PDM-Q2 (does it own invariants enforced across operations? The cross-checks, such as majors, exports, "plan equals what apply does" and the approved privileged set, are rules over plain data; durable state lives in `components.lock` and `install-state.json`, not in objects with identity and lifecycle → NO) → PDM-Q3 (an input to output transform: files in, a plan as data (DR-306), effects at the edge, a report out → YES) → functional-pipeline. PDM-Q4 not reached; the constitution default is `none`.

@@ -5,9 +5,9 @@
 #
 # Flags: `layout [--report] [--repo <name>] --root <dir>`. --report lists findings and exits 0; without it a finding exits 1.
 # --repo <name> names the repository for its exceptions (agent-config); --root is the folder to check.
-# The generated-from line is written by the render rules of T057, whose text is not fixed yet. The forbidden-rule
-# scenario assumes the provisional form `<!-- generated from <source path>; edit the source, not this copy -->` and
-# must be changed together with T057 if that text differs.
+# The generated-from line is written by the render rules of T057 (contracts/lib/render-rules.ts); its text is the one of
+# AC-16.4 and rendered-copy-v1.md: Generated from `<source path>`; edit that file, not this copy. The forbidden-rule
+# scenarios use it and must change together with that function.
 #
 # Output contract the scenarios pin (T076 may change a message only together with this file):
 #   finding: missing required entry <path>      one line per finding
@@ -79,7 +79,7 @@ Feature: Repo layout check
   Scenario: FR-012 A tracked file whose first line is the generated-from line is a finding, and not fatal in report mode
     Given the file "docs/copy.md" contains:
       """
-      <!-- generated from docs/source.md; edit the source, not this copy -->
+      Generated from `docs/source.md`; edit that file, not this copy.
       Some text.
       """
     And "." is a git repository with everything committed
@@ -91,7 +91,7 @@ Feature: Repo layout check
     Given "." is a git repository with everything committed
     And the file "docs/copy.md" contains:
       """
-      <!-- generated from docs/source.md; edit the source, not this copy -->
+      Generated from `docs/source.md`; edit that file, not this copy.
       Some text.
       """
     When the tool runs with "--report"

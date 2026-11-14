@@ -7,8 +7,8 @@
 // The reader contract assumed (T055, contracts/lib/reader.ts):
 //   readContract(id: string, text: string): { errors: readonly unknown[]; warnings: readonly unknown[] }
 // where `id` is "<name>/v<major>" (the folder) and the document is valid when `errors` is empty (warnings do not count).
-// The reader gets the raw text and ajv gets the raw parse of the same file (JSON.parse for .json and .lock, the yaml parser
-// otherwise; a file that does not parse fails the schema side), so neither form validates the other's output.
+// The reader gets the raw text and ajv gets the raw parse of the same file (JSON.parse for .json and .lock, the yaml wrapper
+// contracts/lib/yaml.ts otherwise (DR-102: the wrapper is the only importer); a file that does not parse fails the schema side), so neither form validates the other's output.
 // Schemas avoid `format` (ajv-formats is not a dependency); they use `pattern`.
 //
 // The suite does not fail open. It is skipped only while no contract folder exists and T058 is not ticked in
@@ -18,8 +18,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { pathToFileURL } from 'node:url';
-import { parse as parseYaml } from 'yaml';
 import { describe, expect, it } from 'vitest';
+import { readYaml } from './yaml.ts';
 
 const contractsDir = path.resolve(import.meta.dirname, '..');
 const tasksFile = path.resolve(contractsDir, '..', 'specs', '022-repo-split', 'tasks.md');
@@ -114,11 +114,15 @@ function compileSchema(dir: string): ReturnType<Ajv2020['compile']> {
 /** The raw parse of an example for ajv: JSON for .json and .lock, YAML otherwise; undefined when the file does not parse. */
 function rawParse(file: string): { readonly value: unknown } | undefined {
   const text = fs.readFileSync(file, 'utf8');
-  try {
-    return { value: /\.(json|lock)$/.test(file) ? (JSON.parse(text) as unknown) : (parseYaml(text) as unknown) };
-  } catch {
-    return undefined;
+  if (/\.(json|lock)$/.test(file)) {
+    try {
+      return { value: JSON.parse(text) as unknown };
+    } catch {
+      return undefined;
+    }
   }
+  const read = readYaml(text);
+  return read.ok ? { value: read.value } : undefined;
 }
 
 const contracts = discoverContracts();

@@ -25,6 +25,7 @@ JavaScript runtime internals covers engine and Node.js behaviors that affect cor
 | [atomic-symlink-swap.md](atomic-symlink-swap.md) | reference | Replacing a directory symlink in one step with `fs.renameSync` (macOS, measured); Windows untested | verified |
 | [yaml-comment-round-trip.md](yaml-comment-round-trip.md) | reference | `yaml` 2.9.1 keeps comments when a tool rewrites a hand-edited file, but not inline-comment spacing (measured) | verified |
 | [eslint-nested-config-lookup.md](eslint-nested-config-lookup.md) | reference | Which `eslint.config.*` ESLint 10 uses per file: own folder, then parents; one root `eslint .` runs nested configs (measured) | verified |
+| [url-parser-differential-node-git.md](url-parser-differential-node-git.md) | reference | Node `URL` reads `\` as `/` and drops tabs and newlines, git does not: check the exact string (measured) | verified |
 | [Node.js / nvm / corepack / pnpm / yarn Architecture](../nodejs/node-nvm-corepack-pnpm-yarn-architecture.md) | legacy | Windows Node.js toolchain dispatch and Corepack behavior | — |
 
 ## References

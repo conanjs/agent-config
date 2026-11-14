@@ -18,7 +18,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
     - [Knowledge framework](map/agent-config/knowledge-framework.md) — Schemas and validator for the global knowledge base (6 files)
     - [Company KB framework](map/agent-config/company-kb-framework.md) — Schemas for per-company knowledge bases (11 files)
     - [Agent Foundry](map/agent-config/agent-foundry.md) — Charters, floors, trees and lenses for standalone review and triage agents (25 files)
-  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (369 files)
+  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (370 files)
   - [Company knowledge bases](map/agent-config/companies.md) — Facts about one company's systems, one folder per company (22 files)
   - [Procedures](map/agent-config/procedures.md) — Repeatable multi-step tasks, written once in tool-neutral prose (10 files)
   - [Patterns](map/agent-config/patterns.md) — Named, reusable techniques learned from real cases (12 files)
@@ -27,7 +27,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (10 files)
   - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (171 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (179 files)
-  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (25 files)
+  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (113 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
   - [Source](map/reference-typescript-node/ref-src.md) — The composition root, module composers and the four layers of each module
@@ -107,6 +107,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Checks, hooks and CI](map/agent-config/tooling.md#repo-check) | Repo tooling | `{scripts/*.sh,.githooks/*,.github/**,.claude/settings.json}` | — | `README.md` | — | — | — |
 | [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs}` | — | `README.md` | — | — | — |
 | [Contract library and tools](map/agent-config/tooling.md#contract-code) | Repo tooling | `contracts/{lib,tools}/**/*.ts` | — | — | tsc, eslint, vitest | `tests/contracts/schemas.feature` | — |
+| [Vendored yaml library](map/agent-config/tooling.md#vendored-yaml) | Repo tooling | `contracts/lib/vendor/yaml/**` | — | — | vitest (contracts/lib/yaml.test.ts) | — | — |
 | [GitHub repo templates](map/agent-config/templates.md#template) | Templates | `templates/**` | — | `copilot/procedures/init-github-governance.procedure.md` | — | — | — |
 | [Composition root and entry point](map/reference-typescript-node/ref-src.md#ref-composition) | Source | `src/{CompositionRoot,main}.ts` | — | `docs/architecture.md` | lint (MOD-11 zones) | `test/integration/documents.int.test.ts` | — |
 | [Module composers](map/reference-typescript-node/ref-src.md#ref-composer) | Source | `src/modules/*/*Module.ts` | — | `docs/architecture.md` | lint (MOD-11 zones) | — | — |

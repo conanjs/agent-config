@@ -123,6 +123,8 @@ modules:
 
 Rules on top of the table: only `src/CompositionRoot.ts` imports adapters and composers; no composer imports an adapter; no layer imports a composer (MOD-11). Domain and application never touch the file system, network, clock or process environment; they reach them through ports (`FileSystem`, `Links`, `Git`, `Clock`, `Environment`, `Terminal`, `Runtime`, `HomeLock`) (CA-2, CA-7, DR-305). The pure planner returns one `Plan` that `plan`, `apply`, the journal, the consent check and dry runs all use (DR-306). Paradigm: `installers/core` and `contracts/lib` are **functional-pipeline@1** (V, G4): data is immutable, each use case is a pipeline of pure functions, and effects stay in the infrastructure layer. Imports across modules use `package.json` `imports` aliases (`#` prefix), because the code has no build step (TSN-15); erasable TypeScript syntax only, so no `enum` and no constructor parameter properties (TSN-20). Shared pure rules (render rules, citation classifier, manifest reader, character counter, the one `yaml` wrapper and its vendored copy) live in `contracts/lib/` and are imported by both the installer and the build tool (DR-304).
 
+**Aliases** (IMP-7; the `package.json` `imports` entries and this list agree): `#contracts/*.ts` → `./contracts/*.ts`, the way code outside a folder of `contracts/` names a file of it. The one relative import into `contracts/lib/vendor/yaml/` (by `contracts/lib/yaml.ts`) is an IMP-1 exception set in `contracts/eslint.config.mjs`.
+
 ## 5. Data
 
 | Store | Kind | Owned entities | Notes |
@@ -179,6 +181,8 @@ The first cell of each row is the id a task uses in `touches: integration:<id>` 
 | DR-604 | Check command for each repo | `specs/022-repo-split/research.md` |
 | DR-605 | Continuous integration without a Node 18 job | `specs/022-repo-split/research.md` |
 | DR-606 | YAML parser limits for `yaml` 2.9.1 | `specs/022-repo-split/research.md` |
+| DR-607 | The path swap applies everywhere, code blocks included | `specs/022-repo-split/research.md` |
+| DR-608 | Duplicate YAML keys found in one pass, not by the library | `specs/022-repo-split/research.md` |
 | PDM-installers-core | Paradigm for the installer core (`installers/core`) | `specs/022-repo-split/research.md` |
 | PDM-contracts-lib | Paradigm for the shared pure rules (`contracts/lib`) | `specs/022-repo-split/research.md` |
 | DR-202 | Home, store and atomic switch | `specs/022-repo-split/research.md` |

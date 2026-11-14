@@ -4,8 +4,8 @@ type: reference
 topic: js-runtime
 status: verified
 applies-to: ["yaml 2.9.1 (npm), Node.js 24.22.1 and 22.23.4, tested 2026-11-13"]
-last-verified: 2026-11-13
-last-updated: 2026-11-13
+last-verified: 2026-11-14
+last-updated: 2026-11-14
 tags: [yaml, parser, comments, config-files, installer]
 ---
 
@@ -32,6 +32,8 @@ Comment-preserving edits with `yaml`'s document API, and the option names that l
 | Tags | `customTags` defaults to `null`. `resolveKnownTags` defaults to `true`, so `!!binary` becomes a `Buffer` with no warning; with `false`, `!!binary`, `!!set` and an unknown tag such as `!foo` give warning `TAG_RESOLVE_FAILED` in `doc.warnings` (not `doc.errors`) and are read as ordinary values. `schema: 'failsafe'` still resolved `!!binary` to a `Buffer` | ✅[^probe2] |
 | Errors by default | A duplicate key is error `DUPLICATE_KEY`; a second document is error `MULTIPLE_DOCS` (not with `logLevel: 'silent'`: the check is skipped and the second document is dropped without an error; `'error'` keeps it); `<<` stays a plain key (`merge` defaults to `false` for YAML 1.2) | ✅[^probe2] |
 | Depth | No depth option; a stack overflow while composing is caught and reported as error `RESOURCE_EXHAUSTION` (1 000 nested `[` already gave it) | ✅[^probe2] |
+| Duplicate-key cost | The `uniqueKeys` check grows faster than linearly with key count: a flat mapping of 20 000 keys (169 KB) took 1.08 s with `uniqueKeys: true` and 0.11 s with `false`; 38 000 keys (331 KB) took 4.16 s and 0.18 s. A byte cap alone does not bound parse time | ✅[^probe3] |
+| Error flood | 100 000 nested `[` gave `RESOURCE_EXHAUSTION` followed by several hundred `BAD_INDENT` errors and a `MISSING_CHAR`; a caller that prints every error should cap the count | ✅[^probe3] |
 
 ## Lookup notes
 - The check imported `browser/dist/index.js` from the package folder, set one value and printed the document.
@@ -44,7 +46,7 @@ Comment-preserving edits with `yaml`'s document API, and the option names that l
 - _Not cited by any rule yet._
 
 ## Verification status
-- Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-13
+- Verified: 15 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-14
 
 ## References
 - Local measurement, 2026-11-13 — `yaml` 2.9.1 from the worktree's pnpm store, Node.js v24.22.1 on macOS; also run by the tech-stack role for spec 022 on Node.js 24.22.2 and 22.23.4 (decision DR-102). Backs: Comments, Spacing, Node versions. [^probe]
@@ -52,6 +54,7 @@ Comment-preserving edits with `yaml`'s document API, and the option names that l
 
 - `yaml` 2.9.1 `dist/options.d.ts` and `dist/compose/compose-node.js` (npm package `yaml`) — read 2026-11-13. Backs: size limit (no such option), where `maxAliasCount` is declared, the depth handling. [^src]
 - Local measurement, 2026-11-13 — `parseDocument` and `toJS` on small inputs (an alias used 1 to 3 times at limits 0 to 100, `!foo`, `!!binary`, `!!set`, duplicate keys, two documents, a merge key, nested brackets), `yaml` 2.9.1, Node.js v24.22.1 on macOS. Backs: Alias limit, Tags, Errors by default, Depth. [^probe2]
+- Local measurement, 2026-11-14 — `parseDocument` then `toJS` on flat mappings of 20 000 and 38 000 numeric keys with `uniqueKeys` true and false, and on 100 000 `[`, `yaml` 2.9.1 from the worktree pnpm store, Node.js v24.22.1 on macOS; the engineering role of spec 022 measured the same trend (T054). Backs: Duplicate-key cost, Error flood. [^probe3]
 
 ## Related
 - [js-runtime index](index.md)

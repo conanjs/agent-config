@@ -242,6 +242,7 @@ Where: `copilot/knowledge/**/*.md` · Schema: `copilot/frameworks/knowledge/sche
 - [`copilot/knowledge/js-runtime/private-fields.md`](../../../knowledge/js-runtime/private-fields.md)
 - [`copilot/knowledge/js-runtime/promise-rejections.md`](../../../knowledge/js-runtime/promise-rejections.md)
 - [`copilot/knowledge/js-runtime/subpath-imports.md`](../../../knowledge/js-runtime/subpath-imports.md)
+- [`copilot/knowledge/js-runtime/url-parser-differential-node-git.md`](../../../knowledge/js-runtime/url-parser-differential-node-git.md)
 - [`copilot/knowledge/js-runtime/v8-hidden-classes.md`](../../../knowledge/js-runtime/v8-hidden-classes.md)
 - [`copilot/knowledge/js-runtime/worker-thread-pools.md`](../../../knowledge/js-runtime/worker-thread-pools.md)
 - [`copilot/knowledge/js-runtime/yaml-comment-round-trip.md`](../../../knowledge/js-runtime/yaml-comment-round-trip.md)
