@@ -70,3 +70,15 @@ This constitution outranks other practices in this repo. An amendment is a pull 
 | Re-execute after review-fail | 2 |
 | Automatic rework per feature | 1 |
 | Parallel [P] tasks | 4 |
+
+### Test run time (spec 022, QB-6, TST-12)
+
+Budgets: the unit layer under 60 seconds in total; the scenario layer under 3 minutes per operating system. If a layer goes over, split it into a fast set run on every commit and a full set run on pull requests.
+
+Method: wall-clock seconds of each command run three times in a row from the repository root, the median taken. Unit layer: `node node_modules/vitest/vitest.mjs run --silent` (contracts, scripts, eslint and installers/core tests). Scenario layer: `node node_modules/@cucumber/cucumber/bin/cucumber.js --format progress` (the Cucumber run, 4 workers, all features of `tests/`; the `@windows` scenarios are left out on Mac). Measured on commit 7946a50, 2026-11-14.
+
+| System | Machine | Node | Unit layer (3 runs, median) | Scenario layer (3 runs, median) |
+|---|---|---|---|---|
+| macOS 26.1 | Apple M2 | 24.22.1 | 2.2 s, 2.2 s, 2.3 s: 2.2 s | 29.5 s, 29.0 s, 29.4 s: 29.4 s |
+| Linux | GitHub runner ubuntu-latest | .nvmrc (24) | to be measured on the CI runner (T085) | to be measured on the CI runner (T085) |
+| Windows | GitHub runner windows-latest | .nvmrc (24) | to be measured on the CI runner (T085) | to be measured on the CI runner (T085) |
