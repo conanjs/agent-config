@@ -426,7 +426,9 @@ function parseBudgetArgs(argv: readonly string[], env: ToolEnv): Result<BudgetAr
     });
     const platform = platformArg(values.platform, env.platform);
     if (!platform.ok) return platform;
-    const agentHome = values['agent-home'] ?? path.join(env.home, '.agent-config');
+    // Join with the target platform's rules, not the host's: a darwin render on a Windows runner keeps '/'.
+    const paths = platform.value === 'win32' ? path.win32 : path.posix;
+    const agentHome = values['agent-home'] ?? paths.join(env.home, '.agent-config');
     if (agentHome.trim() === '') return fail('--agent-home must not be empty');
     if (values.out !== undefined && values.render !== undefined)
       return fail('--out and --render cannot be used together');
