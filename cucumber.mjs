@@ -7,10 +7,28 @@
 const hostOs = { darwin: ['@mac', '@posix'], linux: ['@posix'], win32: ['@windows'] }[process.platform] ?? [];
 const leftOut = ['@mac', '@windows', '@posix'].filter((tag) => !hostOs.includes(tag));
 
-export default {
+const config = {
   paths: ['tests/**/*.feature'],
   import: ['tests/support/*.mjs', 'tests/support/*.ts', 'tests/*/tool.mjs', 'tests/*/tool.ts'],
   ...(leftOut.length > 0 && { tags: leftOut.map((tag) => `not ${tag}`).join(' and ') }),
   format: ['progress'],
   parallel: 4,
+};
+
+export default config;
+
+// The spec 022 scenarios only: the installer (windows) CI job runs these (scripts/check-new-tiers.sh), because the
+// repo's older tools have not been made to run on Windows yet (V, 2026-11-16). Use: cucumber-js --profile spec022.
+export const spec022 = {
+  ...config,
+  paths: [
+    'tests/contracts/*.feature',
+    'tests/baseline/*.feature',
+    'tests/repo-layout/*.feature',
+    'tests/fitness/*.feature',
+    'tests/coverage/*.feature',
+    'tests/installers/golden.feature',
+    'tests/tools-support/*.feature',
+    'tests/cucumber-config/*.feature',
+  ],
 };
