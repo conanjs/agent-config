@@ -57,6 +57,8 @@ A component pins the major only (FR-006, "functional requirement 6"). A reader a
 - A new or changed hook needs V's consent before it is merged (M-01): `install` exits 10 with a "privileged changes" need and writes nothing. The session-start and post-merge hooks never change the privileged set.
 - An unresolvable merged hook command makes `doctor` fail (M-14). Claude Code treats any exit code except 2 as non-blocking, so a missing guard script would otherwise turn the guard off silently.
 
+**Windows device names (DR-610, M-03).** An id is refused when it is `con`, `prn`, `aux`, `nul`, `com0` to `com9` or `lpt0` to `lpt9`. A path segment is refused when the part of its name before the first `.` (spaces before the dot ignored, letter case ignored) is one of those, `conin$`, `conout$`, `clock$`, or `com` or `lpt` followed by `¹`, `²` or `³`: Windows opens a device, not a file, for these names.
+
 ## Examples
 
 `examples/valid/` and `examples/invalid/` are shared with the parity test.

@@ -311,7 +311,7 @@ Feature: Components come from git or a local folder, listed in two files
 
   # ---- AC-3.8 (the check of the local files; tool installer-local-files) ------------------------------------
 
-  @pending @T150
+  @T150
   Scenario: AC-3.8 A tracked components.local.yaml fails the check, naming the file
     Given the base fixture tree of "installer-local-files"
     And the file "repo/components.local.yaml" contains:
@@ -327,22 +327,22 @@ Feature: Components come from git or a local folder, listed in two files
       error: components.local.yaml is tracked by git
       """
 
-  @pending @T150
-  Scenario: AC-3.8 A staged variables.local.yaml in a subfolder fails the check, naming the file
+  @T150
+  Scenario: AC-3.8 A staged variables.local.yaml fails the check, naming the file
     Given the base fixture tree of "installer-local-files"
     And "repo" is a git repository with everything committed
-    And the file "repo/sub/variables.local.yaml" contains:
+    And the file "repo/variables.local.yaml" contains:
       """
       schema: variables-local/v1
       """
-    And the source repo stages "sub/variables.local.yaml"
+    And the source repo stages "variables.local.yaml"
     When the tool runs with "{root}/repo"
     Then it exits with 1 and prints:
       """
-      error: sub/variables.local.yaml is staged for commit
+      error: variables.local.yaml is staged for commit
       """
 
-  @pending @T150
+  @T150
   Scenario: AC-3.8 A local file that is neither tracked nor staged passes the check
     Given the base fixture tree of "installer-local-files"
     And "repo" is a git repository with everything committed

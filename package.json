@@ -5,7 +5,8 @@
   "description": "Agent configuration, frameworks and knowledge; package.json exists only for the tool tests (specs/003).",
   "type": "module",
   "imports": {
-    "#contracts/*.ts": "./contracts/*.ts"
+    "#contracts/*.ts": "./contracts/*.ts",
+    "#installer/*.ts": "./installers/core/*.ts"
   },
   "engines": {
     "node": ">=24.12 <25"

@@ -9,7 +9,7 @@
 Feature: The sorting check classifies every hard-coded ~/.copilot line
   Each line that names ~/.copilot is agent-home content or a Copilot-own path on a named allow-list, and a new agent-home line fails.
 
-  @pending @T149
+  @T149
   Scenario: AC-8.4 The sorting check classifies every line that names ~/.copilot and passes at the baseline
     Given the base fixture tree of "installer-compat-sorting"
     When the tool runs with "--root {root}"
@@ -18,7 +18,7 @@ Feature: The sorting check classifies every hard-coded ~/.copilot line
       copilot paths: 3 lines in 2 files (agent-home 1, copilot-own 2), baseline agent-home 1
       """
 
-  @pending @T149
+  @T149
   Scenario: AC-8.4 The listing shows the class of each line, and the totals count each of them
     Given the base fixture tree of "installer-compat-sorting"
     When the tool runs with "--list --root {root}"
@@ -30,7 +30,7 @@ Feature: The sorting check classifies every hard-coded ~/.copilot line
       copilot paths: 3 lines in 2 files (agent-home 1, copilot-own 2), baseline agent-home 1
       """
 
-  @pending @T149
+  @T149
   Scenario: AC-8.4 A new hard-coded agent-home line fails the check and names its file and line
     Given the base fixture tree of "installer-compat-sorting"
     And the file "docs/d.md" contains:
@@ -45,7 +45,7 @@ Feature: The sorting check classifies every hard-coded ~/.copilot line
       copilot paths: 4 lines in 3 files (agent-home 2, copilot-own 2), baseline agent-home 1
       """
 
-  @pending @T149
+  @T149
   Scenario: AC-8.4 A line that names an own path and an agent-home path counts as agent-home and fails when new
     Given the base fixture tree of "installer-compat-sorting"
     And the file "docs/e.md" contains:
@@ -59,7 +59,7 @@ Feature: The sorting check classifies every hard-coded ~/.copilot line
       copilot paths: 4 lines in 3 files (agent-home 2, copilot-own 2), baseline agent-home 1
       """
 
-  @pending @T149
+  @T149
   Scenario: AC-8.4 A new line on a Copilot-own path passes
     Given the base fixture tree of "installer-compat-sorting"
     And the file "docs/f.md" contains:
@@ -72,7 +72,7 @@ Feature: The sorting check classifies every hard-coded ~/.copilot line
       copilot paths: 4 lines in 3 files (agent-home 1, copilot-own 3), baseline agent-home 1
       """
 
-  @pending @T149
+  @T149
   Scenario: AC-8.4 A line converted to the placeholder leaves the count and the check passes
     Given the base fixture tree of "installer-compat-sorting"
     And in "docs/a.md", `Read ~/.copilot/knowledge/index.md first.` becomes `Read {{AGENT_HOME}}/knowledge/index.md first.`
@@ -82,7 +82,7 @@ Feature: The sorting check classifies every hard-coded ~/.copilot line
       copilot paths: 2 lines in 1 files (agent-home 0, copilot-own 2), baseline agent-home 1
       """
 
-  @pending @T149
+  @T149
   Scenario: AC-8.4 The check passes on the repository itself and fails no line
     When the sorting check runs on the repository
     Then it exits with 0

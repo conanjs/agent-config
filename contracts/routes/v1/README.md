@@ -51,6 +51,8 @@ A component pins the major only (FR-006, "functional requirement 6"). A reader a
 - A machine whose generated routes file no longer matches the sources: `doctor` fails on the hash check (AC-12.5); the post-merge and session-start hooks re-render it. They never change the set of routes, only its text.
 - A component with no `routes` simply adds none.
 
+**Windows device names (DR-610, M-03).** An id is refused when it is `con`, `prn`, `aux`, `nul`, `com0` to `com9` or `lpt0` to `lpt9`. A path segment is refused when the part of its name before the first `.` (spaces before the dot ignored, letter case ignored) is one of those, `conin$`, `conout$`, `clock$`, or `com` or `lpt` followed by `¹`, `²` or `³`: Windows opens a device, not a file, for these names.
+
 ## Examples
 
 `examples/valid/` and `examples/invalid/` are run through `schema.json` and through the reader by the parity test; both must agree.

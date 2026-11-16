@@ -9,7 +9,7 @@
     },
     "adapter": {
       "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+      "pattern": "^(?!(?:con|prn|aux|nul|com[0-9]|lpt[0-9])$)[a-z0-9][a-z0-9-]{0,63}$"
     },
     "version": {
       "type": "integer",
@@ -44,7 +44,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+            "pattern": "^(?!(?:con|prn|aux|nul|com[0-9]|lpt[0-9])$)[a-z0-9][a-z0-9-]{0,63}$"
           },
           "applies-to": {
             "enum": ["agent", "skill"]

@@ -18,16 +18,16 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
     - [Knowledge framework](map/agent-config/knowledge-framework.md) — Schemas and validator for the global knowledge base (6 files)
     - [Company KB framework](map/agent-config/company-kb-framework.md) — Schemas for per-company knowledge bases (11 files)
     - [Agent Foundry](map/agent-config/agent-foundry.md) — Charters, floors, trees and lenses for standalone review and triage agents (25 files)
-  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (372 files)
+  - [Global knowledge](map/agent-config/knowledge.md) — Cross-project reference docs: how technologies and techniques work, with sources (373 files)
   - [Company knowledge bases](map/agent-config/companies.md) — Facts about one company's systems, one folder per company (22 files)
   - [Procedures](map/agent-config/procedures.md) — Repeatable multi-step tasks, written once in tool-neutral prose (10 files)
   - [Patterns](map/agent-config/patterns.md) — Named, reusable techniques learned from real cases (12 files)
   - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (54 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (20 files)
-  - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (10 files)
+  - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (72 files)
   - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (173 files)
   - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (406 files)
-  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (369 files)
+  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (391 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
   - [Source](map/reference-typescript-node/ref-src.md) — The composition root, module composers and the four layers of each module
@@ -104,7 +104,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Shared steps](map/agent-config/tests.md#test-support) | Tool tests | `tests/support/{*.{mjs,ts,d.mts},launchers/*.ts}` | — | — | — | — | — |
 | [Features](map/agent-config/tests.md#test-feature) | Tool tests | `tests/*/{*.feature,*.mjs,*.ts,exemptions.yaml}` | — | — | cucumber-js | — | — |
 | [Fixtures and golden files](map/agent-config/tests.md#test-fixture) | Tool tests | `tests/*/{fixtures,golden}/**` | — | — | — | — | — |
-| [Checks, hooks and CI](map/agent-config/tooling.md#repo-check) | Repo tooling | `{scripts/*.{sh,ts},.githooks/*,.github/**,.claude/settings.json}` | — | `README.md` | scenarios (fitness, coverage), tsc, vitest | — | — |
+| [Checks, hooks and CI](map/agent-config/tooling.md#repo-check) | Repo tooling | `{scripts/*.{sh,ts,yaml},.githooks/*,.github/**,.claude/settings.json}` | — | `README.md` | scenarios (fitness, coverage), tsc, vitest | — | — |
 | [Recorded baselines](map/agent-config/tooling.md#baseline) | Repo tooling | `docs/baselines/*.json` | — | — | check-fitness.ts (fitness.json) | `tests/fitness/fitness.feature` | — |
 | [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs,scripts/eslint.config.mjs,tests/eslint.config.mjs}` | — | `README.md` | — | — | — |
 | [Adapter map](map/agent-config/tooling.md#adapter-map) | Repo tooling | `adapters.json` | — | — | copilot/frameworks/agentic-sdlc/tools/validate.mjs | `tests/validate-sdlc/validate-sdlc.feature` | — |

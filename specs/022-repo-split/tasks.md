@@ -341,9 +341,9 @@ Blocker mitigations in this phase: M-01 mechanism, M-02, M-03, M-04, M-05, M-11,
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T118
 - [x] T128 [P] [US2] Scenarios for the entry scripts on their own OS: Node lookup with the NODE override first, one line need and exit 10 when no Node 24.12 or later is found, exit code passed through, install.sh with legacy and install.ps1 with Legacy run the old installer, a home path with a space. Traces FR-033 and FR-035 (tests/installer/shims.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T118
-- [ ] T129 [US2] Installer core package: package.json with engines >=24.12 <25 and the imports map, tsconfig, four-layer folders per module with keep files, vitest include for src test files (installers/core)  [Eng] [llm]
+- [x] T129 [US2] Installer core package: package.json with engines >=24.12 <25 and the imports map, tsconfig, four-layer folders per module with keep files, vitest include for src test files (installers/core)  [Eng] [llm]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/js-runtime/subpath-imports.md  ·  procedure: none  ·  hot-path: no  ·  requires: T119, T120, T121, T122, T123, T124, T125, T126, T127, T128, T003, T040
-- [ ] T130 [US4] Shared module, domain neutral only: M-03 path containment and name rules, hashing, redaction of user-info and token query parts M-07, exit codes 0 10 1 2, the report model and the one message catalog TR-5. Unit tests with negatives (installers/core/src/modules/shared)  [Eng] [llm] [Sec]
+- [x] T130 [US4] Shared module, domain neutral only: M-03 path containment and name rules, hashing, redaction of user-info and token query parts M-07, exit codes 0 10 1 2, the report model and the one message catalog TR-5. Unit tests with negatives (installers/core/src/modules/shared)  [Eng] [llm] [Sec]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T129, T055
 - [ ] T131 [US3] Manifests module: read and validate component.yaml, both lists and the slots file through contracts/lib, name and path rules M-03, credentials in a source URL refused M-07, archive skipped with the exact text (installers/core/src/modules/manifests)  [Eng] [llm] [Sec]
       touches: none  ·  refs: specs/022-repo-split/contracts/installer-cli.md  ·  procedure: none  ·  hot-path: no  ·  requires: T130
@@ -381,9 +381,9 @@ Blocker mitigations in this phase: M-01 mechanism, M-02, M-03, M-04, M-05, M-11,
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T131, T059
 - [ ] T148 [P] [US3] In-repo stand-in manifests for the knowledge base and the SDLC framework so they install as path sources until their repos exist (copilot/knowledge/component.yaml)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T131, T059
-- [ ] T149 [US8] Sorting check: classify each hard-coded copilot agent-home line as agent-home content or a Copilot-own path on a named allow-list, record the baseline count and file count with method and date, fail a new agent-home line. Unit tests with the classifier table (scripts/check-copilot-paths.ts)  [Eng] [llm]
+- [x] T149 [US8] Sorting check: classify each hard-coded copilot agent-home line as agent-home content or a Copilot-own path on a named allow-list, record the baseline count and file count with method and date, fail a new agent-home line. Unit tests with the classifier table (scripts/check-copilot-paths.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T125, T040
-- [ ] T150 [US3] Check that components.local.yaml and variables.local.yaml are never inside a tracked path or staged, naming the file (scripts/check-local-files.ts)  [Eng] [llm]
+- [x] T150 [US3] Check that components.local.yaml and variables.local.yaml are never inside a tracked path or staged, naming the file (scripts/check-local-files.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T120, T040
 - [ ] T151 [P] [US3] Integration docs for GitHub and the git program as in-repo interface notes, then point the architecture section 6 rows at them (docs/integrations)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T133

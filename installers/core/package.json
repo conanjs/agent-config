@@ -1,0 +1,22 @@
+{
+  "name": "agent-config-installer-core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The installer core of agent-config (specs/022): TypeScript run directly by Node type stripping, no build step and no installed dependency.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.12 <25"
+  },
+  "imports": {
+    "#src/*.ts": "./src/*.ts",
+    "#commands/*.ts": "./src/modules/commands/*.ts",
+    "#manifests/*.ts": "./src/modules/manifests/*.ts",
+    "#rendering/*.ts": "./src/modules/rendering/*.ts",
+    "#resolution/*.ts": "./src/modules/resolution/*.ts",
+    "#shared/*.ts": "./src/modules/shared/*.ts",
+    "#sources/*.ts": "./src/modules/sources/*.ts",
+    "#state/*.ts": "./src/modules/state/*.ts",
+    "#variables/*.ts": "./src/modules/variables/*.ts",
+    "#wiring/*.ts": "./src/modules/wiring/*.ts"
+  }
+}

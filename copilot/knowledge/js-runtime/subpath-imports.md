@@ -4,8 +4,8 @@ type: concept
 topic: js-runtime
 status: verified
 applies-to: ["Node ≥ 14.6 / 12.19", "TypeScript ≥ 4.7 (node16/nodenext/bundler resolution); tsconfig behaviour tested on 6.0.3"]
-last-verified: 2026-10-30
-last-updated: 2026-11-14
+last-verified: 2026-11-16
+last-updated: 2026-11-16
 tags: [subpath-imports, package-json, imports, aliases, module-resolution, tsconfig, extends]
 ---
 
@@ -82,13 +82,14 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 | `#` in an import versus `#field` in a class | Unrelated | One is a module specifier, the other a private class field |
 | Monorepo package with its own `tsconfig.json` that `extends` a shared base | The package's config gives its files' aliases; the base's `paths` are read from the base's folder unless written with `${configDir}` | How it works 9, 10, 12 (tested on 6.0.3) |
 | One `#/*` key for a whole `src/` tree (`"#/*": { "source": "./src/*.ts", "default": "./dist/*.js" }`) | Works with tsc (`customConditions: ["source"]`), tsx `--conditions=source`, Vitest `ssr.resolve.conditions` and the built `dist/`; tested 2026-10-28 on Node 24.22 in a copy of the typescript-node stack reference | Keys may start with `#/` from Node 24.14; the `source`/`default` conditions pick `.ts` in development and `.js` after the build |
+| A target that leaves the package folder (`"#up/*": "../shared/*"` or `"./../shared/*"`) | Refused: `import('#up/x.mjs')` rejects with `ERR_INVALID_PACKAGE_TARGET` ✅[^10] | A nested `package.json` is its own package scope, so its files cannot reach a sibling folder through `imports`; use a relative import or a workspace package (spec 022 `installers/core` imports `contracts/lib` by relative path for this reason) |
 
 ## Takeaways
 - Use an alias every tool resolves: `package.json` `imports`, or tsconfig `paths` with a build-time rewrite. Never rely on `paths` alone. [rule-candidate]
 - Allow relative paths only for files in the same folder, so aliases and relative paths never mix. [rule-candidate]
 
 ## Verification status
-- Verified: 21 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-30
+- Verified: 22 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-16
 - Tested 2026-10-30 with `tsc` 6.0.3 (`--traceResolution`, `--showConfig`) on a scratch project: How it works 9–13; the cases are listed in `specs/014-nested-tsconfig-and-shared-names/research.md`.
 
 ## References
@@ -102,6 +103,7 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 - [TypeScript 5.5 release notes: `${configDir}`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html) — TypeScript team, 2024. Backs: How it works 12. [^8]
 - [TypeScript wiki: Standalone Server (tsserver)](https://github.com/microsoft/TypeScript/wiki/Standalone-Server-%28tsserver%29) — TypeScript team, living. Backs: How it works 9 (inferred project). [^9]
 - [tsc-alias](https://github.com/justkey007/tsc-alias) — tsc-alias maintainers, living. The build-time rewrite tool in the tested row.
+- Local measurement, 2026-11-16 — a package with `"imports": {"#up/*": "../shared/*", "#dotup/*": "./../shared/*"}` and a sibling `shared/x.mjs`; both `import()` calls rejected with `ERR_INVALID_PACKAGE_TARGET`, Node.js v24.22.1 on macOS; the engineering role of spec 022 (T129) saw the same. Backs: Edge cases, target outside the package. [^10]
 - [NestJS: Libraries](https://docs.nestjs.com/cli/libraries) — NestJS, living. NestJS aliases through tsconfig path mapping and resolves them in its build.
 - `copilot/atlas/tools/atlas.mjs` — `--explain` applies How it works 7–13 to find which files import a `.ts` file (`specs/013-cross-repo-and-name-references/`, `specs/014-nested-tsconfig-and-shared-names/`).
 

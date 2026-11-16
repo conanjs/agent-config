@@ -12,7 +12,7 @@
     },
     "copy": {
       "type": "string",
-      "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))generated/[a-z0-9][a-z0-9-]{0,63}/[\\s\\S]+$"
+      "pattern": "^(?![\\s\\S]*(?:^|/)(?:[cC][oO][nN]|[pP][rR][nN]|[aA][uU][xX]|[nN][uU][lL]|[cC][oO][nN][iI][nN]\\$|[cC][oO][nN][oO][uU][tT]\\$|[cC][lL][oO][cC][kK]\\$|[cC][oO][mM][0-9\\u00b9\\u00b2\\u00b3]|[lL][pP][tT][0-9\\u00b9\\u00b2\\u00b3])(?: *\\.[^/]*)?(?:/|$))(?!/)(?![\\s\\S]*[\\\\:\\u0000])(?![\\s\\S]*(?:^|/)\\.\\.(?:/|$))(?![\\s\\S]*(?:[^/][. ]|(?:^|/) )(?:/|$))generated/(?!(?:con|prn|aux|nul|com[0-9]|lpt[0-9])/)[a-z0-9][a-z0-9-]{0,63}/[\\s\\S]+$"
     },
     "first-line": {
       "const": "Generated from `<source path>`; edit that file, not this copy."
@@ -67,7 +67,7 @@
           },
           "target": {
             "type": "string",
-            "pattern": "^(?!/)(?![\\s\\S]*[\\\\:\\s\\u0000])[\\s\\S]+$"
+            "pattern": "^(?![\\s\\S]*(?:^|/)(?:[cC][oO][nN]|[pP][rR][nN]|[aA][uU][xX]|[nN][uU][lL]|[cC][oO][nN][iI][nN]\\$|[cC][oO][nN][oO][uU][tT]\\$|[cC][lL][oO][cC][kK]\\$|[cC][oO][mM][0-9\\u00b9\\u00b2\\u00b3]|[lL][pP][tT][0-9\\u00b9\\u00b2\\u00b3])(?: *\\.[^/]*)?(?:/|$))(?!/)(?![\\s\\S]*[\\\\:\\s\\u0000])[\\s\\S]+$"
           }
         },
         "required": ["text", "target"]

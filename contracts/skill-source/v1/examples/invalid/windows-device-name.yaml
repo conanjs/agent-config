@@ -1,0 +1,4 @@
+schema: skill-source/v1
+name: con
+description: Install Windows software.
+targets: [agents]

@@ -63,3 +63,5 @@ See [{{AGENT_HOME}}/knowledge/x.md](https://github.com/conanjs/agent-knowledge/b
 Generated from `foo.md`; edit that file, not this copy.
 See [/Users/v/.agent-config/knowledge/x.md](../../knowledge/x.md).
 ```
+
+**Windows device names (DR-610, M-03).** An id is refused when it is `con`, `prn`, `aux`, `nul`, `com0` to `com9` or `lpt0` to `lpt9`. A path segment is refused when the part of its name before the first `.` (spaces before the dot ignored, letter case ignored) is one of those, `conin$`, `conout$`, `clock$`, or `com` or `lpt` followed by `¹`, `²` or `³`: Windows opens a device, not a file, for these names.

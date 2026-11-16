@@ -16,7 +16,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 | DR-301 to DR-309 | architecture | this file | New in this run |
 | DR-401 to DR-418 | system-architecture | `decisions/system-architecture.md` §4 | "Contract facts" lines kept as an extra field |
 | DR-501 | qa | `decisions/qa.md` §1 to §3 | The QA file calls it `DR-QA-1`, which is not a valid record id; renumbered here |
-| DR-601 to DR-609, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm, swap everywhere), engineering (parser limits), security (duplicate keys) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
+| DR-601 to DR-610, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm, swap everywhere), engineering (parser limits), security (duplicate keys) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
 
 ## Conflicts between the role records, and how precedence resolves them
 
@@ -698,6 +698,17 @@ Measured 2026-11-13 on Node.js v24.22.1 (macOS): a class with `constructor(priva
 - **Supersedes:** none
 - **Narrows:** architecture DR-305: only its "selected through one environment variable read by the composition root alone" clause is replaced; ports, the fault adapter's limits and the one report model stand. docs/architecture.md §4 says only `src/CompositionRoot.ts` chooses production adapters and a test entry may supply test doubles through `composeInstaller`.
 - **Decided by:** engineering, qa · **Approved at:** P6 (2026-11-16)
+
+## DR-610: Windows device names are refused in ids and path segments (narrows the M-03 rules of contracts/lib)
+- **Tree path:** security review of T130 (finding 4) → the cross-platform contract owns the rule.
+- **Criteria:** M-03; component/v1 is cross-platform, so a manifest valid on macOS must be valid on Windows; Microsoft "Naming Files, Paths, and Namespaces" (NUL.txt and NUL.tar.gz are equivalent to NUL); on Windows a write to NUL is lost and a read of CON or CONIN$ waits for keyboard input.
+- **Options considered:** (A) contracts/lib refuses ids `con`, `prn`, `aux`, `nul`, `com0` to `com9`, `lpt0` to `lpt9` (any case), and any path segment whose part before the first `.`, trailing spaces trimmed, is one of those or `conin$`, `conout$`, `clock$`, or com/lpt followed by a superscript digit; the schemas and reader agree (parity) | (B) refuse only in the installer on Windows
+- **Chosen:** (A) — authors get the error from the same rule in build and CI on any OS; the installer inherits it through its name rules.
+- **Rejected:** (B) — a component would install on macOS and fail on Windows.
+- **Confidence:** high
+- **Supersedes:** none
+- **Narrows:** the id and path rules of contracts/lib (DR-606 era, phase 0): only the device names are added; every other rule stands.
+- **Decided by:** security, engineering · **Approved at:** P6 (2026-11-16)
 
 ## PDM-installers-core: Paradigm for the installer core (`installers/core`, clears unlisted need U-2)
 - **Tree path:** PDM-Q1 (greenfield: `installers/core` does not exist yet → NO) → PDM-Q2 (does it own invariants enforced across operations? The cross-checks, such as majors, exports, "plan equals what apply does" and the approved privileged set, are rules over plain data; durable state lives in `components.lock` and `install-state.json`, not in objects with identity and lifecycle → NO) → PDM-Q3 (an input to output transform: files in, a plan as data (DR-306), effects at the edge, a report out → YES) → functional-pipeline. PDM-Q4 not reached; the constitution default is `none`.

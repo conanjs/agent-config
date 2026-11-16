@@ -5,6 +5,12 @@
 /** Component, skill, agent, route and hook ids (M-03, FR-004): lowercase letters, digits and hyphens, 1 to 64 characters. */
 export const ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
+// M-03, DR-610: names Windows opens as a device instead of a file. An id is lower case, so only the plain names can occur.
+const RESERVED_ID = /^(?:con|prn|aux|nul|com[0-9]|lpt[0-9])$/;
+const RESERVED_SEGMENT_STEM = /^(?:con|prn|aux|nul|conin\$|conout\$|clock\$|(?:com|lpt)[0-9\u00b9\u00b2\u00b3])$/i;
+const RESERVED_NAME_SENTENCE =
+  'must not be a name Windows reserves for a device (con, prn, aux, nul, com0 to com9, lpt0 to lpt9)';
+
 const GITHUB_HOST = 'github.com';
 const DRIVE_LETTER = /^[A-Za-z]:/;
 // M-07, M-05: text that a URL parser silently repairs or reads differently from git (backslash as slash, a tab dropped, a line
@@ -20,9 +26,15 @@ const PLAIN_HOST = /^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$/;
  * @returns what is wrong with it, or `undefined` when it matches {@link ID_PATTERN}
  */
 export function idProblem(value: string): string | undefined {
-  return ID_PATTERN.test(value)
-    ? undefined
-    : 'must be 1 to 64 characters: lowercase letters, digits and hyphens, starting with a letter or digit';
+  if (!ID_PATTERN.test(value)) {
+    return 'must be 1 to 64 characters: lowercase letters, digits and hyphens, starting with a letter or digit';
+  }
+  return RESERVED_ID.test(value) ? RESERVED_NAME_SENTENCE : undefined;
+}
+
+// A segment is a device name when the part before its first dot, with spaces before that dot ignored, is one (`CON.txt`, `nul .x`).
+function isReservedSegment(segment: string): boolean {
+  return RESERVED_SEGMENT_STEM.test((segment.split('.')[0] ?? '').trimEnd());
 }
 
 /**
@@ -30,7 +42,7 @@ export function idProblem(value: string): string | undefined {
  *
  * The check is on the text only; reading a file also needs the real-path check under the component root, which needs the
  * file system and so belongs to the caller (CM-3). Windows would also read a segment that ends in `.` or a space as another
- * name, and `:` as a drive or a data stream, so those are refused too.
+ * name, and `:` as a drive or a data stream, so those are refused too, as is a segment that names a Windows device (DR-610).
  *
  * @param value - the candidate path
  * @returns what is wrong with it, or `undefined` when it is relative with no `..` segment, drive letter, `:`, `\` or NUL
@@ -45,7 +57,10 @@ export function relativePathProblem(value: string): string | undefined {
   const segments = value.split('/');
   if (segments.includes('..')) return 'must not contain a .. segment';
   const odd = segments.some((segment) => segment !== '.' && (segment.endsWith('.') || segment.endsWith(' ')));
-  return odd ? 'must not have a folder or file name that ends in a dot or a space' : undefined;
+  if (odd) return 'must not have a folder or file name that ends in a dot or a space';
+  return segments.some(isReservedSegment)
+    ? 'must not have a folder or file name that Windows reserves for a device (DR-610)'
+    : undefined;
 }
 
 /**

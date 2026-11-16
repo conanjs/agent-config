@@ -48,6 +48,8 @@ A component pins the major only (FR-006, "functional requirement 6"). A reader a
 
 Blocking in each new repo from its first commit; report mode in agent-config until phase 8, when its content has moved (DR-412). A repo's CI that cannot read this contract fails. Each repo's `INTERFACES.md` lists its `component.yaml` as a provided file interface that links to the `component/v1` schema.
 
+**Windows device names (DR-610, M-03).** An id is refused when it is `con`, `prn`, `aux`, `nul`, `com0` to `com9` or `lpt0` to `lpt9`. A path segment is refused when the part of its name before the first `.` (spaces before the dot ignored, letter case ignored) is one of those, `conin$`, `conout$`, `clock$`, or `com` or `lpt` followed by `¹`, `²` or `³`: Windows opens a device, not a file, for these names.
+
 ## Examples
 
 `examples/valid/` and `examples/invalid/` are shared with the parity test.
