@@ -26,7 +26,7 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (20 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (10 files)
   - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (173 files)
-  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (198 files)
+  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (199 files)
   - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (369 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md

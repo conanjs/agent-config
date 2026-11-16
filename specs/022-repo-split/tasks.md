@@ -143,9 +143,9 @@ No task line is written for these, because only V can do them. A phase does not 
 
 - [x] T036 [P] [US1] Record the golden plans of the old bash installers on Mac and Linux before anything changes: run install.sh against the real mapping.yaml with a private HOME and list every link and seeded file as target to source with mode, one committed golden file per OS. Characterization test, QB-3 (tests/installers/golden/posix)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T035
-- [ ] T037 [P] [US1] Record the golden plan of install.ps1 on the Windows runner before anything changes, in the same listing form; V commits the file the Windows job produces (tests/installers/golden/windows)  [QA] [llm]
+- [x] T037 [P] [US1] Record the golden plan of install.ps1 on the Windows runner before anything changes, in the same listing form; V commits the file the Windows job produces (tests/installers/golden/windows)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T035
-- [ ] T038 [US1] Scenario AC-1.9: the plan of the old installers on the phase 0 branch equals each golden file on Mac, Linux and Windows; a changed mapping makes it fail (tests/installers/golden.feature)  [QA] [llm]
+- [x] T038 [US1] Scenario AC-1.9: the plan of the old installers on the phase 0 branch equals each golden file on Mac, Linux and Windows; a changed mapping makes it fail (tests/installers/golden.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T036, T037
 - [x] T039 [US1] Toolchain per the superseding records: exact dev dependencies for prettier, eslint, typescript-eslint, typescript, @types/node 24, vitest, ajv and eslint-plugin-n; package scripts; engines of the new packages set to >=24.12 <25; root tsconfig with strict, noUncheckedIndexedAccess, erasableSyntaxOnly, allowImportingTsExtensions and noEmit; vitest limited to src test files; prettier ignores vendor (package.json)  [Eng] [llm]
       touches: none  ·  refs: {{AGENT_HOME}}/knowledge/js-runtime/subpath-imports.md  ·  procedure: none  ·  hot-path: no  ·  requires: T035
