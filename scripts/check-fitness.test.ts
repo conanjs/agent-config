@@ -14,6 +14,7 @@ import {
   architectureFindings,
   readArchitectureLayers,
   readBaseline,
+  readHardZero,
   readRegistry,
   run,
   type Component,
@@ -284,5 +285,30 @@ describe('FIT-4 and FIT-5 the atlas against docs/architecture.md', () => {
     expect(
       architectureFindings(registry(), layersOf('```yaml\nlayers:\n  - { name: core, may-depend-on: [] }\n```\n')),
     ).toEqual([]);
+  });
+});
+
+describe('AC-9.1 the hard zero', () => {
+  const counts = { 'knowledge-to-companies-lines': 0, 'core-to-companies-lines': 1 };
+  const text = (extra: string): string => JSON.stringify({ counts, ...JSON.parse(`{${extra}}`) });
+
+  it('no list means no hard-zero counts', () => {
+    expect(readHardZero(text(''), counts)).toEqual({ ok: true, value: [] });
+  });
+
+  it('reads the listed names', () => {
+    expect(readHardZero(text('"hard-zero":["knowledge-to-companies-lines"]'), counts)).toEqual({
+      ok: true,
+      value: ['knowledge-to-companies-lines'],
+    });
+  });
+
+  it('refuses a name the baseline has no count for, and a list that is not a list of names', () => {
+    const unknown = readHardZero(text('"hard-zero":["nope"]'), counts);
+    expect(unknown).toEqual({
+      ok: false,
+      problems: ['docs/baselines/fitness.json: hard-zero names "nope", which is not a count'],
+    });
+    expect(readHardZero(text('"hard-zero":"x"'), counts).ok).toBe(false);
   });
 });

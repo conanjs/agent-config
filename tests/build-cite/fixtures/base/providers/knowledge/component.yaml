@@ -1,0 +1,14 @@
+schema: component/v1
+name: agent-knowledge
+version: 1.0.0
+slot: knowledge-storage
+repository: https://github.com/conanjs/agent-knowledge
+contracts:
+  pin: 1
+locations:
+  content: .
+  framework: fw
+provides:
+  contracts: [knowledge-provider/v1]
+  index: index.md
+  exports: [x.md]

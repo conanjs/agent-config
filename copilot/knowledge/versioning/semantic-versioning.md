@@ -5,7 +5,7 @@ topic: versioning
 status: verified
 applies-to: ["SemVer 2.0.0"]
 last-verified: 2026-10-25
-last-updated: 2026-10-25
+last-updated: 2026-11-14
 tags: [semver, versioning, release, pinning, compatibility]
 ---
 
@@ -75,16 +75,12 @@ A rule set is at `1.0.0`, and a project pins `@1`.
 - Never edit a released version in place; publish a new one. [rule-candidate]
 - Pin the major for compatibility, and a SHA where tampering or moving tags is a risk. [rule-candidate]
 
-## Used by
-- _Not cited by any rule yet._
-
 ## Verification status
 - Verified: 12 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
 
 ## References
 - [Semantic Versioning 2.0.0](https://semver.org/) — Tom Preston-Werner, living. Backs: How it works 1–6, Worked example, Edge cases. [^1]
 - [Security hardening / secure use for GitHub Actions](https://docs.github.com/en/actions/reference/security/secure-use) — GitHub, living. Backs: How it works 7, Edge cases. [^2]
-- `copilot/frameworks/agentic-sdlc/conventions.md` — §13 Versioning applies this to paradigms, overlays and schemas.
 
 ## Related
 - `git/`

@@ -5,7 +5,7 @@ topic: software-design/ddd
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [ddd, aggregates, invariants, testing]
 ---
 
@@ -76,12 +76,6 @@ Tests should exercise aggregate behavior through root operations because outside
 - Keep aggregates small by modeling true consistency boundaries, not screen shapes. [rule-candidate]
 - Test valid and invalid behavior through root operations instead of mutating internals. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-class-modeled-R2 | Source: |
-| paradigm rule | PDM-class-modeled-R6 | Source: |
-
 ## Verification status
 - Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -90,7 +84,6 @@ Tests should exercise aggregate behavior through root operations because outside
 - [Effective Aggregate Design](https://www.dddcommunity.org/library/vernon_2011/) — Vaughn Vernon / DDD Community, 2011. Backs: Problem, How it works, Edge cases. [^2]
 - [Effective Aggregate Design, Part I](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_1.pdf), [Part II](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_2.pdf), [Part III](https://www.dddcommunity.org/wp-content/uploads/files/pdf_articles/Vernon_2011_3.pdf) — Vaughn Vernon, 2011. Backs: identity references, small aggregates, eventual consistency. [^3]
 - [DDD Reference](https://www.domainlanguage.com/ddd/reference/) — Eric Evans / Domain Language, 2015. Backs: DDD pattern classification. [^4]
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites this doc as PDM-class-modeled-R2 and PDM-class-modeled-R6.
 - Vaughn Vernon, *Implementing Domain-Driven Design* (2013) — further reading; the free Effective Aggregate Design materials above are used for verified claims.
 - Eric Evans, *Domain-Driven Design* (2003) — further reading; the free DDD Reference above is used for verified claims.
 

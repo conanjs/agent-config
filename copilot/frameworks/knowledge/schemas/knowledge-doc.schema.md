@@ -1,6 +1,6 @@
 ---
 schema: schema/v1
-last-updated: 2026-10-29
+last-updated: 2026-11-14
 ---
 
 # Schema: Knowledge Doc (`knowledge-doc/v1`)
@@ -15,8 +15,8 @@ The **patterned named sections** every future knowledge file follows. The shape 
 ├──────────── TYPE BODY ──────────────┤
 │ concept | how-to | reference | case │
 ├──────────── COMMON TAIL ────────────┤
-│ Takeaways · Used by · Verification  │
-│ status · References · Related       │
+│ Takeaways · Verification status ·   │
+│ References · Related                │
 └─────────────────────────────────────┘
 ```
 
@@ -96,19 +96,14 @@ Section names are fixed. Sections marked *(opt)* may be omitted, but **not renam
 ## Takeaways
 - <short, actionable statement> [rule-candidate]   ← tag = could become a rule in store A
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-12 | Source: |
-| stack Reference topics | stacks/typescript-node | Attach when: hot-path |
-<!-- or "- _Not cited by any rule yet._" -->
-
 ## Verification status
 - Verified: <n> claims (✅) · Unverified: <n> claims (⚠️) · Last verified: <date>
 
 ## References
 ## Related
 ```
+
+A doc does not list who cites it. A leftover `## Used by` section (heading, table or text) between Takeaways and Verification status is allowed and ignored: the validator neither requires nor reads it. Remove it when you next edit the doc.
 
 ## Rules
 
@@ -117,7 +112,7 @@ Section names are fixed. Sections marked *(opt)* may be omitted, but **not renam
 | KD-1 | Section names and order match the type table | Headings diff is empty | script |
 | KD-2 | `status: verified` ⇒ zero `⚠️ unverified` markers and `last-verified` set | — | script |
 | KD-3 | A `[rule-candidate]` takeaway turns into a rule in A, or the tag is removed, within one learning cycle | — | llm (learning loop, open question 2) |
-| KD-4 | `Used by` lists exactly the store A files whose `Source:` points here | — | script |
+| KD-4 | Retired. No `Used by` section is required; a leftover one is ignored | — | none |
 | KD-5 | The Mental model has both an analogy and an artifact | — | llm |
 | KD-6 | Concept docs ≤ ~400 lines; split by sub-mechanism if longer. A long, free-form treatment belongs in a `deep-dive/v1` doc instead | — | script (warn) |
 | KD-7 | Every `derived-from` path exists; if it is a `deep-dive/v1` doc, its `synthesized-into` lists this doc. Facts cite the original sources, not the deep dive | links agree both ways | script |
@@ -180,11 +175,6 @@ const b = { y: 2, x: 1 };   // shape S2: different order → different shape
 - Initialize all fields in one place (constructor or factory), always in the same order. [rule-candidate]
 - Don't `delete` properties on hot objects; set them to `undefined`. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-12 | Source: |
-
 ## Verification status
 - Verified: 4 · Unverified: 1 · Last verified: 2026-10-04
 
@@ -201,7 +191,7 @@ const b = { y: 2, x: 1 };   // shape S2: different order → different shape
 
 | Check | Tool |
 |---|---|
-| KD-1, KD-2, KD-4, KD-6, KD-7, KD-9; the shared KB-9 … KB-12 (front-matter values and keys, title and Summary head, References/Related/footnotes); KB-2; KB-7 and KB-8 heuristics (warn); URLs resolve (KB-3, `--urls`) | `validate-knowledge.mjs`, run by `scripts/check-docs.sh` (pre-commit, Claude Code hook, CI) |
+| KD-1, KD-2, KD-6, KD-7, KD-9; the shared KB-9 … KB-12 (front-matter values and keys, title and Summary head, References/Related/footnotes); KB-7 and KB-8 heuristics (warn); URLs resolve (KB-3, `--urls`) | `validate-knowledge.mjs`, run by `scripts/check-docs.sh` (pre-commit, Claude Code hook, CI) |
 | KD-3, KD-5, KD-8, KB-1, KB-5, KB-7, KB-8 | LLM review: `{{AGENT_HOME}}/procedures/review-docs.procedure.md`, before committing changes under `knowledge/` |
 
 ## References
@@ -214,4 +204,3 @@ const b = { y: 2, x: 1 };   // shape S2: different order → different shape
 
 - `_system.md`, `topic-index.schema.md`
 - `deep-dive.schema.md`: free-form docs that are synthesized into this shape
-- `{{AGENT_HOME}}/frameworks/agentic-sdlc/schemas/stack.schema.md` — Reference topics (A → B)

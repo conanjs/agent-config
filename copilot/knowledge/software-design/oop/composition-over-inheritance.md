@@ -5,7 +5,7 @@ topic: software-design/oop
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [oop, composition, inheritance, delegation, strategy]
 ---
 
@@ -112,11 +112,6 @@ Go embeds a field; Rust constrains behavior with a trait.
 - Reserve inheritance for stable substitutable contracts, not convenience sharing. [rule-candidate]
 - In Go and Rust, reach for embedding, interfaces, traits, and functions rather than implementation inheritance. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-9 | Source: |
-
 ## Verification status
 - Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -127,7 +122,6 @@ Go embeds a field; Rust constrains behavior with a trait.
 - [Using Trait Objects to Abstract over Shared Behavior](https://raw.githubusercontent.com/rust-lang/book/main/src/ch18-02-trait-objects.md) — Rust Project, living. Backs: How it works, Edge cases. [^4]
 - [TypeScript Handbook: Mixins](https://www.typescriptlang.org/docs/handbook/mixins.html) — TypeScript team, living. Backs: How it works. [^5]
 - [Advanced Functions and Closures](https://raw.githubusercontent.com/rust-lang/book/main/src/ch20-04-advanced-functions-and-closures.md) — Rust Project, living. Backs: How it works. [^6]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-9.
 - Gamma, Helm, Johnson, Vlissides, *Design Patterns* (1994) — further reading on object composition and class inheritance.
 
 ## Related

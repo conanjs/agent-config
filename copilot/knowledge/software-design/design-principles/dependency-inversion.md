@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-25
+last-updated: 2026-11-14
 tags: [solid, dip, dependency-injection, boundaries, ports]
 ---
 
@@ -91,12 +91,6 @@ The application composition root wires `PgShipmentStore` or `saveWithPg`; the po
 - Use DI as a wiring tool, not as a substitute for dependency direction. [rule-candidate]
 - Apply DIP where I/O, frameworks, or deployment details cross into policy. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-5 | Source: |
-| paradigm rule | PDM-class-modeled-R10 | Source: |
-
 ## Verification status
 - Verified: 9 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -105,8 +99,6 @@ The application composition root wires `PgShipmentStore` or `saveWithPg`; the po
 - [Inversion of Control Containers and the Dependency Injection pattern](https://martinfowler.com/articles/injection.html) — Martin Fowler, 2004. Backs: How it works, Edge cases. [^2]
 - [Plugin](https://martinfowler.com/eaaCatalog/plugin.html) — Martin Fowler, 2002. Backs: Edge cases. [^3]
 - [SOLID Relevance](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html) — Robert C. Martin, 2020. Backs: Summary. [^4]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-5.
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites this doc as PDM-class-modeled-R10.
 
 ## Related
 - `software-design/oop/dependency-injection.md`

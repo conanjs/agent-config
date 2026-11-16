@@ -5,7 +5,7 @@ topic: software-design/functional-modeling
 status: verified
 applies-to: ["TypeScript functional-pipeline cores"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [testing, table-tests, property-based-testing, fast-check]
 ---
 
@@ -91,11 +91,6 @@ fast-check generates inputs for the property, runs the assertion many times, and
 - Add property-based tests for invariants that should hold across many inputs. [rule-candidate]
 - Use few shell integration tests for adapters; do not mock infrastructure for every core rule. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-functional-pipeline-R6 | Source: |
-
 ## Verification status
 - Verified: 20 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -104,8 +99,6 @@ fast-check generates inputs for the property, runs the assertion many times, and
 - [Property-based testing](https://fsharpforfunandprofit.com/posts/property-based-testing/) and [Choosing properties](https://fsharpforfunandprofit.com/posts/property-based-testing-2/) — Scott Wlaschin / F# for Fun and Profit, 2014. Backs: property motivation and property patterns. [^2]
 - [What is Property-Based Testing?](https://fast-check.dev/docs/introduction/what-is-property-based-testing/) — fast-check documentation, living. Backs: generated inputs, multiple runs, shrinking, seeded repeatability. [^3]
 - [TableDrivenTests](https://go.dev/wiki/TableDrivenTests) — Go Wiki, living. Backs: table/example-driven tests. [^4]
-- `copilot/frameworks/agentic-sdlc/paradigms/functional-pipeline.md` — cites this doc as PDM-functional-pipeline-R6.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/functional-pipeline.md` — TypeScript overlay for table-driven core tests and adapter tests.
 - Scott Wlaschin, *Domain Modeling Made Functional* (2018) — further reading; consolidated here through Wlaschin's free F# for Fun and Profit materials.
 
 ## Related

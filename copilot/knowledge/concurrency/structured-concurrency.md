@@ -5,7 +5,7 @@ topic: concurrency
 status: verified
 applies-to: ["Go", "Python >= 3.11", "Rust tokio", "TypeScript"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [concurrency, cancellation, async, goroutines]
 ---
 
@@ -88,13 +88,6 @@ The same shape maps to Python `TaskGroup`, where exiting the `async with` waits 
 - Pass cancellation to every blocking or I/O child operation. [rule-candidate]
 - Treat unjoined goroutines, tasks, and promises as leaks until proven supervised. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | GO-5 | Source: |
-| stack idiom | PY-6 | Source: |
-| stack idiom | RS-6 | Source: |
-
 ## Verification status
 - Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -105,9 +98,6 @@ The same shape maps to Python `TaskGroup`, where exiting the `async with` waits 
 - [Coroutines and tasks: TaskGroup](https://docs.python.org/3/library/asyncio-task.html#task-groups) — Python Software Foundation, living. Backs: Python examples. [^4]
 - [tokio::task::JoinSet](https://docs.rs/tokio/latest/tokio/task/struct.JoinSet.html) — Tokio project, living. Backs: Rust examples and edge cases. [^5]
 - [Promise.all()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all), [Promise.allSettled()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled), and [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) — MDN, living. Backs: TypeScript examples. [^6]
-- `copilot/frameworks/agentic-sdlc/stacks/go/idioms.md` — cites this doc as GO-5.
-- `copilot/frameworks/agentic-sdlc/stacks/python/idioms.md` — cites this doc as PY-6.
-- `copilot/frameworks/agentic-sdlc/stacks/rust/idioms.md` — cites this doc as RS-6.
 
 ## Related
 - `concurrency/blocking-in-async-runtimes.md`

@@ -25,7 +25,7 @@ cucumber="$root/node_modules/@cucumber/cucumber/bin/cucumber.js"
 status=0
 "$node_bin" "$root/copilot/frameworks/knowledge/tools/validate-knowledge.mjs" || status=1
 "$node_bin" "$root/copilot/procedures/tools/validate-procedures.mjs" || status=1
-"$node_bin" "$root/copilot/frameworks/agentic-sdlc/tools/validate.mjs" || status=1
+"$node_bin" "$root/copilot/frameworks/agentic-sdlc/tools/validate.mjs" --knowledge "$root/copilot/knowledge" --adapters "$root/adapters.json" || status=1
 "$node_bin" "$root/copilot/frameworks/agent-foundry/tools/validate-foundry.mjs" || status=1
 # The atlas: every file under a kind, the tree whole, the generated map current (after adding files: atlas.mjs --write).
 "$node_bin" "$root/copilot/atlas/tools/atlas.mjs" || status=1
@@ -48,7 +48,10 @@ if command -v usage >/dev/null 2>&1; then usage lint -W "$wg/interfaces/workflow
 (cd "$root" && "$node_bin" node_modules/prettier/bin/prettier.cjs --check --log-level warn . && "$node_bin" node_modules/eslint/bin/eslint.js . --max-warnings 0 && "$node_bin" node_modules/typescript/bin/tsc --noEmit -p tsconfig.json && "$node_bin" node_modules/vitest/vitest.mjs run --silent) || status=1
 schemas_out="$(cd "$root" && "$node_bin" contracts/tools/check-schemas.ts contracts/index.md contracts/slots.yaml contracts/*/v1/examples/valid/* 2>&1)" || { printf '%s\n' "$schemas_out" >&2; status=1; }
 (cd "$root" && "$node_bin" scripts/check-fitness.ts --root "$root") || status=1
-(cd "$root" && "$node_bin" scripts/check-ac-coverage.ts --root "$root" --delivered 0) || status=1
+(cd "$root" && "$node_bin" scripts/check-ac-coverage.ts --root "$root" --delivered 0,1) || status=1
 (cd "$root" && "$node_bin" contracts/tools/build.ts layout --report --repo agent-config --root "$root") || status=1
+# build cite in check mode over the fixture tree (T114): the checker itself stays honest; real consumer enforcement starts in
+# phase 6, when a provider repository URL exists.
+(cd "$root" && "$node_bin" contracts/tools/build.ts cite --root "$root/tests/build-cite/fixtures/base" --slots "$root/contracts/slots.yaml" --provider providers/knowledge/component.yaml --provider providers/core/component.yaml) || status=1
 (cd "$root" && "$node_bin" "$cucumber") || status=1
 exit $status

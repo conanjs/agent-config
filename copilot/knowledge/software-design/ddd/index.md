@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: subtopic
 topic: software-design/ddd
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 ---
 
 # Domain-Driven Design
@@ -19,8 +19,6 @@ Domain-Driven Design covers business language, model boundaries, tactical buildi
 
 ## References
 - `copilot/frameworks/knowledge/schemas/topic-index.schema.md` — defines the topic index shape.
-- `copilot/frameworks/agentic-sdlc/foundations/design/domain-driven-design.md` — DDD foundation aligned by these docs.
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites aggregate and layering docs from PDM class-modeled rules.
 - [DDD Reference](https://www.domainlanguage.com/ddd/reference/) — Eric Evans / Domain Language, 2015. Backs: DDD topic scope.
 - [BoundedContext](https://martinfowler.com/bliki/BoundedContext.html) — Martin Fowler, 2014. Backs: strategic DDD scope.
 

@@ -5,7 +5,7 @@ topic: software-design/oop
 status: verified
 applies-to: ["C#", "Java", "TypeScript", "JavaScript (ES modules)"]
 last-verified: 2026-10-25
-last-updated: 2026-10-25
+last-updated: 2026-11-14
 tags: [static-class, modules, namespaces, organization, typescript, csharp]
 ---
 
@@ -75,9 +75,6 @@ All three are found under one name. Pick the last one when the unit plays a name
 - In TypeScript, group stateless helpers by module, not by a static-only class. [rule-candidate]
 - A stateless unit that plays a named role or needs a fake is an instance class, injected. [rule-candidate]
 
-## Used by
-- _Not cited by any rule yet._
-
 ## Verification status
 - Verified: 7 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
 
@@ -86,7 +83,6 @@ All three are found under one name. Pick the last one when the unit plays a name
 - [Static classes and static class members (C#)](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/static-classes-and-static-class-members) — Microsoft, living. Backs: How it works 1, Edge cases. [^2]
 - [TypeScript Handbook: Classes, "Why No Static Classes?"](https://www.typescriptlang.org/docs/handbook/2/classes.html) — TypeScript team, living. Backs: How it works 2. [^3]
 - [no-extraneous-class](https://typescript-eslint.io/rules/no-extraneous-class/) — typescript-eslint, living. Backs: How it works 3, boundary table, Edge cases. [^4]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/class-modeled.md` — the Tier B form for TypeScript.
 
 ## Related
 - `software-design/oop/encapsulation.md`

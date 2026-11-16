@@ -5,7 +5,7 @@ topic: concurrency
 status: verified
 applies-to: ["Python asyncio", "Rust tokio", "Node.js", "TypeScript"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [async, event-loop, tokio, asyncio, node]
 ---
 
@@ -77,12 +77,6 @@ In Rust, the equivalent change is replacing inline blocking work with `tokio::ta
 - Use async-native APIs first; use thread or process offload for bounded blocking work. [rule-candidate]
 - Turn on asyncio debug mode when hunting event-loop stalls. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | PY-5 | Source: |
-| stack idiom | RS-5 | Source: |
-
 ## Verification status
 - Verified: 17 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -91,8 +85,6 @@ In Rust, the equivalent change is replacing inline blocking work with `tokio::ta
 - [Developing with asyncio](https://docs.python.org/3/library/asyncio-dev.html) and [asyncio.to_thread](https://docs.python.org/3/library/asyncio-task.html#asyncio.to_thread) — Python Software Foundation, living. Backs: Python event loop, debug mode, offload APIs. [^2]
 - [tokio::task::spawn_blocking](https://docs.rs/tokio/latest/tokio/task/fn.spawn_blocking.html) — Tokio project, living. Backs: Rust blocking behavior. [^3]
 - [Don't block the Event Loop](https://nodejs.org/learn/asynchronous-work/dont-block-the-event-loop) — Node.js project, living. Backs: Node Event Loop behavior. [^4]
-- `copilot/frameworks/agentic-sdlc/stacks/python/idioms.md` — cites this doc as PY-5.
-- `copilot/frameworks/agentic-sdlc/stacks/rust/idioms.md` — cites this doc as RS-5.
 
 ## Related
 - `concurrency/structured-concurrency.md`

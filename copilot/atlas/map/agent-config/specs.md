@@ -144,6 +144,7 @@ Where: `specs/**` · Schema: — · Index: `specs/README.md` · Checked by: — 
 - [`specs/022-repo-split/decisions/system-architecture.md`](../../../../specs/022-repo-split/decisions/system-architecture.md)
 - [`specs/022-repo-split/decisions/tech-stack.md`](../../../../specs/022-repo-split/decisions/tech-stack.md)
 - [`specs/022-repo-split/phase-0-exit.md`](../../../../specs/022-repo-split/phase-0-exit.md)
+- [`specs/022-repo-split/phase-1-exit.md`](../../../../specs/022-repo-split/phase-1-exit.md)
 - [`specs/022-repo-split/plan.md`](../../../../specs/022-repo-split/plan.md)
 - [`specs/022-repo-split/research.md`](../../../../specs/022-repo-split/research.md)
 - [`specs/022-repo-split/spec.md`](../../../../specs/022-repo-split/spec.md)

@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["@langchain/langgraph 1.6.0", "@langchain/langgraph-checkpoint-sqlite 1.1.0", "@langchain/core 1.3.2", "Node.js 24.22.1, macOS"]
 last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-updated: 2026-11-14
 tags: [langgraph, langgraph-js, graph-engineering, orchestration, checkpoints, human-in-the-loop]
 ---
 
@@ -14,7 +14,7 @@ tags: [langgraph, langgraph-js, graph-engineering, orchestration, checkpoints, h
 ## Summary
 **TL;DR:** LangGraph.js runs a graph of plain JavaScript functions over a shared state. Conditional edges route; `Send` fans out with per-branch input; reducers join parallel writes. With a checkpointer, `interrupt()` pauses a run for a person, and a different process can resume it. Tested on 2026-11-03: a gate paused in one process and resumed in another from a SQLite file.
 **Use this when:** deciding whether LangGraph.js can execute an agent workflow (gates, retries, parallel tasks, crash-safe runs), or writing such a runner.
-**Not this doc:** what Graph Engineering is → `graph-engineering-study-guide.md`; the agentic-sdlc design that uses this → `specs/019-workflow-graph/` in agent-config.
+**Not this doc:** what Graph Engineering is → `graph-engineering-study-guide.md`.
 
 ## Scope
 The JavaScript LangGraph packages listed in `applies-to`, from the official docs read on 2026-11-02/03 and a spike run on this machine on 2026-11-03 (a five-node graph: plan, three parallel tasks each running a child process, a join, a budgeted retry loop, a gate).
@@ -58,9 +58,6 @@ The JavaScript LangGraph packages listed in `applies-to`, from the official docs
 ## Takeaways
 - LangGraph.js can execute a gated, budgeted, parallel workflow whose workers are command-line agents; the gate survives the process.
 - Put side effects after `interrupt()`, never before it.
-
-## Used by
-- _Not cited by any rule yet._
 
 ## Verification status
 - Verified: 19 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03

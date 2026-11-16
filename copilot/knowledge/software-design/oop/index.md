@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: subtopic
 topic: software-design/oop
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 ---
 
 # Object-oriented modeling
@@ -23,8 +23,6 @@ Object-oriented modeling covers objects, identity, state, behavior, messaging, c
 
 ## References
 - `copilot/frameworks/knowledge/schemas/topic-index.schema.md` — defines the topic index shape.
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites these docs from PDM class-modeled rules.
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites `composition-over-inheritance.md` as DP-9.
 - [Clarification of "object-oriented"](http://www.purl.org/stefan_ram/pub/doc_kay_oop_en) — Alan Kay via Stefan Ram, 2003. Backs: messaging scope.
 - [TellDontAsk](https://martinfowler.com/bliki/TellDontAsk.html) — Martin Fowler, 2013. Backs: OOP behavior ownership scope.
 - [Inversion of Control Containers and the Dependency Injection pattern](https://martinfowler.com/articles/injection.html) — Martin Fowler, 2004. Backs: dependency injection scope.

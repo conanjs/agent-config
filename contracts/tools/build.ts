@@ -3,6 +3,7 @@
 // Exit codes (A-8): 0 ok, 1 a check failed, 2 a wrong command line. The tool imports nothing outside contracts/ (DR-302).
 import { runBudget } from './budget.ts';
 import { runCheckSchemas } from './check-schemas.ts';
+import { runCite } from './cite.ts';
 import { runLayout } from './layout.ts';
 import { ExitCode, failure, oneLine, realEnv, type Outcome, type ToolEnv } from './tool-io.ts';
 
@@ -19,6 +20,11 @@ Subcommands built in this version:
       It writes nothing, unless --out is given: then the same report goes to <file>, relative to --root.
       --render <file> prints that one file as rendered. The default --agent-home is ~/.agent-config.
       The only git command it runs is "git rev-parse HEAD".
+  cite [--write] [--root <dir>] --slots <slots.yaml> --provider <component.yaml> [--provider <component.yaml> ...]
+      Checks each citation of another component in the Markdown files below --root: a link whose text starts with
+      {{AGENT_HOME}}/ must target the cited file in the provider's GitHub repository, and depends.slots[].docs of
+      <root>/component.yaml must list the cited files. With --write the missing or stale targets and docs are written
+      (a second run changes nothing); without it nothing is written. Paths resolve against --root.
   layout [--report] [--repo <name>] [--root <dir>]
       Checks the repository root against contracts/repo-layout/v1/rules.yaml. With --report findings are
       listed and the exit code is 0; without it any finding exits 1. --repo names the repository for its exceptions.
@@ -26,13 +32,14 @@ Subcommands built in this version:
       Reads each file with the contract reader: "<file>: error|warning: <field>: <message>" or "<file>: ok".
       A file named index.md is checked as the contracts index.
 
-Not built yet (later phases): build (skill and agent sources), budget without --baseline, cite.
+Not built yet (later phases): build (skill and agent sources), budget without --baseline.
 
 Options: -h, --help   show this text
 Exit codes: 0 ok, 1 a check failed, 2 usage error`;
 
 const SUBCOMMANDS: Readonly<Record<string, (argv: readonly string[], env: ToolEnv) => Outcome>> = {
   budget: runBudget,
+  cite: runCite,
   layout: runLayout,
   'check-schemas': runCheckSchemas,
 };

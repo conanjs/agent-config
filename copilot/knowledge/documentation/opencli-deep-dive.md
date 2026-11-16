@@ -4,7 +4,7 @@ topic: documentation
 status: verified
 applies-to: ["OpenCLI draft 0.1 (opencli.org, spectreconsole/open-cli, change log to 2026-04-19)", "OpenCLI 1.0.0-alpha.16 (opencli.dev, bcdxn/opencli, ocli v1.3.0)", "sources read 2026-11-03"]
 last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-updated: 2026-11-14
 synthesized-into:
   - { path: documentation/interface-description-standards.md, on: 2026-11-03 }
 tags: [opencli, cli, interface-description, contract-first, json-schema, spectre-console, dotnet, code-generation]
@@ -336,4 +336,3 @@ The diff in code-first step 4 is how API Extractor treats a TypeScript library: 
 - `documentation/interface-description-standards.md` — which format fits which interface (synthesized from this dive).
 - `documentation/usage-spec-deep-dive.md` — usage (jdx), the most complete CLI spec today.
 - `documentation/cli-description-formats-deep-dive.md` — docopt, Fig, carapace, `--cli-schema`, man pages and the comparison of all formats.
-- `frameworks/agentic-sdlc/foundations/design/contract-design.md` — contract rules CON-1 … CON-14.

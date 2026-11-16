@@ -34,7 +34,7 @@ Feature: Knowledge validator
     Then it exits with 1 and prints:
       """
       FAIL (1)
-        KD-1  demo/concept.md: unexpected or out-of-order section "## Corner cases" (expected order: Summary → Problem → Mental model → How it works → Worked example → Edge cases → Trade-offs? → Case studies? → Takeaways → Used by → Verification status → References → Related)
+        KD-1  demo/concept.md: unexpected or out-of-order section "## Corner cases" (expected order: Summary → Problem → Mental model → How it works → Worked example → Edge cases → Trade-offs? → Case studies? → Takeaways → Used by? → Verification status → References → Related)
       """
 
   Scenario: KD-1 a missing required section fails
@@ -250,46 +250,6 @@ Feature: Knowledge validator
       """
       FAIL (1)
         KD-9  demo/concept.md: Verification status says last verified 2026-10-02, front-matter says 2026-10-01
-      """
-
-  # ---- KD-4: Used by matches the rules that cite the doc --------------------------------------
-
-  Scenario: KD-4 a Used by section with neither a table nor the placeholder fails
-    Given in "knowledge/demo/concept.md", `| Where | Id / path | How |\n|---|---|---|\n| foundation rule | DEMO-1 | Source: |` becomes `- See the rules.`
-    When the tool runs
-    Then it exits with 1 and prints:
-      """
-      FAIL (2)
-        KD-4  demo/concept.md: Used by has no table and no "_Not cited by any rule yet._"
-        KD-4  demo/concept.md: cited by DEMO-1 (Source) but not listed in Used by
-      """
-
-  Scenario: KD-4 a rule that cites the doc but is missing from Used by fails
-    Given in "knowledge/demo/concept.md", `| Where | Id / path | How |\n|---|---|---|\n| foundation rule | DEMO-1 | Source: |` becomes `- _Not cited by any rule yet._`
-    When the tool runs
-    Then it exits with 1 and prints:
-      """
-      FAIL (1)
-        KD-4  demo/concept.md: cited by DEMO-1 (Source) but not listed in Used by
-      """
-
-  Scenario: KD-4 a rule listed in Used by that does not cite the doc fails
-    Given in "agentic-sdlc/foundations/demo.md", `knowledge/demo/concept.md` becomes `none`
-    When the tool runs
-    Then it exits with 1 and prints:
-      """
-      FAIL (1)
-        KD-4  demo/concept.md: Used by lists DEMO-1, but that rule's Source does not cite this doc
-      """
-
-  Scenario: KD-4 a missing agentic-sdlc root warns, and every listed rule then fails
-    Given the folder "agentic-sdlc" is removed
-    When the tool runs
-    Then it exits with 1 and prints:
-      """
-        warn  KD-4  agentic-sdlc root not found at {root}/agentic-sdlc; Used by not checked
-      FAIL (1)
-        KD-4  demo/concept.md: Used by lists DEMO-1, but that rule's Source does not cite this doc
       """
 
   # ---- KD-7, DD-1, DD-3, DD-4: deep dives and the docs synthesized from them -------------------
@@ -604,15 +564,6 @@ Feature: Knowledge validator
 
   # ---- KB: knowledge-base hygiene ---------------------------------------------------------------
 
-  Scenario: KB-2 a company or repo name from the Company KB fails
-    Given in "knowledge/demo/concept.md", `Scenarios need a known good doc.` becomes `Scenarios need a known good doc, like the one in widget-api.`
-    When the tool runs
-    Then it exits with 1 and prints:
-      """
-      FAIL (1)
-        KB-2  demo/concept.md: company-specific name "widget-api" in store B
-      """
-
   Scenario: KB-7 a paragraph that opens with a bare Yes warns
     Given in "knowledge/demo/concept.md", `Scenarios need a known good doc.` becomes `**Yes.** Scenarios need a known good doc.`
     When the tool runs
@@ -692,6 +643,46 @@ Feature: Knowledge validator
     Given in "knowledge/demo/concept.md", `## Edge cases\nNone.` becomes `## Edge cases\nSee http://127.0.0.1:9/closed for details.`
     When the tool runs
     Then it passes with no warnings
+
+  # ---- specs/022 phase 1 (US9): the knowledge area stands alone ---------------------------------
+  # Written before the code (QB-3, tests first); T097 (validator) and T098 (framework schemas) made them pass.
+
+  Scenario: AC-9.2 a doc without a Used by section passes
+    Given in "knowledge/demo/concept.md", `## Used by\n| Where | Id / path | How |\n|---|---|---|\n| foundation rule | DEMO-1 | Source: |\n\n` becomes ``
+    When the tool runs
+    Then it passes with no warnings
+
+  Scenario: AC-9.2 a leftover Used by table is ignored, whatever it lists
+    Given in "knowledge/demo/concept.md", `| foundation rule | DEMO-1 | Source: |` becomes `| nothing | GONE-9 | none |`
+    When the tool runs
+    Then it passes with no warnings
+
+  Scenario: AC-9.2 a leftover Used by section with no table is ignored
+    Given in "knowledge/demo/concept.md", `| Where | Id / path | How |\n|---|---|---|\n| foundation rule | DEMO-1 | Source: |` becomes `- See the rules.`
+    When the tool runs
+    Then it passes with no warnings
+
+  Scenario: AC-9.2 the validator source holds no backlink scan and does not read the SDLC framework
+    Given the repo's "copilot/frameworks/knowledge/tools" folder is copied to "validator"
+    Then the file "validator/validate-knowledge.mjs" has no line containing "backlink"
+    And the file "validator/validate-knowledge.mjs" has no line containing "KD-4"
+    And the file "validator/validate-knowledge.mjs" has no line containing "sdlc"
+
+  Scenario: AC-9.4 a company or repository name is no longer refused
+    Given in "knowledge/demo/concept.md", `Scenarios need a known good doc.` becomes `Scenarios need a known good doc, like the one in widget-api at acme.`
+    When the tool runs
+    Then it passes with no warnings
+
+  Scenario: AC-9.4 a checkout holding only the knowledge area passes
+    Given the folder "agentic-sdlc" is removed
+    And the folder "companies" is removed
+    When the tool runs with "--only-knowledge"
+    Then it passes with no warnings
+
+  Scenario: AC-9.4 the validator source never reads a company folder and the deny-list check is gone
+    Given the repo's "copilot/frameworks/knowledge/tools" folder is copied to "validator"
+    Then the file "validator/validate-knowledge.mjs" has no line containing "companies"
+    And the file "validator/validate-knowledge.mjs" has no line containing "deny"
 
   # ---- traceability (TST-14) -------------------------------------------------------------------
 

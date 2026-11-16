@@ -256,59 +256,59 @@ No task line is written for these, because only V can do them. A phase does not 
 
 Characterization scenarios of the two validators come first (QB-3). The core instruction edits of three later criteria are done here, in one change, so the phase 2 move leaves the text agents load unchanged (AC-8.6).
 
-- [ ] T090 [P] [US9] Characterization scenarios that pin what the knowledge validator does today for the three behaviours this phase removes: the Used by rule, the backlink scan and the deny-list check on company folders (tests/validate-knowledge/characterization.feature)  [QA] [llm]
+- [x] T090 [P] [US9] Characterization scenarios that pin what the knowledge validator does today for the three behaviours this phase removes: the Used by rule, the backlink scan and the deny-list check on company folders (tests/validate-knowledge/characterization.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T089
-- [ ] T091 [P] [US9] Characterization scenarios that pin the SDLC validator today: the hard-coded knowledge and adapter folders and what a missing citation prints (tests/validate-sdlc/characterization.feature)  [QA] [llm]
+- [x] T091 [P] [US9] Characterization scenarios that pin the SDLC validator today: the hard-coded knowledge and adapter folders and what a missing citation prints (tests/validate-sdlc/characterization.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T089
-- [ ] T092 [US9] Scenarios AC-9.2 a doc without Used by passes and a doc with a Used by table is ignored without error, and the validator source holds no backlink scan; AC-9.4 the validator reads only the knowledge area, never a company folder, and the deny-list check no longer exists (tests/validate-knowledge/validate-knowledge.feature)  [QA] [llm]
+- [x] T092 [US9] Scenarios AC-9.2 a doc without Used by passes and a doc with a Used by table is ignored without error, and the validator source holds no backlink scan; AC-9.4 the validator reads only the knowledge area, never a company folder, and the deny-list check no longer exists (tests/validate-knowledge/validate-knowledge.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T090
-- [ ] T093 [US9] Scenario AC-9.3: with the knowledge root and the adapter map as arguments an unresolved citation fails naming the citing file and the missing path, and a fixture with renamed folders passes, so no folder name is hard-coded (tests/validate-sdlc/validate-sdlc.feature)  [QA] [llm]
+- [x] T093 [US9] Scenario AC-9.3: with the knowledge root and the adapter map as arguments an unresolved citation fails naming the citing file and the missing path, and a fixture with renamed folders passes, so no folder name is hard-coded (tests/validate-sdlc/validate-sdlc.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T091
-- [ ] T094 [P] [US9] Scenarios for build cite: AC-9.5 write makes the GitHub target from the provider repository URL and a second write changes nothing byte for byte; AC-9.6 a missing or different target fails naming file, citation and expected target; AC-9.7 a provider with no repository fails naming provider and file; AC-5.10 the three classifier cases; EDGE-7 and FR-017 a hand-written depends.docs that disagrees fails and prints the generated value; EDGE-13 a provider with no repository. Spaces and non-ASCII paths in the unit table (tests/build/cite.feature)  [QA] [llm]
+- [x] T094 [P] [US9] Scenarios for build cite: AC-9.5 write makes the GitHub target from the provider repository URL and a second write changes nothing byte for byte; AC-9.6 a missing or different target fails naming file, citation and expected target; AC-9.7 a provider with no repository fails naming provider and file; AC-5.10 the three classifier cases; EDGE-7 and FR-017 a hand-written depends.docs that disagrees fails and prints the generated value; EDGE-13 a provider with no repository. Spaces and non-ASCII paths in the unit table (tests/build/cite.feature)  [QA] [llm]
       touches: none  ·  refs: specs/022-repo-split/contracts/knowledge-provider-v1.md  ·  procedure: none  ·  hot-path: no  ·  requires: T089
-- [ ] T095 [P] [US9] Scenarios on the core instruction text: AC-9.8 the VAR rule says resolve from global-variables.md and read the resolved file on this machine and never fetch it, and no line tells agents to read link text instead of the target; AC-6.5 one line defines AGENT_HOME and no other variable is defined; AC-4.8 one line says agents never run add, use or an approval from a NEEDS report without V approval in chat. Each forbidden line when added fails (tests/core-instructions/core.feature)  [QA] [llm]
+- [x] T095 [P] [US9] Scenarios on the core instruction text: AC-9.8 the VAR rule says resolve from global-variables.md and read the resolved file on this machine and never fetch it, and no line tells agents to read link text instead of the target; AC-6.5 one line defines AGENT_HOME and no other variable is defined; AC-4.8 one line says agents never run add, use or an approval from a NEEDS report without V approval in chat. Each forbidden line when added fails (tests/core-instructions/core.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T089
-- [ ] T096 [US9] Scenario AC-9.1: the count of knowledge mentions of agentic-sdlc is 0 and the check is on for good, a single new mention fails; the checks that read another area count 0, which is the measure behind SC-012 (tests/fitness/phase1.feature)  [QA] [llm]
+- [x] T096 [US9] Scenario AC-9.1: the count of knowledge mentions of agentic-sdlc is 0 and the check is on for good, a single new mention fails; the checks that read another area count 0, which is the measure behind SC-012 (tests/fitness/phase1.feature)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T089
-- [ ] T097 [US9] Knowledge validator: remove the Used by rule, the backlink scan and the deny-list check, read only the knowledge area (copilot/frameworks/knowledge/tools/validate-knowledge.mjs)  [Eng] [llm]
+- [x] T097 [US9] Knowledge validator: remove the Used by rule, the backlink scan and the deny-list check, read only the knowledge area (copilot/frameworks/knowledge/tools/validate-knowledge.mjs)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T092
-- [ ] T098 [US9] Knowledge framework schemas and index: drop the Used by requirement and say a leftover table is ignored (copilot/frameworks/knowledge/schemas)  [Eng] [llm]
+- [x] T098 [US9] Knowledge framework schemas and index: drop the Used by requirement and say a leftover table is ignored (copilot/frameworks/knowledge/schemas)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T092
-- [ ] T099 [US9] SDLC validator: take the knowledge root and the adapter map as arguments, fail an unresolved citation naming file and path, no hard-coded folder names (copilot/frameworks/agentic-sdlc/tools/validate.mjs)  [Eng] [llm]
+- [x] T099 [US9] SDLC validator: take the knowledge root and the adapter map as arguments, fail an unresolved citation naming file and path, no hard-coded folder names (copilot/frameworks/agentic-sdlc/tools/validate.mjs)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T093
-- [ ] T100 [US9] The build cite subcommand with an optional write: classify with the shared classifier, generate the target from the provider repository URL, idempotent, generate depends.docs, fail on missing or stale target and on a provider without repository (contracts/tools/cite.ts)  [Eng] [llm]
+- [x] T100 [US9] The build cite subcommand with an optional write: classify with the shared classifier, generate the target from the provider repository URL, idempotent, generate depends.docs, fail on missing or stale target and on a provider without repository (contracts/tools/cite.ts)  [Eng] [llm]
       touches: none  ·  refs: specs/022-repo-split/contracts/knowledge-provider-v1.md  ·  procedure: none  ·  hot-path: no  ·  requires: T094, T077, T056
-- [ ] T101 [US9] Core instructions: the VAR rule reads the resolved file locally and never fetches; remove any read the link text line; one line defining AGENT_HOME and no other variable definition; one line that agents never run add, use or an approval from a NEEDS report without V approval in chat (copilot/instructions/core.instructions.md)  [Eng] [llm]
+- [x] T101 [US9] Core instructions: the VAR rule reads the resolved file locally and never fetches; remove any read the link text line; one line defining AGENT_HOME and no other variable definition; one line that agents never run add, use or an approval from a NEEDS report without V approval in chat (copilot/instructions/core.instructions.md)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T095, T009
-- [ ] T102 [P] [US9] Remove mentions of agentic-sdlc from the design-principles knowledge docs, keeping every other sentence (copilot/knowledge/software-design/design-principles)  [Eng] [llm]
+- [x] T102 [P] [US9] Remove mentions of agentic-sdlc from the design-principles knowledge docs, keeping every other sentence (copilot/knowledge/software-design/design-principles)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T103 [P] [US9] Remove mentions of agentic-sdlc from the architecture-styles knowledge docs (copilot/knowledge/software-design/architecture-styles)  [Eng] [llm]
+- [x] T103 [P] [US9] Remove mentions of agentic-sdlc from the architecture-styles knowledge docs (copilot/knowledge/software-design/architecture-styles)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T104 [P] [US9] Remove mentions of agentic-sdlc from the oop knowledge docs (copilot/knowledge/software-design/oop)  [Eng] [llm]
+- [x] T104 [P] [US9] Remove mentions of agentic-sdlc from the oop knowledge docs (copilot/knowledge/software-design/oop)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T105 [P] [US9] Remove mentions of agentic-sdlc from the functional-modeling knowledge docs (copilot/knowledge/software-design/functional-modeling)  [Eng] [llm]
+- [x] T105 [P] [US9] Remove mentions of agentic-sdlc from the functional-modeling knowledge docs (copilot/knowledge/software-design/functional-modeling)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T106 [P] [US9] Remove mentions of agentic-sdlc from the ddd docs and the software-design root (copilot/knowledge/software-design/ddd)  [Eng] [llm]
+- [x] T106 [P] [US9] Remove mentions of agentic-sdlc from the ddd docs and the software-design root (copilot/knowledge/software-design/ddd)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T107 [P] [US9] Remove mentions of agentic-sdlc from the js-runtime knowledge docs (copilot/knowledge/js-runtime)  [Eng] [llm]
+- [x] T107 [P] [US9] Remove mentions of agentic-sdlc from the js-runtime knowledge docs (copilot/knowledge/js-runtime)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T108 [P] [US9] Remove mentions of agentic-sdlc from the ai-agents knowledge docs (copilot/knowledge/ai-agents)  [Eng] [llm]
+- [x] T108 [P] [US9] Remove mentions of agentic-sdlc from the ai-agents knowledge docs (copilot/knowledge/ai-agents)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T109 [P] [US9] Remove mentions of agentic-sdlc from the error-handling knowledge docs (copilot/knowledge/error-handling)  [Eng] [llm]
+- [x] T109 [P] [US9] Remove mentions of agentic-sdlc from the error-handling knowledge docs (copilot/knowledge/error-handling)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T110 [P] [US9] Remove mentions of agentic-sdlc from the documentation and code-documentation knowledge docs (copilot/knowledge/documentation)  [Eng] [llm]
+- [x] T110 [P] [US9] Remove mentions of agentic-sdlc from the documentation and code-documentation knowledge docs (copilot/knowledge/documentation)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T111 [P] [US9] Remove mentions of agentic-sdlc from the concurrency, testing, operations, web-apis and versioning docs and the knowledge root index (copilot/knowledge)  [Eng] [llm]
+- [x] T111 [P] [US9] Remove mentions of agentic-sdlc from the concurrency, testing, operations, web-apis and versioning docs and the knowledge root index (copilot/knowledge)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T112 [P] [US9] Remove mentions of agentic-sdlc from the knowledge framework and the company-kb framework files (copilot/frameworks/company-kb)  [Eng] [llm]
+- [x] T112 [P] [US9] Remove mentions of agentic-sdlc from the knowledge framework and the company-kb framework files (copilot/frameworks/company-kb)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T096
-- [ ] T113 [US9] Fitness check: switch the knowledge to agentic-sdlc count and the checks that read another area from a baseline to a hard zero, on for good (scripts/check-fitness.ts)  [Eng] [llm]
+- [x] T113 [US9] Fitness check: switch the knowledge to agentic-sdlc count and the checks that read another area from a baseline to a hard zero, on for good (scripts/check-fitness.ts)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T102, T103, T104, T105, T106, T107, T108, T109, T110, T111, T112, T097, T098, T081
-- [ ] T114 [US9] Check entry: run the SDLC validator with the knowledge root and adapter map arguments and build cite in check mode over fixtures; real consumer enforcement starts in phase 6 when a provider repository URL exists (scripts/check-docs.sh)  [Eng] [llm]
+- [x] T114 [US9] Check entry: run the SDLC validator with the knowledge root and adapter map arguments and build cite in check mode over fixtures; real consumer enforcement starts in phase 6 when a provider repository URL exists (scripts/check-docs.sh)  [Eng] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T099, T100, T113, T086
-- [ ] T115 [US9] Mutation proof QB-7 for the zero count check, the cite checks and the core wording check; record in research.md (specs/022-repo-split/research.md)  [QA] [llm]
+- [x] T115 [US9] Mutation proof QB-7 for the zero count check, the cite checks and the core wording check; record in research.md (specs/022-repo-split/research.md)  [QA] [llm]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T114, T101, T087
-- [ ] T116 [US9] Phase 1 exit check: fitness count is 0 and on for good, AC-9.1 to AC-9.8 scenarios pass, phase 0 scenarios pass unchanged QB-5, and the install difference is empty (specs/022-repo-split)  [QA] [script]
+- [x] T116 [US9] Phase 1 exit check: fitness count is 0 and on for good, AC-9.1 to AC-9.8 scenarios pass, phase 0 scenarios pass unchanged QB-5, and the install difference is empty (specs/022-repo-split)  [QA] [script]
       touches: none  ·  refs: none  ·  procedure: none  ·  hot-path: no  ·  requires: T115
 
 ## Phase 2: Minimal installer (US2 to US8)

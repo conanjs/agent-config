@@ -24,7 +24,7 @@ Every document must declare its schema. **See `{{AGENT_HOME}}/frameworks/company
 | **service-catalog** | `system/service-catalog.yaml` | *Optional.* Every service: repo, owner, stack, owned entities, contracts provided/consumed — see `schemas/service-catalog.schema.md` |
 | **cross-repo-feature** | `system/features/{NNN-slug}.md` | *Optional.* System-level plan for one feature spanning repos: behaviour, contract changes, decisions, per-repo slices — see `schemas/cross-repo-feature.schema.md` |
 
-**Note (2026-10-04):** the three `system/` types replace the separate "system repo" from agentic-sdlc v1. `flows/` stays the place for *request* sequences; `system/architecture.md` is the static *topology* and links to flows rather than repeating them.
+**Note (2026-10-04):** the three `system/` types replace the separate "system repo". `flows/` stays the place for *request* sequences; `system/architecture.md` is the static *topology* and links to flows rather than repeating them.
 
 **Note (2026-09-20):** `architecture` as a separate doc type was removed from this table — its scope (module structure, DB schema, external integrations) overlapped with `repo-overview`'s `Module Map`/`External Integrations` sections. The one genuinely new piece, DB schema, is now `repo-overview.schema.md`'s optional `## Data Model` section instead of a whole separate file.
 

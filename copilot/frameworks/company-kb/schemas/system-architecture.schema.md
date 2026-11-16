@@ -2,7 +2,7 @@
 
 _Applies to: `system/architecture.md` (optional; only for companies whose repos form one multi-repo system)_
 
-The map of everything **between** repos: which services exist, how they connect, and the rules every repo follows. A repo's own internals stay in that repo's `docs/architecture.md`; this doc never restates them. This replaces the separate "system repo" from agentic-sdlc v1.
+The map of everything **between** repos: which services exist, how they connect, and the rules every repo follows. A repo's own internals stay in that repo's `docs/architecture.md`; this doc never restates them. This replaces the separate "system repo".
 
 ---
 

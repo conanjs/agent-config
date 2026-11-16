@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: subtopic
 topic: software-design/design-principles
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 ---
 
 # Design principles
@@ -28,7 +28,6 @@ SOLID is a set of five class/module design principles named by Robert C. Martin:
 ## References
 - [SOLID Relevance](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html) — Robert C. Martin, 2020. Backs: SOLID scope.
 - `copilot/frameworks/knowledge/schemas/topic-index.schema.md` — defines the topic index shape.
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites design-principles docs as DP-1 through DP-8, DP-10, and DP-11.
 - [BeckDesignRules](https://martinfowler.com/bliki/BeckDesignRules.html) — Martin Fowler, 2015. Backs: topic scope for simple design.
 
 ## Related

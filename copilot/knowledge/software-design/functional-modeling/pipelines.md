@@ -5,7 +5,7 @@ topic: software-design/functional-modeling
 status: verified
 applies-to: ["TypeScript functional-pipeline cores"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [pipelines, railway-oriented-programming, result, composition]
 ---
 
@@ -84,11 +84,6 @@ For `{ role: "viewer", permission: "shipment:write" }`, parsing succeeds and `to
 - Use Result chaining for expected failures that should stop later success-only steps. [rule-candidate]
 - End the pure pipeline at decision or command data; let the shell perform effects. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-functional-pipeline-R4 | Source: |
-
 ## Verification status
 - Verified: 18 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -96,8 +91,6 @@ For `{ role: "viewer", permission: "shipment:write" }`, parsing succeeds and `to
 - [Railway Oriented Programming](https://fsharpforfunandprofit.com/rop/) — Scott Wlaschin / F# for Fun and Profit, 2014. Backs: railway analogy, useful limits, error-handling techniques. [^1]
 - [A recipe for a functional app, part 2](https://fsharpforfunandprofit.com/posts/recipe-part2/) — Scott Wlaschin / F# for Fun and Profit, 2013. Backs: Result shape, bind, connecting validation steps. [^2]
 - [Impureim sandwich](https://blog.ploeh.dk/2020/03/02/impureim-sandwich/) — Mark Seemann, 2020. Backs: effect boundary around the pure middle. [^3]
-- `copilot/frameworks/agentic-sdlc/paradigms/functional-pipeline.md` — cites this doc as PDM-functional-pipeline-R4.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/functional-pipeline.md` — TypeScript overlay for Result-shaped composition.
 - Scott Wlaschin, *Domain Modeling Made Functional* (2018) — further reading; consolidated here through Wlaschin's free F# for Fun and Profit materials.
 
 ## Related

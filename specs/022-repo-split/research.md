@@ -734,6 +734,35 @@ Gaps this exercise found, not fixed here:
 - Removing the "is required" rule from the shape checker is caught by 13 unit tests of `reader.test.ts` and by no scenario: `tests/contracts/schemas.feature` has none for a missing required field. The unit tests satisfy QB-7, but a scenario would be the named proof.
 - A pending scenario also inherits the task tags of its feature (here `@T083` on `coverage.feature`), so the guard fires only when those are ticked too.
 
+## QB-7 mutation proof, phase 1 (T115)
+
+Method as in T087: each check was disabled, or the rule it enforces broken, in a temporary copy of the work tree outside the repository (copy with its own throwaway `git init`, `node_modules` included). The unmutated copy gave `scripts/check-docs.sh` exit 0 (894 scenarios, 873 passed, 21 skipped). After each change the whole `scripts/check-docs.sh` ran, and the copy was restored from memory before the next one. Node 24.22.1 on macOS, 2026-11-16. The driver and logs are scratch files, not committed. Every mutation gave exit 1.
+
+| Check | How disabled | What failed | check-docs | Date |
+|---|---|---|---|---|
+| Zero count (FIT-6) | `check-fitness.ts`: the hard-zero test `> 0` changed to `> 1e9` | 5 scenarios of `tests/fitness/phase1.feature`: "AC-9.1 A single new mention of agentic-sdlc in a knowledge doc fails", "...A path under frameworks/agentic-sdlc counts as a mention", "...Raising the baseline by hand does not turn the check off", "...A count outside the hard-zero list keeps the baseline rule", "SC-012 A check that reads another area's files fails" | exit 1 | 2026-11-16 |
+| Zero count (switched off) | `docs/baselines/fitness.json`: the `hard-zero` list deleted | "AC-9.1 The real baseline lists the three hard-zero counts and records them as 0" | exit 1 | 2026-11-16 |
+| Zero count (real tree) | `copilot/knowledge/index.md`: one mention of `agentic-sdlc` added | `FIT-6 knowledge-to-agentic-sdlc-lines must be 0, found 1` and the same for files; scenario "AC-1.6 The real tree has counts equal to the recorded baseline" | exit 1 | 2026-11-16 |
+| Zero count (reference repository rule) | `atlas.yaml`: the `knowledge: 'agentic-sdlc(?!-reference)'` expression removed | `FIT-6 ... found 16` (lines) and `found 12` (files); "AC-9.1 The real atlas does not count the reference repository as a mention" | exit 1 | 2026-11-16 |
+| Zero count (checks reading other areas) | `validate-knowledge.mjs`: a comment naming `{{AGENT_HOME}}/companies/` added | `FIT-6 checks-reading-other-areas must be 0, found 1`; "AC-9.4 the validator source never reads a company folder and the deny-list check is gone" | exit 1 | 2026-11-16 |
+| Cite: target compare | `cite.ts` `judge`: a check run accepts any target | "AC-9.6 A missing target fails without --write...", "AC-9.6 A target that differs because the provider's repository changed...", "AC-9.6 Every citing file is reported...", "AC-5.10 The longest matching location..."; 2 unit tests of `cite.test.ts` | exit 1 | 2026-11-16 |
+| Cite: provider without repository | `cite.ts` `expectedTarget`: the no-repository branch unreachable | "AC-9.7 A provider whose component.yaml has no repository fails and names the provider and the citing file", "EDGE-13 A provider never pushed writes nothing, even with --write" | exit 1 | 2026-11-16 |
+| Cite: percent-encoding | `cite.ts` `encodePath`: segments no longer encoded | the 3 rows of "AC-5.10 The target of the path <path> is percent-encoded segment by segment" (space, accent, Japanese); 2 unit tests | exit 1 | 2026-11-16 |
+| Cite: depends.docs | `cite.ts` `checkDocs`: a check run no longer compares the list | scenario "EDGE-7 A hand-written depends.docs that disagrees fails and prints the generated value"; unit test "FR-017 depends.docs > reports the written and the generated value without write" | exit 1 | 2026-11-16 |
+| Cite: unresolved citation (SDLC validator) | `validate.mjs`: unresolved Source `fail` changed to `warn` | "AC-9.3 an unresolved citation fails naming the citing file and the missing path", "QB-3 the knowledge root is the argument: a root without the cited docs fails every citation" | exit 1 | 2026-11-16 |
+| Cite: adapter map (SDLC validator) | `validate.mjs`: `at(skillsPath)` replaced by `at('skills')` | "AC-9.3 a fixture with renamed folders passes", "AC-9.3 with renamed folders a missing wrapper is named by its mapped path", "AC-9.3 the validator source holds no repo folder name" | exit 1 | 2026-11-16 |
+| Check entry: validator arguments | `check-docs.sh`: `--knowledge` removed from the SDLC validator line | `check-docs.test.ts` "AC-9.1 runs the SDLC validator with the knowledge root and the adapter map..." | exit 1 | 2026-11-16 |
+| Check entry: build cite step | `check-docs.sh`: the `build.ts cite` line deleted | `check-docs.test.ts` "AC-9.1 runs build cite in check mode over the fixture tree..." | exit 1 | 2026-11-16 |
+| Core wording: never fetch | `core.instructions.md`: ", read the resolved file on this machine and never fetch it" removed | "AC-9.8 The real {{VAR}} rule reads the resolved file on this machine, never fetches..." and "AC-9.8 AC-6.5 AC-4.8 The real core meets every rule together" | exit 1 | 2026-11-16 |
+| Core wording: link text | a line "read the link text, not the target" added | the same two scenarios | exit 1 | 2026-11-16 |
+| Core wording: approval line | the `add`, `use` and needs-report line removed | "AC-4.8 The real core has one line on approvals from a needs report" and the combined scenario | exit 1 | 2026-11-16 |
+| Core wording: one variable | a line defining `{{LANGUAGE}}` added | "AC-6.5 The real core defines {{AGENT_HOME}} in one line and no other variable" and the combined scenario | exit 1 | 2026-11-16 |
+| Core oracle: approval rule | `check-core.ts` `approvalFindings` returns nothing | one row of "AC-9.8 AC-6.5 AC-4.8 A forbidden line, once added, fails and is the only finding" | exit 1 | 2026-11-16 |
+| Core oracle: link text | `check-core.ts`: the `LINK_TEXT` test never true | two rows of the same outline | exit 1 | 2026-11-16 |
+
+Gaps this exercise found, not fixed here:
+- The per-folder scenarios "AC-9.1 The knowledge docs of <folder> hold no mention..." carry `@pending`, so `check-docs.sh` skips them; the `check-fitness.ts` step is what holds the zero today. The tags must be removed when T102 to T113 are ticked (the pending guard fails otherwise).
+
 ## References
 
 **Local artifacts:**

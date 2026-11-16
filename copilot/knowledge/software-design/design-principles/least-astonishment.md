@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [least-astonishment, naming, command-query-separation, api-design]
 ---
 
@@ -85,11 +85,6 @@ A method named `getOrCreateUser(id)` may create a row, so `getUser(id)` would be
 - Replace public boolean behavior flags with intention-revealing methods when callers choose behavior. [rule-candidate]
 - Make expected failure visible in the signature or documented contract. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-11 | Source: |
-
 ## Verification status
 - Verified: 10 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -99,7 +94,6 @@ A method named `getOrCreateUser(id)` may create a row, so `getUser(id)` would be
 - [FlagArgument](https://martinfowler.com/bliki/FlagArgument.html) — Martin Fowler, 2011. Backs: How it works, Edge cases. [^3]
 - [Everyday Types: Functions](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#functions) — TypeScript Handbook, living. Backs: How it works. [^4]
 - [Narrowing: Discriminated unions](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions) — TypeScript Handbook, living. Backs: How it works. [^5]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-11.
 
 ## Related
 - `software-design/oop/design-by-contract.md`

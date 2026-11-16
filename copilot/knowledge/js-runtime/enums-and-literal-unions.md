@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["TypeScript 5.8+", "Node.js type stripping (22.18+, 23.6+)"]
 last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [enum, as-const, string-literal-union, erasable-syntax, refactoring, type-stripping]
 ---
 
@@ -119,11 +119,6 @@ Only this one file changes. Code such as `function publish(status: DocumentStatu
 ## Takeaways
 - Do not use TypeScript `enum`; it is not erasable. Declare codes the project owns and writes in several files as an `as const` object in the layer that owns them, use the keys in code, and keep wire values literal in contract tests. Use a literal union for fixed vocabularies, and an `as const` array when such a vocabulary is needed at runtime. Ban enums with a lint selector, not with `erasableSyntaxOnly`, while the code uses parameter properties. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-20 | Source: |
-
 ## Verification status
 - Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
@@ -131,7 +126,6 @@ Only this one file changes. Code such as `function publish(status: DocumentStatu
 - [TypeScript Handbook: Enums](https://www.typescriptlang.org/docs/handbook/enums.html) — TypeScript team, living. Backs: How it works 1–3, Edge cases. [^1]
 - [Announcing TypeScript 5.8: `--erasableSyntaxOnly`](https://devblogs.microsoft.com/typescript/announcing-typescript-5-8/) — Microsoft, 2025. Backs: How it works 4, Trade-offs. [^2]
 - [Node.js: Modules: TypeScript](https://nodejs.org/api/typescript.html) — Node.js project, living. Backs: How it works 5, Edge cases. [^3]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — `idiom.errors`, the literal-union reasons.
 - `conanjs/agentic-sdlc-reference-typescript-node` v3.1.0 — `src/modules/documents/interface/errors/HttpErrorMapper.ts`, the measured rename.
 
 ## Related

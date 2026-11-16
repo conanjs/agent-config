@@ -5,7 +5,7 @@ topic: software-design/oop
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [oop, design-by-contract, invariants, errors]
 ---
 
@@ -75,18 +75,12 @@ In a class-modeled domain, expected business-rule failures such as `already_gran
 - Return expected domain denials explicitly when the caller may legitimately make the request. [rule-candidate]
 - Write tests that prove public operations preserve invariants across valid and invalid sequences. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-class-modeled-R5 | Source: |
-
 ## Verification status
 - Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
 ## References
 - [Design by Contract and Assertions](https://www.eiffel.org/doc/solutions/Design_by_Contract_and_Assertions) — Eiffel Software, living. Backs: Problem, How it works. [^1]
 - [ET: Design by Contract (tm), Assertions and Exceptions](https://www.eiffel.org/doc/eiffel/ET-_Design_by_Contract_%28tm%29%2C_Assertions_and_Exceptions) — Eiffel Software, living. Backs: How it works, Edge cases. [^2]
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites this doc as PDM-class-modeled-R5.
 - Bertrand Meyer, *Object-Oriented Software Construction*, 2nd ed. (1997) — further reading; Eiffel's public DbC documentation is used above for verified claims.
 
 ## Related

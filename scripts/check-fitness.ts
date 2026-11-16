@@ -1,7 +1,7 @@
 // The architecture fitness check (specs/022 T081; requirements: tests/fitness/fitness.feature, AC-1.6, FR-008).
 // It reads the architecture map from copilot/atlas/atlas.yaml and the recorded counts from docs/baselines/fitness.json and
 // fails in four cases: a declared edge the map forbids (FIT-1), a count of mentions that cross a component boundary
-// above its recorded baseline (FIT-2), and an atlas edge that docs/architecture.md (its `layers` block, `may-depend-on`) does not
+// above its recorded baseline (FIT-2), a count the baseline lists under `hard-zero` that is above 0 whatever the baseline records (FIT-6), and an atlas edge that docs/architecture.md (its `layers` block, `may-depend-on`) does not
 // draw (FIT-4), or the reverse (FIT-5). A count below its baseline passes; lowering the baseline is a human edit.
 //
 // Usage: node scripts/check-fitness.ts [--root <dir>] [--measure]
@@ -444,6 +444,25 @@ function fitnessFunctionLine(name: string): string {
 }
 
 /**
+ * Reads the `hard-zero` list of the baseline text: counts that must measure 0 whatever the baseline records.
+ *
+ * @param text - the contents of docs/baselines/fitness.json, already read once by readBaseline
+ * @param counts - the counts of the baseline, which every listed name must belong to
+ * @returns the listed names (none when the key is absent), or the problem with a name that is not a count
+ */
+export function readHardZero(text: string, counts: Counts): Parsed<readonly string[]> {
+  const parsed: unknown = JSON.parse(text);
+  const listed = isRecord(parsed) ? parsed['hard-zero'] : undefined;
+  if (listed === undefined) return succeed([]);
+  const names = stringList(listed);
+  if (names === null) return fail(`${BASELINE_FILE}: hard-zero must be a list of count names`);
+  const unknown = names.find((name) => !(name in counts));
+  return unknown === undefined
+    ? succeed(names)
+    : fail(`${BASELINE_FILE}: hard-zero names "${unknown}", which is not a count`);
+}
+
+/**
  * Lists the counts that rose above the baseline and those that fell below it.
  *
  * @param baseline - the recorded counts
@@ -488,6 +507,34 @@ function edgeFindings(root: string, registry: Registry): Parsed<readonly string[
 }
 
 /**
+ * Turns the findings of a run into its output and exit code.
+ *
+ * @param edges - the FIT-1, FIT-4 and FIT-5 lines
+ * @param rises - the FIT-2 lines for counts above the baseline
+ * @param falls - the notes for counts below the baseline
+ * @param hardZero - the names listed under `hard-zero`
+ * @param now - the measured counts
+ * @returns the lines to print and the exit code
+ */
+function verdict(
+  edges: readonly string[],
+  rises: readonly string[],
+  falls: readonly string[],
+  hardZero: readonly string[],
+  now: Counts,
+): Outcome {
+  const zeroLines = hardZero
+    .filter((name) => (now[name] ?? 0) > 0)
+    .map((name) => `FIT-6 ${name} must be 0, found ${now[name] ?? 0}`);
+  if (edges.length + rises.length + zeroLines.length > 0) {
+    return { code: EXIT_FINDING, lines: [...edges, ...rises, ...zeroLines, ...falls] };
+  }
+  const counts = falls.length === 0 ? 'check-fitness: counts equal the baseline' : 'check-fitness: no count rose';
+  const zero = hardZero.length > 0 ? [`check-fitness: ${hardZero.length} hard-zero counts are 0`] : [];
+  return { code: EXIT_PASS, lines: [counts, ...zero, ...falls] };
+}
+
+/**
  * Runs the check on a tree.
  *
  * @param root - the tree to check
@@ -508,12 +555,10 @@ export function run(root: string, printCounts: boolean): Outcome {
   if (printCounts) return { code: EXIT_PASS, lines: [JSON.stringify({ counts: now.value }, null, 2)] };
   const edges = edgeFindings(root, registry.value);
   if (!edges.ok) return { code: EXIT_FINDING, lines: edges.problems };
+  const hardZero = readHardZero(baselineText, baseline.value);
+  if (!hardZero.ok) return { code: EXIT_FINDING, lines: hardZero.problems };
   const { rises, falls } = compareCounts(baseline.value, now.value);
-  if (edges.value.length + rises.length > 0) {
-    return { code: EXIT_FINDING, lines: [...edges.value, ...rises, ...falls] };
-  }
-  const verdict = falls.length === 0 ? 'check-fitness: counts equal the baseline' : 'check-fitness: no count rose';
-  return { code: EXIT_PASS, lines: [verdict, ...falls] };
+  return verdict(edges.value, rises, falls, hardZero.value, now.value);
 }
 
 /**

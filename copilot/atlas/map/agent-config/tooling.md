@@ -62,6 +62,14 @@ Where: `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.j
 - [`tsconfig.json`](../../../../tsconfig.json)
 - [`vitest.config.ts`](../../../../vitest.config.ts)
 
+## Adapter map
+
+<a id="adapter-map"></a>Where each coding agent keeps the SDLC role wrappers and skills, read by the SDLC validator (specs/022 T099, --adapters)
+
+Where: `adapters.json` · Schema: — · Index: — · Checked by: copilot/frameworks/agentic-sdlc/tools/validate.mjs · Scenarios: `tests/validate-sdlc/validate-sdlc.feature` · Installed to: —
+
+- [`adapters.json`](../../../../adapters.json)
+
 ## Contract library and tools
 
 <a id="contract-code"></a>The shared contract reader, its parity test and the contract tools of specs/022 (TypeScript, run by Node type stripping)
@@ -93,6 +101,8 @@ Where: `contracts/{lib,tools}/**/*.ts` · Schema: — · Index: — · Checked b
 - [`contracts/tools/build.ts`](../../../../contracts/tools/build.ts)
 - [`contracts/tools/check-schemas.test.ts`](../../../../contracts/tools/check-schemas.test.ts)
 - [`contracts/tools/check-schemas.ts`](../../../../contracts/tools/check-schemas.ts)
+- [`contracts/tools/cite.test.ts`](../../../../contracts/tools/cite.test.ts)
+- [`contracts/tools/cite.ts`](../../../../contracts/tools/cite.ts)
 - [`contracts/tools/layout.test.ts`](../../../../contracts/tools/layout.test.ts)
 - [`contracts/tools/layout.ts`](../../../../contracts/tools/layout.ts)
 - [`contracts/tools/tool-io.ts`](../../../../contracts/tools/tool-io.ts)

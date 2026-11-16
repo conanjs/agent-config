@@ -5,7 +5,7 @@ topic: error-handling
 status: verified
 applies-to: ["TypeScript", "Rust", "Swift", "F#", "any language with tagged unions"]
 last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [result, errors-as-values, discriminated-union, railway-oriented-programming, expected-failures]
 ---
 
@@ -95,11 +95,6 @@ The payload keeps its own kind. `Document.revise` returns `Result<Document, …>
 ## Takeaways
 - Return a `Result` for failures the caller is expected to handle; throw an `Error` subclass for bugs and broken infrastructure. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-4 | Source: |
-
 ## Verification status
 - Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
@@ -111,7 +106,6 @@ The payload keeps its own kind. `Document.revise` returns `Result<Document, …>
 - [TypeScript Handbook: Discriminated unions](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions) — TypeScript team, living. Backs: How it works 6. [^5]
 - [EvansClassification](https://martinfowler.com/bliki/EvansClassification.html) — Martin Fowler, 2005. Backs: How it works (entity versus value object). [^6]
 - [Railway Oriented Programming](https://fsharpforfunandprofit.com/rop/) — Scott Wlaschin, 2014. Background for chaining Results.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — `idiom.errors`, TSN-4 and TSN-5 apply this.
 
 ## Related
 - `error-handling/handle-errors-once.md` — where thrown errors are logged.

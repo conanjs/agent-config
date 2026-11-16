@@ -5,7 +5,7 @@ topic: code-documentation
 status: verified
 applies-to: ["C#", "TypeScript (TSDoc)", "JavaScript (JSDoc)", "Python", "Go", "Rust"]
 last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [doc-comments, tsdoc, jsdoc, xml-documentation, csharp, linting]
 ---
 
@@ -83,11 +83,6 @@ To re-run it, create a language service over the repo's `tsconfig.json` (`ts.cre
 - Link a doc comment toward what the code depends on (its contract, its input), never toward its callers; the editor lists callers live. [rule-candidate]
 - Write the contract once on the interface or port. An implementation keeps a summary of its own that links the contract and says what it adds; in TypeScript it carries no block tag, so the editor still shows the contract's notes. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation | CMT-12 | Source: |
-
 ## Verification status
 - Verified: 30 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
@@ -106,8 +101,6 @@ To re-run it, create a language service over the repo's `tsconfig.json` (`ts.cre
 - [TypeDoc: {@inheritDoc}](https://typedoc.org/documents/Tags.__inheritDoc_.html) — TypeDoc maintainers, living. TypeDoc accepts both the inline and the block form.
 - [TypeDoc: Validation options](https://typedoc.org/documents/Options.Validation.html) — TypeDoc maintainers, living. Backs: Lookup notes (`invalidLink`). [^12]
 - [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012. Backs: Lookup notes (the Dependency Rule names). [^13]
-- `copilot/frameworks/agentic-sdlc/foundations/code/comments.md` — CMT-5 and CMT-12 apply this.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — TSN-13 and its tested lint config.
 
 ## Related
 - `js-runtime/subpath-imports.md`

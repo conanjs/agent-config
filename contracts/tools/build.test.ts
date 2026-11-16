@@ -24,9 +24,9 @@ describe('build.ts dispatch (A-8: exit 0, 1, 2)', () => {
       out: '',
       err: expect.stringContaining('Subcommands built in this version') as string,
     });
-    expect(runBuild(['cite'], env)).toMatchObject({
+    expect(runBuild(['build'], env)).toMatchObject({
       code: 2,
-      err: expect.stringContaining('"cite" is not a subcommand built in this version') as string,
+      err: expect.stringContaining('"build" is not a subcommand built in this version') as string,
     });
   });
 
@@ -38,11 +38,10 @@ describe('build.ts dispatch (A-8: exit 0, 1, 2)', () => {
     expect(runBuild(['check-schemas'], env).code).toBe(2);
     expect(runBuild(['layout', '--nope'], env).code).toBe(2);
     expect(runBuild(['budget'], env).code).toBe(2);
+    expect(runBuild(['cite', '--nope'], env).code).toBe(2);
   });
 
   it('says in the help what is not built yet, so the text does not promise more than the tool does', () => {
-    expect(HELP).toContain(
-      'Not built yet (later phases): build (skill and agent sources), budget without --baseline, cite.',
-    );
+    expect(HELP).toContain('Not built yet (later phases): build (skill and agent sources), budget without --baseline.');
   });
 });

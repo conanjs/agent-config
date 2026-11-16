@@ -1,37 +1,32 @@
 #!/usr/bin/env node
 // validate-knowledge.mjs — checks store B (global knowledge) against the knowledge framework schemas.
 //
-// Usage: node validate-knowledge.mjs [knowledge-root] [--sdlc <agentic-sdlc root>] [--companies <companies root>] [--urls]
+// Usage: node validate-knowledge.mjs [knowledge-root] [--urls]
 //   knowledge-root  default: <this framework>/../../knowledge  (repo: copilot/knowledge, installed: ~/.copilot/knowledge)
-//   --sdlc          agentic-sdlc root used for KD-4 backlinks  (default: <this framework>/../agentic-sdlc)
-//   --companies     Company KB root used for the KB-2 deny-list (default: <this framework>/../../companies)
 //   --urls          also run KB-3: every external URL in a v1 doc must answer HTTP < 400 (network; slow)
 //
 // Only v1 docs are checked (front-matter `schema:` = knowledge-doc/v1 | deep-dive/v1 | topic-index/v1).
 // Legacy docs (no such schema) are skipped: schemas/_system.md §6, no retrofit.
 //
 // Every code printed is a rule id in ../schemas/ (a test checks this: tests/validate-knowledge/).
-// Checks: knowledge-doc KD-1 (sections/order), KD-2 (verified ⇒ no ⚠️ + last-verified), KD-4 (Used by = real
-// Source backlinks from agentic-sdlc), KD-6 (concept ≤ 400 lines, warn), KD-7 (derived-from ↔ synthesized-into),
+// Checks: knowledge-doc KD-1 (sections/order), KD-2 (verified ⇒ no ⚠️ + last-verified), KD-6 (concept ≤ 400 lines, warn), KD-7 (derived-from ↔ synthesized-into),
 // KD-9 (exact Verification status line, singular/plural, date = last-verified; counts warn);
 // deep-dive DD-1, DD-3, DD-4 (warn); topic-index TI-1 … TI-7; shared KB-9 (front-matter values),
 // KB-10 (only keys the schema defines), KB-11 (title and Summary head), KB-12 (References, Related, footnotes);
-// KB-2 (company / repo names from the Company KB as a deny-list); KB-3 with --urls;
+// KB-3 with --urls;
 // KB-7 conversation residue (warn, heuristic); KB-8 duplicated fenced blocks across docs / repeated paragraphs (warn).
-// LLM-only rules (KD-3, KD-5, KD-8, KB-1, KB-5, KB-6, KB-7 in full, DD-2) are not checked here:
-// see {{AGENT_HOME}}/procedures/review-docs.procedure.md.
+// The validator reads only the knowledge folder. A leftover "Used by" section is ignored.
+// LLM-only rules (KD-3, KD-5, KD-8, KB-1, KB-2, KB-5, KB-6, KB-7 in full, DD-2) are not checked here; a reviewer
+// checks them (the review-docs procedure of the agent home).
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
-const flag = (n) => { const i = args.indexOf(n); if (i < 0) return undefined; const v = args[i + 1]; args.splice(i, 2); return v; };
 const checkUrls = args.includes('--urls'); if (checkUrls) args.splice(args.indexOf('--urls'), 1);
 const here = fs.realpathSync(path.dirname(fileURLToPath(import.meta.url)));
 const fwRoot = path.resolve(here, '..');
-const sdlcRoot = path.resolve(flag('--sdlc') ?? path.join(fwRoot, '..', 'agentic-sdlc'));
-const companiesRoot = path.resolve(flag('--companies') ?? path.join(fwRoot, '..', '..', 'companies'));
 const kRoot = fs.realpathSync(path.resolve(args[0] ?? path.join(fwRoot, '..', '..', 'knowledge')));
 
 const fails = []; const warns = [];
@@ -104,7 +99,8 @@ const TYPES = {
   reference: [['Scope', 1], ['Catalog', 1], ['Lookup notes', 0]],
   'case-study': [['Context', 1], ['Symptom', 1], ['Root cause', 1], ['Fix', 1], ['Timeline', 0], ['Generalized lesson', 1]],
 };
-const TAIL = ['Takeaways', 'Used by', 'Verification status', 'References', 'Related'];
+// A leftover "Used by" section stays legal between Takeaways and Verification status; it is not read.
+const TAIL = [['Takeaways', 1], ['Used by', 0], ['Verification status', 1], ['References', 1], ['Related', 1]];
 const STATUS = ['draft', 'verified', 'stale'];
 const V1 = ['knowledge-doc/v1', 'deep-dive/v1', 'topic-index/v1'];
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -184,43 +180,12 @@ for (const f of walk(kRoot)) {
   if (fm && V1.includes(fm.schema)) docs.set(f, { fm, text });
 }
 
-// ---- KD-4 backlinks: Source cells and Reference topics in agentic-sdlc ---------------------------
-const backlinks = new Map(); // knowledge-relative path -> Set(ids)
-if (exists(sdlcRoot)) {
-  for (const f of walk(sdlcRoot).filter((p) => !/[\\/](schemas|tools)[\\/]/.test(p))) {
-    const t = read(f);
-    for (const tb of tables(stripFences(body(t)))) {
-      if (!tb.head.includes('Source')) continue;
-      const idCol = tb.head.includes('Id') ? 'Id' : tb.head[0];
-      for (const r of tb.rows) {
-        for (const m of (r.Source || '').matchAll(/knowledge\/([\w./-]+\.md)/g)) {
-          const k = m[1];
-          if (!backlinks.has(k)) backlinks.set(k, new Set());
-          backlinks.get(k).add(stripCode(r[idCol]));
-        }
-      }
-    }
-  }
-} else warn('KD-4', `agentic-sdlc root not found at ${sdlcRoot}; Used by not checked`);
-
-// ---- KB-2 deny-list ------------------------------------------------------------------------------
-const deny = [];
-if (exists(companiesRoot)) {
-  for (const co of fs.readdirSync(companiesRoot, { withFileTypes: true }).filter((e) => e.isDirectory())) {
-    deny.push(co.name);
-    const repos = path.join(companiesRoot, co.name, 'repos');
-    if (exists(repos)) for (const r of fs.readdirSync(repos, { withFileTypes: true }).filter((e) => e.isDirectory())) deny.push(r.name);
-  }
-}
-const denyRe = deny.length ? new RegExp(`\\b(${deny.map((d) => d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'i') : null;
-
 // ---- per-doc checks -----------------------------------------------------------------------------
 const urls = new Map(); // url -> first file
 const fences = new Map(); // normalized fenced block -> [files]
 for (const [f, { fm, text }] of docs) {
   const b = body(text);
   const heads = h2s(b);
-  if (denyRe) { const m = b.match(denyRe); if (m) fail('KB-2', `${rel(f)}: company-specific name "${m[1]}" in store B`); }
   for (const m of stripFences(b).matchAll(/\]\((https?:\/\/[^)\s]+)\)|<(https?:\/\/[^>\s]+)>|(?:^|\s)(https?:\/\/[^\s)>|`]+)/g)) {
     const u = (m[1] || m[2] || m[3]).replace(/[.,;]+$/, '');
     if (!urls.has(u)) urls.set(u, f);
@@ -249,7 +214,7 @@ for (const [f, { fm, text }] of docs) {
   if (fm.schema === 'knowledge-doc/v1') {
     checkCommonFrontMatter(f, fm, 'knowledge-doc');
     if (!TYPES[fm.type]) { fail('KB-9', `${rel(f)}: type "${fm.type}" not one of ${Object.keys(TYPES).join('|')}`); continue; }
-    checkSequence(f, heads, [['Summary', 1], ...TYPES[fm.type], ...TAIL.map((n) => [n, 1])]);
+    checkSequence(f, heads, [['Summary', 1], ...TYPES[fm.type], ...TAIL]);
     checkSummary(f, text, false);
     checkTail(f, text, fm);
     // KD-6
@@ -270,14 +235,7 @@ for (const [f, { fm, text }] of docs) {
         if (fm['last-verified'] && exact[5] !== fm['last-verified']) fail('KD-9', `${rel(f)}: Verification status says last verified ${exact[5]}, front-matter says ${fm['last-verified']}`);
       }
     }
-    // KD-4
     const me = rel(f);
-    const actual = backlinks.get(me) ?? new Set();
-    const ub = section(text, 'Used by') ?? '';
-    const listed = new Set(tables(ub).flatMap((tb) => tb.rows.map((r) => stripCode(r['Id / path'] ?? Object.values(r)[1] ?? ''))).filter(Boolean));
-    if (!listed.size && !/_Not cited by any rule yet\._/.test(ub)) fail('KD-4', `${me}: Used by has no table and no "_Not cited by any rule yet._"`);
-    for (const id of actual) if (!listed.has(id)) fail('KD-4', `${me}: cited by ${id} (Source) but not listed in Used by`);
-    for (const id of listed) if (!actual.has(id) && /^[A-Z][\w-]*-R?\d+$/.test(id)) fail('KD-4', `${me}: Used by lists ${id}, but that rule's Source does not cite this doc`);
     // KD-7
     for (const d of [].concat(fm['derived-from'] ?? [])) {
       const p = path.join(kRoot, String(d));
@@ -383,7 +341,7 @@ const uniq = (a) => [...new Set(a)];
 const F = uniq(fails); const W = uniq(warns);
 const counts = { 'knowledge-doc/v1': 0, 'deep-dive/v1': 0, 'topic-index/v1': 0 };
 for (const { fm } of docs.values()) counts[fm.schema]++;
-console.log(`knowledge validate: ${counts['knowledge-doc/v1']} docs, ${counts['deep-dive/v1']} deep dives, ${counts['topic-index/v1']} indexes, ${backlinks.size} cited docs${checkUrls ? `, ${urls.size} URLs probed` : ''} (legacy docs skipped) — ${today}`);
+console.log(`knowledge validate: ${counts['knowledge-doc/v1']} docs, ${counts['deep-dive/v1']} deep dives, ${counts['topic-index/v1']} indexes${checkUrls ? `, ${urls.size} URLs probed` : ''} (legacy docs skipped) — ${today}`);
 for (const w of W) console.log(w);
 if (F.length) { console.log(`FAIL (${F.length})`); for (const x of F) console.log(x); process.exit(1); }
 console.log(`PASS (${W.length} warning(s))`);

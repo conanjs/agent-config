@@ -1,12 +1,12 @@
 ---
 schema: topic-index/v1
 kind: root
-last-updated: 2026-11-11
+last-updated: 2026-11-14
 ---
 
 # Global knowledge
 
-Cross-project reference material (store B): how technologies and design techniques work and why, in our own words, with links to the original sources. Not covered here: rules an agent must follow (those live in `{{AGENT_HOME}}/frameworks/agentic-sdlc/`, which cite these docs through `Source:`) and facts about one company's systems (those live in `{{AGENT_HOME}}/companies/<co>/`).
+Cross-project reference material (store B): how technologies and design techniques work and why, in our own words, with links to the original sources. Not covered here: facts about one company's systems (those live in `{{AGENT_HOME}}/companies/<co>/`).
 
 New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics marked *legacy* predate that framework and keep their own shape (never retrofitted).
 
@@ -48,5 +48,4 @@ New docs follow `{{AGENT_HOME}}/frameworks/knowledge/schemas/_system.md`. Topics
 - [Diátaxis](https://diataxis.fr/) — Daniele Procida, living. Backs: the doc-type split used by v1 docs.
 
 ## Related
-- `{{AGENT_HOME}}/frameworks/agentic-sdlc/index.md` — the rules that cite these docs.
 - `{{AGENT_HOME}}/companies/` — company-specific facts (store C).

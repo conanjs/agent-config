@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["GitHub Copilot CLI 1.0.105", "Copilot agent in VS Code 1.143.0 (Copilot SDK runtime 1.0.100)", "docs read 2026-11-02", "GitHub Copilot CLI 1.0.105 (local test 2026-11-09)", "Copilot session logs of 2026-10-26 to 2026-11-09 (read 2026-11-10)", "GitHub Copilot CLI 1.0.107 help text (read 2026-11-10)"]
 last-verified: 2026-11-10
-last-updated: 2026-11-10
+last-updated: 2026-11-14
 tags: [github-copilot, copilot-cli, vscode, tokens, ai-credits, hooks, instructions]
 ---
 
@@ -70,7 +70,7 @@ GitHub Copilot's local usage records, its AI-credit billing, its hooks and how V
 | Repository hooks and folder trust | `.github/hooks/*.json` did **not** run in a folder outside the trusted folders (`trustedFolders` in `~/.copilot/config.json`); the same file ran in a trusted folder. User hooks in `~/.copilot/hooks/` ran in both | ✅[^6] |
 | `userPromptSubmitted` | Input `sessionId`, `timestamp`, `cwd`, `prompt`; a config-file hook's output is dropped (only SDK hooks may return `modifiedPrompt`) | ✅[^1] |
 | `copilot -p --agent <name>` | Runs the prompt as that custom agent (tested with `sdlc-qa`) | ✅[^6] |
-| `userPromptSubmitted` in `copilot -p` | A user-level hook (`~/.copilot/hooks/*.json`) received the prompt of a non-interactive run, with `sessionId` and `cwd`; a user-level `preToolUse` hook denied `task` and then allowed it (agentic-sdlc workflow guard, live test) | ✅[^6] |
+| `userPromptSubmitted` in `copilot -p` | A user-level hook (`~/.copilot/hooks/*.json`) received the prompt of a non-interactive run, with `sessionId` and `cwd`; a user-level `preToolUse` hook denied `task` and then allowed it (workflow guard, live test) | ✅[^6] |
 | Progress lines in VS Code | Not shown. A `preToolUse` hook whose run succeeded printed a progress line before its decision, and the chat showed only the tool step and the answer. Progress lines from `agentStop` (the probe's and the turn token report's, which did run and save its record) did not show either; there the whole `agentStop` run was marked failed because another hook (`desktop-notify`) crashed | ✅[^8] |
 | Order at the end of a turn | The last `session.usage_record`, then the final `assistant.message` (no `toolRequests`), then `assistant.turn_end`, then the `agentStop` hook | ✅[^5] |
 

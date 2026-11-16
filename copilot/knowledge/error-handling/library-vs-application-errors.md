@@ -5,7 +5,7 @@ topic: error-handling
 status: verified
 applies-to: ["Rust", "Go", "Python", "TypeScript"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [errors, libraries, applications, rust, thiserror, anyhow]
 ---
 
@@ -93,11 +93,6 @@ The same split maps to Go packages returning sentinel or typed errors, Python mo
 - Applications add human context and perform final mapping at the edge. [rule-candidate]
 - Preserve causes across abstraction boundaries unless doing so would expose an implementation detail. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | RS-8 | Source: |
-
 ## Verification status
 - Verified: 15 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -107,7 +102,6 @@ The same split maps to Go packages returning sentinel or typed errors, Python mo
 - [Error: cause](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause), [Errors and Exceptions](https://docs.python.org/3/tutorial/errors.html), and [Working with Errors in Go 1.13](https://go.dev/blog/go1.13-errors) — MDN, Python Software Foundation, and Go team, living/2019. Backs: cross-language cause chains. [^3]
 - [Working with Errors in Go 1.13](https://go.dev/blog/go1.13-errors) — Go team, 2019. Backs: wrapping as API exposure. [^4]
 - [Errors and Exceptions](https://docs.python.org/3/tutorial/errors.html) — Python Software Foundation, living. Backs: exception hierarchy matching. [^5]
-- `copilot/frameworks/agentic-sdlc/stacks/rust/idioms.md` — cites this doc as RS-8.
 
 ## Related
 - `error-handling/handle-errors-once.md`

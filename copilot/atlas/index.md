@@ -25,9 +25,9 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
   - [Agents, prompts and tool settings](map/agent-config/agents.md) — Per-tool wrappers (Copilot, Claude Code, Codex) that point at the shared definitions (54 files)
   - [Skills](map/agent-config/skills.md) — Tool-neutral SKILL.md files installed for Claude Code, Copilot and Codex (20 files)
   - [Installers](map/agent-config/installers.md) — Link or seed this repo's files into the home folder, per mapping.yaml (10 files)
-  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (172 files)
-  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (183 files)
-  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (365 files)
+  - [Specs and decisions](map/agent-config/specs.md) — Spec Kit setup, one spec folder per change, and the design notes written before Spec Kit (173 files)
+  - [Tool tests](map/agent-config/tests.md) — Cucumber scenarios for every validator, installer and tool (198 files)
+  - [Repo tooling](map/agent-config/tooling.md) — Checks, hooks, CI and the test dependencies (368 files)
   - [Templates](map/agent-config/templates.md) — Files copied into other repos on demand (7 files)
 - **typescript-node reference (feature-first)** (`reference-typescript-node`, at `v4.2.0`) — The stack reference on main: two modules through every layer, pinned in stacks/typescript-node/reference.md
   - [Source](map/reference-typescript-node/ref-src.md) — The composition root, module composers and the four layers of each module
@@ -102,11 +102,12 @@ The map of every repo, area, kind of file and file. Start here, or ask the `coor
 | [Repo architecture](map/agent-config/specs.md#repo-architecture) | Specs and decisions | `docs/architecture.md` | `copilot/frameworks/agentic-sdlc/schemas/repo-architecture.schema.md` | `README.md` | validate-project.mjs ARCH | — | — |
 | [Proposals (legacy)](map/agent-config/specs.md#proposal) | Specs and decisions | `proposals/**` | — | `proposals/README.md` | — | — | — |
 | [Shared steps](map/agent-config/tests.md#test-support) | Tool tests | `tests/support/*.{mjs,ts,d.mts}` | — | — | — | — | — |
-| [Features](map/agent-config/tests.md#test-feature) | Tool tests | `tests/*/{*.feature,tool.mjs,tool.ts,exemptions.yaml}` | — | — | cucumber-js | — | — |
+| [Features](map/agent-config/tests.md#test-feature) | Tool tests | `tests/*/{*.feature,*.mjs,*.ts,exemptions.yaml}` | — | — | cucumber-js | — | — |
 | [Fixtures and golden files](map/agent-config/tests.md#test-fixture) | Tool tests | `tests/*/{fixtures,golden}/**` | — | — | — | — | — |
 | [Checks, hooks and CI](map/agent-config/tooling.md#repo-check) | Repo tooling | `{scripts/*.{sh,ts},.githooks/*,.github/**,.claude/settings.json}` | — | `README.md` | scenarios (fitness, coverage), tsc, vitest | — | — |
 | [Recorded baselines](map/agent-config/tooling.md#baseline) | Repo tooling | `docs/baselines/*.json` | — | — | check-fitness.ts (fitness.json) | `tests/fitness/fitness.feature` | — |
 | [Node setup](map/agent-config/tooling.md#test-setup) | Repo tooling | `{package.json,pnpm-lock.yaml,pnpm-workspace.yaml,cucumber.mjs,tsconfig.json,vitest.config.ts,.prettierrc.json,.prettierignore,.nvmrc,.gitignore,.ignore,eslint.config.mjs,eslint/**,contracts/eslint.config.mjs,scripts/eslint.config.mjs,tests/eslint.config.mjs}` | — | `README.md` | — | — | — |
+| [Adapter map](map/agent-config/tooling.md#adapter-map) | Repo tooling | `adapters.json` | — | — | copilot/frameworks/agentic-sdlc/tools/validate.mjs | `tests/validate-sdlc/validate-sdlc.feature` | — |
 | [Contract library and tools](map/agent-config/tooling.md#contract-code) | Repo tooling | `contracts/{lib,tools}/**/*.ts` | — | — | tsc, eslint, vitest | `tests/contracts/schemas.feature` | — |
 | [Contracts](map/agent-config/tooling.md#contract) | Repo tooling | `contracts/{slots.yaml,index.md,README.md,*/v1/**}` | — | `contracts/index.md` | vitest parity test, check-schemas | `tests/contracts/schemas.feature` | — |
 | [Vendored yaml library](map/agent-config/tooling.md#vendored-yaml) | Repo tooling | `contracts/lib/vendor/yaml/**` | — | — | vitest (contracts/lib/yaml.test.ts) | — | — |
@@ -135,7 +136,7 @@ How kinds point at each other. Each chain is checked where the last column says.
 
 | From | To | How | Checked by |
 |---|---|---|---|
-| Foundations | Knowledge docs | a rule's Source cell cites the doc; the doc's Used by lists the rule | validate-knowledge.mjs KD-4 |
+| Foundations | Knowledge docs | a rule's Source cell cites the doc | validate.mjs SRC (--knowledge) |
 | Roles | Foundations | the role's Preset knowledge table | validate.mjs ROLE |
 | Skills | Roles | a preset skill mirrors the role's Preset table; the agentic-sdlc skill reads agents/orchestrator.md | validate.mjs SKILL |
 | Skills | Foundations | a preset skill lists the role's Preset foundations, read in order | validate.mjs SKILL |

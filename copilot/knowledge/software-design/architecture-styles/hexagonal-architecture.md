@@ -5,7 +5,7 @@ topic: software-design/architecture-styles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-25
-last-updated: 2026-10-25
+last-updated: 2026-11-14
 tags: [hexagonal-architecture, ports-and-adapters, driving-adapter, driven-adapter, architecture]
 ---
 
@@ -90,17 +90,11 @@ If the handler had imported `SqlDocumentStore` and called `remove(7)` directly, 
 - Adapters do not depend on each other; a driving adapter reaches a driven adapter only through a use case and its port. [rule-candidate]
 - Declare ports on the application side, in the application's vocabulary. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | CA-10 | Source: |
-
 ## Verification status
 - Verified: 8 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
 
 ## References
 - [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: Problem, How it works, Edge cases. [^1]
-- `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — cites this doc as CA-10.
 
 ## Related
 - `software-design/architecture-styles/clean-architecture.md`

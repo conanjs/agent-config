@@ -5,7 +5,7 @@ topic: software-design/architecture-styles
 status: verified
 applies-to: ["any layered or clean-architecture codebase", "TypeScript stack reference v3.1.0 (flat) and v4.0.0 (option B)"]
 last-verified: 2026-10-29
-last-updated: 2026-10-29
+last-updated: 2026-11-14
 tags: [folder-structure, use-case, vertical-slice, cqrs, colocation, module-layout]
 ---
 
@@ -170,11 +170,6 @@ Adding `ArchiveDocument` to the `documents` module, in each option:
 - Put each file in the deepest folder that contains all of its users; inside a layer, import only from your own folder or a folder above it. [rule-candidate]
 - Use full vertical slices only for thin-domain modules whose layer rule can still be checked; use command/query folders only once reads have their own model. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation | MOD-10 | Source: |
-
 ## Verification status
 - Verified: 19 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
@@ -186,7 +181,6 @@ Adding `ArchiveDocument` to the `documents` module, in each option:
 - [DDD_Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html) — Martin Fowler, 2013. Backs: How it works 4, Edge cases (aggregate, root, unit of loading and transactions). [^5]
 - [Express 5.x API: Router](https://expressjs.com/en/5x/api/router/) — Express project, living. Backs: Edge cases (`mergeParams`: preserves the parent's `req.params`, default `false`). [^6]
 - [Screaming Architecture](https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html) — Robert C. Martin, 2011. Background: folders should show the use cases.
-- `copilot/frameworks/agentic-sdlc/foundations/design/module-boundaries.md` — MOD-9 (first grouping) and MOD-10 (inside a module).
 - `conanjs/agentic-sdlc-reference-typescript-node` v3.1.0 — `src/modules/documents/` (the flat tree measured above) and `eslint.config.mjs` (`layerZones`, `moduleZones`); v4.0.0 — the same module in option B, the artifact above; v4.1 branch — `interface/routes/DocumentsRouter.ts`, `CommentsRouter.ts` (module routers) and the prefix-mount typing test.
 
 ## Related

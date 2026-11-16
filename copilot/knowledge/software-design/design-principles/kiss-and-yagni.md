@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [kiss, yagni, simple-design, speculative-generality]
 ---
 
@@ -85,12 +85,6 @@ A team needs one CSV import path today. A speculative design adds `ImporterPlugi
 - Treat unused flags, hooks, and abstract bases as speculative generality findings. [rule-candidate]
 - Do refactor for malleability; do not build future capabilities. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-7 | Source: |
-| foundation rule | DP-8 | Source: |
-
 ## Verification status
 - Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -98,7 +92,6 @@ A team needs one CSV import path today. A speculative design adds `ImporterPlugi
 - [Yagni](https://martinfowler.com/bliki/Yagni.html) — Martin Fowler, 2015. Backs: Problem, How it works, Edge cases, Trade-offs. [^1]
 - [BeckDesignRules](https://martinfowler.com/bliki/BeckDesignRules.html) — Martin Fowler, 2015. Backs: How it works. [^2]
 - [CodeSmell](https://martinfowler.com/bliki/CodeSmell.html) — Martin Fowler, 2006. Backs: How it works, Edge cases. [^3]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-7 and DP-8.
 
 ## Related
 - `software-design/design-principles/dry.md`

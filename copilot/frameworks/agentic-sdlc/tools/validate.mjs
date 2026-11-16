@@ -4,28 +4,38 @@
 // Roles, profile dimensions, rule prefixes and tree prefixes are read from the
 // docs themselves (conventions.md §1/§4, front-matter) — never hardcoded here.
 //
-// Usage: node tools/validate.mjs [frameworkRoot] [--repo <agent-config repo root>] [--upstream]
+// Usage: node tools/validate.mjs [frameworkRoot] [--repo <repo root>] [--knowledge <knowledge root>]
+//                                [--adapters <adapter map file>] [--upstream]
+//   --knowledge the folder that holds the cited docs: a Source or Reference-topic path "knowledge/<p>" (or with the
+//   {{AGENT_HOME}}/ prefix) resolves to <knowledge root>/<p>; one that does not exist fails. Left out, citations are not
+//   checked and a notice says so.
+//   --adapters  a JSON file that maps each adapter to its wrapper path, "{id}" standing for the role id, and "skills" to
+//   the skills folder; paths are relative to the folder of the map file, which is also the base of the paths in
+//   messages. A key other than "skills" is an adapter; its file kind decides the checks: ".agent.md" must be
+//   user-invocable, another ".md" must list the role's preset skill, ".toml" files must parse (TOML escapes). Left out,
+//   the wrapper and skill checks are skipped and a notice says so.
+//   --repo      accepted and ignored (the repo root is no longer read; the two arguments above name every folder).
 //   --upstream also asks GitHub for the latest tag of every stack reference repo (stacks/<id>/reference.md)
 //   and warns when it differs from the pinned tag (network; uses GITHUB_TOKEN when set, and GITHUB_API_URL when set,
 //   as GitHub Actions and GitHub Enterprise do; default https://api.github.com).
-//   frameworkRoot defaults to this script's parent dir. The repo root (for
-//   wrappers and skills) defaults to <frameworkRoot>/../../.. when it holds
-//   skills/; otherwise wrapper/skill checks are skipped with a notice.
-// Exit code: 0 = no failures (warnings allowed), 1 = at least one failure.
+//   frameworkRoot defaults to this script's parent dir.
+// Exit code: 0 = no failures (warnings allowed), 1 = at least one failure, 2 = the command line or the map file is unusable.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
-const repoFlag = args.indexOf('--repo');
-const repoArg = repoFlag >= 0 ? args.splice(repoFlag, 2)[1] : undefined;
+const takeFlag = (name) => { const i = args.indexOf(name); return i >= 0 ? args.splice(i, 2)[1] : undefined; };
+takeFlag('--repo');
+const knowledgeArg = takeFlag('--knowledge');
+const adaptersArg = takeFlag('--adapters');
+const usageError = (msg) => { console.error(`validate.mjs: ${msg}`); process.exit(2); };
 const upstream = args.includes('--upstream'); if (upstream) args.splice(args.indexOf('--upstream'), 1);
 const refPins = []; // [stack, repo, pinned] for --upstream
 const root = fs.realpathSync(path.resolve(args[0] ?? path.join(path.dirname(fileURLToPath(import.meta.url)), '..')));
-const guessRepo = path.resolve(root, '..', '..', '..');
-const repo = repoArg ? path.resolve(repoArg) : (fs.existsSync(path.join(guessRepo, 'skills')) ? guessRepo : null);
-const knowledgeRoot = repo ? path.join(repo, 'copilot', 'knowledge') : path.resolve(root, '..', '..', 'knowledge');
+const knowledgeRoot = knowledgeArg ? path.resolve(knowledgeArg) : null;
+if (knowledgeRoot && !fs.statSync(knowledgeRoot, { throwIfNoEntry: false })?.isDirectory()) usageError(`--knowledge ${knowledgeArg}: not a folder`);
 
 // The only fixed lists: values defined by schemas/_system.md §1.4 and stack.schema.md.
 const ENFORCED_BY = ['lint', 'typecheck', 'test', 'script', 'llm'];
@@ -114,7 +124,7 @@ function resolveKnowledge(p) {
   const s = stripCode(p).replace(/\[([^\]]*)\]\(([^)]*)\)/, '$2');
   if (!s || s === '—' || s === '-' || /^_?none/i.test(s)) return null;
   const k = s.replace(/^\{\{AGENT_HOME\}\}\/knowledge\//, '').replace(/^knowledge\//, '');
-  return path.join(knowledgeRoot, ...k.split('/'));
+  return path.join(knowledgeRoot ?? '', ...k.split('/'));
 }
 
 // ---- conventions.md: roles (§1) and profile dimensions (§4) -------------------
@@ -199,7 +209,7 @@ function claimPrefix(prefix, f) {
   if (rulePrefixes.has(prefix)) fail('IDS', `rule-prefix ${prefix} used by ${rel(f)} and ${rulePrefixes.get(prefix)}`);
   else rulePrefixes.set(prefix, rel(f));
 }
-function checkRules(f, text, idPattern, { needSource = false } = {}) {
+function checkRules(f, text, idPattern) {
   const sect = section(text, 'Rules') ?? '';
   const found = tables(sect, 'Id').flat();
   const ids = [];
@@ -212,8 +222,8 @@ function checkRules(f, text, idPattern, { needSource = false } = {}) {
     if (row['Enforced by'] && !validEnforcedBy(row['Enforced by'])) fail('RULE', `${rel(f)} ${id}: Enforced by "${row['Enforced by']}" is not one of ${ENFORCED_BY.join('|')}`);
     if ('Source' in row) {
       const src = resolveKnowledge(row.Source);
-      if (src && !exists(src)) (needSource ? fail : warn)('SRC', `${rel(f)} ${id}: Source ${stripCode(row.Source)} does not exist`);
-      if (src && exists(src)) {
+      if (src && knowledgeRoot && !exists(src)) fail('SRC', `${rel(f)} ${id}: Source ${stripCode(row.Source)} does not exist`);
+      if (src && knowledgeRoot && exists(src)) {
         const kfm = frontMatter(read(src)) || {};
         if (kfm.status === 'stale') warn('SRC', `${rel(f)} ${id}: Source is stale: ${stripCode(row.Source)}`);
         if (kfm.schema === 'deep-dive/v1' && Array.isArray(kfm['synthesized-into']) && kfm['synthesized-into'].length) warn('SRC', `${rel(f)} ${id}: Source is a deep dive that has been synthesized; cite the derived doc`);
@@ -277,7 +287,7 @@ for (const stack of stackIds) {
   if ([...pds].sort().join() !== [...pdDisk].sort().join()) fail('STACK', `stacks/${stack}: paradigms [${pds}] ≠ overlay files on disk [${pdDisk}]`);
   for (const row of tables(section(text, 'Reference topics') ?? '', 'Topic').flat()) {
     const p = resolveKnowledge(row.Path || '');
-    if (!p) continue;
+    if (!p || !knowledgeRoot) continue;
     if (!exists(p)) { fail('STACK', `stacks/${stack}: Reference topic path does not exist: ${stripCode(row.Path)}`); continue; }
     const s = (frontMatter(read(p)) || {}).schema;
     if (s && !['knowledge-doc/v1', 'deep-dive/v1'].includes(s)) warn('STACK', `stacks/${stack}: Reference topic ${stripCode(row.Path)} has unknown schema ${s}`);
@@ -488,45 +498,61 @@ if (exists(sysPath)) {
   for (const m of new Set([...reg.matchAll(/`([a-z-]+\.schema\.md)`/g)].map((x) => x[1]))) if (!exists(path.join(root, 'schemas', m))) fail('SCHEMA', `_system.md §4 lists ${m}, which does not exist`);
 }
 
-// ---- wrappers and skills (agent-config repo) ------------------------------------------------------
-if (repo) {
+// ---- wrappers and skills (the adapter map, --adapters) ---------------------------------------------
+if (!knowledgeRoot) warn('SRC', 'no --knowledge; cited docs are not checked (pass --knowledge <knowledge root>)');
+if (adaptersArg) {
+  const mapFile = path.resolve(adaptersArg);
+  let map;
+  try { map = JSON.parse(read(mapFile)); } catch (e) { usageError(`--adapters ${adaptersArg}: ${e.message}`); }
+  const mapDir = path.dirname(mapFile);
+  const { skills: skillsPath, ...adapterPaths } = map ?? {};
+  if (typeof skillsPath !== 'string' || !Object.keys(adapterPaths).length || !Object.values(adapterPaths).every((v) => typeof v === 'string' && v.includes('{id}'))) {
+    usageError(`--adapters ${adaptersArg}: needs a "skills" folder and one "{id}" wrapper path per adapter`);
+  }
+  const at = (rel) => path.resolve(mapDir, rel);
+  const shown = (abs) => path.relative(mapDir, abs).split(path.sep).join('/');
+  const skillsDir = at(skillsPath);
+  const skillsShown = shown(skillsDir);
+  const skillsFound = exists(skillsDir);
+  if (!skillsFound) fail('SKILL', `missing skills folder ${skillsShown}`);
+
   const wrapped = roles.filter((r) => r.id !== 'orchestrator');
   for (const r of wrapped) {
-    const files = [
-      path.join(repo, 'copilot', 'agents', `sdlc-${r.id}.agent.md`),
-      path.join(repo, 'claude', 'agents', `sdlc-${r.id}.md`),
-      path.join(repo, 'codex', 'agents', `sdlc-${r.id}.toml`),
-    ];
-    for (const w of files) {
-      if (!exists(w)) { fail('WRAP', `missing wrapper ${path.relative(repo, w)}`); continue; }
+    for (const template of Object.values(adapterPaths)) {
+      const w = at(template.replaceAll('{id}', r.id));
+      const label = shown(w);
+      if (!exists(w)) { fail('WRAP', `missing wrapper ${label}`); continue; }
       const t = read(w);
-      if (!new RegExp(`name\\s*[:=]\\s*"?sdlc-${r.id}"?\\s*$`, 'm').test(t)) fail('WRAP', `${path.relative(repo, w)}: name must be sdlc-${r.id}`);
-      if (!t.includes(`agentic-sdlc/agents/${r.id}.md`) || !t.includes('Standalone use') || !t.includes('Never launch other agents')) fail('WRAP', `${path.relative(repo, w)}: body does not match the role-wrapper template`);
-      if (w.endsWith('.agent.md') && !/^user-invocable: true\s*$/m.test(t)) fail('WRAP', `${path.relative(repo, w)}: user-invocable must be true`);
-      if (w.includes(`${path.sep}claude${path.sep}`) && !new RegExp(`^\\s+- sdlc-${r.id}-preset\\s*$`, 'm').test(t)) fail('WRAP', `${path.relative(repo, w)}: skills must list sdlc-${r.id}-preset`);
+      if (!new RegExp(`name\\s*[:=]\\s*"?sdlc-${r.id}"?\\s*$`, 'm').test(t)) fail('WRAP', `${label}: name must be sdlc-${r.id}`);
+      if (!t.includes(`agentic-sdlc/agents/${r.id}.md`) || !t.includes('Standalone use') || !t.includes('Never launch other agents')) fail('WRAP', `${label}: body does not match the role-wrapper template`);
+      if (w.endsWith('.agent.md') && !/^user-invocable: true\s*$/m.test(t)) fail('WRAP', `${label}: user-invocable must be true`);
+      if (w.endsWith('.md') && !w.endsWith('.agent.md') && !new RegExp(`^\\s+- sdlc-${r.id}-preset\\s*$`, 'm').test(t)) fail('WRAP', `${label}: skills must list sdlc-${r.id}-preset`);
     }
+    if (!skillsFound) continue;
     // preset skill == role Preset table
-    const sk = path.join(repo, 'skills', `sdlc-${r.id}-preset`, 'SKILL.md');
-    if (!exists(sk)) { fail('SKILL', `missing skills/sdlc-${r.id}-preset/SKILL.md`); continue; }
+    const sk = path.join(skillsDir, `sdlc-${r.id}-preset`, 'SKILL.md');
+    if (!exists(sk)) { fail('SKILL', `missing ${shown(sk)}`); continue; }
     const listed = [...read(sk).matchAll(/^\d+\.\s+`~\/\.copilot\/frameworks\/agentic-sdlc\/([^`]+)`/gm)].map((m) => m[1]);
     const want = presets.get(r.id) || [];
-    if (listed.join('\n') !== want.join('\n')) fail('SKILL', `skills/sdlc-${r.id}-preset: list [${listed.join(', ')}] ≠ agents/${r.id}.md Preset [${want.join(', ')}]`);
+    if (listed.join('\n') !== want.join('\n')) fail('SKILL', `${skillsShown}/sdlc-${r.id}-preset: list [${listed.join(', ')}] ≠ agents/${r.id}.md Preset [${want.join(', ')}]`);
   }
   // Every Codex wrapper must parse as TOML, or Codex silently ignores it: in a basic string ("…" or """…"""), a
   // backslash starts an escape, so `%USERPROFILE%\.copilot` there is an error. Literal strings ('…', '''…''') are left alone.
-  const codexDir = path.join(repo, 'codex', 'agents');
-  if (exists(codexDir)) for (const f of fs.readdirSync(codexDir).filter((x) => x.endsWith('.toml')).sort()) {
-    const bad = tomlEscapeError(read(path.join(codexDir, f)));
-    if (bad) fail('WRAP', `codex/agents/${f}: line ${bad.line}: "\\${bad.char}" is not a TOML escape, so Codex ignores this file (put Windows paths in a '''…''' string)`);
+  const tomlDirs = new Set(Object.values(adapterPaths).filter((t) => t.endsWith('.toml')).map((t) => path.dirname(at(t))));
+  for (const dirPath of tomlDirs) if (exists(dirPath)) for (const f of fs.readdirSync(dirPath).filter((x) => x.endsWith('.toml')).sort()) {
+    const bad = tomlEscapeError(read(path.join(dirPath, f)));
+    if (bad) fail('WRAP', `${shown(path.join(dirPath, f))}: line ${bad.line}: "\\${bad.char}" is not a TOML escape, so Codex ignores this file (put Windows paths in a '''…''' string)`);
   }
-  for (const s of stackIds) if (!exists(path.join(repo, 'skills', `sdlc-stack-${s}`, 'SKILL.md'))) fail('SKILL', `missing skills/sdlc-stack-${s}/SKILL.md`);
-  for (const p of paradigmIds) if (!exists(path.join(repo, 'skills', `sdlc-paradigm-${p}`, 'SKILL.md'))) fail('SKILL', `missing skills/sdlc-paradigm-${p}/SKILL.md`);
-  for (const d of fs.readdirSync(path.join(repo, 'skills'))) {
-    const m = d.match(/^sdlc-(stack|paradigm)-(.+)$/);
-    if (m && !(m[1] === 'stack' ? stackIds : paradigmIds).includes(m[2])) fail('SKILL', `skills/${d} has no matching ${m[1]}`);
-    if (/^sdlc-binding-|^sdlc-engineering-principles$/.test(d)) fail('SKILL', `skills/${d} is a v1 skill; remove it`);
+  if (skillsFound) {
+    for (const s of stackIds) if (!exists(path.join(skillsDir, `sdlc-stack-${s}`, 'SKILL.md'))) fail('SKILL', `missing ${skillsShown}/sdlc-stack-${s}/SKILL.md`);
+    for (const p of paradigmIds) if (!exists(path.join(skillsDir, `sdlc-paradigm-${p}`, 'SKILL.md'))) fail('SKILL', `missing ${skillsShown}/sdlc-paradigm-${p}/SKILL.md`);
+    for (const d of fs.readdirSync(skillsDir)) {
+      const m = d.match(/^sdlc-(stack|paradigm)-(.+)$/);
+      if (m && !(m[1] === 'stack' ? stackIds : paradigmIds).includes(m[2])) fail('SKILL', `${skillsShown}/${d} has no matching ${m[1]}`);
+      if (/^sdlc-binding-|^sdlc-engineering-principles$/.test(d)) fail('SKILL', `${skillsShown}/${d} is a v1 skill; remove it`);
+    }
   }
-} else warn('WRAP', 'agent-config repo not found; wrapper and skill checks skipped (pass --repo <path>)');
+} else warn('WRAP', 'no --adapters; wrapper and skill checks skipped (pass --adapters <adapter map file>)');
 
 // The first invalid escape in a TOML document's basic strings (TOML 1.0 escapes plus 1.1's \e and \xHH; in a
 // multi-line string also a backslash that ends the line), or null.

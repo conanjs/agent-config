@@ -1,11 +1,11 @@
 ---
 schema: schema-system/v1
-last-updated: 2026-10-29
+last-updated: 2026-11-14
 ---
 
 # Knowledge Framework: Schema System
 
-The same meta-schema as `{{AGENT_HOME}}/frameworks/agentic-sdlc/schemas/_system.md` §2: a header line, Front-matter, Required structure, Rules, Example, Checks. This file adds what is specific to store B.
+The meta-schema: a header line, Front-matter, Required structure, Rules, Example, Checks. This file adds what is specific to store B.
 
 ## 1. Shared front-matter
 
@@ -40,7 +40,6 @@ Example:
 
 ```markdown
 - [Fast properties in V8](https://v8.dev/blog/fast-properties) — V8 team, 2017. Backs: How it works §2.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-12.
 ```
 
 ## 3. Claim marking
@@ -59,9 +58,9 @@ The **Verification status** section (knowledge-doc) counts these.
 | Id | Rule | Enforced by |
 |---|---|---|
 | KB-1 | Own words; quotes ≤ 2 sentences, cited | llm |
-| KB-2 | No company names, hosts or secrets (store B is company-neutral) | script (deny-list) + llm |
+| KB-2 | No company names, hosts or secrets (store B is company-neutral) | llm |
 | KB-3 | Every external URL resolves (HTTP < 400) at `last-verified` | script |
-| KB-4 | `Used by` matches the real backlinks from store A | script |
+| KB-4 | Retired. A doc needs no `Used by` section; a leftover `Used by` section or table is ignored, not checked | none |
 | KB-5 | One type per doc | llm |
 | KB-6 | Technical/abstract terms get an analogy + one concrete artifact (global instruction) | llm |
 | KB-7 | **Stands alone.** The doc reads correctly without the conversation it was drafted in: no answer to a question the doc never states, no "as discussed", "you asked", "in my previous answer", no sentence that only makes sense as a reply to someone. Applies with extra care to text drafted in another AI chat and pasted in | script (heuristic warn) + llm |
@@ -101,7 +100,7 @@ The schemas apply to **new docs only**. Existing docs stay as they are.
 | When edited | Keeps complying | Keeps its own existing shape; normal content edits are fine |
 | Checked by `validate-knowledge.mjs` | yes | skipped |
 | May be cited by a rule's `Source:` or a task's `refs:` | yes | yes |
-| `Used by` backlinks (KB-4) | required | not required |
+| `Used by` section (retired, KB-4) | not required; a leftover is ignored | not required |
 | Listed in a topic `index.md` | required | optional, with Type `legacy` |
 | May be a **synthesis source** (`deep-dive.schema.md`) | yes, if `deep-dive/v1` | yes: the derived doc records `derived-from:`, and the legacy doc itself is not edited |
 

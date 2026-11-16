@@ -87,11 +87,6 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 - Use an alias every tool resolves: `package.json` `imports`, or tsconfig `paths` with a build-time rewrite. Never rely on `paths` alone. [rule-candidate]
 - Allow relative paths only for files in the same folder, so aliases and relative paths never mix. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-15 | Source: |
-
 ## Verification status
 - Verified: 21 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-30
 - Tested 2026-10-30 with `tsc` 6.0.3 (`--traceResolution`, `--showConfig`) on a scratch project: How it works 9–13; the cases are listed in `specs/014-nested-tsconfig-and-shared-names/research.md`.
@@ -108,8 +103,6 @@ Moving `routes/` to another folder changes no import in it, because none of its 
 - [TypeScript wiki: Standalone Server (tsserver)](https://github.com/microsoft/TypeScript/wiki/Standalone-Server-%28tsserver%29) — TypeScript team, living. Backs: How it works 9 (inferred project). [^9]
 - [tsc-alias](https://github.com/justkey007/tsc-alias) — tsc-alias maintainers, living. The build-time rewrite tool in the tested row.
 - [NestJS: Libraries](https://docs.nestjs.com/cli/libraries) — NestJS, living. NestJS aliases through tsconfig path mapping and resolves them in its build.
-- `copilot/frameworks/agentic-sdlc/foundations/design/import-paths.md` — IMP-1, IMP-2 apply this.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — TSN-15, TSN-16 and the tested tool config.
 - `copilot/atlas/tools/atlas.mjs` — `--explain` applies How it works 7–13 to find which files import a `.ts` file (`specs/013-cross-repo-and-name-references/`, `specs/014-nested-tsconfig-and-shared-names/`).
 
 ## Related

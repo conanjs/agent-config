@@ -6,7 +6,7 @@ status: verified
 applies-to: ["OpenAPI 3.2.0", "AsyncAPI 3.1.0", "OpenRPC 1.4.x", "OpenCLI 0.1 (opencli.org, draft)", "OpenCLI 1.0.0-alpha.16 (opencli.dev)", "usage 7.1.5 (jdx)", "JSON Schema 2020-12", "API Extractor", "IEEE Std 1003.1-2024", "Backstage catalog descriptor v1alpha1", "checked 2026-11-03"]
 derived-from: [documentation/opencli-deep-dive.md, documentation/usage-spec-deep-dive.md, documentation/cli-description-formats-deep-dive.md]
 last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-updated: 2026-11-14
 tags: [interfaces, contracts, openapi, asyncapi, openrpc, opencli, cli, json-schema, api-extractor, backstage, documentation]
 ---
 
@@ -15,7 +15,7 @@ tags: [interfaces, contracts, openapi, asyncapi, openrpc, opencli, cli, json-sch
 ## Summary
 **TL;DR:** Every way another program or person can talk to a repo is an interface, and most kinds have a standard, machine-readable description format: OpenAPI for HTTP, AsyncAPI for events, OpenRPC for JSON-RPC, usage or OpenCLI for command-line tools (two unrelated specs share the name OpenCLI), JSON Schema for JSON data such as files and hook payloads, and an API Extractor report for a TypeScript library. A repo-level catalog that lists all of them has a convention too: Backstage's `catalog-info.yaml`.
 **Use this when:** deciding how a repo documents what it exposes, choosing the format for one interface, or reviewing whether a tool can be used without reading its code.
-**Not this doc:** how to design and version contracts between services (rules CON-1 … CON-14, `frameworks/agentic-sdlc/foundations/design/contract-design.md`); HTTP error mapping → `web-apis/http-error-mapping.md`.
+**Not this doc:** HTTP error mapping → `web-apis/http-error-mapping.md`.
 
 ## Scope
 Formats that describe an interface so that a person or a program can use it without the source code, as published on 2026-11-03. Covers network APIs, command-line programs, data files and streams, libraries, and the catalog that lists a repo's interfaces. Not covered: GraphQL (its schema language describes itself) and protobuf (its `.proto` files are the description).
@@ -58,12 +58,6 @@ Formats that describe an interface so that a person or a program can use it with
 - A repo is usable from outside only when each of its interfaces has a description a reader can find without the code, listed in one catalog (now CON-15, with CON-16 for the drift check).
 - Pick the format by interface kind; where none exists, a table in the catalog plus JSON Schema for the data.
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation | CON-15 | Source: |
-| foundation | CON-16 | Source: |
-
 ## Verification status
 - Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
@@ -84,6 +78,5 @@ Formats that describe an interface so that a person or a program can use it with
 
 ## Related
 - `documentation/opencli-deep-dive.md`, `documentation/usage-spec-deep-dive.md`, `documentation/cli-description-formats-deep-dive.md` — the full investigations.
-- `frameworks/agentic-sdlc/foundations/design/contract-design.md` — contract rules (CON-1 … CON-14) and the formats it names today (OpenAPI, AsyncAPI, protobuf).
 - `web-apis/http-error-mapping.md`
 - `documentation/learning-explanation-framework.md`

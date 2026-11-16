@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: draft
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [separation-of-concerns, information-hiding, boundaries, architecture]
 ---
 
@@ -88,11 +88,6 @@ A `POST /shipments/42/cancel` endpoint receives an HTTP request. The adapter par
 - Add a boundary when two concerns change for different reasons, not merely to satisfy a layer diagram. [rule-candidate]
 - In functional code, keep effects at the shell; in class-modeled code, keep invariants on behavior-owning objects. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-10 | Source: |
-
 ## Verification status
 - Verified: 5 claims (✅) · Unverified: 1 claim (⚠️) · Last verified: 2026-10-04
 
@@ -101,7 +96,6 @@ A `POST /shipments/42/cancel` endpoint receives an HTTP request. The adapter par
 - [Functional Core, Imperative Shell](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) — Gary Bernhardt / Destroy All Software, 2012. Backs: How it works, Edge cases. [^2]
 - [Yagni](https://martinfowler.com/bliki/Yagni.html) — Martin Fowler, 2015. Backs: Edge cases. [^3]
 - [On the Criteria To Be Used in Decomposing Systems into Modules](https://wstomv.win.tue.nl/edu/2ip30/references/criteria_for_modularization.pdf) — David L. Parnas, Communications of the ACM, 1972. Backs: Problem (decompose by design decisions likely to change, not flowchart steps). [^4]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-10.
 
 ## Related
 - `software-design/ddd/layering.md`

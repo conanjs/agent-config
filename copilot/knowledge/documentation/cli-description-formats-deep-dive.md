@@ -4,7 +4,7 @@ topic: documentation
 status: verified
 applies-to: ["docopt 0.6.2", "Fig completion specs (@withfig/autocomplete-types 1.31.0)", "carapace-spec (schema read 2026-11-03)", "argc (read 2026-11-03)", ".NET 10 SDK --cli-schema (preview)", "OpenCLI 0.1 and 1.0.0-alpha.16", "usage 7.1.5", "IEEE Std 1003.1-2024", "sources read 2026-11-03"]
 last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-updated: 2026-11-14
 synthesized-into:
   - { path: documentation/interface-description-standards.md, on: 2026-11-03 }
 tags: [cli, interface-description, docopt, fig, amazon-q, carapace, argc, dotnet, posix, clig, comparison]
@@ -233,4 +233,3 @@ Whatever you pick, add a **drift check**: a test that compares the program's rea
 - `documentation/interface-description-standards.md` — which format fits which interface kind (synthesized from this dive).
 - `documentation/opencli-deep-dive.md` — both OpenCLI specifications in full.
 - `documentation/usage-spec-deep-dive.md` — usage in full.
-- `frameworks/agentic-sdlc/foundations/design/contract-design.md` — contract rules CON-1 … CON-14.
