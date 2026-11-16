@@ -5,6 +5,12 @@ export type RealPathAnswer =
 /** The answer to "is the last segment of this path a link": yes, certainly not, or not knowable. */
 export type LinkAnswer = 'link' | 'not-link' | 'unknown';
 
+/** The answer to "which file is this": its device and index number (the same for two paths that reach one folder), missing, or not knowable. */
+export type IdentityAnswer =
+  | { readonly kind: 'identity'; readonly dev: bigint; readonly ino: bigint }
+  | { readonly kind: 'missing' }
+  | { readonly kind: 'unknown' };
+
 /**
  * The questions the real-path check asks the disk, owned by the application layer and answered by an adapter (DR-305).
  *
@@ -16,6 +22,11 @@ export type LinkAnswer = 'link' | 'not-link' | 'unknown';
  * must not be used. Whether `.native` canonicalises letter case on APFS is not confirmed here: T132 must test it on a macOS
  * runner, because a root and a target spelled in two cases are compared as different on a `posix` flavor, which refuses the
  * path (the safe direction).
+ *
+ * `identity` is for comparing folders that text cannot compare: a firmlink or a bind mount gives one folder two paths
+ * (`/System/Volumes/Data/Users/v` and `/Users/v`), and only the device and index number say they are the same (M-03). The real
+ * adapter uses `fs.statSync(path, { bigint: true })` (links followed) and may call `nodeFileIdentity` of
+ * `shared/infrastructure/nodeFileIdentity.ts`, which answers `missing` only for ENOENT and ENOTDIR.
  *
  * A double with a small table of links can stand in for any file system in a unit test.
  */
@@ -35,4 +46,12 @@ export interface PathProbe {
    * @returns `link` for a link, working or dangling; `not-link` for anything else including a missing path; `unknown` on any other error
    */
   isLink(path: string): LinkAnswer;
+
+  /**
+   * Gives the identity of the file or folder a path reaches, every link followed.
+   *
+   * @param path - an absolute path
+   * @returns device and index number; `missing` when nothing is there; `unknown` for any other error
+   */
+  identity(path: string): IdentityAnswer;
 }

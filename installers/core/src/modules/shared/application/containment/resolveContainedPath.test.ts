@@ -45,7 +45,11 @@ function probeOf(disk: FakeDisk, flavor: PathFlavor): PathProbe {
     if (unreadable.has(target)) return 'unknown';
     return disk.links[target] === undefined ? 'not-link' : 'link';
   };
-  return { realPath: (target) => resolve(flavored.normalize(target), 0), isLink };
+  return {
+    realPath: (target) => resolve(flavored.normalize(target), 0),
+    isLink,
+    identity: () => ({ kind: 'unknown' }),
+  };
 }
 
 const posixHome = '/h/.agent-config';

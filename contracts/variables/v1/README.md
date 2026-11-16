@@ -30,7 +30,7 @@ A variable is a named, public value (a folder, a language) that documents refer 
 | VR-5 | First phase 2 install: values found in the old `~/.copilot/global-variables.md` are offered as proposals in the needs report, the old file is backed up, V confirms with `set` (DR-414)                                                                                                                                                         |
 | VR-6 | A required value that is missing exits 10 with a "variables" need after any "components" need, and nothing changes (AC-4.2)                                                                                                                                                                                                                     |
 
-V's values live in `{{AGENT_HOME}}/variables.local.yaml` (`schema: variables-local/v1`, a `values:` map, written by `set` after a backup, never tracked). That file is the installer's own state, not one of the fifteen contracts, so this folder has no schema for it.
+V's values live in `{{AGENT_HOME}}/variables.local.yaml` (`schema: variables-local/v1`, a `values:` map, written by `set` after a backup, never tracked). `set` rewrites the whole file sorted by name and drops comments written by hand. That file is the installer's own state, not one of the fifteen contracts, so this folder has no schema for it.
 
 ## Worked example
 

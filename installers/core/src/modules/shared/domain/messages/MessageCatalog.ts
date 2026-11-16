@@ -72,6 +72,7 @@ export const MESSAGE_CATALOG = {
   'MG-29': 'error: tag moved: component {name}, tag {tag}, locked {locked}, now {current}',
   'MG-30': 'error: another run holds the lock {lock} ({command}, started {started})',
   'MG-31': 'error: component {name}: path source folder {folder} does not exist',
+  'MG-31.refused': 'error: component {name}: path source folder {folder} is refused: {reason} (M-03)',
   'MG-32': 'error: component {name}: cannot fetch git source {url} (ref {ref})',
   'MG-32.cause': '   cause: {cause}',
   'MG-33': 'error: {folder}/component.yaml already exists; init-component never overwrites a manifest',
@@ -113,6 +114,9 @@ export const MESSAGE_CATALOG = {
   'MG-39.old-agent-home-path': 'names ~/.copilot/knowledge',
   'MG-39.backups.one': 'warning: backups: 1 backup, {size}',
   'MG-39.backups.many': 'warning: backups: {count} backups, {size}',
+  'MG-41': 'error: agent home {path} is refused: {reason}',
+  'MG-42': 'error: the value of {name} is refused: {reason}',
+  'MG-43': 'warning: component {name}: {file}: {sentence}',
 } as const;
 
 /** The id of one row of {@link MESSAGE_CATALOG}. */

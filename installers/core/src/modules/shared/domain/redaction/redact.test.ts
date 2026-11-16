@@ -211,8 +211,7 @@ describe('M-01 needsRedaction', () => {
 
 // M-13: no input makes the redaction slow. Each text is 256 KiB of the shape that would hurt a backtracking expression.
 describe('M-13 redact stays linear', () => {
-  const size = 256 * 1024;
-  const hostile: [title: string, text: string][] = [
+  const hostileAt = (size: number): [title: string, text: string][] => [
     ['one long word', 'a'.repeat(size)],
     ['schemes with no authority', '://'.repeat(size / 3)],
     ['schemes with short authorities', 'a://'.repeat(size / 4)],
@@ -228,9 +227,30 @@ describe('M-13 redact stays linear', () => {
     ['prefixes', 'ghp_'.repeat(size / 4)],
   ];
 
-  it.each(hostile)('redacts %s in under 50 ms', (_title, text) => {
-    const started = performance.now();
-    redact(text);
-    expect(performance.now() - started).toBeLessThan(50);
+  const hostile = hostileAt(256 * 1024);
+  const small = hostileAt(64 * 1024);
+
+  // The best of three runs, so a pause of a busy machine does not fail a linear rule.
+  const bestOfThree = (text: string): number =>
+    Math.min(
+      ...[0, 1, 2].map(() => {
+        const started = performance.now();
+        redact(text);
+        return performance.now() - started;
+      }),
+    );
+
+  it.each(hostile)('redacts %s in under 500 ms', (_title, text) => {
+    expect(bestOfThree(text)).toBeLessThan(500);
   });
+
+  // A floor of 5 ms keeps timer noise on a fast case from deciding the ratio. Four times the text takes about four times as long when linear and about sixteen times as long when quadratic.
+  it.each(hostile.map(([title], index) => [title, index] as const))(
+    '%s: 256 KiB takes at most 8 times the time of 64 KiB',
+    (_title, index) => {
+      const large = bestOfThree(hostile[index]?.[1] ?? '');
+      const little = Math.max(bestOfThree(small[index]?.[1] ?? ''), 5);
+      expect(large / little).toBeLessThanOrEqual(8);
+    },
+  );
 });

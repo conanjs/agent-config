@@ -263,18 +263,40 @@ const rows: Row[] = [
   ['MG-39.old-agent-home-path', {}, 'names ~/' + '.copilot/knowledge'],
   ['MG-39.backups.one', { size: '1.2 MB' }, 'warning: backups: 1 backup, 1.2 MB'],
   ['MG-39.backups.many', { count: '3', size: '1.2 MB' }, 'warning: backups: 3 backups, 1.2 MB'],
+  [
+    'MG-31.refused',
+    { name: 'kb', folder: '/', reason: 'it is a file system root' },
+    'error: component kb: path source folder / is refused: it is a file system root (M-03)',
+  ],
+  [
+    'MG-41',
+    { path: '/', reason: 'it must not be a file system root' },
+    'error: agent home / is refused: it must not be a file system root',
+  ],
+  [
+    'MG-42',
+    { name: 'LANGUAGE', reason: 'the value is empty' },
+    'error: the value of LANGUAGE is refused: the value is empty',
+  ],
+  [
+    'MG-43',
+    { name: 'kb', file: 'component.yaml', sentence: 'unknown key x' },
+    'warning: component kb: component.yaml: unknown key x',
+  ],
 ];
 
 describe('TR-5 message catalogue', () => {
   it('has exactly the rows of the table above, no more and no fewer', () => {
     expect(rows.map(([id]) => id).sort()).toEqual(Object.keys(MESSAGE_CATALOG).sort());
-    expect(rows).toHaveLength(94);
+    expect(rows).toHaveLength(98);
   });
 
-  it('covers MG-01 to MG-39 and nothing above MG-39', () => {
+  it('covers MG-01 to MG-39 and MG-41 to MG-43 and nothing above (MG-40 is script output, not a catalogue row)', () => {
     const numbers = new Set(Object.keys(MESSAGE_CATALOG).map((id) => Number(id.slice(3, 5))));
-    expect([...numbers].filter((number) => number > 39)).toEqual([]);
-    const missing = Array.from({ length: 39 }, (_unused, index) => index + 1).filter((number) => !numbers.has(number));
+    expect([...numbers].filter((number) => number > 43 || number === 40)).toEqual([]);
+    const missing = Array.from({ length: 43 }, (_unused, index) => index + 1)
+      .filter((number) => number !== 40)
+      .filter((number) => !numbers.has(number));
     expect(missing).toEqual([]);
   });
 
