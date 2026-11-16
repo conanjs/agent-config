@@ -127,6 +127,35 @@ Run-level fields: `installer` (version, commit), `home` (the confirmed home path
 
 **Journal** (`{{AGENT_HOME}}/install-state.pending.json`): the plan's link and write operations with each path's old target or old hash, written before the switch and deleted at the commit point (DR-202 steps 7 to 9).
 
+Format `install-journal/v1` (JSON, keys sorted, written by temporary file and rename; implemented in `installers/core/src/modules/state/domain/journal/Journal.ts`):
+
+| Field | Meaning |
+|---|---|
+| `schema` | `install-journal/v1` |
+| `home` | The agent home of the run |
+| `command` | The command that wrote it |
+| `started` | When it was written (an instant of the Clock) |
+| `operations` | The link and write operations in the order the run performs them |
+
+Each operation has a `path` (absolute, inside the home or an agent folder) and an `old` field that says what the path held before the run:
+
+| `op` | Other fields | `old.state` forms |
+|---|---|---|
+| `link` | `kind` (`symlink` or `junction`), `target` | `absent`; `link` with `target` and `kind` (an older link, to be switched back); `backed-up` with `backup` (a real file or folder, copied to the backups folder before it was replaced) |
+| `write` | `hash` (SHA-256 of the content the run writes) | `absent`; `file` with `backup` (the old content, copied to the backups folder) |
+
+**Replay.** Operations are undone last to first, each step safe to run twice, and the journal is deleted last, so a crash during a restore is finished by the next one. A path that is not what this run placed (another link target, content that V edited) is left as it is and reported. Every journaled path is proven to lie inside the home or an agent folder before anything is undone; a journal that is corrupt or names a path outside is refused and kept.
+
+| Operation, `old.state` | What is at the path now | Step |
+|---|---|---|
+| `link`, `absent` | our link | remove the link |
+| `link`, `link` | our link / nothing (killed between remove and create) / the old link | switch back / create the old link / nothing |
+| `link`, `backed-up` | our link / nothing / the real entry | remove the link and copy the backup back / copy the backup back / nothing |
+| `write`, `absent` | our content (hash equal) | remove the file |
+| `write`, `file` | our content or nothing | copy the backup back |
+
+**Already committed.** A kill between the rename of `install-state.json` and the deletion of the journal leaves a journal of a finished run. If `install-state.json` lists every journaled path with the journaled link `target` or write `hash`, the journal is deleted and nothing is undone. For that rule to hold, the entries of a run must list every journaled link and write, `components.lock` included.
+
 ### Need (the NEEDS report, exit 10)
 
 `{ kind: home | components | variables | privileged, item, detail, satisfy }`. Ordering: home confirmation first, then components (sources), then variables, then privileged changes (FR-018, AC-4.2; M-01). `satisfy` is the exact command for installer-made needs; for text that comes from a component (a `suggest` source) it is shown as "suggested by `<component>`, unverified" and never as a ready-to-run command (M-11).

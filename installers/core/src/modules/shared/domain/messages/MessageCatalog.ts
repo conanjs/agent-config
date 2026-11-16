@@ -117,6 +117,8 @@ export const MESSAGE_CATALOG = {
   'MG-41': 'error: agent home {path} is refused: {reason}',
   'MG-42': 'error: the value of {name} is refused: {reason}',
   'MG-43': 'warning: component {name}: {file}: {sentence}',
+  'MG-44': 'error: component {name} needs {tool} {range}, found {version}',
+  'MG-45': 'error: component {name}: suggested source refused: it contains credential-like text',
 } as const;
 
 /** The id of one row of {@link MESSAGE_CATALOG}. */

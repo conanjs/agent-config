@@ -16,6 +16,10 @@
 # The first install asks one question (home confirmation); a git source is listed as https://example.invalid/<name>.git (tool.ts maps it).
 # Journal: `home/.agent-config/install-state.pending.json`. "Changing nothing" in EDGE-3 means: no link, no store, no install-state.json,
 # no components.lock and no change in the agent folders (the lock file and an empty home folder may come and go).
+# Killed runs and the lock (EDGE-4, M-12): a killed process leaves `install.lock` behind on purpose (no exit handler removes it), and the
+# clock is fixed, so the leftover lock is fresh. The scenarios that run again after a kill move the clock 11 minutes forward first
+# (the lock is then stale and taken over); one scenario stays 9 minutes after the kill and expects MG-30. `doctor` takes the same
+# lock, because it replays the journal (restoreFromJournal runs under the lock, T139), so it needs the later clock too.
 
 Feature: Edge cases of the minimal installer
   Unmanaged files stay, machines share nothing committed, failures change nothing, interrupted runs complete or restore, the local
@@ -128,6 +132,7 @@ Feature: Edge cases of the minimal installer
     And the installer process is killed after link switch 1
     And the tool runs with "install"
     And the edge faults are cleared
+    And the clock is fixed at "2026-11-20T09:25:03.000Z"
     When the tool runs with "install"
     Then it exits with 0
     And "home/.agent-config/install-state.pending.json" does not exist
@@ -147,6 +152,7 @@ Feature: Edge cases of the minimal installer
     And the installer process is killed after link switch 1
     And the tool runs with "install"
     And the edge faults are cleared
+    And the clock is fixed at "2026-11-20T09:25:03.000Z"
     When the tool runs with "doctor"
     Then it exits with 1
     And the output has the line "error: interrupted-install: {root}/home/.agent-config/install-state.pending.json: restored to the previous state"
@@ -155,11 +161,24 @@ Feature: Edge cases of the minimal installer
     And "home/.agent-config/companies/notes" does not exist
 
   @pending @T132 @T138 @T139 @T142
+  Scenario: EDGE-4 Nine minutes after a kill the leftover lock still holds, so doctor exits 1 naming it and restores nothing
+    Given the edge setup lists locally the path components "notes"
+    And the installer process is killed after link switch 1
+    And the tool runs with "install"
+    And the edge faults are cleared
+    And the clock is fixed at "2026-11-20T09:23:03.000Z"
+    When the tool runs with "doctor"
+    Then it exits with 1
+    And the output has the line "error: another run holds the lock {root}/home/.agent-config/install.lock (install, started 2026-11-20T09:14:03.000Z)"
+    And "home/.agent-config/install-state.pending.json" exists
+
+  @pending @T132 @T138 @T139 @T142
   Scenario: EDGE-4 After doctor restored the half-state, install completes cleanly
     Given the edge setup lists locally the path components "notes"
     And the installer process is killed after link switch 1
     And the tool runs with "install"
     And the edge faults are cleared
+    And the clock is fixed at "2026-11-20T09:25:03.000Z"
     And the tool runs with "doctor"
     When the tool runs with "install"
     Then it exits with 0
