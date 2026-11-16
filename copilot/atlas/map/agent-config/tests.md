@@ -128,6 +128,7 @@ Where: `tests/*/{fixtures,golden}/**` · Schema: — · Index: — · Checked by
 - [`tests/installers/golden/posix/linux.txt`](../../../../tests/installers/golden/posix/linux.txt)
 - [`tests/installers/golden/posix/plan.sh`](../../../../tests/installers/golden/posix/plan.sh)
 - [`tests/installers/golden/windows/plan.ps1`](../../../../tests/installers/golden/windows/plan.ps1)
+- [`tests/installers/golden/windows/windows.txt`](../../../../tests/installers/golden/windows/windows.txt)
 - [`tests/repo-layout/fixtures/base/AGENTS.md`](../../../../tests/repo-layout/fixtures/base/AGENTS.md)
 - [`tests/repo-layout/fixtures/base/CHANGELOG.md`](../../../../tests/repo-layout/fixtures/base/CHANGELOG.md)
 - [`tests/repo-layout/fixtures/base/INTERFACES.md`](../../../../tests/repo-layout/fixtures/base/INTERFACES.md)

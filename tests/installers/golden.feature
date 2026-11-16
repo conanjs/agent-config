@@ -41,7 +41,7 @@ Feature: Golden install plans of the old installers
     When the old installers' plan in "copy" for "darwin" is listed
     Then the plan equals the golden file "posix/darwin.txt"
 
-  @windows @pending @T037 @T038
+  @windows @T037 @T038
   Scenario: AC-1.9 The Windows plan equals the golden file windows.txt, once T037 provides it
     When the plan of install.ps1 is listed on the Windows runner
     Then the plan equals the golden file "windows/windows.txt"

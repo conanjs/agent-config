@@ -59,8 +59,10 @@ try {
 
   foreach ($e in Get-Entries $home_ '') {
     if ($e.Rel -like '.agent-config-backups/*') { continue }
-    # PowerShell's own cache and config under HOME (macOS and Linux hosts only; used when testing this script there).
+    # PowerShell's own cache and config under HOME, not the installer's: .cache, .config and .local/share on macOS and Linux
+    # hosts, AppData/Local/Microsoft/PowerShell on Windows (seen in the first runner artifact, 2026-11-16).
     if ($e.Rel -like '.cache/powershell/*' -or $e.Rel -like '.config/powershell/*' -or $e.Rel -like '.local/share/powershell/*') { continue }
+    if ($e.Rel -like 'AppData/Local/Microsoft/PowerShell/*') { continue }
     $t = "~/$($e.Rel)"
     if ($e.Link) {
       $lines += "link $t -> $(Format-Source (@((Get-Item -LiteralPath $e.Path -Force).Target) | Select-Object -First 1))"
