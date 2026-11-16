@@ -1,6 +1,6 @@
 ---
 schema: framework-index/v1
-last-updated: 2026-10-27
+last-updated: 2026-11-14
 ---
 
 # Knowledge Framework (store B)
@@ -11,7 +11,7 @@ last-updated: 2026-10-27
 ## 1. Where this sits
 
 ```
- A  agentic-sdlc framework      RULES       "must / must not"      foundations/, stacks/, paradigms/
+ A  rules framework             RULES       "must / must not"      foundations/, stacks/, paradigms/
  │   Source: + Reference topics
  ▼
  B  knowledge framework (this)  REFERENCES  "how it works, why"    {{AGENT_HOME}}/knowledge/<topic>/
@@ -27,7 +27,7 @@ last-updated: 2026-10-27
 |---|---|---|
 | A → B | A rule's `Source:` column; a stack's *Reference topics* table | `TSN-12` → `knowledge/js-runtime/v8-hidden-classes.md` |
 | C → B | A Company KB doc's References section | `companies/ots/flows/shipment-import.md` → `knowledge/grpc/stale-connection-keepalive.md` |
-| B → A | A knowledge doc's **Used by** section (backlinks) | `v8-hidden-classes.md` → Used by: `TSN-12` |
+| B → A | **Never.** Store B does not list who cites it. A leftover `Used by` section or table in a doc is ignored by the validator. | — |
 | B → C/D | **Never.** Store B stays company-neutral. | — |
 
 ## 2. What goes in B (and what doesn't)
@@ -111,10 +111,8 @@ draft ──(sources checked, claims marked)──► verified ──(applies-to
 ## References
 
 - Diátaxis — https://diataxis.fr/
-- `{{AGENT_CONFIG_REPO}}/proposals/agentic-sdlc-v2-structure.md` §6 (Knowledge architecture), decision D10 (deep dives)
 - `{{AGENT_HOME}}/frameworks/company-kb/index.md`
 
 ## Related
 
-- `{{AGENT_HOME}}/frameworks/agentic-sdlc/index.md` — the framework that consumes B
 - `{{AGENT_HOME}}/knowledge/documentation/doc-template-base.md` — team docs (a different audience)

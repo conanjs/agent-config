@@ -1,0 +1,37 @@
+{
+  "schema": "build/v1",
+  "agents": {
+    "claude-code": {
+      "characters": 5110,
+      "tokens_estimate": 1278,
+      "agent_home_lines": 1,
+      "method": "dry run, rendered in memory, Unicode code points; tokens_estimate is characters / 4 rounded up; agent home path of 29 characters; the tree may include uncommitted work, which git rev-parse cannot tell",
+      "tool_version": "1",
+      "node_version": "24.22.1",
+      "date": "2026-11-14",
+      "commit": "dae2284b04a5848946a8ac0cee66f205c123d127",
+      "skill_list_characters": 4892,
+      "skill_list_sdlc_characters": 3542
+    },
+    "copilot-cli": {
+      "characters": 4957,
+      "tokens_estimate": 1240,
+      "agent_home_lines": 1,
+      "method": "dry run, rendered in memory, Unicode code points; tokens_estimate is characters / 4 rounded up; agent home path of 29 characters; the tree may include uncommitted work, which git rev-parse cannot tell",
+      "tool_version": "1",
+      "node_version": "24.22.1",
+      "date": "2026-11-14",
+      "commit": "dae2284b04a5848946a8ac0cee66f205c123d127"
+    },
+    "codex": {
+      "characters": 4957,
+      "tokens_estimate": 1240,
+      "agent_home_lines": 1,
+      "method": "dry run, rendered in memory, Unicode code points; tokens_estimate is characters / 4 rounded up; agent home path of 29 characters; the tree may include uncommitted work, which git rev-parse cannot tell",
+      "tool_version": "1",
+      "node_version": "24.22.1",
+      "date": "2026-11-14",
+      "commit": "dae2284b04a5848946a8ac0cee66f205c123d127"
+    }
+  }
+}

@@ -280,15 +280,6 @@ Feature: Agentic SDLC framework validator
         RULE  foundations/code/demo.md: "## Rules" has no rule table (Id | Rule | Holds when | Typical violation | Enforced by | Source)
       """
 
-  Scenario: SRC a Source that does not exist warns
-    Given in "repo/copilot/frameworks/agentic-sdlc/foundations/code/demo.md", `| llm | knowledge/demo/doc.md |` becomes `| llm | knowledge/demo/gone.md |`
-    When the tool runs
-    Then it exits with 0 and prints:
-      """
-        warn  SRC  foundations/code/demo.md DEM-1: Source knowledge/demo/gone.md does not exist
-      PASS (1 warning(s))
-      """
-
   Scenario: SRC a stale Source warns
     Given in "repo/copilot/knowledge/demo/doc.md", `status: verified` becomes `status: stale`
     When the tool runs
@@ -1138,13 +1129,60 @@ Feature: Agentic SDLC framework validator
         WRAP  claude/agents/sdlc-engineering.md: skills must list sdlc-engineering-preset
       """
 
-  Scenario: WRAP without the agent-config repo the wrapper checks are skipped with a warning
-    Given the folder "repo/skills" is removed
-    When the tool runs with "--no-repo"
+  Scenario: WRAP without --adapters the wrapper and skill checks are skipped with a warning
+    When the tool runs with "--no-adapters"
     Then it exits with 0 and prints:
       """
-        warn  WRAP  agent-config repo not found; wrapper and skill checks skipped (pass --repo <path>)
+        warn  WRAP  no --adapters; wrapper and skill checks skipped (pass --adapters <adapter map file>)
       PASS (1 warning(s))
+      """
+
+  Scenario: SRC without --knowledge the cited docs are not checked and a warning says so
+    Given the folder "repo/copilot/knowledge" is removed
+    When the tool runs with "--no-knowledge"
+    Then it exits with 0 and prints:
+      """
+        warn  SRC  no --knowledge; cited docs are not checked (pass --knowledge <knowledge root>)
+      PASS (1 warning(s))
+      """
+
+  Scenario: SRC a --knowledge that is not a folder is a usage error
+    When the tool runs with "--knowledge {root}/repo/nowhere"
+    Then it exits with 2 and prints:
+      """
+      validate.mjs: --knowledge {root}/repo/nowhere: not a folder
+      """
+
+  Scenario: WRAP an adapter map that is not JSON is a usage error
+    Given the file "repo/adapters.json" contains:
+      """
+      not json
+      """
+    When the tool runs
+    Then it exits with 2 and prints:
+      """
+      validate.mjs: --adapters {root}/repo/adapters.json: Unexpected token 'o', "not json
+      " is not valid JSON
+      """
+
+  Scenario: WRAP an adapter map without a skills folder is a usage error
+    Given the file "repo/adapters.json" contains:
+      """
+      { "copilot": "copilot/agents/sdlc-{id}.agent.md" }
+      """
+    When the tool runs
+    Then it exits with 2 and prints:
+      """
+      validate.mjs: --adapters {root}/repo/adapters.json: needs a "skills" folder and one "{id}" wrapper path per adapter
+      """
+
+  Scenario: SKILL a missing skills folder is one finding, not a crash
+    Given the folder "repo/skills" is removed
+    When the tool runs
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        SKILL  missing skills folder skills
       """
 
   Scenario: SKILL a missing preset skill fails
@@ -1240,6 +1278,89 @@ Feature: Agentic SDLC framework validator
         warn  REF  stacks/demo/reference.md: demo-org/demo-reference → TypeError: fetch failed
       PASS (1 warning(s))
       """
+
+  # ---- specs/022 phase 1 (US9): the knowledge root and the adapter map are arguments -----------------
+  # Written before the code (QB-3, tests first); T099 (validator) made them pass.
+  #
+  # The command line T099 builds (fixed here because no other document fixes it; plan.md phase 1 gives the names):
+  #   validate.mjs [frameworkRoot] [--repo <repo root>] --knowledge <knowledge root> --adapters <adapter map file>
+  #   --knowledge  the folder that holds the cited docs; a Source or Reference-topic cell "knowledge/<p>" or
+  #                "{{AGENT_HOME}}/knowledge/<p>" resolves to <knowledge root>/<p>.
+  #   --adapters   a JSON file mapping each adapter to its wrapper path, "{id}" standing for the role id, and "skills"
+  #                to the skills folder. Paths are relative to the folder that holds the map file.
+  #                {"copilot": "…/sdlc-{id}.agent.md", "claude": "…/sdlc-{id}.md", "codex": "…/sdlc-{id}.toml", "skills": "…"}
+  #   No repo folder name is written in the validator: not "copilot/knowledge", "copilot/agents", "claude/agents",
+  #   "codex/agents" and not "skills".
+  # The message T099 prints when a citation does not resolve (it fails; with no --knowledge it is not checked):
+  #   SRC  <citing file> <rule id>: Source <cited path> does not exist
+  # The wrapper and skill messages keep their text; their paths are written relative to the folder of the map file.
+
+  @T099
+  Scenario: AC-9.3 an unresolved citation fails naming the citing file and the missing path
+    Given in "repo/copilot/frameworks/agentic-sdlc/foundations/code/demo.md", `| llm | knowledge/demo/doc.md |` becomes `| llm | knowledge/demo/gone.md |`
+    When the tool runs with "--knowledge {root}/repo/copilot/knowledge --adapters {root}/repo/adapters.json"
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        SRC  foundations/code/demo.md DEM-1: Source knowledge/demo/gone.md does not exist
+      """
+
+  @T099
+  Scenario: AC-9.3 the knowledge root is the argument, not a folder next to the framework
+    Given the folder "repo/copilot/knowledge" is renamed to "repo/library"
+    When the tool runs with "--knowledge {root}/repo/library --adapters {root}/repo/adapters.json"
+    Then it passes with no warnings
+
+  @T099
+  Scenario: AC-9.3 a fixture with renamed folders passes
+    Given the folder "repo/copilot/knowledge" is renamed to "repo/library"
+    And the folder "repo/copilot/agents" is renamed to "repo/wrappers-gh"
+    And the folder "repo/claude/agents" is renamed to "repo/wrappers-cl"
+    And the folder "repo/codex/agents" is renamed to "repo/wrappers-cx"
+    And the folder "repo/skills" is renamed to "repo/packs"
+    And the file "repo/adapters.json" contains:
+      """
+      {
+        "copilot": "wrappers-gh/sdlc-{id}.agent.md",
+        "claude": "wrappers-cl/sdlc-{id}.md",
+        "codex": "wrappers-cx/sdlc-{id}.toml",
+        "skills": "packs"
+      }
+      """
+    When the tool runs with "--knowledge {root}/repo/library --adapters {root}/repo/adapters.json"
+    Then it passes with no warnings
+
+  @T099
+  Scenario: AC-9.3 with renamed folders a missing wrapper is named by its mapped path
+    Given the folder "repo/copilot/agents" is renamed to "repo/wrappers-gh"
+    And the folder "repo/claude/agents" is renamed to "repo/wrappers-cl"
+    And the folder "repo/codex/agents" is renamed to "repo/wrappers-cx"
+    And the folder "repo/skills" is renamed to "repo/packs"
+    And the file "repo/adapters.json" contains:
+      """
+      {
+        "copilot": "wrappers-gh/sdlc-{id}.agent.md",
+        "claude": "wrappers-cl/sdlc-{id}.md",
+        "codex": "wrappers-cx/sdlc-{id}.toml",
+        "skills": "packs"
+      }
+      """
+    And the file "repo/wrappers-cl/sdlc-engineering.md" is removed
+    When the tool runs with "--knowledge {root}/repo/copilot/knowledge --adapters {root}/repo/adapters.json"
+    Then it exits with 1 and prints:
+      """
+      FAIL (1)
+        WRAP  missing wrapper wrappers-cl/sdlc-engineering.md
+      """
+
+  @T099
+  Scenario: AC-9.3 the validator source holds no repo folder name
+    Given the repo's "copilot/frameworks/agentic-sdlc/tools" folder is copied to "validator"
+    Then the file "validator/validate.mjs" has no line containing "'copilot'"
+    And the file "validator/validate.mjs" has no line containing "'claude'"
+    And the file "validator/validate.mjs" has no line containing "'codex'"
+    And the file "validator/validate.mjs" has no line containing "'skills'"
+    And the file "validator/validate.mjs" has no line containing "codex/agents"
 
   # ---- traceability (TST-14) -----------------------------------------------------------------------
 

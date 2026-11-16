@@ -6,7 +6,7 @@ status: verified
 applies-to: ["any"]
 derived-from: [software-design/architecture-styles/clean-architecture-deep-dive.md]
 last-verified: 2026-10-27
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [clean-architecture, dependency-rule, interface-adapters, presenter, input-port, output-port, request-response, architecture]
 ---
 
@@ -134,9 +134,6 @@ Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mista
 - Choosing return over an output port is legitimate; record the choice and when to switch.
 - Group by feature first and put the rings inside each module; keep rings at the top only as a recorded choice for a small app.
 
-## Used by
-- _Not cited by any rule yet._
-
 ## Verification status
 - Verified: 18 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
 
@@ -148,9 +145,7 @@ Until 2026-10-26, step 5 returned the `Document` entity itself. That was a mista
 - [Common web application architectures](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) — Microsoft, living. Backs: Edge cases (gateway ports and entities). [^5]
 - [Type Compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility.html) — TypeScript Handbook, living. Backs: Edge cases (private members and structural typing). [^6]
 - [GUI Architectures](https://martinfowler.com/eaaDev/uiArchs.html) — Martin Fowler, 2006. Backs: the Model-View-Presenter meaning of "presenter".
-- `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules this doc explains.
-- `copilot/frameworks/agentic-sdlc/foundations/code/naming.md` — the `Presenter` role suffix.
-- [`src/` of the stack reference at v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. Pointer: `copilot/frameworks/agentic-sdlc/stacks/typescript-node/reference.md`. The same code in the default feature-first layout (MOD-9): [@ v3.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a7cf35cefff608099e7bc6bec84c889e9dd444c1) (`src/modules/documents/`, `src/modules/shared/`).
+- [`src/` of the stack reference at v1.2.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a8e776660fe686a716fc1f80550f2671c972cc7b/src) — `ReviseDocument.ts`, `ReviseDocumentHandler.ts`, `ports/DocumentStore.ts`, `CompositionRoot.ts`: the second worked example. The same code in the default feature-first layout (MOD-9): [@ v3.0.0](https://github.com/conanjs/agentic-sdlc-reference-typescript-node/tree/a7cf35cefff608099e7bc6bec84c889e9dd444c1) (`src/modules/documents/`, `src/modules/shared/`).
 - `copilot/knowledge/software-design/architecture-styles/clean-architecture-deep-dive.md` — the deep dive this doc was distilled from (§6.3, §6.6, §6.7, §7).
 
 ## Related

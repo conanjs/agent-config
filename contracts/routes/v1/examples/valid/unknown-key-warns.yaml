@@ -1,0 +1,6 @@
+schema: routes/v1
+routes:
+  - id: patterns
+    when: Designing a reusable mechanism
+    read: patterns/index.md
+    priority: high

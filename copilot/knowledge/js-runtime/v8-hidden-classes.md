@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["V8", "Node.js on V8", "Chromium on V8"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [performance, v8, objects, inline-caches]
 ---
 
@@ -81,11 +81,6 @@ Using `delete row.email` on hot objects is risky because V8 supports slow dictio
 - Prefer assigning `undefined` over `delete` for hot objects whose shape should stay stable. [rule-candidate]
 - Keep class and object-literal factories shape-stable before measuring micro-optimizations. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-12 | Source: |
-
 ## Verification status
 - Verified: 34 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -93,7 +88,6 @@ Using `delete row.email` on hot objects is risky because V8 supports slow dictio
 - [Fast properties in V8](https://v8.dev/blog/fast-properties) — V8 team, 2017. Backs: Problem, Mental model, How it works, Worked example, Edge cases, Trade-offs. [^1]
 - [What's up with monomorphism?](https://mrale.ph/blog/2015/01/11/whats-up-with-monomorphism.html) — Vyacheslav Egorov, 2015. Backs: Problem, How it works, Worked example, Edge cases. [^2]
 - [Maps (Hidden Classes) in V8](https://v8.dev/docs/hidden-classes) — V8 team, living. Backs: How it works. [^3]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-12.
 
 ## Related
 - `js-runtime/promise-rejections.md` — async failure handling in Node.js.

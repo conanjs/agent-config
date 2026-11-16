@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["Node.js >= 18", "Web APIs", "TypeScript on Node.js"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [cancellation, abortsignal, fetch, timeouts]
 ---
 
@@ -77,11 +77,6 @@ If `loadUser` registers its own cleanup listener, it should use `{ once: true }`
 - Compose timeouts with caller cancellation instead of replacing caller signals. [rule-candidate]
 - Clean up abort listeners with `{ once: true }` or explicit removal. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-8 | Source: |
-
 ## Verification status
 - Verified: 30 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -89,7 +84,6 @@ If `loadUser` registers its own cleanup listener, it should use `{ once: true }`
 - [Node.js Globals: AbortController and AbortSignal](https://nodejs.org/api/globals.html#class-abortsignal) — Node.js project, living. Backs: Summary, Problem, Mental model, How it works, Worked example, Edge cases, Trade-offs. [^1]
 - [DOM Standard: AbortSignal](https://dom.spec.whatwg.org/#interface-abortsignal) — WHATWG, living. Backs: Problem, How it works, Edge cases. [^2]
 - [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) — MDN Web Docs, living. Backs: broader API context. [^3]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-8.
 
 ## Related
 - `js-runtime/promise-rejections.md` — promise ownership after cancellation rejects work.

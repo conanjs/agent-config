@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: subtopic
 topic: software-design/architecture-styles
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 ---
 
 # Architecture styles
@@ -24,7 +24,6 @@ How the code inside one deployable is arranged so that business rules stay indep
 
 ## References
 - `copilot/frameworks/knowledge/schemas/topic-index.schema.md` — defines the topic index shape.
-- `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — the CA rules these docs explain.
 - [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: topic scope.
 - [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012. Backs: topic scope.
 

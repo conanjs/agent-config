@@ -1,0 +1,5 @@
+schema: variables/v1
+variables:
+  - name: LANGUAGE
+    description: Language the agents answer in
+    required: 'yes'

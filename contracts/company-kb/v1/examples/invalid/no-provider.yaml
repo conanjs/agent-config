@@ -1,0 +1,5 @@
+schema: company-kb/v1
+slot: company-knowledge-storage
+layout: flat
+companies: companies
+schemas: frameworks/company-kb/schemas

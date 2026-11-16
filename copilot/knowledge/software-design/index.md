@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: topic
 topic: software-design
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 ---
 
 # Software design
@@ -25,8 +25,6 @@ Software design covers design principles, model structure, boundaries, and depen
 
 ## References
 - `copilot/frameworks/knowledge/schemas/topic-index.schema.md` — defines the topic index shape.
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites OOP and DDD knowledge docs under this topic.
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites design-principles and OOP docs (DP-1…DP-11).
 - [DDD Reference](https://www.domainlanguage.com/ddd/reference/) — Eric Evans / Domain Language, 2015. Backs: DDD topic scope.
 - [Domain Model](https://martinfowler.com/eaaCatalog/domainModel.html) — Martin Fowler, 2002. Backs: behavior-and-data modeling scope.
 

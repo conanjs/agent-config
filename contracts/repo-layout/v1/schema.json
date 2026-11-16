@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/contracts/repo-layout/v1/schema.json",
+  "title": "repo-layout/v1: what every repository must have",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "repo-layout/v1"
+    },
+    "required": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/path"
+      },
+      "minItems": 1
+    },
+    "required-if-content": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "missing-message": {
+      "type": "string"
+    },
+    "forbidden": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "rule": {
+                "const": "generated-from-line"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": ["rule", "message"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "rule": {
+                "const": "build-output-folder"
+              },
+              "message": {
+                "type": "string"
+              },
+              "folders": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/path"
+                },
+                "minItems": 1
+              }
+            },
+            "required": ["rule", "message", "folders"]
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "exceptions": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "entry": {
+              "$ref": "#/$defs/path"
+            },
+            "stand-in": {
+              "$ref": "#/$defs/path"
+            }
+          },
+          "required": ["entry", "stand-in"]
+        }
+      }
+    }
+  },
+  "required": ["schema", "required", "missing-message", "forbidden"],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?:\\.|[^/\\\\:\\u0000]*[^/\\\\:\\u0000. ])?(?:/(?:\\.|[^/\\\\:\\u0000]*[^/\\\\:\\u0000. ])?)*$"
+    }
+  }
+}

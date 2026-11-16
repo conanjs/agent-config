@@ -1,0 +1,10 @@
+schema: agent-source/v1
+name: sdlc-system-architecture
+description: 'Agentic SDLC System Architecture role.'
+model-tier: top
+auto-delegate: false
+needs-project-instructions: true
+preload: [sdlc-system-architecture-preset]
+tools: { intent: [read, search, edit, shell] }
+targets: [claude, copilot, codex]
+platforms: {}

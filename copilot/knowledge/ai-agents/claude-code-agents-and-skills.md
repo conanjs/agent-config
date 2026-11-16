@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["Claude Code 2.1.129 (CLI), and the docs read 2026-10-29"]
 last-verified: 2026-10-29
-last-updated: 2026-11-07
+last-updated: 2026-11-14
 tags: [claude-code, subagents, skills, install, synced]
 ---
 
@@ -14,7 +14,7 @@ tags: [claude-code, subagents, skills, install, synced]
 ## Summary
 **TL;DR:** User-level agents load from `~/.claude/agents/` and project agents from `.claude/agents/`. Call one by asking for it by name, by `@`-mentioning it, or by running a whole session as it with `claude --agent <name>`. `~/.claude/skills/` can also hold a `synced/` folder with the skills enabled on claude.ai; replacing `~/.claude/skills` with a link moves that folder, and the next session did not download it again.
 **Use this when:** installing agents or skills into a home folder, or calling an agent in Claude Code.
-**Not this doc:** how agent-config's installer works → `README.md` "Install strategies"; what each `sdlc-*` agent does → `{{AGENT_HOME}}/frameworks/agentic-sdlc/index.md`.
+**Not this doc:** how agent-config's installer works → `README.md` "Install strategies".
 
 ## Scope
 Claude Code's user and project agent folders, the four ways to call an agent, and the `~/.claude/skills/synced/` folder, as documented on 2026-10-29 and as tested on this machine with Claude Code 2.1.129.
@@ -41,9 +41,6 @@ Claude Code's user and project agent folders, the four ways to call an agent, an
 ## Takeaways
 - Linking the whole `~/.claude/skills` folder moves the claude.ai `synced/` skills aside; link each skill instead when they must stay.
 - Use `@agent-<name>` when a specific agent must answer; plain requests let Claude choose.
-
-## Used by
-- _Not cited by any rule yet._
 
 ## Verification status
 - Verified: 9 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29

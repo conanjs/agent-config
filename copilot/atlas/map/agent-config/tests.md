@@ -8,26 +8,56 @@ Up: [Atlas](../../index.md) › agent-config
 
 ## Shared steps
 
-<a id="test-support"></a>The World, the tool registry and the steps every feature uses
+<a id="test-support"></a>The World, the tool registry, its type declarations and the steps every feature uses
 
-Where: `tests/support/*.mjs` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
+Where: `tests/support/*.{mjs,ts,d.mts}` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
 
+- [`tests/support/os-steps.ts`](../../../../tests/support/os-steps.ts)
+- [`tests/support/pending.ts`](../../../../tests/support/pending.ts)
 - [`tests/support/steps.mjs`](../../../../tests/support/steps.mjs)
+- [`tests/support/tools.d.mts`](../../../../tests/support/tools.d.mts)
 - [`tests/support/tools.mjs`](../../../../tests/support/tools.mjs)
+- [`tests/support/tools.ts`](../../../../tests/support/tools.ts)
 - [`tests/support/world.mjs`](../../../../tests/support/world.mjs)
 
 ## Features
 
-<a id="test-feature"></a>One feature file and one tool entry per tool under test
+<a id="test-feature"></a>One feature file and one tool entry per tool under test, and the coverage exemption list
 
-Where: `tests/*/{*.feature,tool.mjs}` · Schema: — · Index: — · Checked by: cucumber-js · Scenarios: — · Installed to: —
+Where: `tests/*/{*.feature,*.mjs,*.ts,exemptions.yaml}` · Schema: — · Index: — · Checked by: cucumber-js · Scenarios: — · Installed to: —
 
 - [`tests/atlas/atlas.feature`](../../../../tests/atlas/atlas.feature)
 - [`tests/atlas/tool.mjs`](../../../../tests/atlas/tool.mjs)
+- [`tests/baseline/baseline.feature`](../../../../tests/baseline/baseline.feature)
+- [`tests/baseline/tool.ts`](../../../../tests/baseline/tool.ts)
+- [`tests/build-cite/cite.feature`](../../../../tests/build-cite/cite.feature)
+- [`tests/build-cite/tool.ts`](../../../../tests/build-cite/tool.ts)
+- [`tests/contracts/constitution.feature`](../../../../tests/contracts/constitution.feature)
+- [`tests/contracts/index.feature`](../../../../tests/contracts/index.feature)
+- [`tests/contracts/schemas.feature`](../../../../tests/contracts/schemas.feature)
+- [`tests/contracts/tool.ts`](../../../../tests/contracts/tool.ts)
+- [`tests/core-text/check-core.ts`](../../../../tests/core-text/check-core.ts)
+- [`tests/core-text/core.feature`](../../../../tests/core-text/core.feature)
+- [`tests/core-text/real-steps.ts`](../../../../tests/core-text/real-steps.ts)
+- [`tests/core-text/tool.ts`](../../../../tests/core-text/tool.ts)
+- [`tests/coverage/coverage.feature`](../../../../tests/coverage/coverage.feature)
+- [`tests/coverage/exemptions.yaml`](../../../../tests/coverage/exemptions.yaml)
+- [`tests/coverage/tool.ts`](../../../../tests/coverage/tool.ts)
+- [`tests/cucumber-config/cucumber-config.feature`](../../../../tests/cucumber-config/cucumber-config.feature)
+- [`tests/cucumber-config/tool.ts`](../../../../tests/cucumber-config/tool.ts)
 - [`tests/efficiency-audit/efficiency-audit.feature`](../../../../tests/efficiency-audit/efficiency-audit.feature)
 - [`tests/efficiency-audit/tool.mjs`](../../../../tests/efficiency-audit/tool.mjs)
+- [`tests/fitness/fitness.feature`](../../../../tests/fitness/fitness.feature)
+- [`tests/fitness/phase1.feature`](../../../../tests/fitness/phase1.feature)
+- [`tests/fitness/tool.ts`](../../../../tests/fitness/tool.ts)
+- [`tests/installers/golden.feature`](../../../../tests/installers/golden.feature)
 - [`tests/installers/installers.feature`](../../../../tests/installers/installers.feature)
 - [`tests/installers/tool.mjs`](../../../../tests/installers/tool.mjs)
+- [`tests/installers/tool.ts`](../../../../tests/installers/tool.ts)
+- [`tests/repo-layout/layout.feature`](../../../../tests/repo-layout/layout.feature)
+- [`tests/repo-layout/tool.ts`](../../../../tests/repo-layout/tool.ts)
+- [`tests/tools-support/tool.ts`](../../../../tests/tools-support/tool.ts)
+- [`tests/tools-support/tools-support.feature`](../../../../tests/tools-support/tools-support.feature)
 - [`tests/tracker/tool.mjs`](../../../../tests/tracker/tool.mjs)
 - [`tests/tracker/tracker.feature`](../../../../tests/tracker/tracker.feature)
 - [`tests/turn-tokens/tool.mjs`](../../../../tests/turn-tokens/tool.mjs)
@@ -40,16 +70,17 @@ Where: `tests/*/{*.feature,tool.mjs}` · Schema: — · Index: — · Checked by
 - [`tests/validate-procedures/validate-procedures.feature`](../../../../tests/validate-procedures/validate-procedures.feature)
 - [`tests/validate-project/tool.mjs`](../../../../tests/validate-project/tool.mjs)
 - [`tests/validate-project/validate-project.feature`](../../../../tests/validate-project/validate-project.feature)
+- [`tests/validate-sdlc/characterization.feature`](../../../../tests/validate-sdlc/characterization.feature)
 - [`tests/validate-sdlc/tool.mjs`](../../../../tests/validate-sdlc/tool.mjs)
 - [`tests/validate-sdlc/validate-sdlc.feature`](../../../../tests/validate-sdlc/validate-sdlc.feature)
 - [`tests/workflow-graph/tool.mjs`](../../../../tests/workflow-graph/tool.mjs)
 - [`tests/workflow-graph/workflow-graph.feature`](../../../../tests/workflow-graph/workflow-graph.feature)
 
-## Fixtures
+## Fixtures and golden files
 
-<a id="test-fixture"></a>The smallest valid input tree per tool, copied fresh for every scenario
+<a id="test-fixture"></a>The smallest valid input tree per tool, copied fresh for every scenario, and recorded golden plans
 
-Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
+Where: `tests/*/{fixtures,golden}/**` · Schema: — · Index: — · Checked by: — · Scenarios: — · Installed to: —
 
 - [`tests/atlas/fixtures/base/README.md`](../../../../tests/atlas/fixtures/base/README.md)
 - [`tests/atlas/fixtures/base/copilot/atlas/atlas.yaml`](../../../../tests/atlas/fixtures/base/copilot/atlas/atlas.yaml)
@@ -60,6 +91,28 @@ Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · 
 - [`tests/atlas/fixtures/base/docs/guide.schema.md`](../../../../tests/atlas/fixtures/base/docs/guide.schema.md)
 - [`tests/atlas/fixtures/base/docs/guides/setup.md`](../../../../tests/atlas/fixtures/base/docs/guides/setup.md)
 - [`tests/atlas/fixtures/base/docs/index.md`](../../../../tests/atlas/fixtures/base/docs/index.md)
+- [`tests/baseline/fixtures/base/claude/CLAUDE.md`](../../../../tests/baseline/fixtures/base/claude/CLAUDE.md)
+- [`tests/baseline/fixtures/base/copilot/instructions/core.instructions.md`](../../../../tests/baseline/fixtures/base/copilot/instructions/core.instructions.md)
+- [`tests/baseline/fixtures/base/copilot/instructions/extra.instructions.md`](../../../../tests/baseline/fixtures/base/copilot/instructions/extra.instructions.md)
+- [`tests/baseline/fixtures/base/docs/baselines/always-loaded.json`](../../../../tests/baseline/fixtures/base/docs/baselines/always-loaded.json)
+- [`tests/baseline/fixtures/base/mapping.yaml`](../../../../tests/baseline/fixtures/base/mapping.yaml)
+- [`tests/baseline/fixtures/base/skills/plain-cc/SKILL.md`](../../../../tests/baseline/fixtures/base/skills/plain-cc/SKILL.md)
+- [`tests/baseline/fixtures/base/skills/sdlc-aa/SKILL.md`](../../../../tests/baseline/fixtures/base/skills/sdlc-aa/SKILL.md)
+- [`tests/baseline/fixtures/base/skills/sdlc-bb/SKILL.md`](../../../../tests/baseline/fixtures/base/skills/sdlc-bb/SKILL.md)
+- [`tests/build-cite/fixtures/base/component.yaml`](../../../../tests/build-cite/fixtures/base/component.yaml)
+- [`tests/build-cite/fixtures/base/docs/own.md`](../../../../tests/build-cite/fixtures/base/docs/own.md)
+- [`tests/build-cite/fixtures/base/foo.md`](../../../../tests/build-cite/fixtures/base/foo.md)
+- [`tests/build-cite/fixtures/base/providers/core/component.yaml`](../../../../tests/build-cite/fixtures/base/providers/core/component.yaml)
+- [`tests/build-cite/fixtures/base/providers/knowledge/component.yaml`](../../../../tests/build-cite/fixtures/base/providers/knowledge/component.yaml)
+- [`tests/contracts/fixtures/base/component.yaml`](../../../../tests/contracts/fixtures/base/component.yaml)
+- [`tests/contracts/fixtures/base/components.local.yaml`](../../../../tests/contracts/fixtures/base/components.local.yaml)
+- [`tests/contracts/fixtures/base/components.lock`](../../../../tests/contracts/fixtures/base/components.lock)
+- [`tests/contracts/fixtures/base/components.yaml`](../../../../tests/contracts/fixtures/base/components.yaml)
+- [`tests/contracts/fixtures/base/index.md`](../../../../tests/contracts/fixtures/base/index.md)
+- [`tests/contracts/fixtures/base/slots.yaml`](../../../../tests/contracts/fixtures/base/slots.yaml)
+- [`tests/core-text/fixtures/base/core.instructions.md`](../../../../tests/core-text/fixtures/base/core.instructions.md)
+- [`tests/coverage/fixtures/base/specs/022-repo-split/spec.md`](../../../../tests/coverage/fixtures/base/specs/022-repo-split/spec.md)
+- [`tests/coverage/fixtures/base/tests/coverage/exemptions.yaml`](../../../../tests/coverage/fixtures/base/tests/coverage/exemptions.yaml)
 - [`tests/efficiency-audit/fixtures/base/claude-home/projects/-tmp-run1/s2.jsonl`](../../../../tests/efficiency-audit/fixtures/base/claude-home/projects/-tmp-run1/s2.jsonl)
 - [`tests/efficiency-audit/fixtures/base/claude-home/projects/-work-p/c1.jsonl`](../../../../tests/efficiency-audit/fixtures/base/claude-home/projects/-work-p/c1.jsonl)
 - [`tests/efficiency-audit/fixtures/base/codex-home/sessions/2026/11/04/rollout-2026-11-04T08-00-00-x1.jsonl`](../../../../tests/efficiency-audit/fixtures/base/codex-home/sessions/2026/11/04/rollout-2026-11-04T08-00-00-x1.jsonl)
@@ -69,12 +122,39 @@ Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · 
 - [`tests/efficiency-audit/fixtures/base/copilot-home/efficiency-audit/history.jsonl`](../../../../tests/efficiency-audit/fixtures/base/copilot-home/efficiency-audit/history.jsonl)
 - [`tests/efficiency-audit/fixtures/base/copilot-home/session-state/g1/events.jsonl`](../../../../tests/efficiency-audit/fixtures/base/copilot-home/session-state/g1/events.jsonl)
 - [`tests/efficiency-audit/fixtures/base/repo/TRACKER.md`](../../../../tests/efficiency-audit/fixtures/base/repo/TRACKER.md)
+- [`tests/fitness/fixtures/base/agentic-sdlc/readme.md`](../../../../tests/fitness/fixtures/base/agentic-sdlc/readme.md)
+- [`tests/fitness/fixtures/base/companies/index.md`](../../../../tests/fitness/fixtures/base/companies/index.md)
+- [`tests/fitness/fixtures/base/contracts/schema.md`](../../../../tests/fitness/fixtures/base/contracts/schema.md)
+- [`tests/fitness/fixtures/base/copilot/atlas/atlas.yaml`](../../../../tests/fitness/fixtures/base/copilot/atlas/atlas.yaml)
+- [`tests/fitness/fixtures/base/core/core.md`](../../../../tests/fitness/fixtures/base/core/core.md)
+- [`tests/fitness/fixtures/base/docs/architecture.md`](../../../../tests/fitness/fixtures/base/docs/architecture.md)
+- [`tests/fitness/fixtures/base/docs/baselines/fitness.json`](../../../../tests/fitness/fixtures/base/docs/baselines/fitness.json)
+- [`tests/fitness/fixtures/base/knowledge/a.md`](../../../../tests/fitness/fixtures/base/knowledge/a.md)
+- [`tests/fitness/fixtures/base/knowledge/b.md`](../../../../tests/fitness/fixtures/base/knowledge/b.md)
+- [`tests/fitness/fixtures/base/knowledge/check-docs.mjs`](../../../../tests/fitness/fixtures/base/knowledge/check-docs.mjs)
 - [`tests/installers/fixtures/base/home/.gitkeep`](../../../../tests/installers/fixtures/base/home/.gitkeep)
 - [`tests/installers/fixtures/base/repo/claude/CLAUDE.md`](../../../../tests/installers/fixtures/base/repo/claude/CLAUDE.md)
 - [`tests/installers/fixtures/base/repo/claude/settings.json`](../../../../tests/installers/fixtures/base/repo/claude/settings.json)
 - [`tests/installers/fixtures/base/repo/copilot/knowledge/index.md`](../../../../tests/installers/fixtures/base/repo/copilot/knowledge/index.md)
 - [`tests/installers/fixtures/base/repo/mapping.yaml`](../../../../tests/installers/fixtures/base/repo/mapping.yaml)
 - [`tests/installers/fixtures/base/repo/skills/demo/SKILL.md`](../../../../tests/installers/fixtures/base/repo/skills/demo/SKILL.md)
+- [`tests/installers/golden/posix/darwin.txt`](../../../../tests/installers/golden/posix/darwin.txt)
+- [`tests/installers/golden/posix/linux.txt`](../../../../tests/installers/golden/posix/linux.txt)
+- [`tests/installers/golden/posix/plan.sh`](../../../../tests/installers/golden/posix/plan.sh)
+- [`tests/installers/golden/windows/plan.ps1`](../../../../tests/installers/golden/windows/plan.ps1)
+- [`tests/installers/golden/windows/windows.txt`](../../../../tests/installers/golden/windows/windows.txt)
+- [`tests/repo-layout/fixtures/base/AGENTS.md`](../../../../tests/repo-layout/fixtures/base/AGENTS.md)
+- [`tests/repo-layout/fixtures/base/CHANGELOG.md`](../../../../tests/repo-layout/fixtures/base/CHANGELOG.md)
+- [`tests/repo-layout/fixtures/base/INTERFACES.md`](../../../../tests/repo-layout/fixtures/base/INTERFACES.md)
+- [`tests/repo-layout/fixtures/base/README.md`](../../../../tests/repo-layout/fixtures/base/README.md)
+- [`tests/repo-layout/fixtures/base/atlas.yaml`](../../../../tests/repo-layout/fixtures/base/atlas.yaml)
+- [`tests/repo-layout/fixtures/base/catalog-info.yaml`](../../../../tests/repo-layout/fixtures/base/catalog-info.yaml)
+- [`tests/repo-layout/fixtures/base/component.yaml`](../../../../tests/repo-layout/fixtures/base/component.yaml)
+- [`tests/repo-layout/fixtures/base/scripts/check.sh`](../../../../tests/repo-layout/fixtures/base/scripts/check.sh)
+- [`tests/repo-layout/fixtures/base/tests/.gitkeep`](../../../../tests/repo-layout/fixtures/base/tests/.gitkeep)
+- [`tests/repo-layout/fixtures/base/tools/.gitkeep`](../../../../tests/repo-layout/fixtures/base/tools/.gitkeep)
+- [`tests/tools-support/fixtures/base/bin/probe.mjs`](../../../../tests/tools-support/fixtures/base/bin/probe.mjs)
+- [`tests/tools-support/fixtures/base/bin/probe.sh`](../../../../tests/tools-support/fixtures/base/bin/probe.sh)
 - [`tests/tracker/fixtures/base/TRACKER.md`](../../../../tests/tracker/fixtures/base/TRACKER.md)
 - [`tests/turn-tokens/fixtures/base/claude-home/projects/p/s1.jsonl`](../../../../tests/turn-tokens/fixtures/base/claude-home/projects/p/s1.jsonl)
 - [`tests/turn-tokens/fixtures/base/claude-home/projects/p/s1/subagents/agent-a0.jsonl`](../../../../tests/turn-tokens/fixtures/base/claude-home/projects/p/s1/subagents/agent-a0.jsonl)
@@ -117,6 +197,7 @@ Where: `tests/*/fixtures/**` · Schema: — · Index: — · Checked by: — · 
 - [`tests/validate-project/fixtures/base/project/src/demo.lint.json`](../../../../tests/validate-project/fixtures/base/project/src/demo.lint.json)
 - [`tests/validate-project/fixtures/base/project/src/modules/orders/application/.gitkeep`](../../../../tests/validate-project/fixtures/base/project/src/modules/orders/application/.gitkeep)
 - [`tests/validate-project/fixtures/base/project/src/modules/orders/domain/.gitkeep`](../../../../tests/validate-project/fixtures/base/project/src/modules/orders/domain/.gitkeep)
+- [`tests/validate-sdlc/fixtures/base/repo/adapters.json`](../../../../tests/validate-sdlc/fixtures/base/repo/adapters.json)
 - [`tests/validate-sdlc/fixtures/base/repo/claude/agents/sdlc-engineering.md`](../../../../tests/validate-sdlc/fixtures/base/repo/claude/agents/sdlc-engineering.md)
 - [`tests/validate-sdlc/fixtures/base/repo/codex/agents/sdlc-engineering.toml`](../../../../tests/validate-sdlc/fixtures/base/repo/codex/agents/sdlc-engineering.toml)
 - [`tests/validate-sdlc/fixtures/base/repo/copilot/agents/sdlc-engineering.agent.md`](../../../../tests/validate-sdlc/fixtures/base/repo/copilot/agents/sdlc-engineering.agent.md)

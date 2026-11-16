@@ -5,7 +5,7 @@ topic: web-apis
 status: verified
 applies-to: ["HTTP APIs", "REST-like services", "TypeScript interface layers"]
 last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [http, errors, problem-details, api]
 ---
 
@@ -107,21 +107,12 @@ Whichever form, list every type with its title and status in one document (the s
 - Log internal causes, but send clients only stable and safe problem details. [rule-candidate]
 - Document every problem type (URI, title, status) in one place, and treat a change of `type` as a breaking API change. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-11 | Source: |
-| stack idiom | TSN-19 | Source: |
-| stack framework | EXP-8 | Source: |
-
 ## Verification status
 - Verified: 32 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
 ## References
 - [RFC 9457: Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457.html) — IETF, 2023. Backs: Summary, Problem, How it works, Trade-offs. [^1]
 - [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes) — IETF, 2022. Backs: How it works, Worked example, Edge cases. [^2]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-11 and TSN-19.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/frameworks/express.md` — EXP-8, problem bodies for every error response.
 - Stack reference `conanjs/agentic-sdlc-reference-typescript-node` v3.0.0, `src/modules/shared/interface/ProblemDetails.ts` — a tested implementation.
 
 ## Related

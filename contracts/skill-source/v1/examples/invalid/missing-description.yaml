@@ -1,0 +1,3 @@
+schema: skill-source/v1
+name: review-docs
+targets: [claude]

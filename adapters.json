@@ -1,0 +1,6 @@
+{
+  "copilot": "copilot/agents/sdlc-{id}.agent.md",
+  "claude": "claude/agents/sdlc-{id}.md",
+  "codex": "codex/agents/sdlc-{id}.toml",
+  "skills": "skills"
+}

@@ -1,0 +1,4 @@
+schema: skill-source/v1
+name: windows-software
+description: Install Windows software.
+targets: [agents]

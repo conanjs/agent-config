@@ -1,0 +1,13 @@
+schema: rendered-copy/v1
+system: mac
+copy: generated/agentic-sdlc/foo.md
+first-line: 'This file is generated.'
+mode: read-only
+index: '{{AGENT_HOME}}/generated/index.md'
+refresh:
+  on: [install]
+  session-start:
+    { only-changed: true, time-limit-seconds: 5, network: none, on-failure: keep-previous-print-one-line-exit-0 }
+citations:
+  - text: /Users/v/.agent-config/knowledge/x.md
+    target: ../../knowledge/x.md

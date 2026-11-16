@@ -5,7 +5,7 @@ topic: software-design/architecture-styles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-25
-last-updated: 2026-10-25
+last-updated: 2026-11-14
 tags: [ddd, layered-architecture, onion-architecture, hexagonal-architecture, clean-architecture]
 ---
 
@@ -68,9 +68,6 @@ So the rule comes from hexagonal architecture. It matters most when the use case
 - Name the style a rule comes from when citing it: modeling (DDD), direction (onion/clean), or hub (hexagonal). [rule-candidate]
 - Keep use cases and adapters in different folders, so boundary rules can tell them apart. [rule-candidate]
 
-## Used by
-- _Not cited by any rule yet._
-
 ## Verification status
 - Verified: 13 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-25
 
@@ -79,8 +76,6 @@ So the rule comes from hexagonal architecture. It matters most when the use case
 - [The Onion Architecture, part 1](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/) — Jeffrey Palermo, 2008. Backs: coupling toward the centre, interface placement. [^2]
 - [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) — Alistair Cockburn, 2005. Backs: adapters and the application as hub. [^3]
 - [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012. Backs: dependency rule, shared objective, port placement. [^4]
-- `copilot/frameworks/agentic-sdlc/foundations/design/clean-architecture.md` — CA-1 (direction) and CA-10 (hub) apply these styles together.
-- `copilot/frameworks/agentic-sdlc/foundations/design/domain-driven-design.md` — the DDD foundation.
 
 ## Related
 - `software-design/architecture-styles/hexagonal-architecture.md`

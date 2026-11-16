@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: draft
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [dry, duplication, abstraction, maintainability]
 ---
 
@@ -94,11 +94,6 @@ A product has three handlers: create role, update role, and import role. All req
 - Prefer duplication over a shared helper that needs mode flags for unrelated cases. [rule-candidate]
 - Apply DRY inside a module by default; preserve independence across module or service boundaries unless a contract is the authority. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-6 | Source: |
-
 ## Verification status
 - Verified: 12 claims (✅) · Unverified: 1 claim (⚠️) · Last verified: 2026-10-04
 
@@ -106,7 +101,6 @@ A product has three handlers: create role, update role, and import role. All req
 - [Orthogonality and the DRY Principle](https://www.artima.com/articles/orthogonality-and-the-dry-principle) — Bill Venners interview with Andy Hunt and Dave Thomas, 2003. Backs: Problem, How it works, Edge cases, Trade-offs. [^1]
 - [The Wrong Abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction) — Sandi Metz, 2016. Backs: Problem, How it works, Edge cases. [^2]
 - [BeckDesignRules](https://martinfowler.com/bliki/BeckDesignRules.html) — Martin Fowler, 2015. Backs: How it works. [^3]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-6.
 
 ## Related
 - `software-design/design-principles/kiss-and-yagni.md`

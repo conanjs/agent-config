@@ -1,0 +1,7 @@
+schema: variables/v1
+variables:
+  - name: OTS_REPOS_ROOT
+    description: Folder that holds the OTS repos
+    detect:
+      kind: command
+      run: ls ~/workspace

@@ -1,0 +1,18 @@
+schema: rendered-copy/v1
+system: mac
+copy: generated/agentic-sdlc/foo.md
+first-line: 'Generated from `<source path>`; edit that file, not this copy.'
+mode: read-only
+index: '{{AGENT_HOME}}/generated/index.md'
+refresh:
+  on: [install, install --update, session-start]
+  session-start:
+    only-changed: true
+    time-limit-seconds: 5
+    network: none
+    on-failure: keep-previous-print-one-line-exit-0
+citations:
+  - text: '/Users/Vinh Do/.agent-config/knowledge/x.md'
+    target: ../../knowledge/x.md
+  - text: '/Users/Vinh Do/.agent-config/knowledge/x.md'
+    target: ../../../home%20with%20space/knowledge/x.md

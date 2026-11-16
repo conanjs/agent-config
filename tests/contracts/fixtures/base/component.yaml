@@ -1,0 +1,40 @@
+schema: component/v1
+name: agentic-sdlc
+version: 1.4.0
+slot: framework
+repository: https://github.com/conanjs/agentic-sdlc
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+  skills: skills/
+  agents: agents/
+depends:
+  slots:
+    - slot: knowledge-storage
+      contract: knowledge-provider/v1
+      required: true
+      docs: []
+    - slot: core
+      contract: component/v1
+      docs: []
+  runtime:
+    node: ">=24.12"
+routes:
+  - id: agentic-sdlc
+    when: The project has a .specify/ folder
+    read: frameworks/agentic-sdlc/index.md
+hooks: []
+variables:
+  - name: REFERENCE_REPOS_ROOT
+    description: Folder holding reference repositories cloned for comparison
+    required: false
+idle-cost:
+  claude-code: 3500
+  copilot-cli: 3200
+  codex: 0

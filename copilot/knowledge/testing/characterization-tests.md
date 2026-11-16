@@ -5,7 +5,7 @@ topic: testing
 status: verified
 applies-to: ["any language", "Node.js 24 (examples)", "Spec Kit 1.2.3"]
 last-verified: 2026-10-29
-last-updated: 2026-10-29
+last-updated: 2026-11-14
 tags: [characterization-test, legacy-code, bdd, gherkin, brownfield, spec-kit, mutation, node-test]
 ---
 
@@ -14,7 +14,6 @@ tags: [characterization-test, legacy-code, bdd, gherkin, brownfield, spec-kit, m
 ## Summary
 **TL;DR:** When code or a tool already works but has no tests, don't rewrite its spec from scratch. First pin what it does today with characterization tests, list anything that looks wrong for a decision, prove the tests catch breakage by switching off each check in turn, and only then change behavior under a new spec.
 **Use this when:** adding tests to an existing validator, script, installer or module before changing it, or adopting spec-driven development in a repo that already has code.
-**Not this doc:** writing a new feature's acceptance scenarios → the agentic-sdlc framework's `foundations/delivery/spec-writing.md`.
 
 ## Problem
 A tool that has been changed many times without tests has no record of what it promises. Rebuilding its requirements as prose costs a lot and can still miss what the code really does. Changing it with no tests means a broken check passes CI silently. In agent-config, about 1,800 lines of validators had no tests on 2026-10-29.

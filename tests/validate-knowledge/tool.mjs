@@ -6,9 +6,10 @@ const validator = 'copilot/frameworks/knowledge/tools/validate-knowledge.mjs';
 
 registerTool('validate-knowledge', {
   fixture: 'tests/validate-knowledge/fixtures/base',
+  // "--only-knowledge" is accepted and dropped: the validator always reads the knowledge folder alone.
   run: (world, extra) => ({
     file: process.execPath,
-    args: [path.join(repo, validator), world.at('knowledge'), '--sdlc', world.at('agentic-sdlc'), '--companies', world.at('companies'), ...extra],
+    args: [path.join(repo, validator), world.at('knowledge'), ...extra.filter((a) => a !== '--only-knowledge')],
   }),
   header: /^knowledge validate: /,
   quietPass: 'PASS (0 warning(s))',

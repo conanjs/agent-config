@@ -5,7 +5,7 @@ topic: software-design/ddd
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-25
+last-updated: 2026-11-14
 tags: [ddd, layering, hexagonal-architecture, ports-and-adapters]
 ---
 
@@ -76,12 +76,6 @@ Dependency direction should point inward: domain code defines or consumes abstra
 - Let application services orchestrate transactions and ports while domain objects make decisions. [rule-candidate]
 - Put adapters outside the core and make dependency direction point inward. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-class-modeled-R4 | Source: |
-| paradigm rule | PDM-class-modeled-R7 | Source: |
-
 ## Verification status
 - Verified: 14 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -91,8 +85,6 @@ Dependency direction should point inward: domain code defines or consumes abstra
 - [Repository](https://martinfowler.com/eaaCatalog/repository.html) — Martin Fowler, 2002. Backs: How it works, Edge cases. [^3]
 - [Data Mapper](https://www.martinfowler.com/eaaCatalog/dataMapper.html) — Martin Fowler, 2002. Backs: How it works. [^4]
 - [AnemicDomainModel](https://martinfowler.com/bliki/AnemicDomainModel.html) — Martin Fowler, 2003. Backs: layered domain/application responsibilities. [^5]
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites this doc as PDM-class-modeled-R4.
-- `copilot/frameworks/agentic-sdlc/foundations/design/domain-driven-design.md` — aligns DDD layering with domain isolation.
 - Eric Evans, *Domain-Driven Design* (2003) — further reading on layered architecture.
 
 ## Related

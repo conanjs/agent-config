@@ -1,0 +1,15 @@
+{
+  "components": {
+    "my-archive": {
+      "resolved": { "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+      "source": { "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", "type": "archive", "url": "https://example.invalid/n.tgz" }
+    },
+    "my-notes": {
+      "build": { "adapters": { "agents": 1, "claude": 1 }, "build": 0, "source_sha": "9c1d5e7a2b4f60813d9ce5a7b1f20486c3d7e951" },
+      "manifest": { "contracts": ["framework/v1"], "slot": "framework", "version": "0.3.0" },
+      "resolved": { "live": true, "path": "/Users/v/workspace/my-notes" },
+      "source": { "path": "~/workspace/my-notes", "type": "path" }
+    }
+  },
+  "schema": "components-lock/v1"
+}

@@ -5,7 +5,7 @@ topic: operations
 status: verified
 applies-to: ["TypeScript", "Python", "Go", "12-factor services"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [configuration, environment, startup, validation]
 ---
 
@@ -79,12 +79,6 @@ In Go, `main` can parse `os.Getenv` values into a `Config` struct and pass that 
 - Validate config before serving traffic and fail fast on invalid values. [rule-candidate]
 - Pass typed immutable config to constructors instead of reading globals in business code. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-9 | Source: |
-| stack idiom | PY-7 | Source: |
-
 ## Verification status
 - Verified: 28 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -94,8 +88,6 @@ In Go, `main` can parse `os.Getenv` values into a `Config` struct and pass that 
 - [Pydantic Settings: Settings Management](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) — Pydantic project, living. Backs: How it works, Worked example, Edge cases, Trade-offs. [^3]
 - [Pydantic configuration: frozen](https://docs.pydantic.dev/latest/concepts/config/#frozen) — Pydantic project, living. Backs: How it works. [^4]
 - [Go Specification: Struct types](https://go.dev/ref/spec#Struct_types) — Go project, living. Backs: How it works, Worked example, Trade-offs. [^5]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-9.
-- `copilot/frameworks/agentic-sdlc/stacks/python/idioms.md` — cites this doc as PY-7.
 
 ## Related
 - `operations/structured-logging.md` — logger construction belongs beside config loading.

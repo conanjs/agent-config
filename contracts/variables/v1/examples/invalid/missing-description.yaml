@@ -1,0 +1,3 @@
+schema: variables/v1
+variables:
+  - name: LANGUAGE

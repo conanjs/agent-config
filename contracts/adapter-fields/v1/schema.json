@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/contracts/adapter-fields/v1/schema.json",
+  "title": "adapter-fields/v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "adapter-fields/v1"
+    },
+    "adapter": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "targets": {
+      "type": "object",
+      "propertyNames": {
+        "enum": ["agents", "skills"]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string",
+            "pattern": "^~/[A-Za-z0-9._-][A-Za-z0-9._/-]*$"
+          },
+          "file": {
+            "type": "string"
+          },
+          "link": {
+            "enum": ["per-entry", "whole"]
+          }
+        },
+        "required": ["folder", "file", "link"]
+      }
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+          },
+          "applies-to": {
+            "enum": ["agent", "skill"]
+          },
+          "from": {
+            "type": "object",
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "source": {
+            "type": "string",
+            "pattern": "^https://(?![^/]*:443(?:/|$))[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]{1,5})?(/(?!(?:.*/)?\\.\\.?(/|$))[A-Za-z0-9._~!$&'()*+,;=:@/-]*)?$"
+          },
+          "verified": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "enforced": {
+            "type": "boolean"
+          }
+        },
+        "required": ["name", "applies-to", "from", "source", "verified"]
+      }
+    },
+    "events": {
+      "type": "object",
+      "propertyNames": {
+        "enum": ["session-start", "pre-tool", "prompt-submit", "stop"]
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["schema", "adapter", "version", "targets", "fields"]
+}

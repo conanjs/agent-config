@@ -1,8 +1,36 @@
-// Cucumber.js configuration for the tool tests (specs/003). Each tests/<tool>/ folder holds one feature file,
-// a tool.mjs that says how to run that tool, and its fixtures; tests/support/ holds the shared World and steps.
-export default {
+// Cucumber.js configuration for the tool tests (specs/003, 022). Each tests/<tool>/ folder holds one feature file,
+// a tool.mjs or tool.ts that says how to run that tool, and its fixtures; tests/support/ holds the shared World and steps.
+// .ts files load by Node type stripping (Node 24.12+, specs/022 DR-601): erasable syntax only, imports keep their extension.
+//
+// OS tags: @mac, @windows and @posix (macOS and Linux) mark a scenario that makes sense on one OS only. A scenario whose
+// tag does not match the OS running the tests is left out of the run, so it is neither passed nor skipped.
+const hostOs = { darwin: ['@mac', '@posix'], linux: ['@posix'], win32: ['@windows'] }[process.platform] ?? [];
+const leftOut = ['@mac', '@windows', '@posix'].filter((tag) => !hostOs.includes(tag));
+
+const config = {
   paths: ['tests/**/*.feature'],
-  import: ['tests/support/*.mjs', 'tests/*/tool.mjs'],
+  import: ['tests/support/*.mjs', 'tests/support/*.ts', 'tests/*/tool.mjs', 'tests/*/tool.ts'],
+  ...(leftOut.length > 0 && { tags: leftOut.map((tag) => `not ${tag}`).join(' and ') }),
   format: ['progress'],
   parallel: 4,
+};
+
+export default config;
+
+// The spec 022 scenarios only: the installer (windows) CI job runs these (scripts/check-new-tiers.sh), because the
+// repo's older tools have not been made to run on Windows yet (V, 2026-11-16). Use: cucumber-js --profile spec022.
+export const spec022 = {
+  ...config,
+  paths: [
+    'tests/contracts/*.feature',
+    'tests/baseline/*.feature',
+    'tests/repo-layout/*.feature',
+    'tests/fitness/*.feature',
+    'tests/coverage/*.feature',
+    'tests/installers/golden.feature',
+    'tests/tools-support/*.feature',
+    'tests/cucumber-config/*.feature',
+    'tests/build-cite/*.feature',
+    'tests/core-text/*.feature',
+  ],
 };

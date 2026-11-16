@@ -1,0 +1,6 @@
+schema: agent-source/v1
+name: SDLC QA
+description: x
+model-tier: top
+auto-delegate: false
+targets: [claude]

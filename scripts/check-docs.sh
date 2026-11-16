@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # check-docs.sh — runs the repo's document validators (layer 1 of the doc guards): knowledge, procedures, agentic-sdlc,
-# agent-foundry, the atlas, this repo's TRACKER.md, the workflow graph tool (specs/019), then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
+# agent-foundry, the atlas, this repo's TRACKER.md, the workflow graph tool (specs/019), the spec 022 TypeScript tiers and their checks, then the Cucumber scenarios that pin what the repo's tools do (tests/, specs/001 and 003).
 # Used by .githooks/pre-commit, the Claude Code hook (.claude/settings.json) and CI (.github/workflows/validate-docs.yml).
 #
 # Usage: scripts/check-docs.sh   (network checks are separate: validate-knowledge.mjs --urls, validate-procedures.mjs --upstream)
@@ -25,7 +25,7 @@ cucumber="$root/node_modules/@cucumber/cucumber/bin/cucumber.js"
 status=0
 "$node_bin" "$root/copilot/frameworks/knowledge/tools/validate-knowledge.mjs" || status=1
 "$node_bin" "$root/copilot/procedures/tools/validate-procedures.mjs" || status=1
-"$node_bin" "$root/copilot/frameworks/agentic-sdlc/tools/validate.mjs" || status=1
+"$node_bin" "$root/copilot/frameworks/agentic-sdlc/tools/validate.mjs" --knowledge "$root/copilot/knowledge" --adapters "$root/adapters.json" || status=1
 "$node_bin" "$root/copilot/frameworks/agent-foundry/tools/validate-foundry.mjs" || status=1
 # The atlas: every file under a kind, the tree whole, the generated map current (after adding files: atlas.mjs --write).
 "$node_bin" "$root/copilot/atlas/tools/atlas.mjs" || status=1
@@ -41,5 +41,8 @@ wg="$root/copilot/frameworks/agentic-sdlc/tools/workflow-graph"
 "$node_bin" "$wg/src/main.ts" interfaces || status=1
 # The usage CLI's own lint, when installed (optional, 021 D45); `usage diff --breaking` joins once the tool has a release tag.
 if command -v usage >/dev/null 2>&1; then usage lint -W "$wg/interfaces/workflow-graph.usage.kdl" || status=1; else echo "check-docs: usage not installed; skipped usage lint (specs/021 D45)"; fi
+# Spec 022 (T086): the new TypeScript tiers and the tools built on them, in their own script so the Windows CI job can
+# run them alone; the scenarios run once, in the Cucumber step below.
+"$root/scripts/check-new-tiers.sh" --no-scenarios || status=1
 (cd "$root" && "$node_bin" "$cucumber") || status=1
 exit $status

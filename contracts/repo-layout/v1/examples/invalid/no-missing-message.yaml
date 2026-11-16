@@ -1,0 +1,5 @@
+schema: repo-layout/v1
+required: [README.md]
+forbidden:
+  - rule: generated-from-line
+    message: 'tracked file starts with the generated-from line: {path}'

@@ -1,0 +1,10 @@
+schema: company-kb/v1
+slot: company-knowledge-storage
+layout: flat
+companies: companies
+schemas: frameworks/company-kb/schemas
+provider:
+  slot: knowledge-storage
+  contract: company-kb/v1
+check:
+  provider-env: agent_knowledge

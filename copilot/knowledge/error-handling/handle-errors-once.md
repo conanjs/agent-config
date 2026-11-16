@@ -5,7 +5,7 @@ topic: error-handling
 status: verified
 applies-to: ["Go", "Python", "Rust", "TypeScript"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [errors, logging, go, wrapping]
 ---
 
@@ -90,11 +90,6 @@ This preserves machine matching, human context, and one log record per failure.
 - Log once where you decide the response, retry, or process exit. [rule-candidate]
 - In Go, use `%w` plus `errors.Is` or `errors.As` for matchable causes. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | GO-7 | Source: |
-
 ## Verification status
 - Verified: 10 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -103,7 +98,6 @@ This preserves machine matching, human context, and one log record per failure.
 - [Don't just check errors, handle them gracefully](https://dave.cheney.net/tag/error-handling) — Dave Cheney, 2016. Backs: opaque errors, avoiding error-string inspection, and error API coupling.
 - [Go Code Review Comments: Error Strings](https://go.dev/wiki/CodeReviewComments#error-strings) — Go project, living. Backs: composable error text. [^3]
 - [Errors are values](https://go.dev/blog/errors-are-values) — Go team, 2015. Backs: errors as values and explicit handling. [^4]
-- `copilot/frameworks/agentic-sdlc/stacks/go/idioms.md` — cites this doc as GO-7.
 
 ## Related
 - `error-handling/library-vs-application-errors.md`

@@ -5,7 +5,7 @@ topic: software-design/oop
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [oop, encapsulation, domain-model]
 ---
 
@@ -69,11 +69,6 @@ Query methods are not forbidden; Fowler warns that tell-don't-ask can be overuse
 - Put a rule on the type that owns the data needed to check it. [rule-candidate]
 - Use queries to reveal facts, not to make callers reconstruct the object's decision. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-class-modeled-R1 | Source: |
-
 ## Verification status
 - Verified: 10 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -81,8 +76,6 @@ Query methods are not forbidden; Fowler warns that tell-don't-ask can be overuse
 - [TellDontAsk](https://martinfowler.com/bliki/TellDontAsk.html) — Martin Fowler, 2013. Backs: Problem, How it works, Edge cases. [^1]
 - [AnemicDomainModel](https://martinfowler.com/bliki/AnemicDomainModel.html) — Martin Fowler, 2003. Backs: Problem, How it works, Edge cases. [^2]
 - [Domain Model](https://martinfowler.com/eaaCatalog/domainModel.html) — Martin Fowler, 2002. Backs: How it works, Edge cases. [^3]
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites this doc as PDM-class-modeled-R1.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/class-modeled.md` — shows the TypeScript private-state shape this doc backs.
 - Eric Evans, *Domain-Driven Design* (2003) — further reading on behavior-rich domain models.
 
 ## Related

@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["ES modules and CommonJS", "TypeScript", "Python packages", "any JS tool that follows imports (bundlers, test runners, type checkers)"]
 last-verified: 2026-10-27
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [barrel-files, index-ts, re-export, module-graph, build-performance, module-boundaries]
 ---
 
@@ -73,12 +73,6 @@ The stack reference (`conanjs/agentic-sdlc-reference-typescript-node`) has a `co
 - In application code, import the file that declares the symbol; never add a re-export file. [rule-candidate]
 - Declare a module's public surface as a list of files and enforce it with lint, not with a barrel. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation | IMP-5 | Source: |
-| stack idiom | TSN-18 | Source: |
-
 ## Verification status
 - Verified: 8 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-27
 
@@ -87,9 +81,6 @@ The stack reference (`conanjs/agentic-sdlc-reference-typescript-node`) has a `co
 - [How We Achieved 75% Faster Builds by Removing Barrel Files](https://www.atlassian.com/blog/atlassian-engineering/faster-builds-when-removing-barrel-files) — Atlassian Engineering, 2025-06-26. Backs: How it works 2, Trade-offs. [^2]
 - [Node.js Packages: `exports`](https://nodejs.org/api/packages.html#exports) — Node.js project, living. Backs: How it works 4, Edge cases, Trade-offs. [^3]
 - [Python Language Reference §5.2.1, Regular packages](https://docs.python.org/3/reference/import.html#regular-packages) — Python Software Foundation, living. Backs: Edge cases (Python row). [^4]
-- `copilot/frameworks/agentic-sdlc/foundations/design/import-paths.md` — IMP-5 applies this.
-- `copilot/frameworks/agentic-sdlc/foundations/design/module-boundaries.md` — MOD-3, the public surface as a list of files.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — TSN-18 and the `noReExports` lint.
 - `proposals/agentic-sdlc-reference-feature-first.md` §A5 — the four options compared before the decision.
 
 ## Related

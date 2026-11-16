@@ -1,0 +1,4 @@
+schema: framework/v1
+validators:
+  - id: Validate SDLC
+    command: node tools/validate-sdlc/cli.mjs

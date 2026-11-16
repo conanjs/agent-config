@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/conanjs/agent-config/contracts/variables/v1/schema.json",
+  "title": "variables/v1: the variables of a component",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "variables/v1"
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/variable"
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["schema", "variables"],
+  "$defs": {
+    "variable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "detect": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "env"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": ["kind", "name"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "dir-exists"
+                },
+                "candidates": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^~/(?=[\\s\\S])(?!/)(?:\\.|[^/\\\\:\\u0000]*[^/\\\\:\\u0000. ])?(?:/(?:\\.|[^/\\\\:\\u0000]*[^/\\\\:\\u0000. ])?)*$"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": ["kind", "candidates"]
+            }
+          ]
+        }
+      },
+      "required": ["name", "description"]
+    }
+  }
+}

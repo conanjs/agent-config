@@ -5,7 +5,7 @@ topic: concurrency
 status: verified
 applies-to: ["Go", "Rust", "Python", "TypeScript"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [data-race, mutex, channels, send, sync]
 ---
 
@@ -84,12 +84,6 @@ In Rust, trying to move `Rc<RefCell<T>>` into a thread fails because `Rc` is not
 - Run Go's race detector on tests that exercise concurrent paths. [rule-candidate]
 - In Rust, let `Send` and `Sync` errors guide the design instead of bypassing them. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | GO-6 | Source: |
-| stack idiom | RS-7 | Source: |
-
 ## Verification status
 - Verified: 16 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -100,8 +94,6 @@ In Rust, trying to move `Rc<RefCell<T>>` into a thread fails because `Rc` is not
 - [Send and Sync](https://doc.rust-lang.org/nomicon/send-and-sync.html) plus [`Send`](https://doc.rust-lang.org/std/marker/trait.Send.html) and [`Sync`](https://doc.rust-lang.org/std/marker/trait.Sync.html) — Rust project, living. Backs: trait model. [^4]
 - [`Arc<T>`](https://doc.rust-lang.org/std/sync/struct.Arc.html) and [Shared-State Concurrency](https://doc.rust-lang.org/book/ch16-03-shared-state.html) — Rust project, living. Backs: `Arc<Mutex<T>>` behavior. [^5]
 - [Developing with asyncio](https://docs.python.org/3/library/asyncio-dev.html) and [Don't block the Event Loop](https://nodejs.org/learn/asynchronous-work/dont-block-the-event-loop) — Python Software Foundation and Node.js project, living. Backs: cooperative interleaving context. [^6]
-- `copilot/frameworks/agentic-sdlc/stacks/go/idioms.md` — cites this doc as GO-6.
-- `copilot/frameworks/agentic-sdlc/stacks/rust/idioms.md` — cites this doc as RS-7.
 
 ## Related
 - `concurrency/structured-concurrency.md`

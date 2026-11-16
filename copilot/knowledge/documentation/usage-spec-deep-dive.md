@@ -4,7 +4,7 @@ topic: documentation
 status: verified
 applies-to: ["usage spec and usage-cli 7.1.5 (jdx/usage, released 2026-11-01)", "KDL 2.0.0", "sources read 2026-11-03"]
 last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-updated: 2026-11-14
 synthesized-into:
   - { path: documentation/interface-description-standards.md, on: 2026-11-03 }
 tags: [usage, kdl, cli, interface-description, exit-codes, json-schema, breaking-changes, completions, mcp, mise]
@@ -75,8 +75,10 @@ The `usage` tool then lints the file, finds breaking changes between two version
 name "Workflow graph"
 bin "workflow-graph"
 version "0.1.0"
-about "Checks and records agentic-sdlc runs against the workflow graph"
+about "Checks and records [workflow] runs against the workflow graph"
 ```
+
+In this `about` text, here and in §6, the bracketed `[workflow]` replaces the framework's name in the tool's own string.
 
 ### 3.2 `flag`
 
@@ -207,7 +209,7 @@ The workflow-graph tool in this repo:
 name "Workflow graph"
 bin "workflow-graph"
 version "0.1.0"
-about "Checks and records agentic-sdlc runs against the workflow graph"
+about "Checks and records [workflow] runs against the workflow graph"
 
 exit_code 0 "success"
 exit_code 1 "a check failed; nothing was written"
@@ -298,7 +300,6 @@ Steps 3, 5 and 6 are documented usage commands ✅[^usage_lint][^usage_diff][^us
 - [Framework integrations](https://usage.jdx.dev/spec/integrations) — exporters and planned ones. [^usage_integrations]
 - [cmd reference](https://usage.jdx.dev/spec/reference/cmd) — every `cmd` property. [^usage_cmd]
 - [arg reference](https://usage.jdx.dev/spec/reference/arg) — every `arg` property, variadic forms. [^usage_arg]
-- Local: `copilot/frameworks/agentic-sdlc/tools/workflow-graph/interfaces/workflow-graph.usage.kdl` — a real spec, checked against its code by `workflow-graph interfaces`.
 - [usage CLI](https://usage.jdx.dev/cli/) — subcommands and install. [^usage_cli]
 - [usage lint](https://usage.jdx.dev/cli/reference/lint) — checks and exit codes. [^usage_lint]
 - [Interface checks: usage diff](https://usage.jdx.dev/cli/diff) — breaking-change rules, CI recipe. [^usage_diff]

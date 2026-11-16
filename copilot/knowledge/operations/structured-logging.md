@@ -5,7 +5,7 @@ topic: operations
 status: verified
 applies-to: ["services", "TypeScript", "Python", "12-factor services"]
 last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-updated: 2026-11-14
 tags: [logging, observability, json, redaction]
 ---
 
@@ -86,11 +86,6 @@ The log sink can index `event`, `requestId`, `route`, and severity without regul
 - Carry request or trace correlation fields on child loggers. [rule-candidate]
 - Configure redaction centrally and never log secrets or full sensitive payloads. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-10 | Source: |
-
 ## Verification status
 - Verified: 35 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
@@ -100,7 +95,6 @@ The log sink can index `event`, `requestId`, `route`, and severity without regul
 - [Pino API documentation](https://raw.githubusercontent.com/pinojs/pino/main/docs/api.md) — Pino project, living. Backs: How it works, Worked example, Edge cases, Trade-offs. [^3]
 - [Node.js 24: HTTP, class `http.ServerResponse`](https://nodejs.org/docs/latest-v24.x/api/http.html#class-httpserverresponse) — Node.js project, living. Backs: Edge cases (`close` and `finish` events). [^5]
 - [OWASP Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html) — OWASP, living. Backs: Problem, How it works, Edge cases, Trade-offs. [^4]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-10.
 
 ## Related
 - `operations/config-at-startup.md` — logger level and redact paths come from validated startup config.

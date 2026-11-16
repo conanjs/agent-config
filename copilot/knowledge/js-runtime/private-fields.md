@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["ES2022+", "TypeScript ≥ 3.8", "V8 ≥ 9.7 (Node ≥ 18)"]
 last-verified: 2026-11-03
-last-updated: 2026-11-03
+last-updated: 2026-11-14
 tags: [private-fields, encapsulation, typescript, serialization, performance, v8]
 ---
 
@@ -80,9 +80,6 @@ The speed difference is within run-to-run noise. A first attempt that ran both c
 - Store secrets and domain state in `readonly #` fields; never rely on `private` to keep a value out of logs. [rule-candidate]
 - On an ES2022+ target, do not avoid `#` for speed; measured cost is nil. [rule-candidate]
 
-## Used by
-- _Not cited by any rule yet._
-
 ## Verification status
 - Verified: 10 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-11-03
 
@@ -91,7 +88,6 @@ The speed difference is within run-to-run noise. A first attempt that ran both c
 - [Private elements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_elements) — MDN, living. Backs: How it works 4–5, Edge cases. [^2]
 - [Faster initialization of instances with new class features](https://v8.dev/blog/faster-class-features) — V8 team, 2022. Backs: How it works 6. [^3]
 - [Modules: TypeScript](https://nodejs.org/api/typescript.html) — Node.js, living (read 2026-11-03). Backs: stability and version history of type stripping, unsupported syntax, removal of `--experimental-transform-types` in 26.0.0, tsconfig ignored, `.ts` extensions; the 24.22.1 behaviour re-tested the same day. [^4]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/class-modeled.md` — the State row that applies this.
 
 ## Related
 - `js-runtime/v8-hidden-classes.md`

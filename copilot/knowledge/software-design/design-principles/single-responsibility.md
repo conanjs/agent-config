@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [solid, srp, cohesion, modularity]
 ---
 
@@ -85,11 +85,6 @@ If audit wording changes, only `QuoteAuditor` or the edge formatter changes; if 
 - Split only when parts change for different reasons. [rule-candidate]
 - Do not translate SRP into "one method per class". [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-1 | Source: |
-
 ## Verification status
 - Verified: 5 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -97,7 +92,6 @@ If audit wording changes, only `QuoteAuditor` or the edge formatter changes; if 
 - [Single Responsibility Principle](https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html) — Robert C. Martin, 2014. Backs: Problem, How it works, Edge cases. [^1]
 - [SOLID Relevance](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html) — Robert C. Martin, 2020. Backs: Summary, Takeaways. [^2]
 - [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — Robert C. Martin, 2012. Backs: Edge cases. [^3]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-1.
 
 ## Related
 - `software-design/design-principles/cohesion-and-coupling.md`

@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: draft
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [solid, lsp, behavioral-subtyping, contracts]
 ---
 
@@ -85,11 +85,6 @@ const invalid: Discount = amount => { if (amount.cents === 0) throw new Error("u
 - Do not inherit operations an implementation cannot honor. [rule-candidate]
 - Prefer narrower abstractions over throwing `NotSupported` from inherited members. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-3 | Source: |
-
 ## Verification status
 - Verified: 10 claims (✅) · Unverified: 1 claim (⚠️) · Last verified: 2026-10-04
 
@@ -98,7 +93,6 @@ const invalid: Discount = amount => { if (amount.cents === 0) throw new Error("u
 - [Design by Contract, Assertions and Exceptions](https://www.eiffel.org/doc/eiffel/ET-_Design_by_Contract_%28tm%29%2C_Assertions_and_Exceptions) — Eiffel Software, living. Backs: How it works, Edge cases. [^2]
 - [SOLID Relevance](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html) — Robert C. Martin, 2020. Backs: Problem, How it works, Edge cases. [^3]
 - [A Behavioral Notion of Subtyping (full paper, ACM TOPLAS 16(6))](https://www.cs.cmu.edu/~wing/publications/LiskovWing94.pdf) — Barbara Liskov and Jeannette Wing, 1994. Backs: How it works (history properties: properties over sequences of states that subtypes must preserve). [^4]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-3.
 
 ## Related
 - `software-design/oop/design-by-contract.md`

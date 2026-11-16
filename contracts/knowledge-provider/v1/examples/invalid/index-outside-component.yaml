@@ -1,0 +1,7 @@
+schema: knowledge-provider/v1
+slot: knowledge-storage
+repository: https://github.com/conanjs/agent-knowledge
+locations:
+  content: knowledge
+index: ../index.md
+exports: [x.md]

@@ -1,0 +1,12 @@
+{
+  "counts": {
+    "knowledge-to-agentic-sdlc-lines": 3,
+    "knowledge-to-agentic-sdlc-files": 2,
+    "core-to-agentic-sdlc-lines": 1,
+    "core-to-companies-lines": 1,
+    "checks-reading-other-areas": 1
+  },
+  "method": "lines mentioning the component, counted per owning folder",
+  "tool_version": "1",
+  "date": "2026-11-14"
+}

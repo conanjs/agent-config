@@ -1,0 +1,10 @@
+schema: repo-layout/v1
+required: [README.md]
+missing-message: 'missing required entry {path}'
+forbidden:
+  - rule: generated-from-line
+    message: 'tracked file starts with the generated-from line: {path}'
+exceptions:
+  Agent_Config:
+    - entry: README.md
+      stand-in: README.txt

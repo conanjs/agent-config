@@ -1,0 +1,6 @@
+schema: adapter-fields/v1
+adapter: copilot
+version: 1
+targets:
+  agents: { folder: /etc/agents, file: '{name}.agent.md', link: per-entry }
+fields: []

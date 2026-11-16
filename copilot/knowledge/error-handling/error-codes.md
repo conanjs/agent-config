@@ -5,7 +5,7 @@ topic: error-handling
 status: verified
 applies-to: ["TypeScript 5.8+ (tested on 6.0.3)", "stack reference v4.0.0 and layer-first v1.5.0", "any API that sends RFC 9457 problems"]
 last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [error-codes, as-const, result, problem-details, contract-test, single-source-of-truth]
 ---
 
@@ -119,9 +119,6 @@ Before v4.0.0 the same change meant editing 9 raw strings in 7 files, with the c
 - Declare each error code once, as a key of an `as const` object with a same-name derived type, in the layer that owns the failure; wider layers spread the narrower objects. [rule-candidate]
 - Use the keys in code, doc comments and unit tests; write the values out only in the HTTP contract test, because a changed value is an API change. [rule-candidate]
 
-## Used by
-- _Not cited by any rule yet._ TSN-20 (stack `typescript-node`) states the rule; its Source is `js-runtime/enums-and-literal-unions.md`.
-
 ## Verification status
 - Verified: 4 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
@@ -129,7 +126,6 @@ Before v4.0.0 the same change meant editing 9 raw strings in 7 files, with the c
 - [RFC 9457: Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457.html) — IETF, 2023. Backs: How it works flow step 4 and rule 9, Edge cases (§3.1.1: consumers must use the `type` URI as the problem type's primary identifier). [^1]
 - [Node.js: Modules: TypeScript](https://nodejs.org/api/typescript.html) — Node.js project, living. Backs: Trade-offs (`enum` needs transformation, so type stripping rejects it). [^2]
 - `conanjs/agentic-sdlc-reference-typescript-node` v4.0.0 — `domain/document/DocumentError.ts`, `application/LookupError.ts`, `interface/errors/HttpErrorMapper.ts`, `test/integration/documents.int.test.ts`; every measurement above was run there on 2026-10-28.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — TSN-4 (Results), TSN-11 (one mapper), TSN-20 (the rule).
 
 ## Related
 - `error-handling/result-type.md` — the `Result` these codes travel in.

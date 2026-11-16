@@ -1,0 +1,5 @@
+schema: components-list/v1
+local: true
+components:
+  - name: agent-knowledge
+    source: { type: path, path: ~/workspace/agent-knowledge }

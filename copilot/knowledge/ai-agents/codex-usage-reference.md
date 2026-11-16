@@ -5,7 +5,7 @@ topic: ai-agents
 status: verified
 applies-to: ["Codex CLI 0.164.0-alpha.11.1 (bundled with the ChatGPT desktop app)", "Codex CLI 0.166.0-alpha.6 (instruction-file benchmark)", "Codex docs read 2026-10-30"]
 last-verified: 2026-11-09
-last-updated: 2026-11-09
+last-updated: 2026-11-14
 tags: [codex, openai, tokens, usage, rate-limits, prompt-caching, compaction, opentelemetry, subagents, agents-md]
 ---
 
@@ -182,7 +182,7 @@ Codex has no import syntax for `AGENTS.md` (Claude Code has `@path` imports; Cop
 - [Subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) — OpenAI, living. Backs: built-in agents, TOML fields, `[agents]` keys, inheritance, token warning. [^10]
 - [Hooks](https://learn.chatgpt.com/docs/hooks) — OpenAI, living. Backs: hook locations, trust, events, input and output fields, `PreToolUse` on `spawn_agent` and its deny forms, transcript stability warning. [^11]
 - [codex-rs/core/src/tools/registry.rs at rust-v0.164.0-alpha.11](https://github.com/openai/codex/blob/rust-v0.164.0-alpha.11/codex-rs/core/src/tools/registry.rs), [hook_names.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/hook_names.rs), [tools/mod.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/mod.rs), [tools/router.rs](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/router.rs), [multi_agents_spec.rs](https://github.com/openai/codex/blob/rust-v0.164.0-alpha.11/codex-rs/core/src/tools/handlers/multi_agents_spec.rs) — OpenAI, read 2026-11-03 (also `registry.rs` at [rust-v0.166.0](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/core/src/tools/registry.rs)). Backs: hook tool names and aliases, flat names, encrypted collaboration arguments, `task_name` rules. [^13]
-- `codex exec` runs (codex-cli 0.164.0-alpha.11.1) with the agentic-sdlc workflow guard's trusted hooks, a logging wrapper on the hook's stdin, and the session's rollout file — local test, 2026-11-03 (agent-config `specs/019-workflow-graph/`). [^12]
+- `codex exec` runs (codex-cli 0.164.0-alpha.11.1) with the workflow guard's trusted hooks, a logging wrapper on the hook's stdin, and the session's rollout file — local test, 2026-11-03 (agent-config `specs/019-workflow-graph/`). [^12]
 
 - Local benchmark, 2026-11-07, re-checked 2026-11-09 — Codex CLI 0.166.0-alpha.6 (bundled in the ChatGPT app), `codex exec --ignore-user-config --ephemeral --json -m gpt-6.1-sol -c model_reasoning_effort="medium"`. Variant A: a copy of this repo's `codex/AGENTS.md` and the three `copilot/instructions/*.instructions.md` files, byte-identical to the repo on 2026-11-09. Variant B: a 7-line core with conditional reads. Five prompts, two runs each per variant. Event logs `~/Documents/Codex/2026-11-06/referenced-chatgpt-conversation-this-is-an/work/bench/out/codex-*.jsonl`, scored in `…/outputs/cli-instructions-benchmark.csv`; on 2026-11-09 the CSV totals were re-added and every run's commands were re-read, including those that exited non-zero. [^14]
 

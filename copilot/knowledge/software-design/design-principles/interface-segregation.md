@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [solid, isp, interfaces, structural-typing]
 ---
 
@@ -85,11 +85,6 @@ A mock for `QuotePage` now supplies one operation, not four unrelated ones.
 - Prefer role interfaces or function types over class-shaped headers. [rule-candidate]
 - In structural languages, use the shape you need; do not require explicit adapter ceremony without value. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-4 | Source: |
-
 ## Verification status
 - Verified: 10 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -99,7 +94,6 @@ A mock for `QuotePage` now supplies one operation, not four unrelated ones.
 - [Header Interface](https://martinfowler.com/bliki/HeaderInterface.html) — Martin Fowler, 2006. Backs: How it works. [^3]
 - [Type Compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility.html) — TypeScript Handbook, living. Backs: How it works, Edge cases. [^4]
 - [Effective Go: Interface names](https://go.dev/doc/effective_go#interfaces) — Go project, living. Backs: How it works, Edge cases. [^5]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-4.
 
 ## Related
 - `software-design/design-principles/liskov-substitution.md`

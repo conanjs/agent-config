@@ -5,7 +5,7 @@ topic: software-design/functional-modeling
 status: verified
 applies-to: ["TypeScript functional-pipeline cores"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [types, discriminated-unions, parse-dont-validate, workflow-outcomes]
 ---
 
@@ -106,11 +106,6 @@ The parser preserves the knowledge it gained by returning `ParsedGrantRequest`, 
 - Parse raw boundary data into stronger core types before the first business decision. [rule-candidate]
 - Return expected workflow outcomes as explicit values. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-functional-pipeline-R3 | Source: |
-
 ## Verification status
 - Verified: 18 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -120,8 +115,6 @@ The parser preserves the knowledge it gained by returning `ParsedGrantRequest`, 
 - [Designing with types: making illegal states unrepresentable](https://fsharpforfunandprofit.com/posts/designing-with-types-making-illegal-states-unrepresentable/) — Scott Wlaschin / F# for Fun and Profit, 2013. Backs: invalid-state modeling. [^3]
 - [Railway Oriented Programming](https://fsharpforfunandprofit.com/rop/) — Scott Wlaschin / F# for Fun and Profit, 2014. Backs: custom error outcomes and Result-shaped workflows. [^4]
 - [Domain Modeling Made Functional](https://fsharpforfunandprofit.com/ddd/) — Scott Wlaschin / F# for Fun and Profit, living. Backs: type-driven domain modeling. [^5]
-- `copilot/frameworks/agentic-sdlc/paradigms/functional-pipeline.md` — cites this doc as PDM-functional-pipeline-R3.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/functional-pipeline.md` — TypeScript overlay for discriminated Result and exhaustive errors.
 - Scott Wlaschin, *Domain Modeling Made Functional* (2018) — further reading; consolidated here through Wlaschin's free F# for Fun and Profit materials.
 
 ## Related

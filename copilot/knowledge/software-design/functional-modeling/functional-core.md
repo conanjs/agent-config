@@ -5,7 +5,7 @@ topic: software-design/functional-modeling
 status: verified
 applies-to: ["TypeScript functional-pipeline cores"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [functional-core, imperative-shell, ports-and-adapters, decisions-as-data]
 ---
 
@@ -99,12 +99,6 @@ The shell is thin because it only loads facts, calls the core, and translates th
 - Keep controllers, handlers, jobs, and adapters as the thin impure shell. [rule-candidate]
 - Prefer decision values over callbacks when the core must tell the shell what to do. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-functional-pipeline-R2 | Source: |
-| paradigm rule | PDM-functional-pipeline-R5 | Source: |
-
 ## Verification status
 - Verified: 18 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -113,8 +107,6 @@ The shell is thin because it only loads facts, calls the core, and translates th
 - [Impureim sandwich](https://blog.ploeh.dk/2020/03/02/impureim-sandwich/) — Mark Seemann, 2020. Backs: Summary, How it works, shell thinness. [^2]
 - [Functional architecture is Ports and Adapters](https://blog.ploeh.dk/2016/03/18/functional-architecture-is-ports-and-adapters/) — Mark Seemann, 2016. Backs: ports/adapters mapping and I/O boundary. [^3]
 - [Domain Modeling Made Functional](https://fsharpforfunandprofit.com/ddd/) — Scott Wlaschin / F# for Fun and Profit, living. Backs: domain decisions represented with functional types. [^4]
-- `copilot/frameworks/agentic-sdlc/paradigms/functional-pipeline.md` — cites this doc as PDM-functional-pipeline-R2 and PDM-functional-pipeline-R5.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/functional-pipeline.md` — TypeScript overlay for shell/core separation.
 - Scott Wlaschin, *Domain Modeling Made Functional* (2018) — further reading; consolidated here through Wlaschin's free F# for Fun and Profit materials.
 
 ## Related

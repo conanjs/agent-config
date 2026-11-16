@@ -5,7 +5,7 @@ topic: software-design/oop
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-29
-last-updated: 2026-10-29
+last-updated: 2026-11-14
 tags: [oop, dependency-injection, composition-root, ports, modular-monolith]
 ---
 
@@ -92,13 +92,6 @@ The HTTP adapter parses `{ roleId: "admin", permission: "shipment:approve" }` an
 - Treat service locator as hidden dependency lookup, not dependency injection. [rule-candidate]
 - In a modular monolith, keep adapter choice in the one composition root and give each module a composer that builds its use cases from the adapters it is given (W2, the framework default since MOD-11); one root for everything (W1) fits a single module, and a composition root per module (W3) fits only modules that own separate infrastructure.
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-class-modeled-R3 | Source: |
-| paradigm rule | PDM-class-modeled-R9 | Source: |
-| foundation rule | MOD-11 | Source: |
-
 ## Verification status
 - Verified: 20 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-29
 
@@ -110,8 +103,6 @@ The HTTP adapter parses `{ roleId: "admin", permission: "shipment:approve" }` an
 - [NestJS: Modules](https://docs.nestjs.com/modules) — NestJS project, living. Backs: How it works (W2, providers encapsulated by default, `exports`). [^5]
 - [Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd) — Kamil Grzybek, living. Backs: How it works and Trade-offs (W3, §3.1 assumption 7 "Each Module has its own Composition Root"). [^6]
 - `conanjs/agentic-sdlc-reference-typescript-node` — `v4.1.0`: `src/CompositionRoot.ts` builds every use case (W1); `v4.2.0`: `src/modules/*/<Module>Module.ts` composers and their two lint zones in `eslint.config.mjs` (W2).
-- `copilot/frameworks/agentic-sdlc/paradigms/class-modeled.md` — cites this doc as PDM-class-modeled-R3.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/class-modeled.md` — maps this rule to constructor-injected TypeScript application classes.
 
 ## Related
 - `software-design/oop/composition-over-inheritance.md`

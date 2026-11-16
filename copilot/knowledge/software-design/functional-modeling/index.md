@@ -2,7 +2,7 @@
 schema: topic-index/v1
 kind: subtopic
 topic: software-design/functional-modeling
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 ---
 
 # Functional modeling
@@ -21,7 +21,6 @@ Functional modeling covers immutable data, pure domain cores, explicit type-shap
 ## References
 - [Domain Modeling Made Functional](https://fsharpforfunandprofit.com/ddd/) — Scott Wlaschin / F# for Fun and Profit, living. Backs: subtopic scope.
 - [Functional Core, Imperative Shell](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell) — Gary Bernhardt / Destroy All Software, 2012. Backs: subtopic scope.
-- `copilot/frameworks/agentic-sdlc/paradigms/functional-pipeline.md` — cites every concept doc in this subtopic.
 
 ## Related
 - `software-design/ddd/`

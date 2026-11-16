@@ -5,7 +5,7 @@ topic: software-design/architecture-styles
 status: verified
 applies-to: ["any codebase organized by request or feature", "TypeScript with eslint-plugin-boundaries 7.2.0, ESLint 10"]
 last-verified: 2026-10-28
-last-updated: 2026-10-28
+last-updated: 2026-11-14
 tags: [vertical-slice, feature-folders, coupling, eslint-plugin-boundaries, transaction-script, module-layout]
 ---
 
@@ -144,9 +144,6 @@ Adding `ArchiveDocument` to a module laid out in slices, with one mistake on the
 - Adopt vertical slices only with a lint rule that blocks slice-to-slice imports and shared-to-slice imports; folder names alone do not keep slices apart. [rule-candidate]
 - In a slice layout, keep aggregates in `domain/<aggregate>/` outside the slices, and move business rules there when a slice grows. [rule-candidate]
 
-## Used by
-- _Not cited by any rule yet._ MOD-10's Interpreting table points here for option C.
-
 ## Verification status
 - Verified: 17 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-28
 
@@ -155,7 +152,6 @@ Adding `ArchiveDocument` to a module laid out in slices, with one mistake on the
 - [JS Boundaries: Elements](https://www.jsboundaries.dev/docs/setup/elements/) — `eslint-plugin-boundaries` project, living. Backs: How it works 3 (element types, `capture`), Edge cases. [^2]
 - [eslint-plugin-boundaries README](https://github.com/javierbrea/eslint-plugin-boundaries) — Javier Brea, living. Backs: How it works 3 (`boundaries/dependencies`, `default`, `policies`). [^3]
 - [JS Boundaries: Selectors](https://www.jsboundaries.dev/docs/setup/selectors/) — `eslint-plugin-boundaries` project, living. Backs: How it works 3 (templated captured values). [^4]
-- `copilot/frameworks/agentic-sdlc/foundations/design/module-boundaries.md` — MOD-10 and its option C row.
 - Throwaway probe, 2026-10-28: `eslint-plugin-boundaries` 7.2.0, ESLint 10.13.0, `typescript-eslint` 8.72.0, Node 24; the configuration in the Mental model is the one that ran.
 
 ## Related

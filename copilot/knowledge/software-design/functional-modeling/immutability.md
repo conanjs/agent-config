@@ -5,7 +5,7 @@ topic: software-design/functional-modeling
 status: verified
 applies-to: ["TypeScript functional-pipeline cores"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [functional-modeling, immutability, typescript, structural-sharing]
 ---
 
@@ -100,11 +100,6 @@ The old array remains valid for tests, logging, or another branch, while the new
 - Use `Readonly<T>` and `ReadonlyArray<T>` for core inputs and outputs, then measure before optimizing away copies. [rule-candidate]
 - For hot JavaScript object paths, read `js-runtime/v8-hidden-classes.md` before choosing an update shape. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| paradigm rule | PDM-functional-pipeline-R1 | Source: |
-
 ## Verification status
 - Verified: 18 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -113,8 +108,6 @@ The old array remains valid for tests, logging, or another branch, while the new
 - [Immer introduction](https://immerjs.github.io/immer/) — Immer documentation, living. Backs: structural sharing, immutable update costs, Trade-offs. [^2]
 - [Fast properties in V8](https://v8.dev/blog/fast-properties) — V8 team, 2017. Backs: runtime cost notes and hidden-class link. [^3]
 - [Impureim sandwich](https://blog.ploeh.dk/2020/03/02/impureim-sandwich/) — Mark Seemann, 2020. Backs: boundary normalization at the shell edge. [^4]
-- `copilot/frameworks/agentic-sdlc/paradigms/functional-pipeline.md` — cites this doc as PDM-functional-pipeline-R1.
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/paradigms/functional-pipeline.md` — TypeScript overlay using readonly records and arrays.
 - Scott Wlaschin, *Domain Modeling Made Functional* (2018) — further reading; consolidated here through Wlaschin's free F# for Fun and Profit materials.
 
 ## Related

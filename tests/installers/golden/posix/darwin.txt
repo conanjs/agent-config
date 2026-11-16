@@ -1,0 +1,23 @@
+# install plan of installers/install.sh, os=darwin, exit=0
+link ~/.agents/skills -> skills
+link ~/.claude/CLAUDE.md -> claude/CLAUDE.md
+link ~/.claude/agents -> claude/agents
+link ~/.claude/plugins/blocklist.json -> claude/plugins/blocklist.json
+link ~/.claude/skills -> skills
+link ~/.codex/AGENTS.md -> copilot/instructions/core.instructions.md
+link ~/.codex/agents -> codex/agents
+link ~/.codex/hooks.json -> codex/hooks.json
+link ~/.copilot/agents -> copilot/agents
+link ~/.copilot/atlas -> copilot/atlas
+link ~/.copilot/companies -> copilot/companies
+link ~/.copilot/frameworks -> copilot/frameworks
+link ~/.copilot/hooks -> copilot/hooks
+link ~/.copilot/instructions -> copilot/instructions
+link ~/.copilot/knowledge -> copilot/knowledge
+link ~/.copilot/patterns -> copilot/patterns
+link ~/.copilot/procedures -> copilot/procedures
+link ~/.copilot/prompts -> copilot/prompts
+link ~/.copilot/references -> copilot/references
+link ~/.copilot/tracker -> copilot/tracker
+seed ~/.claude/settings.json <- claude/settings.json 644
+seed ~/.copilot/global-variables.md <- global-variables.md 644

@@ -5,7 +5,7 @@ topic: js-runtime
 status: verified
 applies-to: ["Node.js >= 15", "TypeScript on Node.js"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [promises, nodejs, linting, errors]
 ---
 
@@ -81,11 +81,6 @@ For true background work, a named supervisor should own the promise and attach a
 - Treat `void promise` as a documented exception, not as error handling. [rule-candidate]
 - Enable `@typescript-eslint/no-floating-promises` for TypeScript services. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| stack idiom | TSN-7 | Source: |
-
 ## Verification status
 - Verified: 33 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -94,7 +89,6 @@ For true background work, a named supervisor should own the promise and attach a
 - [Node.js CLI: --unhandled-rejections=mode](https://nodejs.org/api/cli.html#--unhandled-rejectionsmode) — Node.js project, living. Backs: How it works. [^2]
 - [Node.js 15.0.0 release notes](https://nodejs.org/en/blog/release/v15.0.0) — Node.js project, 2020. Backs: Problem, Edge cases. [^3]
 - [@typescript-eslint/no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises/) — typescript-eslint project, living. Backs: Summary, Mental model, How it works, Worked example, Edge cases, Trade-offs. [^4]
-- `copilot/frameworks/agentic-sdlc/stacks/typescript-node/idioms.md` — cites this doc as TSN-7.
 
 ## Related
 - `js-runtime/abort-signal.md` — cancellation ownership for async work.

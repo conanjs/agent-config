@@ -5,7 +5,7 @@ topic: software-design/design-principles
 status: verified
 applies-to: ["any"]
 last-verified: 2026-10-04
-last-updated: 2026-10-04
+last-updated: 2026-11-14
 tags: [solid, ocp, polymorphism, yagni]
 ---
 
@@ -84,11 +84,6 @@ Adding `refrigerated` adds one entry or implementation once the variant is real.
 - Replace growing central switches with added handlers, rules, or implementations. [rule-candidate]
 - Use OCP at stable variation points, not as a blanket ban on editing code. [rule-candidate]
 
-## Used by
-| Where | Id / path | How |
-|---|---|---|
-| foundation rule | DP-2 | Source: |
-
 ## Verification status
 - Verified: 7 claims (✅) · Unverified: 0 claims (⚠️) · Last verified: 2026-10-04
 
@@ -96,7 +91,6 @@ Adding `refrigerated` adds one entry or implementation once the variant is real.
 - [The Open Closed Principle](https://blog.cleancoder.com/uncle-bob/2014/05/12/TheOpenClosedPrinciple.html) — Robert C. Martin, 2014. Backs: Problem, How it works, Edge cases. [^1]
 - [SOLID Relevance](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html) — Robert C. Martin, 2020. Backs: Summary. [^2]
 - [Yagni](https://martinfowler.com/bliki/Yagni.html) — Martin Fowler, 2015. Backs: Problem, How it works, Edge cases. [^3]
-- `copilot/frameworks/agentic-sdlc/foundations/design/design-principles.md` — cites this doc as DP-2.
 
 ## Related
 - `software-design/design-principles/kiss-and-yagni.md`

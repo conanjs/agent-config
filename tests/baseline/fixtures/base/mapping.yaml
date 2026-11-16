@@ -1,0 +1,4 @@
+- { source: copilot/instructions,            target: ~/.copilot/instructions,            strategy: symlink }
+- { source: claude/CLAUDE.md,                target: ~/.claude/CLAUDE.md,                strategy: symlink }
+- { source: copilot/instructions/core.instructions.md, target: ~/.codex/AGENTS.md,    strategy: symlink }
+- { source: skills,                          target: ~/.claude/skills,                   strategy: symlink }

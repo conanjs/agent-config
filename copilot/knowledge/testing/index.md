@@ -2,12 +2,12 @@
 schema: topic-index/v1
 kind: topic
 topic: testing
-last-updated: 2026-10-29
+last-updated: 2026-11-14
 ---
 
 # Testing
 
-How to put tests around code and tools that have none, and how to keep requirements and tests in step as they change. Not covered: the testing rules an agent must follow (those are `TST-n` in the agentic-sdlc framework's `foundations/delivery/testing-strategy.md`) and stack-specific test commands (stack profiles).
+How to put tests around code and tools that have none, and how to keep requirements and tests in step as they change. Not covered: stack-specific test commands (stack profiles).
 
 ## Docs
 | Doc | Type | Summary | Status |
