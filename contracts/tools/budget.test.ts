@@ -197,4 +197,14 @@ describe('AC-1.7 the command', () => {
       'Home: /h/.agent-config/x.md',
     ]);
   });
+
+  it('the default agent home follows the target platform, not the host', () => {
+    const { env } = repoOf();
+    const outcome = runBudget(['--baseline', '--render', 'claude/CLAUDE.md'], {
+      ...env,
+      home: 'C:\\Users\\v',
+      platform: 'win32',
+    });
+    expect(outcome.out.split('\n')[2]).toBe('Home: C:\\Users\\v\\.agent-config\\x.md');
+  });
 });

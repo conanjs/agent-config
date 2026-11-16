@@ -9,6 +9,7 @@ Feature: Shared scenario support for the new tools
   Background:
     Given the base fixture tree of "tools-support"
 
+  @posix
   Scenario: T043-1 A tool runs with HOME set to the scenario's temporary home, never the real one
     Given a temporary home exists
     When the tool runs with "home"
@@ -17,12 +18,31 @@ Feature: Shared scenario support for the new tools
       home={root}/home
       """
 
+  @windows
+  Scenario: T043-1 (Windows) A tool runs with HOME set to the scenario's temporary home, never the real one
+    Given a temporary home exists
+    When the tool runs with "home"
+    Then it exits with 0 and prints:
+      """
+      home={root}\home
+      """
+
+  @posix
   Scenario: T043-2 os.homedir() in the tool is the temporary home too, on every OS
     Given a temporary home exists
     When the tool runs with "homedir"
     Then it exits with 0 and prints:
       """
       homedir={root}/home
+      """
+
+  @windows
+  Scenario: T043-2 (Windows) os.homedir() in the tool is the temporary home too, on every OS
+    Given a temporary home exists
+    When the tool runs with "homedir"
+    Then it exits with 0 and prints:
+      """
+      homedir={root}\home
       """
 
   Scenario: T043-3 A tool gets the arguments after its name and its exit code is reported

@@ -25,6 +25,7 @@ Where: `{scripts/*.{sh,ts},.githooks/*,.github/**,.claude/settings.json}` · Sch
 - [`scripts/check-docs.test.ts`](../../../../scripts/check-docs.test.ts)
 - [`scripts/check-fitness.test.ts`](../../../../scripts/check-fitness.test.ts)
 - [`scripts/check-fitness.ts`](../../../../scripts/check-fitness.ts)
+- [`scripts/check-new-tiers.sh`](../../../../scripts/check-new-tiers.sh)
 - [`scripts/claude-doc-hook.sh`](../../../../scripts/claude-doc-hook.sh)
 
 ## Recorded baselines

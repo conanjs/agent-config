@@ -41,17 +41,8 @@ wg="$root/copilot/frameworks/agentic-sdlc/tools/workflow-graph"
 "$node_bin" "$wg/src/main.ts" interfaces || status=1
 # The usage CLI's own lint, when installed (optional, 021 D45); `usage diff --breaking` joins once the tool has a release tag.
 if command -v usage >/dev/null 2>&1; then usage lint -W "$wg/interfaces/workflow-graph.usage.kdl" || status=1; else echo "check-docs: usage not installed; skipped usage lint (specs/021 D45)"; fi
-# Spec 022 (T086): the new TypeScript tiers (contracts/, installers/, eslint/, scripts/*.ts): format, lint, type check and unit
-# tests, run from source by Node 24.12+ type stripping; then the contract schema check over the shipped files, the fitness
-# check (fails only on a rise over docs/baselines/fitness.json), the coverage check for the delivered phases, and the
-# repo-layout check in report mode (lists findings, never fails until phase 1).
-(cd "$root" && "$node_bin" node_modules/prettier/bin/prettier.cjs --check --log-level warn . && "$node_bin" node_modules/eslint/bin/eslint.js . --max-warnings 0 && "$node_bin" node_modules/typescript/bin/tsc --noEmit -p tsconfig.json && "$node_bin" node_modules/vitest/vitest.mjs run --silent) || status=1
-schemas_out="$(cd "$root" && "$node_bin" contracts/tools/check-schemas.ts contracts/index.md contracts/slots.yaml contracts/*/v1/examples/valid/* 2>&1)" || { printf '%s\n' "$schemas_out" >&2; status=1; }
-(cd "$root" && "$node_bin" scripts/check-fitness.ts --root "$root") || status=1
-(cd "$root" && "$node_bin" scripts/check-ac-coverage.ts --root "$root" --delivered 0,1) || status=1
-(cd "$root" && "$node_bin" contracts/tools/build.ts layout --report --repo agent-config --root "$root") || status=1
-# build cite in check mode over the fixture tree (T114): the checker itself stays honest; real consumer enforcement starts in
-# phase 6, when a provider repository URL exists.
-(cd "$root" && "$node_bin" contracts/tools/build.ts cite --root "$root/tests/build-cite/fixtures/base" --slots "$root/contracts/slots.yaml" --provider providers/knowledge/component.yaml --provider providers/core/component.yaml) || status=1
+# Spec 022 (T086): the new TypeScript tiers and the tools built on them, in their own script so the Windows CI job can
+# run them alone; the scenarios run once, in the Cucumber step below.
+"$root/scripts/check-new-tiers.sh" --no-scenarios || status=1
 (cd "$root" && "$node_bin" "$cucumber") || status=1
 exit $status
