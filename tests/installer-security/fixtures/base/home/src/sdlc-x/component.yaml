@@ -1,0 +1,23 @@
+schema: component/v1
+name: sdlc-x
+version: 1.0.0
+slot: framework
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+  services: []
+depends:
+  slots:
+    - slot: knowledge-storage
+      contract: knowledge-provider/v1
+      required: true
+      docs: [knowledge/a/b.md]
+routes: []
+hooks: []
+variables: []

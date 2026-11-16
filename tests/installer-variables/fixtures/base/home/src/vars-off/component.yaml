@@ -1,0 +1,17 @@
+schema: component/v1
+name: vars-off
+version: 1.0.0
+slot: framework
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+variables:
+  - name: OFF_ONLY
+    description: Declared by a component that is not enabled
+    required: false

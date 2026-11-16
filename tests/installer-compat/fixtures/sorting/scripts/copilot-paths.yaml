@@ -1,0 +1,9 @@
+schema: copilot-paths/v1
+method: grep of ~/.copilot over every file under the root
+date: 2026-11-11
+own:
+  - ~/.copilot/hooks
+  - ~/.copilot/agents
+  - ~/.copilot/prompts
+agent-home-lines:
+  docs/a.md: 1

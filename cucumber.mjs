@@ -29,6 +29,8 @@ export const spec022 = {
     'tests/coverage/*.feature',
     'tests/installers/golden.feature',
     'tests/tools-support/*.feature',
+    'tests/installer-world/*.feature',
+    'tests/installer-*/*.feature',
     'tests/cucumber-config/*.feature',
     'tests/build-cite/*.feature',
     'tests/core-text/*.feature',

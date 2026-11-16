@@ -1,0 +1,14 @@
+schema: component/v1
+name: kb
+version: 1.0.0
+slot: knowledge-storage
+scope: global
+contracts:
+  pin: 1
+locations:
+  content: knowledge
+  framework: frameworks/knowledge
+provides:
+  contracts: [knowledge-provider/v1]
+  index: knowledge/index.md
+  exports: []

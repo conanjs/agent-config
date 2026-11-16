@@ -1,0 +1,16 @@
+schema: component/v1
+name: notes
+version: 1.0.0
+slot: company-knowledge-storage
+scope: global
+contracts:
+  pin: 1
+locations:
+  content: companies
+provides:
+  contracts: [company-kb/v1]
+  index: index.md
+  exports: []
+variables:
+  - name: NOTES_ROOT
+    description: Folder of notes

@@ -1,0 +1,28 @@
+schema: component/v1
+name: trav
+version: 1.0.0
+slot: framework
+repository: https://github.com/example/trav
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: [framework/guide.md]
+  skills: skills/
+  agents: agents/
+  services: []
+depends:
+  slots: []
+routes:
+  - id: trav-route
+    when: always
+    read: frameworks/trav/index.md
+hooks:
+  - id: trav-hook
+    event: stop
+    command: node {{AGENT_HOME}}/core/tools/note.mjs
+variables: []

@@ -16,7 +16,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 | DR-301 to DR-309 | architecture | this file | New in this run |
 | DR-401 to DR-418 | system-architecture | `decisions/system-architecture.md` §4 | "Contract facts" lines kept as an extra field |
 | DR-501 | qa | `decisions/qa.md` §1 to §3 | The QA file calls it `DR-QA-1`, which is not a valid record id; renumbered here |
-| DR-601 to DR-608, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm, swap everywhere), engineering (parser limits), security (duplicate keys) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
+| DR-601 to DR-609, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm, swap everywhere), engineering (parser limits), security (duplicate keys) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
 
 ## Conflicts between the role records, and how precedence resolves them
 
@@ -687,6 +687,17 @@ Measured 2026-11-13 on Node.js v24.22.1 (macOS): a class with `constructor(priva
 - **Supersedes:** none
 - **Narrows:** engineering DR-606: only its `uniqueKeys: true` default is replaced; the other limits of DR-606 stand.
 - **Decided by:** security, engineering · **Approved at:** P6 (2026-11-14)
+
+## DR-609: The test composition is a separate entry; production reads no test variable (narrows DR-305)
+- **Tree path:** review of the phase 2 scenario world (T117, T118) by engineering, against DR-305's "one environment variable read by the composition root alone".
+- **Criteria:** M-11 (consent needs an interactive terminal: a scripted terminal reachable from production could pre-answer a real consent prompt); M-05 (git allows only https and ssh in production); QB-4; CA-2, MOD-11 (only the composition root chooses production adapters).
+- **Options considered:** (A) `src/CompositionRoot.ts` exports `realPorts(options?)` and `composeInstaller(ports)`; production `main.ts` and a test-only entry (`tests/support/installer-test-main.ts`) both call one shared `runCli(argv, ports, io)`; only the test entry reads `AGENT_CONFIG_TEST_*`, wraps the real ports with the fault adapter, and widens the git policy to allow `file` for local bare repos; a seam guard (unit test over the production tiers) and a production-entry scenario prove production ignores every test variable | (B) DR-305 as written: the composition root reads one test variable
+- **Chosen:** (A) — `GitPolicy { allowedProtocols }` is hard-coded to `['https', 'ssh']` in `realPorts()` and is never read from the environment or the command line; source validation takes the same policy.
+- **Rejected:** (B) — a test switch inside the production binary is one environment variable away from scripted consent and a widened git protocol list.
+- **Confidence:** high
+- **Supersedes:** none
+- **Narrows:** architecture DR-305: only its "selected through one environment variable read by the composition root alone" clause is replaced; ports, the fault adapter's limits and the one report model stand. docs/architecture.md §4 says only `src/CompositionRoot.ts` chooses production adapters and a test entry may supply test doubles through `composeInstaller`.
+- **Decided by:** engineering, qa · **Approved at:** P6 (2026-11-16)
 
 ## PDM-installers-core: Paradigm for the installer core (`installers/core`, clears unlisted need U-2)
 - **Tree path:** PDM-Q1 (greenfield: `installers/core` does not exist yet → NO) → PDM-Q2 (does it own invariants enforced across operations? The cross-checks, such as majors, exports, "plan equals what apply does" and the approved privileged set, are rules over plain data; durable state lives in `components.lock` and `install-state.json`, not in objects with identity and lifecycle → NO) → PDM-Q3 (an input to output transform: files in, a plan as data (DR-306), effects at the edge, a report out → YES) → functional-pipeline. PDM-Q4 not reached; the constitution default is `none`.

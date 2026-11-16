@@ -1,0 +1,17 @@
+schema: component/v1
+name: ok-fw
+version: 1.0.0
+slot: framework
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+  services: []
+routes: []
+hooks: []
+variables: []

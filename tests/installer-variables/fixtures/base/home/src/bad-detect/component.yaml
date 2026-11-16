@@ -1,0 +1,18 @@
+schema: component/v1
+name: bad-detect
+version: 1.0.0
+slot: framework
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+variables:
+  - name: REF_ROOT
+    description: Folder of references
+    required: true
+    detect: { kind: command, run: 'touch "$HOME/marker-bad-detect"' }

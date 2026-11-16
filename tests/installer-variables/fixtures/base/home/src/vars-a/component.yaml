@@ -1,0 +1,23 @@
+schema: component/v1
+name: vars-a
+version: 1.0.0
+slot: framework
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+variables:
+  - name: ALPHA_ROOT
+    description: Folder of alpha files
+    required: false
+  - name: BETA_NAME
+    description: Name of beta
+    required: false
+  - name: GAMMA_DIR
+    description: Folder of gamma files
+    required: false

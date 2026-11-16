@@ -1,0 +1,17 @@
+schema: component/v1
+name: kb-v2
+version: 1.0.0
+slot: knowledge-storage
+repository: https://github.com/example/kb-v2
+contracts:
+  pin: 1
+locations:
+  content: content
+provides:
+  contracts: [knowledge-provider/v2]
+  index: index.md
+  exports: [knowledge/a/b.md]
+  services: []
+routes: []
+hooks: []
+variables: []

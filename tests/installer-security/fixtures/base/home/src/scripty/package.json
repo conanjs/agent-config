@@ -1,0 +1,1 @@
+{ "name": "scripty", "scripts": { "preinstall": "node build.mjs", "postinstall": "node build.mjs", "build": "node build.mjs" } }

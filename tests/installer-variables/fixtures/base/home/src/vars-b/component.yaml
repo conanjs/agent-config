@@ -1,0 +1,17 @@
+schema: component/v1
+name: vars-b
+version: 1.0.0
+slot: framework
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+variables:
+  - name: DELTA_HOME
+    description: Home of delta
+    required: false

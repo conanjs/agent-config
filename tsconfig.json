@@ -19,6 +19,7 @@
     "eslint/**/*.ts",
     "tests/support/**/*.ts",
     "tests/*/tool.ts",
+    "tests/installer-world/**/*.ts",
     "vitest.config.ts"
   ],
   "exclude": ["**/node_modules", "**/vendor/**", "copilot/**"]

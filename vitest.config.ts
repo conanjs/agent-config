@@ -7,6 +7,7 @@ export default defineConfig({
       'installers/core/**/src/**/*.test.ts',
       'scripts/**/*.test.ts',
       'eslint/**/*.test.ts',
+      'tests/installer-world/**/*.test.ts',
     ],
     exclude: ['**/node_modules/**', '**/vendor/**', 'copilot/**'],
   },
