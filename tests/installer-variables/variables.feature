@@ -4,11 +4,12 @@
 # FIXTURE. {root}/repo is the agent-config clone (AGENT_CONFIG_TEST_REPO); its component.yaml declares no variable unless a scenario
 # edits it. Path components under {root}/home/src, all in the framework slot: vars-a (ALPHA_ROOT, BETA_NAME, GAMMA_DIR, none required),
 # vars-b (DELTA_HOME), vars-off (OFF_ONLY, listed by no scenario that expects it), vars-detect (REF_ROOT, required, detect dir-exists
-# ~/ws/ref) and bad-detect (a detect of kind command, which the schema refuses: CM-7).
+# ~/ws/ref), bad-detect (a detect of kind command, which the schema refuses: CM-7), vars-c and vars-d (both declare SHARED_DIR with
+# one description) and vars-secret-desc (LINK_ROOT, whose description holds a URL with a password).
 #
 # FILES AND TEXT. Every message and exit code is in the catalogue "Messages" of specs/022-repo-split/contracts/installer-cli.md: MG-01 and
 # MG-02 (first two lines), MG-08 (the variables need and its proposal), MG-17 (set stored a value), MG-21 (a skipped component),
-# MG-36 (the set refusals; the secret check comes before the declared check).
+# MG-36 (the set refusals; the secret check comes before the declared check), MG-47 (a credential-like description).
 #   {root}/home/.agent-config/variables.local.yaml   schema: variables-local/v1, a `values:` map, written by `set` with this exact text
 #       schema: variables-local/v1
 #       values:
@@ -16,7 +17,10 @@
 #   {root}/home/.agent-config/generated/global-variables.md   one table, header line "| Variable | Value | Description | Declared by |"
 #       (VR-1), AGENT_HOME first (value: the home, description "Folder of the agent home", declared by "agent-config"), then the
 #       variables of the enabled components, components by name, each in declaration order; no row of a component that is not enabled.
-#       {root}/home/.agent-config/global-variables.md links to it.
+#       {root}/home/.agent-config/global-variables.md links to it. Three choices the rows rely on (VR-1):
+#         - an optional variable with no stored value shows "(not set)" in the Value cell (a required one never reaches the file: exit 10);
+#         - when several components declare one name, "Declared by" shows the first of them in component name order;
+#         - the file may start with a title and a note before the table; it has no "Generated from" line (it is generated class, A-25).
 #   A value in the old ~/.copilot/global-variables.md (a table row "| `{{NAME}}` | <value> | ... |", value other than "<SETUP REQUIRED>")
 #   is the proposal of a declared variable that has no value (DR-414); the old file is copied into the backup folder at the first
 #   install that replaces it. Nothing is written by a run that exits 10.
@@ -123,6 +127,52 @@ Feature: Variables are declared by the component that uses them
       """
     And the variable table in "home/.agent-config/generated/global-variables.md" has no row for "OFF_ONLY"
     And "home/.agent-config/global-variables.md" exists
+
+  @pending @T135 @T137 @T138 @T142
+  Scenario: AC-6.2 An optional variable with no stored value shows (not set) in its row
+    Given the variable local list holds the path components "vars-a"
+    And the variable value file holds:
+      """
+      ALPHA_ROOT: /data/alpha
+      """
+    When the tool runs with "install"
+    Then it exits with 0
+    And the variable table in "home/.agent-config/generated/global-variables.md" has exactly these rows:
+      """
+      | AGENT_HOME | {root}/home/.agent-config | Folder of the agent home | agent-config |
+      | ALPHA_ROOT | /data/alpha | Folder of alpha files | vars-a |
+      | BETA_NAME | (not set) | Name of beta | vars-a |
+      | GAMMA_DIR | (not set) | Folder of gamma files | vars-a |
+      """
+
+  @pending @T135 @T137 @T138 @T142
+  Scenario: AC-6.2 Two components that declare one name give one row, declared by the first in name order
+    Given the variable local list holds the path components "vars-d, vars-c"
+    And the variable value file holds:
+      """
+      SHARED_DIR: /data/shared
+      """
+    When the tool runs with "install"
+    Then it exits with 0
+    And the variable table in "home/.agent-config/generated/global-variables.md" has exactly these rows:
+      """
+      | AGENT_HOME | {root}/home/.agent-config | Folder of the agent home | agent-config |
+      | SHARED_DIR | /data/shared | Folder both share | vars-c |
+      """
+
+  @pending @T135 @T137 @T138 @T142
+  Scenario: M-08 A description with credential-like text is refused, never printed, and nothing is written
+    Given the variable local list holds the path components "vars-secret-desc"
+    And a snapshot of "home" is taken
+    When the tool runs with "install"
+    Then it exits with 1 and prints:
+      """
+      agent home: {root}/home/.agent-config (recorded, confirmed)
+      status: failed
+      error: component vars-secret-desc: variable LINK_ROOT: the description contains credential-like text
+      """
+    And the variable output has no line containing "hunter2"
+    And since the snapshot, nothing under "home" changed
 
   # ---- AC-6.3: an undeclared name ----------------------------------------------------------------------
 

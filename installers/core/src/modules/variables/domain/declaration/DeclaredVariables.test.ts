@@ -85,6 +85,16 @@ describe('M-08 and M-18 declarations that are refused', () => {
       'invalid-description',
     ],
     ['a description with a bidi control', { name: 'OK', description: 'x\u202ey' }, 'invalid-description'],
+    [
+      'MG-47 a description with a URL password',
+      { name: 'OK', description: 'see https://user:hunter2@example.com/' },
+      'credential-like-description',
+    ],
+    [
+      'MG-47 a description with a token parameter',
+      { name: 'OK', description: 'a ?token=abc123' },
+      'credential-like-description',
+    ],
     ['a description over 300 characters', { name: 'OK', description: 'x'.repeat(301) }, 'invalid-description'],
     [
       'M-18 a detect of kind command',

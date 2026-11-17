@@ -5,6 +5,7 @@ import { parseDetectRule, type DetectRule } from '#variables/domain/declaration/
 import { parseVariableName, type VariableName } from '#variables/domain/name/VariableName.ts';
 import { secretNameWord, type SecretNameWord } from '#variables/domain/secrets/SecretRules.ts';
 import { escapeUnsafeText } from '#shared/domain/redaction/escapeUnsafeText.ts';
+import { needsRedaction } from '#shared/domain/redaction/redact.ts';
 import { refuse, succeed, type Result } from '#shared/domain/result/Result.ts';
 
 /** The row of `AGENT_HOME` in the rendered table: computed by the installer, so it is not a declaration. */
@@ -58,7 +59,7 @@ export type DeclarationViolation =
       readonly word: SecretNameWord;
     }
   | {
-      readonly kind: 'invalid-description' | 'invalid-detect';
+      readonly kind: 'invalid-description' | 'credential-like-description' | 'invalid-detect';
       readonly component: ComponentName;
       readonly name: VariableName;
       readonly reason: string;
@@ -104,6 +105,15 @@ function checkDeclaration(
   const problem = descriptionProblem(input.description);
   if (problem !== undefined) {
     return refuse({ kind: 'invalid-description', component, name: name.value, reason: problem });
+  }
+  // MG-47: the description is printed in the table every agent loads, so credential-like text is refused here, at read time (M-07, M-08).
+  if (needsRedaction(input.description)) {
+    return refuse({
+      kind: 'credential-like-description',
+      component,
+      name: name.value,
+      reason: 'the description contains credential-like text',
+    });
   }
   const detect = parseDetectRule(input.detect, name.value);
   if (!detect.ok) return refuse({ kind: 'invalid-detect', component, name: name.value, reason: detect.error });

@@ -66,7 +66,7 @@ values:
 
 | Id | Rule |
 |---|---|
-| VR-1 | Output `generated/global-variables.md`: one table `| Variable | Value | Description | Declared by |`, `AGENT_HOME` first, exactly one row per variable of each enabled component (AC-6.2); `{{AGENT_HOME}}/global-variables.md` links to it |
+| VR-1 | Output `generated/global-variables.md`: one table `| Variable | Value | Description | Declared by |`, `AGENT_HOME` first, exactly one row per variable of each enabled component (AC-6.2); an optional variable with no stored value shows `(not set)` (a default belongs in its description); when several components declare one name, the first in name order is shown in Declared by; `{{AGENT_HOME}}/global-variables.md` links to it |
 | VR-2 | Two enabled components declaring one name with different descriptions: install fails naming both |
 | VR-3 | `set NAME=value` for an undeclared name exits 1 naming the closest declared names (AC-6.3) |
 | VR-4 | Variables are public values loaded by agents: `set` refuses names containing `TOKEN`, `SECRET`, `PASSWORD`, `APIKEY`, `API_KEY`, and values starting `ghp_`, `github_pat_`, `sk-`, `AKIA`, `xox`; `doctor` re-checks the rendered file (M-08) |

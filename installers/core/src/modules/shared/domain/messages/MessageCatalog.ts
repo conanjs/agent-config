@@ -122,6 +122,7 @@ export const MESSAGE_CATALOG = {
   'MG-44': 'error: component {name} needs {tool} {range}, found {version}',
   'MG-45': 'error: component {name}: suggested source refused: it contains credential-like text',
   'MG-46': 'error: component {name}: git source refused: {reason}',
+  'MG-47': 'error: component {name}: variable {variable}: the description contains credential-like text',
 } as const;
 
 /** The id of one row of {@link MESSAGE_CATALOG}. */

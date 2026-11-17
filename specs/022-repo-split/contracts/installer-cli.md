@@ -139,5 +139,6 @@ A need block is `<n>. <kind>: <item>`, then indented by three spaces: the detail
 | MG-44 | `error: component <name> needs <tool> <range>, found <version>`: a declared runtime other than node that is not met (git, AC-5.9); node keeps MG-28 | 1 | - |
 | MG-45 | `error: component <name>: suggested source refused: it contains credential-like text`: a `suggest` source that redaction would change is never shown (M-07, M-11) | 1 | - |
 | MG-46 | `error: component <name>: git source refused: <reason>`: a git source whose url or ref fails the M-05 rules, at install or update (the reason never repeats the url) | 1 | - |
+| MG-47 | `error: component <name>: variable <NAME>: the description contains credential-like text`: a `variables:` description that redaction would change is refused when the manifest is read; it is never printed in `global-variables.md` (M-07, M-08) | 1 | - |
 
 Install state files named here: `install.lock` (MG-30), `install-log.jsonl` (one line per run with `time`, `command`, `exit`, `components`, `approved_privileged`; rotated at 1 MiB to `install-log.jsonl.1`, M-16).

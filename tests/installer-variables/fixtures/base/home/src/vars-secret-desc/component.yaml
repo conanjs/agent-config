@@ -1,0 +1,17 @@
+schema: component/v1
+name: vars-secret-desc
+version: 1.0.0
+slot: framework
+scope: per-project
+contracts:
+  pin: 1
+locations:
+  framework: .
+provides:
+  contracts: [framework/v1]
+  index: index.md
+  exports: []
+variables:
+  - name: LINK_ROOT
+    description: Folder of links, see https://user:hunter2@example.com/x
+    required: false
