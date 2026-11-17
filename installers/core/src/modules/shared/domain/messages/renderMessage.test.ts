@@ -289,18 +289,25 @@ const rows: Row[] = [
     'error: component sdlc-x needs git >=2.50.1, found 2.40.0',
   ],
   ['MG-45', { name: 'sdlc-x' }, 'error: component sdlc-x: suggested source refused: it contains credential-like text'],
+  [
+    'MG-46',
+    { name: 'kb', reason: 'the url starts with a dash' },
+    'error: component kb: git source refused: the url starts with a dash',
+  ],
+  ['MG-09.matcher', { matcher: 'Bash' }, '   matcher: Bash'],
+  ['MG-09.before-writing', { path: 'frameworks/x/index.md' }, '   before writing: frameworks/x/index.md'],
 ];
 
 describe('TR-5 message catalogue', () => {
   it('has exactly the rows of the table above, no more and no fewer', () => {
     expect(rows.map(([id]) => id).sort()).toEqual(Object.keys(MESSAGE_CATALOG).sort());
-    expect(rows).toHaveLength(100);
+    expect(rows).toHaveLength(103);
   });
 
-  it('covers MG-01 to MG-39 and MG-41 to MG-45 and nothing above (MG-40 is script output, not a catalogue row)', () => {
+  it('covers MG-01 to MG-39 and MG-41 to MG-46 and nothing above (MG-40 is script output, not a catalogue row)', () => {
     const numbers = new Set(Object.keys(MESSAGE_CATALOG).map((id) => Number(id.slice(3, 5))));
-    expect([...numbers].filter((number) => number > 45 || number === 40)).toEqual([]);
-    const missing = Array.from({ length: 45 }, (_unused, index) => index + 1)
+    expect([...numbers].filter((number) => number > 46 || number === 40)).toEqual([]);
+    const missing = Array.from({ length: 46 }, (_unused, index) => index + 1)
       .filter((number) => number !== 40)
       .filter((number) => !numbers.has(number));
     expect(missing).toEqual([]);

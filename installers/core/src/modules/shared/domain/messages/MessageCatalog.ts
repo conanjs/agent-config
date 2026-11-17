@@ -32,6 +32,8 @@ export const MESSAGE_CATALOG = {
   'MG-09.route-detail': '   when: {when}; read: {read}',
   'MG-09.service': 'service {name} ({kind})',
   'MG-09.service-detail': '   {command} {args}',
+  'MG-09.matcher': '   matcher: {matcher}',
+  'MG-09.before-writing': '   before writing: {path}',
   'MG-09.satisfy': '   satisfy: install (interactive) and approve',
   'MG-10':
     '   an interactive terminal is needed; an answer from a pipe, a file or an environment variable is never accepted',
@@ -119,6 +121,7 @@ export const MESSAGE_CATALOG = {
   'MG-43': 'warning: component {name}: {file}: {sentence}',
   'MG-44': 'error: component {name} needs {tool} {range}, found {version}',
   'MG-45': 'error: component {name}: suggested source refused: it contains credential-like text',
+  'MG-46': 'error: component {name}: git source refused: {reason}',
 } as const;
 
 /** The id of one row of {@link MESSAGE_CATALOG}. */

@@ -8,6 +8,8 @@ import { readComponentsLock, readInstallState, writeJournal } from '#state/appli
 import { createHomeFolder } from '#state/application/home/createHomeFolder.ts';
 import { restoreFromJournal } from '#state/application/journal/restoreJournal.ts';
 import { switchLinks } from '#state/application/journal/switchLinks.ts';
+import { removeOwnLink } from '#state/application/links/removeOwnLink.ts';
+import { ensureFolderIn } from '#state/application/home/ensureFolderIn.ts';
 import { placeLink } from '#state/application/links/placeLink.ts';
 import { appendInstallLog } from '#state/application/log/appendInstallLog.ts';
 import { acquireHomeLock, releaseHomeLock } from '#state/application/lock/homeLock.ts';
@@ -31,6 +33,8 @@ export function composeState(ports: StatePorts): StateApi {
     writeJournal: (journal) => writeJournal(ports, journal),
     writeFile: (target, text) => writeFileAtomically(ports, target, text),
     placeLink: (request) => placeLink(ports, request),
+    removeLink: (request) => removeOwnLink(ports, request),
+    ensureFolder: (folder) => ensureFolderIn(ports, folder),
     switchLinks: (journal) => switchLinks(ports, journal),
     restoreFromJournal: () => restoreFromJournal(ports),
     commit: (lock, state) => commitRun(ports, lock, state),

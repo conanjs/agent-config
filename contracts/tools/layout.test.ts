@@ -144,13 +144,24 @@ describe('FR-012 the command', () => {
   });
 });
 
-describe('AC-16.10 a build-output folder at any depth', () => {
-  it('finds a nested folder but not a longer name that merely ends the same way', () => {
-    const tracked = { 'docs/dist/x.md': '', 'predist/y.md': '', 'a/b/generated/z.md': '' };
-    expect(checkLayout(rules, undefined, view(rules.required, tracked))).toEqual([
-      'tracked file lies in a build-output folder: docs/dist/x.md',
-      'tracked file lies in a build-output folder: a/b/generated/z.md',
-    ]);
+describe('AC-16.10 where a build-output folder counts', () => {
+  const found = (path: string): readonly string[] =>
+    checkLayout(rules, undefined, view(rules.required, { [path]: '' }));
+  it.each([
+    ['dist at the root', 'dist/x.js', true],
+    ['dist nested', 'docs/dist/x.md', true],
+    ['a longer name that merely ends the same way', 'predist/y.md', false],
+    ['generated at the root', 'generated/z.md', true],
+    ['store at the root', 'store/z@1/file', true],
+    ['generated nested', 'a/b/generated/z.md', false],
+    [
+      'store inside a module of the installer',
+      'installers/core/src/modules/state/application/store/pruneStoreTrees.ts',
+      false,
+    ],
+    ['a root file that only starts with the name', 'storefront/x.md', false],
+  ])('%s', (_title, file, flagged) => {
+    expect(found(file)).toEqual(flagged ? [`tracked file lies in a build-output folder: ${file}`] : []);
   });
 });
 

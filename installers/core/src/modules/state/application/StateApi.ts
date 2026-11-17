@@ -3,6 +3,8 @@ import type { BackupFailure, BackupResult } from '#state/application/backup/back
 import type { NewestBackupRead, BackupReadFailure } from '#state/application/backup/readNewestBackup.ts';
 import type { FileRefusal } from '#state/application/files/atomicFiles.ts';
 import type { Loaded, StateFileFailure } from '#state/application/files/stateFiles.ts';
+import type { EnsureRefusal } from '#state/application/home/ensureFolder.ts';
+import type { UnlinkRefusal, UnlinkRequest } from '#state/application/links/removeOwnLink.ts';
 import type { HomeFolderRefusal } from '#state/application/home/createHomeFolder.ts';
 import type { RestoreFailure, RestoreOutcome } from '#state/application/journal/restoreJournal.ts';
 import type { SwitchedLink, SwitchFailure } from '#state/application/journal/switchLinks.ts';
@@ -84,6 +86,22 @@ export interface StateApi {
    * @returns what was placed, or why it was refused
    */
   placeLink(request: PlaceRequest): Result<PlacedLink, LinkRefusal>;
+
+  /**
+   * Removes a link the installer placed, only while it still points at the target given; a retired compatibility link.
+   *
+   * @param request - the absolute path of the link and the target it must still have
+   * @returns `removed`, `absent`, or why the path was left
+   */
+  removeLink(request: UnlinkRequest): Result<'removed' | 'absent', UnlinkRefusal>;
+
+  /**
+   * Makes a folder and its missing levels owner-only, when it is inside the agent home, the backups folder or an agent folder.
+   *
+   * @param folder - the absolute folder (Copilot's home on a machine that has none)
+   * @returns `created` or `existed`, or why it was refused
+   */
+  ensureFolder(folder: string): Result<'created' | 'existed', EnsureRefusal>;
 
   /**
    * Switches every link of the journal in order.

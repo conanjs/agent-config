@@ -265,6 +265,7 @@ Feature: The installer stops and asks instead of guessing
       status: needs-input
       1. privileged: hook guard (claude-code, pre-tool)
          node {{AGENT_HOME}}/core/tools/guard.mjs
+         matcher: all tools
          component: sdlc-x, commit: live
          satisfy: install (interactive) and approve
          an interactive terminal is needed; an answer from a pipe, a file or an environment variable is never accepted
@@ -316,7 +317,7 @@ Feature: The installer stops and asks instead of guessing
       agent home: {root}/home/.agent-config (recorded, confirmed)
       status: needs-input
       1. privileged: service kb-search (mcp)
-         node tools/kb-search.mjs
+         node ["tools/kb-search.mjs"]
          component: kb-a, commit: live
          satisfy: install (interactive) and approve
          an interactive terminal is needed; an answer from a pipe, a file or an environment variable is never accepted
@@ -374,6 +375,7 @@ Feature: The installer stops and asks instead of guessing
       status: needs-input
       1. privileged: hook guard (claude-code, pre-tool)
          node {{AGENT_HOME}}/core/tools/guard-v2.mjs
+         matcher: all tools
          component: sdlc-x, commit: live
          satisfy: install (interactive) and approve
          an interactive terminal is needed; an answer from a pipe, a file or an environment variable is never accepted

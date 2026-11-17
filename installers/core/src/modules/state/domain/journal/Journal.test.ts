@@ -259,3 +259,61 @@ describe('a journal of a run that had committed', () => {
     },
   );
 });
+
+describe('AC-8.3 a journaled unlink', () => {
+  const unlink: JournalOperation = {
+    op: 'unlink',
+    path: '/p',
+    old: { state: 'link', target: '/new/home/patterns', kind: 'symlink' },
+  };
+  const withUnlink: Journal = { ...journal, operations: [unlink] };
+
+  it('reads back what it wrote', () => {
+    expect(parseJournal(emitJournal(withUnlink))).toEqual({ ok: true, value: withUnlink });
+  });
+
+  it.each([
+    ['an unlink with no old link', { op: 'unlink', path: '/p' }],
+    ['an unlink whose old state is absent', { op: 'unlink', path: '/p', old: { state: 'absent' } }],
+    ['an unlink with no target', { op: 'unlink', path: '/p', old: { state: 'link', kind: 'symlink' } }],
+    [
+      'an unlink with an unknown kind',
+      { op: 'unlink', path: '/p', old: { state: 'link', target: '/t', kind: 'copy' } },
+    ],
+  ])('refuses %s', (_title, operation) => {
+    const text = JSON.stringify({
+      schema: 'install-journal/v1',
+      home: 'h',
+      command: 'c',
+      started: 's',
+      operations: [operation],
+    });
+    expect(parseJournal(text).ok).toBe(false);
+  });
+
+  it.each([
+    [
+      'nothing there: the old link is created again (killed after the removal)',
+      { kind: 'absent' },
+      { action: 'create-old-link', target: '/new/home/patterns', kind: 'symlink' },
+    ],
+    [
+      'the old link there: nothing (killed before the removal)',
+      { kind: 'link', target: '/new/home/patterns' },
+      { action: 'nothing' },
+    ],
+    [
+      'another link there: left',
+      { kind: 'link', target: '/elsewhere' },
+      { action: 'leave', why: expect.any(String) as string },
+    ],
+    ['a real file there: left', { kind: 'file', hash: '' }, { action: 'leave', why: expect.any(String) as string }],
+  ] as [string, Observed, RestoreStep][])('restores: %s', (_title, observed, step) => {
+    expect(decideRestore(unlink, observed)).toEqual(step);
+  });
+
+  it('is committed when the state no longer lists the path, and not while it does', () => {
+    expect(isCommitted(withUnlink, [])).toBe(true);
+    expect(isCommitted(withUnlink, [{ path: '/p', target: '/new/home/patterns' }])).toBe(false);
+  });
+});

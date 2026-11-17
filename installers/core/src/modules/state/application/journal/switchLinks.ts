@@ -5,6 +5,8 @@ import { isSameOrInside } from '#shared/domain/path/PathContainment.ts';
 import { refuse, succeed, type Result } from '#shared/domain/result/Result.ts';
 import { containIn } from '#state/application/files/containIn.ts';
 import type { Journal } from '#state/domain/journal/Journal.ts';
+import type { UnlinkRefusal } from '#state/application/links/removeOwnLink.ts';
+import { removeOwnLink } from '#state/application/links/removeOwnLink.ts';
 import { placeLink, type LinkRefusal, type PlacedLink } from '#state/application/links/placeLink.ts';
 import type { StateDeps } from '#state/application/StateDeps.ts';
 
@@ -21,7 +23,7 @@ export interface SwitchFailure {
   /** The path of the operation that was refused. */
   readonly path: string;
   /** The refusal. */
-  readonly refusal: LinkRefusal | { readonly kind: 'backup-missing'; readonly reason: string };
+  readonly refusal: LinkRefusal | UnlinkRefusal | { readonly kind: 'backup-missing'; readonly reason: string };
 }
 
 type BackupRefusal = SwitchFailure['refusal'];
@@ -60,6 +62,11 @@ function clearBackedUp(deps: StateDeps, linkPath: string, backupPath: string): B
 export function switchLinks(deps: StateDeps, journal: Journal): Result<readonly SwitchedLink[], SwitchFailure> {
   const done: SwitchedLink[] = [];
   for (const operation of journal.operations) {
+    if (operation.op === 'unlink') {
+      const removed = removeOwnLink(deps, { path: operation.path, target: operation.old.target });
+      if (!removed.ok) return refuse({ path: operation.path, refusal: removed.error });
+      continue;
+    }
     if (operation.op !== 'link') continue;
     const kept =
       operation.old.state === 'backed-up' ? clearBackedUp(deps, operation.path, operation.old.backup) : undefined;

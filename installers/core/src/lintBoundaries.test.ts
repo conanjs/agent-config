@@ -48,6 +48,7 @@ async function bannedSyntax(file: string): Promise<string[]> {
 const exitListener = (selectors: string[]): boolean => selectors.some((selector) => selector.includes('beforeExit'));
 const processExit = (selectors: string[]): boolean => selectors.some((selector) => selector.includes('reallyExit'));
 const processStream = (selectors: string[]): boolean => selectors.some((selector) => selector.includes('stdout'));
+const testSeams = (selectors: string[]): boolean => selectors.some((selector) => selector.includes('extraEnvironment'));
 
 describe('the process rules', () => {
   const main = 'installers/core/main.ts';
@@ -118,5 +119,27 @@ describe('what the process rules leave alone', () => {
     ],
   ])('allows %s in a module file', async (_title, code) => {
     expect(await ruleIds(stateTest, code)).not.toContain('no-restricted-syntax');
+  });
+}, 120_000);
+
+// M-05, DR-609: the git adapter's test seams are refused outside unit tests (the test entry sits outside this config).
+describe('the git adapter test seams', () => {
+  const seams = "import { createNodeGit } from './x.ts';\nexport const git = createNodeGit({ hooksPath: '/tmp/h' });\n";
+  it.each([
+    ['a module file', sha256Hex, true],
+    ['main.ts', 'installers/core/main.ts', true],
+    ['the presenter', presenter, true],
+    ['the composition root', 'installers/core/src/CompositionRoot.ts', true],
+    ['a unit test', stateTest, false],
+  ])('%s refuses them: %s', async (_title, file, refused) => {
+    expect(testSeams(await bannedSyntax(file))).toBe(refused);
+  });
+
+  it.each([
+    ['hooksPath', seams],
+    ['extraEnvironment', "export const options = { extraEnvironment: { GIT_CONFIG_COUNT: '1' } };\n"],
+    ['a quoted key', "export const options = { 'hooksPath': '/tmp/h' };\n"],
+  ])('refuses %s in a module file, as planted text', async (_title, code) => {
+    expect(await ruleIds(sha256Hex, code)).toContain('no-restricted-syntax');
   });
 }, 120_000);

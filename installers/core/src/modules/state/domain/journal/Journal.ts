@@ -8,6 +8,7 @@
 //                             link;  the old link there -> nothing;  anything else -> leave it
 //   link, old = backed up     our link there  -> remove it and copy the backup back;  nothing there -> copy the backup back;
 //                             the real entry there -> nothing
+//   unlink, old = a link     nothing there -> create the old link;  the old link there -> nothing;  anything else -> leave it
 //   write, old = absent       our content there (hash equal) -> remove it;  other content (V edited it) -> leave it
 //   write, old = a file       our content there -> copy the backup back;  nothing there -> copy the backup back;  other -> leave it
 // The journal file is removed last, so a crash during a restore replays the rest on the next run.
@@ -38,6 +39,13 @@ export type JournalOperation =
       readonly target: string;
       /** What the path held before. */
       readonly old: OldLink;
+    }
+  | {
+      readonly op: 'unlink';
+      /** The absolute path of a link the run removes (a retired compatibility link). */
+      readonly path: string;
+      /** The link as it was; it is removed only while it still points at this target, and put back by a restore. */
+      readonly old: { readonly state: 'link'; readonly target: string; readonly kind: 'symlink' | 'junction' };
     }
   | {
       readonly op: 'write';
@@ -87,21 +95,38 @@ function isOldFile(value: unknown): value is OldFile {
   return isRaw(value) && (value['state'] === 'absent' || (value['state'] === 'file' && isText(value['backup'])));
 }
 
-function isOperation(value: unknown): value is JournalOperation {
-  if (!isRaw(value) || !isText(value['path'])) return false;
-  if (value['op'] === 'link') {
-    return (
-      (value['kind'] === 'symlink' || value['kind'] === 'junction') &&
-      isText(value['target']) &&
-      isOldLink(value['old'])
-    );
-  }
+function isUnlink(value: Raw): boolean {
+  const old = value['old'];
+  return (
+    value['op'] === 'unlink' &&
+    isRaw(old) &&
+    old['state'] === 'link' &&
+    isText(old['target']) &&
+    (old['kind'] === 'symlink' || old['kind'] === 'junction')
+  );
+}
+
+function isLinkOperation(value: Raw): boolean {
+  return (
+    value['op'] === 'link' &&
+    (value['kind'] === 'symlink' || value['kind'] === 'junction') &&
+    isText(value['target']) &&
+    isOldLink(value['old'])
+  );
+}
+
+function isWriteOperation(value: Raw): boolean {
   return (
     value['op'] === 'write' &&
     typeof value['hash'] === 'string' &&
     SHA256.test(value['hash']) &&
     isOldFile(value['old'])
   );
+}
+
+function isOperation(value: unknown): value is JournalOperation {
+  if (!isRaw(value) || !isText(value['path'])) return false;
+  return isLinkOperation(value) || isUnlink(value) || isWriteOperation(value);
 }
 
 /**
@@ -199,6 +224,14 @@ function decideLinkRestore(operation: LinkOperation, observed: Observed): Restor
     : restoreOverBackedUp(operation, old, observed);
 }
 
+// An unlinked path: the old link comes back when nothing is there; a link that is there already (the old one, or another) stays.
+function decideUnlinkRestore(operation: Extract<JournalOperation, { op: 'unlink' }>, observed: Observed): RestoreStep {
+  const { old } = operation;
+  if (observed.kind === 'absent') return { action: 'create-old-link', target: old.target, kind: old.kind };
+  if (observed.kind === 'link' && observed.target === old.target) return { action: 'nothing' };
+  return { action: 'leave', why: NOT_OURS };
+}
+
 function decideWriteRestore(operation: Extract<JournalOperation, { op: 'write' }>, observed: Observed): RestoreStep {
   const { old } = operation;
   if (observed.kind === 'absent') {
@@ -218,12 +251,14 @@ function decideWriteRestore(operation: Extract<JournalOperation, { op: 'write' }
  * @returns the step to perform; `leave` for anything the run did not place
  */
 export function decideRestore(operation: JournalOperation, observed: Observed): RestoreStep {
-  return operation.op === 'link' ? decideLinkRestore(operation, observed) : decideWriteRestore(operation, observed);
+  if (operation.op === 'link') return decideLinkRestore(operation, observed);
+  if (operation.op === 'unlink') return decideUnlinkRestore(operation, observed);
+  return decideWriteRestore(operation, observed);
 }
 
 /**
  * Tells whether a journal belongs to a run that already committed: `install-state.json` lists every journaled path with the target (a
- * link) or hash (a write) the journal names. A kill between the state file's rename and the journal's deletion leaves exactly this,
+ * link) or hash (a write) the journal names, and does not list a path the journal unlinks. A kill between the state file's rename and the journal's deletion leaves exactly this,
  * and replaying such a journal would undo a finished run. A journal with no operation is trivially committed.
  *
  * @param journal - the journal found on disk
@@ -234,11 +269,13 @@ export function isCommitted(
   journal: Journal,
   entries: readonly { readonly path: string; readonly target?: string; readonly hash?: string }[],
 ): boolean {
-  return journal.operations.every((operation) =>
-    entries.some(
+  return journal.operations.every((operation) => {
+    // A removed link is committed when the state no longer lists it.
+    if (operation.op === 'unlink') return !entries.some((entry) => entry.path === operation.path);
+    return entries.some(
       (entry) =>
         entry.path === operation.path &&
         (operation.op === 'link' ? entry.target === operation.target : entry.hash === operation.hash),
-    ),
-  );
+    );
+  });
 }

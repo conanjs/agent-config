@@ -9,39 +9,6 @@ function rotated(cycle: readonly string[]): readonly string[] {
   return [...cycle.slice(start), ...cycle.slice(0, start)];
 }
 
-interface Walk {
-  /** The names from the start of the walk to the current one. */
-  readonly path: readonly string[];
-  /** For each name of the path, the index of the next target to follow. */
-  readonly next: readonly number[];
-}
-
-interface Step {
-  readonly walk: Walk;
-  readonly cycle: readonly string[] | undefined;
-}
-
-// Moves the walk one step: down to the next unfinished target, or back up when the current name has none left. The step carries
-// the cycle when it meets a name that is already on the path. Nothing is changed in place.
-function step(edges: Edges, walk: Walk, finished: ReadonlySet<string>): Step & { readonly done: string | undefined } {
-  const current = walk.path[walk.path.length - 1] ?? '';
-  const targets = [...(edges.get(current) ?? [])].sort();
-  const index = walk.next[walk.next.length - 1] ?? 0;
-  if (index >= targets.length) {
-    return { walk: { path: walk.path.slice(0, -1), next: walk.next.slice(0, -1) }, cycle: undefined, done: current };
-  }
-  const advanced = { path: walk.path, next: [...walk.next.slice(0, -1), index + 1] };
-  const target = targets[index] ?? '';
-  const at = walk.path.indexOf(target);
-  if (at !== -1) return { walk: advanced, cycle: rotated(walk.path.slice(at)), done: undefined };
-  const enter = !finished.has(target) && edges.has(target);
-  return {
-    walk: enter ? { path: [...advanced.path, target], next: [...advanced.next, 0] } : advanced,
-    cycle: undefined,
-    done: undefined,
-  };
-}
-
 /**
  * Finds the cycles of the graph by a depth-first walk that starts from each name in order and follows each edge in order; every
  * back edge it meets is one cycle. Cycles that share no back edge are all found; a graph with many overlapping cycles may print
@@ -53,14 +20,35 @@ function step(edges: Edges, walk: Walk, finished: ReadonlySet<string>): Step & {
 export function findCycles(edges: Edges): readonly (readonly string[])[] {
   const found = new Map<string, readonly string[]>();
   const finished = new Set<string>();
-  for (const root of [...edges.keys()].sort()) {
-    // An explicit stack, so a long chain cannot overflow the call stack.
-    let walk: Walk = { path: finished.has(root) ? [] : [root], next: [0] };
-    while (walk.path.length > 0) {
-      const moved = step(edges, walk, finished);
-      walk = moved.walk;
-      if (moved.done !== undefined) finished.add(moved.done);
-      if (moved.cycle !== undefined) found.set(moved.cycle.join('\0'), moved.cycle);
+  const sorted = new Map([...edges].map(([name, targets]) => [name, [...targets].sort()]));
+  const enterable = (name: string): boolean => !finished.has(name) && edges.has(name);
+  for (const root of [...edges.keys()].sort().filter(enterable)) {
+    if (finished.has(root)) continue;
+    // An explicit stack, so a long chain cannot overflow the call stack; `position` finds a name on the path without a scan.
+    const path: string[] = [root];
+    const next: number[] = [0];
+    const position = new Map<string, number>([[root, 0]]);
+    while (path.length > 0) {
+      const current = path[path.length - 1] ?? '';
+      const index = next[next.length - 1] ?? 0;
+      const target = sorted.get(current)?.[index];
+      if (target === undefined) {
+        finished.add(current);
+        position.delete(current);
+        path.pop();
+        next.pop();
+        continue;
+      }
+      next[next.length - 1] = index + 1;
+      const at = position.get(target);
+      if (at !== undefined) {
+        const cycle = rotated(path.slice(at));
+        found.set(cycle.join('\0'), cycle);
+      } else if (enterable(target)) {
+        position.set(target, path.length);
+        path.push(target);
+        next.push(0);
+      }
     }
   }
   return [...found.entries()].sort(([left], [right]) => (left < right ? -1 : 1)).map(([, cycle]) => cycle);

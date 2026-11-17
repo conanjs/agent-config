@@ -19,7 +19,7 @@ forbidden:
     message: 'tracked file starts with the generated-from line: {path}'
   - rule: build-output-folder
     message: 'tracked file lies in a build-output folder: {path}'
-    folders: [generated/, store/, dist/]
+    folders: [./generated/, ./store/, dist/] # `./` means the repository root only; `dist/` matches at any depth
 exceptions:
   agent-config:
     - entry: scripts/check.sh

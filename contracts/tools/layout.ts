@@ -120,6 +120,14 @@ function startsWithGeneratedLine(text: string): boolean {
   return addGeneratedFromLine(text, 'source.md') === text;
 }
 
+// A folder written `./name/` counts only at the repository root; `name/` counts at any depth (a source folder called `store/` inside
+// a module is code, not build output).
+function inBuildOutputFolder(file: string, folder: string): boolean {
+  return folder.startsWith('./')
+    ? file.startsWith(folder.slice(2))
+    : file.startsWith(folder) || file.includes(`/${folder}`);
+}
+
 function forbidden(rule: ForbiddenRule, view: RepoView): string[] {
   const hits =
     rule.rule === 'generated-from-line'
@@ -127,9 +135,7 @@ function forbidden(rule: ForbiddenRule, view: RepoView): string[] {
           const start = view.startOf(file);
           return start !== undefined && startsWithGeneratedLine(start);
         })
-      : view.tracked.filter((file) =>
-          rule.folders.some((folder) => file.startsWith(folder) || file.includes(`/${folder}`)),
-        );
+      : view.tracked.filter((file) => rule.folders.some((folder) => inBuildOutputFolder(file, folder)));
   return hits.map((file) => message(rule.message, file));
 }
 

@@ -185,6 +185,7 @@ The first cell of each row is the id a task uses in `touches: integration:<id>` 
 | DR-608 | Duplicate YAML keys found in one pass, not by the library | `specs/022-repo-split/research.md` |
 | DR-609 | Test composition as a separate entry; production reads no test variable | `specs/022-repo-split/research.md` |
 | DR-610 | Windows device names refused in ids and path segments | `specs/022-repo-split/research.md` |
+| DR-611 | Privileged entries from a path source hashed by text only (accepted risk) | `specs/022-repo-split/research.md` |
 | PDM-installers-core | Paradigm for the installer core (`installers/core`) | `specs/022-repo-split/research.md` |
 | PDM-contracts-lib | Paradigm for the shared pure rules (`contracts/lib`) | `specs/022-repo-split/research.md` |
 | DR-202 | Home, store and atomic switch | `specs/022-repo-split/research.md` |

@@ -72,7 +72,7 @@ Feature: Hostile input and unattended runs cannot make the installer do harm
     And a snapshot of "home" is taken
     When the tool runs with "install"
     Then it exits with 10
-    And the output has the line "   node tools/kb-search-v2.mjs"
+    And the output has the line "   node [\"tools/kb-search-v2.mjs\"]"
     And since the snapshot, nothing under "home" changed
 
   @pending @T136 @T138 @T142

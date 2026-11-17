@@ -84,6 +84,18 @@ const outputSelectors = [
 ];
 const noProcessOutput = outputSelectors.map((selector) => ({ selector, message: outputMessage }));
 
+// M-05, DR-609: the git adapter's two test seams. `extraEnvironment` adds GIT_CONFIG_* names to git's environment and `hooksPath`
+// replaces the empty hooks path; a production caller giving either could undo the adapter's protections. Only the test entry
+// (outside this config, under the tests folder) and unit tests may give them, so an object property with either
+// name is refused everywhere else in the core.
+const noTestSeams = [
+  {
+    selector:
+      'Property[key.name=/^(extraEnvironment|hooksPath)$/], Property[key.value=/^(extraEnvironment|hooksPath)$/]',
+    message: 'Only the test entry and unit tests give the git adapter extraEnvironment or hooksPath (M-05, DR-609)',
+  },
+];
+
 // PDM-functional-pipeline-R2, CA-7: the core reads the clock through the Clock port.
 const noClockInCore = noClock('Read the time through the Clock port (PDM-functional-pipeline-R2)');
 
@@ -202,6 +214,7 @@ export default defineConfig(
         ...noExitHooks,
         ...noProcessExit,
         ...noProcessOutput,
+        ...noTestSeams,
       ),
       'import-x/no-restricted-paths': [
         'error',
@@ -212,7 +225,9 @@ export default defineConfig(
   {
     // The entry may end the process itself; it still may not listen for the end.
     files: ['core/main.ts'],
-    rules: { 'no-restricted-syntax': restrictedSyntax(...noRawStatusCodes, ...noExitHooks, ...noProcessOutput) },
+    rules: {
+      'no-restricted-syntax': restrictedSyntax(...noRawStatusCodes, ...noExitHooks, ...noProcessOutput, ...noTestSeams),
+    },
   },
   {
     // PDM-functional-pipeline-R1, R2, R5: the pure core is immutable and does no I/O.
@@ -232,6 +247,7 @@ export default defineConfig(
         ...noExitHooks,
         ...noProcessExit,
         ...noProcessOutput,
+        ...noTestSeams,
       ),
     },
   },
@@ -243,7 +259,9 @@ export default defineConfig(
   {
     // The presenter is the only file that may write to a stream; the exit rules still apply to it.
     files: [presenterFile],
-    rules: { 'no-restricted-syntax': restrictedSyntax(...noRawStatusCodes, ...noExitHooks, ...noProcessExit) },
+    rules: {
+      'no-restricted-syntax': restrictedSyntax(...noRawStatusCodes, ...noExitHooks, ...noProcessExit, ...noTestSeams),
+    },
   },
   testBlock(['core/**/*.test.ts']),
   {

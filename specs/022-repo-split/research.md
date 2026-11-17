@@ -16,7 +16,7 @@ Words used once here: **G3** = the plan gate (the human approves `plan.md` and t
 | DR-301 to DR-309 | architecture | this file | New in this run |
 | DR-401 to DR-418 | system-architecture | `decisions/system-architecture.md` §4 | "Contract facts" lines kept as an extra field |
 | DR-501 | qa | `decisions/qa.md` §1 to §3 | The QA file calls it `DR-QA-1`, which is not a valid record id; renumbered here |
-| DR-601 to DR-610, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm, swap everywhere), engineering (parser limits), security (duplicate keys) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
+| DR-601 to DR-611, `PDM-installers-core`, `PDM-contracts-lib` | human (N-1 override, paradigm, swap everywhere), engineering (parser limits), security (duplicate keys) | this file, section "Overrides and additions after G3" | Added after G3, at G4 (2026-11-13); each supersedes a G3 record or clears an unlisted need |
 
 ## Conflicts between the role records, and how precedence resolves them
 
@@ -709,6 +709,17 @@ Measured 2026-11-13 on Node.js v24.22.1 (macOS): a class with `constructor(priva
 - **Supersedes:** none
 - **Narrows:** the id and path rules of contracts/lib (DR-606 era, phase 0): only the device names are added; every other rule stands.
 - **Decided by:** security, engineering · **Approved at:** P6 (2026-11-16)
+
+## DR-611: Privileged entries from a path source are hashed by their text only (accepted risk, narrows M-01)
+- **Tree path:** security review of T136 (finding 2) → M-01 / T-01 for git sources versus path sources.
+- **Criteria:** T-01 (new code behind an unchanged hook command must ask again); a `path` source is V's own folder, linked live (DR-301), so every edit there is V's own; asking again on each save of V's own script would train V to approve without reading.
+- **Options considered:** (A) git sources: the entry hash includes the component's commit, so any update of a component with privileged entries asks again; path sources: the command text alone is hashed | (B) hash every file a command names, for path sources too | (C) hash the text only, for both
+- **Chosen:** (A) — accepted risk for path sources, which hold V's own files.
+- **Rejected:** (B) — a command can name files indirectly, so the hash would be incomplete while asking on every edit; (C) — one push to a git component could run new code without consent (T-01).
+- **Confidence:** medium (accepted risk; revisit if path sources ever come from someone else)
+- **Supersedes:** none
+- **Narrows:** M-01 in decisions/security.md: for path sources only, consent covers the entry text, not the files behind it.
+- **Decided by:** orchestrator, security · **Approved at:** P6 (2026-11-17)
 
 ## PDM-installers-core: Paradigm for the installer core (`installers/core`, clears unlisted need U-2)
 - **Tree path:** PDM-Q1 (greenfield: `installers/core` does not exist yet → NO) → PDM-Q2 (does it own invariants enforced across operations? The cross-checks, such as majors, exports, "plan equals what apply does" and the approved privileged set, are rules over plain data; durable state lives in `components.lock` and `install-state.json`, not in objects with identity and lifecycle → NO) → PDM-Q3 (an input to output transform: files in, a plan as data (DR-306), effects at the edge, a report out → YES) → functional-pipeline. PDM-Q4 not reached; the constitution default is `none`.
