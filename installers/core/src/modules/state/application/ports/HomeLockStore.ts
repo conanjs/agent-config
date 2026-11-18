@@ -35,4 +35,14 @@ export interface HomeLockStore {
    * @returns `removed`, `changed` when the file now holds other text (left alone), or `absent`
    */
   removeIfSame(text: string): 'removed' | 'changed' | 'absent';
+
+  /**
+   * Replaces the text of the lock file by a temporary file and a rename, only while it still holds exactly the old text, so a lock that
+   * another run took over is never overwritten.
+   *
+   * @param oldText - the text this run wrote or last wrote
+   * @param newText - the new text, with a later start
+   * @returns `replaced`, `changed` when the file now holds other text (left alone), or `absent`
+   */
+  replaceIfSame(oldText: string, newText: string): 'replaced' | 'changed' | 'absent';
 }

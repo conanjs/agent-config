@@ -1,7 +1,7 @@
 // M-12, MG-30: the home-wide lock. `install` and `uninstall` wait for it at most 2 seconds; `rerender` only tries. It is released at
 // the end of every run by the command's own `finally`, never by an exit handler: a killed run leaves it, and it goes stale after 10
 // minutes (the pid is informative only).
-import { assessLock, emitLockText, type LockRecord } from '#state/domain/lock/HomeLockRecord.ts';
+import { assessLock, emitLockText, parseLockText, type LockRecord } from '#state/domain/lock/HomeLockRecord.ts';
 import { refuse, succeed, type Result } from '#shared/domain/result/Result.ts';
 import type { Clock } from '#state/application/ports/Clock.ts';
 import type { HomeLockStore } from '#state/application/ports/HomeLockStore.ts';
@@ -95,4 +95,31 @@ export async function acquireHomeLock(
  */
 export function releaseHomeLock(deps: LockDeps, handle: HomeLockHandle): 'removed' | 'changed' | 'absent' {
   return deps.lock.removeIfSame(handle.text);
+}
+
+/**
+ * Tells whether the lock file still holds exactly the text this run wrote, so no other run took it over (M-12).
+ *
+ * @param deps - the lock file and the clock
+ * @param handle - what `acquireHomeLock` returned
+ * @returns true while the lock is this run's
+ */
+export function holdsHomeLock(deps: LockDeps, handle: HomeLockHandle): boolean {
+  const seen = deps.lock.read();
+  return seen.kind === 'file' && seen.text === handle.text;
+}
+
+/**
+ * Moves the start of this run's lock to now, by an atomic rewrite, so a run that waits for V or for a slow fetch does not lose the lock
+ * after ten minutes. A lock that another run has taken is left alone.
+ *
+ * @param deps - the lock file and the clock
+ * @param handle - what `acquireHomeLock` or the last refresh returned
+ * @returns the handle with the new text, or `undefined` when the lock is no longer this run's
+ */
+export function refreshHomeLock(deps: LockDeps, handle: HomeLockHandle): HomeLockHandle | undefined {
+  const seen = parseLockText(handle.text);
+  if (seen === undefined) return undefined;
+  const text = emitLockText({ ...seen, started: deps.clock.now().toISOString() });
+  return deps.lock.replaceIfSame(handle.text, text) === 'replaced' ? { path: handle.path, text } : undefined;
 }

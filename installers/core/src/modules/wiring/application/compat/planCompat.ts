@@ -20,6 +20,18 @@ export interface CompatRequest {
 }
 
 /**
+ * Lists the entries of the agent home that a compatibility link points at, so the install can say which of them it puts there.
+ *
+ * @param userHome - the user's home folder
+ * @param home - the agent home
+ * @param flavor - the path syntax
+ * @returns the home entries in table order, relative to the agent home with `/` separators; a folder or a single file
+ */
+export function compatHomeEntries(userHome: string, home: string, flavor: PathFlavor): readonly string[] {
+  return compatLinkTable(userHome, home, flavor).map((link) => link.homeEntry);
+}
+
+/**
  * Plans the compatibility links: which to create, which to switch, which to put in place of a real entry (with a backup), which to
  * leave, and which to skip.
  *

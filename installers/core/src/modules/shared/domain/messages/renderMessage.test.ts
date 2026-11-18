@@ -1,6 +1,6 @@
 // TR-5: the one message catalogue. Each row below is one row of the catalogue with sample values and the exact text the phase 2
 // scenarios and installer-cli.md "Messages" show for it. A change to any catalogue text must change this table in the same commit.
-// The ids stop at MG-39: MG-40 of that table is the output of two check scripts (scripts/check-local-files.ts and
+// The ids stop at MG-51 (MG-48 to MG-51 were added with the install command, T138): MG-40 of that table is the output of two check scripts (scripts/check-local-files.ts and
 // scripts/check-copilot-paths.ts), not an installer message, so it has no row here.
 // The old Copilot folder is written in two pieces below only so that the sorting check of scripts/copilot-paths.yaml, which counts
 // every line that names it, does not count this file; MessageCatalog.ts is the one recorded line.
@@ -162,6 +162,11 @@ const rows: Row[] = [
     'error: another run holds the lock /h/.agent-config/install.lock (install, started 2026-11-16T09:00:00+07:00)',
   ],
   [
+    'MG-30.hint',
+    {},
+    '   a run that was killed leaves this file behind: wait until it is 10 minutes old, or delete it when no other run is active',
+  ],
+  [
     'MG-31',
     { name: 'kb-g', folder: '/h/src/kb' },
     'error: component kb-g: path source folder /h/src/kb does not exist',
@@ -299,6 +304,14 @@ const rows: Row[] = [
     { name: 'sdlc-x', variable: 'OTS_ROOT' },
     'error: component sdlc-x: variable OTS_ROOT: the description contains credential-like text',
   ],
+  ['MG-48', { operation: 'link', path: '/h/.agent-config/knowledge' }, 'would link: /h/.agent-config/knowledge'],
+  ['MG-49', { name: 'kb-g' }, 'warning: component kb-g is not fetched yet; plan cannot read it, run install'],
+  [
+    'MG-50',
+    { journal: '/h/.agent-config/install-state.pending.json' },
+    'warning: install-state.json is written, but the journal /h/.agent-config/install-state.pending.json could not be deleted; the next run deletes it',
+  ],
+  ['MG-51', { reason: 'EACCES' }, 'warning: install-log.jsonl could not be written: EACCES'],
   ['MG-09.matcher', { matcher: 'Bash' }, '   matcher: Bash'],
   ['MG-09.before-writing', { path: 'frameworks/x/index.md' }, '   before writing: frameworks/x/index.md'],
 ];
@@ -306,13 +319,13 @@ const rows: Row[] = [
 describe('TR-5 message catalogue', () => {
   it('has exactly the rows of the table above, no more and no fewer', () => {
     expect(rows.map(([id]) => id).sort()).toEqual(Object.keys(MESSAGE_CATALOG).sort());
-    expect(rows).toHaveLength(104);
+    expect(rows).toHaveLength(109);
   });
 
-  it('covers MG-01 to MG-39 and MG-41 to MG-47 and nothing above (MG-40 is script output, not a catalogue row)', () => {
+  it('covers MG-01 to MG-39 and MG-41 to MG-51 and nothing above (MG-40 is script output, not a catalogue row)', () => {
     const numbers = new Set(Object.keys(MESSAGE_CATALOG).map((id) => Number(id.slice(3, 5))));
-    expect([...numbers].filter((number) => number > 47 || number === 40)).toEqual([]);
-    const missing = Array.from({ length: 47 }, (_unused, index) => index + 1)
+    expect([...numbers].filter((number) => number > 51 || number === 40)).toEqual([]);
+    const missing = Array.from({ length: 51 }, (_unused, index) => index + 1)
       .filter((number) => number !== 40)
       .filter((number) => !numbers.has(number));
     expect(missing).toEqual([]);

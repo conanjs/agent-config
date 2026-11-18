@@ -1,7 +1,7 @@
 // M-03 names and path fields (plan.md, decisions/security.md). The rules live in contracts/lib; these tests prove the installer's
 // view of them: what is accepted, what is refused, and that no refusal repeats the refused text.
 import { describe, expect, it } from 'vitest';
-import { parseComponentName, parseRelativePath } from '#shared/domain/name/NameRules.ts';
+import { classifyCitationText, parseComponentName, parseRelativePath } from '#shared/domain/name/NameRules.ts';
 
 const secretLooking = 'tok-S3CRET-value';
 
@@ -83,5 +83,37 @@ describe('M-03 relative path fields', () => {
   it('M-03 never repeats a refused path', () => {
     const result = parseRelativePath(`../${secretLooking}`);
     expect(JSON.stringify(result)).not.toContain(secretLooking);
+  });
+});
+
+describe('the citation classifier wrapper', () => {
+  const mounts = [
+    { slot: 'knowledge-storage', location: 'content', mount: 'knowledge' },
+    { slot: 'core', location: 'atlas', mount: 'atlas' },
+    { slot: 'framework', location: 'framework', mount: 'frameworks/{component}' },
+  ];
+
+  it('gives the slot and the path of a citation of a location', () => {
+    expect(classifyCitationText('{{AGENT_HOME}}/knowledge/a/b.md', mounts)).toEqual({
+      kind: 'location',
+      slot: 'knowledge-storage',
+      locationPath: 'knowledge/a/b.md',
+    });
+    expect(classifyCitationText('{{AGENT_HOME}}/frameworks/sdlc/x.md', mounts)).toEqual({
+      kind: 'location',
+      slot: 'framework',
+      locationPath: 'frameworks/sdlc/x.md',
+    });
+  });
+
+  it.each([
+    ['a bare relative path (the own file)', 'docs/a.md'],
+    ['a path under no location', '{{AGENT_HOME}}/nowhere/a.md'],
+    ['a path with a .. segment', '{{AGENT_HOME}}/knowledge/../a.md'],
+    ['a placeholder path (A-24)', '{{AGENT_HOME}}/knowledge/<topic>/a.md'],
+    ['a web address', 'https://example.invalid/a.md'],
+    ['empty text', ''],
+  ])('treats %s as other', (_name, text) => {
+    expect(classifyCitationText(text, mounts)).toEqual({ kind: 'other' });
   });
 });

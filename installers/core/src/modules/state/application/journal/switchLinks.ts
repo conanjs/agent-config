@@ -57,10 +57,18 @@ function clearBackedUp(deps: StateDeps, linkPath: string, backupPath: string): B
  *
  * @param deps - the ports and roots
  * @param journal - the journal that was just written
+ * @param targetRoots - folders outside the home that a link may point into, for `path` sources linked live (see `PlaceRequest`)
+ * @param recordedLinks - links `install-state.json` records, which a later link may point at; links placed earlier in this journal count too
  * @returns what each link became (the report names a degraded one), or the first refusal; a disk failure is thrown
  */
-export function switchLinks(deps: StateDeps, journal: Journal): Result<readonly SwitchedLink[], SwitchFailure> {
+export function switchLinks(
+  deps: StateDeps,
+  journal: Journal,
+  targetRoots: readonly string[] = [],
+  recordedLinks: readonly string[] = [],
+): Result<readonly SwitchedLink[], SwitchFailure> {
   const done: SwitchedLink[] = [];
+  const own = [...recordedLinks];
   for (const operation of journal.operations) {
     if (operation.op === 'unlink') {
       const removed = removeOwnLink(deps, { path: operation.path, target: operation.old.target });
@@ -71,8 +79,14 @@ export function switchLinks(deps: StateDeps, journal: Journal): Result<readonly 
     const kept =
       operation.old.state === 'backed-up' ? clearBackedUp(deps, operation.path, operation.old.backup) : undefined;
     if (kept !== undefined) return refuse({ path: operation.path, refusal: kept });
-    const placed = placeLink(deps, { path: operation.path, target: operation.target, kind: operation.kind });
+    const placed = placeLink(deps, {
+      path: operation.path,
+      target: operation.target,
+      kind: operation.kind,
+      targetRoots,
+    });
     if (!placed.ok) return refuse({ path: operation.path, refusal: placed.error });
+    own.push(operation.path);
     done.push({ path: operation.path, placed: placed.value });
   }
   return succeed(done);

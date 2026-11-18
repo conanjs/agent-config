@@ -13,6 +13,13 @@ const wiring = composeWiring({
 });
 
 describe('the wiring composer', () => {
+  it('lists the home entries that compatibility links point at, including the one file inside a folder', () => {
+    const entries = wiring.compatHomeEntries('/h', '/h/.agent-config', 'posix');
+    expect(entries).toContain('knowledge');
+    expect(entries).toContain('global-variables.md');
+    expect(entries).toContain('instructions/core.instructions.md');
+  });
+
   it('plans links, reads the retired list, decides it and checks consent through the same ports', () => {
     const plan = wiring.planCompat({
       userHome: '/h',

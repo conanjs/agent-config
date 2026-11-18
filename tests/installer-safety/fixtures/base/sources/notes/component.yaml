@@ -1,6 +1,7 @@
 schema: component/v1
 name: notes
 version: 1.0.0
+repository: https://github.com/example/notes
 slot: company-knowledge-storage
 scope: global
 contracts:

@@ -288,6 +288,14 @@ function buildLockStore(core: Core, lockPath: string): HomeLockStore {
       core.nodes.delete(found.key);
       return 'removed';
     },
+    replaceIfSame(oldText, newText) {
+      const found = core.at(lockPath);
+      if (found.node === undefined) return 'absent';
+      if (found.node.kind !== 'file' || found.node.text !== oldText) return 'changed';
+      found.node.text = newText;
+      found.node.mtimeMs = core.clock.time;
+      return 'replaced';
+    },
   };
 }
 

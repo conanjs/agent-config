@@ -82,6 +82,84 @@ describe('placing a link on POSIX', () => {
     });
   });
 
+  it('AC-3.2 allows a target in a folder the caller names, such as a path source, and still refuses one beside it', () => {
+    const machine = posix();
+    machine.disk.seedFolder('/work/kb/content');
+    machine.disk.seedFolder('/work/other');
+    const named = { ...request, target: '/work/kb/content', targetRoots: ['/work/kb'] };
+    expect(placeLink(machine.ports, named)).toMatchObject({ ok: true, value: { how: 'created' } });
+    expect(
+      placeLink(machine.ports, {
+        ...request,
+        path: '/h/.copilot/other',
+        target: '/work/other',
+        targetRoots: ['/work/kb'],
+      }),
+    ).toMatchObject({
+      ok: false,
+      error: { kind: 'outside' },
+    });
+  });
+
+  it('AC-3.2 allows the named folder itself as the target, the way a component whose location is its own root is linked', () => {
+    const machine = posix();
+    machine.disk.seedFolder('/work/sdlc');
+    expect(placeLink(machine.ports, { ...request, target: '/work/sdlc', targetRoots: ['/work/sdlc'] })).toMatchObject({
+      ok: true,
+    });
+  });
+
+  it('M-04 refuses a target that a link inside the named folder carries out of it', () => {
+    const machine = posix();
+    machine.disk.seedFolder('/work/kb');
+    machine.disk.seedFolder('/elsewhere');
+    machine.disk.seedLink('/work/kb/escape', '/elsewhere');
+    expect(
+      placeLink(machine.ports, { ...request, target: '/work/kb/escape', targetRoots: ['/work/kb'] }),
+    ).toMatchObject({ ok: false, error: { kind: 'outside' } });
+  });
+
+  it('M-04 refuses a link of the home, or of an agent folder, that points anywhere unless the installer placed it', () => {
+    const machine = posix();
+    machine.disk.seedFolder('/etc');
+    machine.disk.seedFile('/etc/hosts', 'hosts');
+    machine.disk.seedLink('/h/.agent-config/evil', '/etc');
+    machine.disk.seedLink('/h/.claude/evil2', '/etc');
+    for (const evil of ['/h/.agent-config/evil', '/h/.claude/evil2', '/h/.agent-config/evil/hosts']) {
+      expect(placeLink(machine.ports, { ...request, target: evil })).toMatchObject({
+        ok: false,
+        error: { kind: 'outside' },
+      });
+    }
+  });
+
+  it('M-04 accepts a link the installer placed, as the link, and a dangling name under the home', () => {
+    const machine = posix();
+    machine.disk.seedFolder('/work/kb');
+    machine.disk.seedLink('/h/.agent-config/knowledge', '/work/kb');
+    const own = { ...request, target: '/h/.agent-config/knowledge', ownLinks: ['/h/.agent-config/knowledge'] };
+    expect(placeLink(machine.ports, own)).toMatchObject({ ok: true });
+    expect(
+      placeLink(machine.ports, { ...request, path: '/h/.copilot/other', target: '/h/.agent-config/knowledge' }),
+    ).toMatchObject({
+      ok: false,
+    });
+    expect(
+      placeLink(machine.ports, { ...request, path: '/h/.copilot/dangling', target: '/h/.agent-config/not-yet' }),
+    ).toMatchObject({
+      ok: true,
+    });
+  });
+
+  it('M-04 accepts a file reached through a placed link when it lies in a named folder', () => {
+    const machine = posix();
+    machine.disk.seedFile('/work/repo/instructions/core.md', 'core');
+    machine.disk.seedLink('/h/.agent-config/instructions', '/work/repo/instructions');
+    const target = '/h/.agent-config/instructions/core.md';
+    expect(placeLink(machine.ports, { ...request, target })).toMatchObject({ ok: false });
+    expect(placeLink(machine.ports, { ...request, target, targetRoots: ['/work/repo'] })).toMatchObject({ ok: true });
+  });
+
   it('M-04 refuses a link path below a link that leaves its root', () => {
     const machine = posix();
     machine.disk.seedFolder('/outside');

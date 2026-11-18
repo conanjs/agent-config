@@ -1,6 +1,6 @@
 // The composer of the wiring module (MOD-11): it receives the adapters from the composition root (T142) and returns the use cases with
 // their ports filled in. It imports no adapter itself.
-import { planCompat } from '#wiring/application/compat/planCompat.ts';
+import { compatHomeEntries, planCompat } from '#wiring/application/compat/planCompat.ts';
 import { planRetired } from '#wiring/application/compat/planRetired.ts';
 import { readRetiredList } from '#wiring/application/compat/readRetiredList.ts';
 import { renderRetired } from '#wiring/application/compat/renderRetired.ts';
@@ -30,6 +30,7 @@ export interface WiringPorts {
 export function composeWiring(ports: WiringPorts): WiringApi {
   return {
     planCompat: (request) => planCompat(ports.observer, request),
+    compatHomeEntries,
     readRetiredList: (text, userHome, flavor) => readRetiredList(text, ports.readYaml, userHome, flavor),
     planRetired: (request) => planRetired(ports.observer, ports.hookFiles, request),
     checkPrivileged,

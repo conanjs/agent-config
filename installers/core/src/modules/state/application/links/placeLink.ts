@@ -2,7 +2,7 @@
 // the account cannot make a symbolic link. A path that holds a real file or folder is never replaced here (the caller backed it up
 // and said so in the journal).
 import { refuse, succeed, type Result } from '#shared/domain/result/Result.ts';
-import { containIn } from '#state/application/files/containIn.ts';
+import { containIn, containLinkTarget } from '#state/application/files/containIn.ts';
 import type { LinkKind } from '#state/application/ports/Links.ts';
 import type { StateDeps } from '#state/application/StateDeps.ts';
 
@@ -32,6 +32,14 @@ export interface PlaceRequest {
   readonly target: string;
   /** The kind asked for. */
   readonly kind: LinkKind;
+  /**
+   * Folders outside the home that the target may lie in: the folder of a `path` source or the checkout of agent-config, linked live
+   * (AC-3.2). The caller has checked them against the user's home and the agent home (M-03); a target outside the home and outside
+   * these is refused (M-04). Left out, only the home and the agent folders are allowed.
+   */
+  readonly targetRoots?: readonly string[];
+  /** Links of the home that the installer placed itself, which this link may point at without following them (see `TargetAllowance`). */
+  readonly ownLinks?: readonly string[];
 }
 
 // The first rung that works. POSIX has one rung; Windows tries a symbolic link, then a junction (folders only), then a copy (files).
@@ -75,7 +83,10 @@ function createOnLadder(
 export function placeLink(deps: StateDeps, request: PlaceRequest): Result<PlacedLink, LinkRefusal> {
   const link = containIn(deps, request.path, 'keep-link');
   if (!link.ok) return refuse({ kind: 'outside', reason: link.error.reason });
-  const target = containIn(deps, request.target, 'follow-link');
+  const target = containLinkTarget(deps, request.target, {
+    targetRoots: request.targetRoots ?? [],
+    ownLinks: request.ownLinks ?? [],
+  });
   if (!target.ok) return refuse({ kind: 'outside', reason: target.error.reason });
   const present = deps.fs.stat(link.value);
   if (present === undefined) {

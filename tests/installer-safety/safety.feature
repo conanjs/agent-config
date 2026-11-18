@@ -87,6 +87,44 @@ Feature: Re-running is safe, failures keep the old state, and V can inspect and 
       | schema  | in "sources/notes/component.yaml", `schema: component/v1` becomes `schema: component/v9`                          | error: check failed: schema: notes: component.yaml is not a valid component/v1 manifest |
       | exports | in "sources/notes/component.yaml", `exports: []` becomes `exports: [companies/missing.md]`                         | error: check failed: exports: notes: exported path companies/missing.md does not exist |
 
+  @pending @T138 @T142
+  Scenario: AC-7.2 A failed install never writes components.lock or install-state.json
+    Given the tool runs with "install"
+    And the file "home/.agent-config/components.lock" is remembered
+    And the file "home/.agent-config/install-state.json" is remembered
+    And in "sources/notes/component.yaml", `schema: component/v1` becomes `schema: component/v9`
+    When the tool runs with "install"
+    Then it exits with 1
+    And the output has the line "error: check failed: schema: notes: component.yaml is not a valid component/v1 manifest"
+    And the file "home/.agent-config/components.lock" is as remembered
+    And the file "home/.agent-config/install-state.json" is as remembered
+
+  # DR-418 option A (research.md): a component that fails a check goes back to its previous version; the others switch in the same apply.
+  # Both components are path sources, so their links are live; the visible change of the passing one is its edited file.
+  @pending @T134 @T138 @T142
+  Scenario: AC-7.2 One path component fails its schema check, the other component's change is still applied
+    Given the tool runs with "install"
+    And the links under "home" are recorded
+    And in "sources/notes/component.yaml", `schema: component/v1` becomes `schema: component/v9`
+    And in "sources/extras/component.yaml", `version: 1.0.0` becomes `version: 1.1.0`
+    And in "sources/extras/companies/extras/index.md", `Extras of the local source.` becomes `Extras of the new version.`
+    When the tool runs with "install"
+    Then it exits with 1
+    And the output has the line "error: check failed: schema: notes: component.yaml is not a valid component/v1 manifest"
+    And the links under "home" are as recorded
+    And the file "home/.agent-config/companies/notes/index.md" contains exactly:
+      """
+      # notes
+
+      Notes of the local source.
+      """
+    And the file "home/.agent-config/companies/extras/index.md" contains exactly:
+      """
+      # extras
+
+      Extras of the new version.
+      """
+
   @pending @T138 @T142 @T133
   Scenario: AC-7.2 A git component whose new commit fails its schema stays on the commit it had
     Given a local git source "gitnotes" with these files:

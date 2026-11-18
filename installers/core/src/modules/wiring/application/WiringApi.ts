@@ -26,6 +26,16 @@ export interface WiringApi {
   planCompat(request: CompatRequest): WiringCompatPlan;
 
   /**
+   * Lists the entries of the agent home that compatibility links point at.
+   *
+   * @param userHome - the user's home folder
+   * @param home - the agent home
+   * @param flavor - the path syntax
+   * @returns the entries relative to the agent home, with `/` separators
+   */
+  compatHomeEntries(userHome: string, home: string, flavor: PathFlavor): readonly string[];
+
+  /**
    * Reads `compat.yaml` of the agent-config checkout.
    *
    * @param text - the file, or `undefined` when there is none

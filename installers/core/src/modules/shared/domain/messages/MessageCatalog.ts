@@ -73,6 +73,8 @@ export const MESSAGE_CATALOG = {
   'MG-28': 'error: component {name} needs node {range}, found {version}',
   'MG-29': 'error: tag moved: component {name}, tag {tag}, locked {locked}, now {current}',
   'MG-30': 'error: another run holds the lock {lock} ({command}, started {started})',
+  'MG-30.hint':
+    '   a run that was killed leaves this file behind: wait until it is 10 minutes old, or delete it when no other run is active',
   'MG-31': 'error: component {name}: path source folder {folder} does not exist',
   'MG-31.refused': 'error: component {name}: path source folder {folder} is refused: {reason} (M-03)',
   'MG-32': 'error: component {name}: cannot fetch git source {url} (ref {ref})',
@@ -123,6 +125,11 @@ export const MESSAGE_CATALOG = {
   'MG-45': 'error: component {name}: suggested source refused: it contains credential-like text',
   'MG-46': 'error: component {name}: git source refused: {reason}',
   'MG-47': 'error: component {name}: variable {variable}: the description contains credential-like text',
+  'MG-48': 'would {operation}: {path}',
+  'MG-49': 'warning: component {name} is not fetched yet; plan cannot read it, run install',
+  'MG-50':
+    'warning: install-state.json is written, but the journal {journal} could not be deleted; the next run deletes it',
+  'MG-51': 'warning: install-log.jsonl could not be written: {reason}',
 } as const;
 
 /** The id of one row of {@link MESSAGE_CATALOG}. */

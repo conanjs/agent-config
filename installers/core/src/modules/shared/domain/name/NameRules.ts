@@ -4,6 +4,7 @@
 import { idProblem, relativePathProblem } from '../../../../../../../contracts/lib/value-problems.ts';
 import { refuse, succeed, type Result } from '#shared/domain/result/Result.ts';
 import { readContract } from '../../../../../../../contracts/lib/reader.ts';
+import { classifyCitation } from '../../../../../../../contracts/lib/citations.ts';
 import { MAX_YAML_BYTES, readYaml } from '../../../../../../../contracts/lib/yaml.ts';
 import type { Finding } from '../../../../../../../contracts/lib/shape.ts';
 
@@ -82,4 +83,47 @@ export function parseContractFile(id: string, text: string): ContractParse {
     return { ok: false, findings: [{ field: '(document)', message: 'must be a mapping of keys to values' }], value };
   }
   return { ok: true, value: value as Readonly<Record<string, unknown>>, warnings: verdict.warnings };
+}
+
+/** One mount of a slot location, as the citation classifier needs it. */
+export interface CitationMount {
+  /** The slot that owns the location. */
+  readonly slot: string;
+  /** The location's name inside the slot. */
+  readonly location: string;
+  /** The path of the mount below the agent home, `/` separators; a segment `{component}` stands for the filling component's name. */
+  readonly mount: string;
+}
+
+/** What one Markdown link text turned out to be (FR-023, AC-5.10). */
+export type CitationClass =
+  | {
+      /** A citation of a location of another slot or of this one: `{{AGENT_HOME}}/<mount>/<path>`. */
+      readonly kind: 'location';
+      /** The slot whose longest mount prefixes the path. */
+      readonly slot: string;
+      /** The text after `{{AGENT_HOME}}/`, which is what `provides.exports` lists. */
+      readonly locationPath: string;
+    }
+  | {
+      /** Anything else: the component's own file, a placeholder path (A-24), a path under no location, or not a citation at all. */
+      readonly kind: 'other';
+    };
+
+/** The text every citation of another component starts with. */
+export const CITATION_PREFIX = '{{AGENT_HOME}}/';
+
+/**
+ * Classifies the text of one Markdown link through the contract classifier of contracts/lib, so the installer, `build cite` and the
+ * renderer share one rule table (DR-304). A path under no location or with an unsafe segment is `other`: `build cite` reports it at
+ * write time, so the installer neither fails on it nor treats it as a citation.
+ *
+ * @param text - the link text exactly as written
+ * @param mounts - every mount of slots/v1
+ * @returns a location citation with its slot and path, or `other`
+ */
+export function classifyCitationText(text: string, mounts: readonly CitationMount[]): CitationClass {
+  const result = classifyCitation(text, mounts);
+  if (!result.ok || result.citation.kind !== 'location') return { kind: 'other' };
+  return { kind: 'location', slot: result.citation.slot, locationPath: text.slice(CITATION_PREFIX.length) };
 }

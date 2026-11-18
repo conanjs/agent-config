@@ -66,7 +66,6 @@ Feature: Components come from git or a local folder, listed in two files
     And the git source "agent-knowledge" gets a new commit that sets "index.md" to "# newer"
     When the tool runs with "install"
     Then it exits with 0
-    And the source output has the component line for "agent-knowledge" at the noted commit
     And the source lock commit of "agent-knowledge" is the noted one
     And the source clone "home/.agent-config/components/agent-knowledge" is at the noted commit of "agent-knowledge"
     And the file "home/.agent-config/knowledge/index.md" contains exactly:

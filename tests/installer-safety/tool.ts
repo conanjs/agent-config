@@ -211,6 +211,13 @@ Given('the file {string} is remembered', function (this: unknown, file: string) 
   ((world.remembered ??= {}).files ??= new Map()).set(file, sha(world.at(file)));
 });
 
+Then('the file {string} is as remembered', function (this: unknown, file: string) {
+  const world = as(this);
+  const want = world.remembered?.files?.get(file);
+  assert.ok(want, `"${file}" was not remembered`);
+  assert.equal(sha(world.at(file)), want);
+});
+
 Then('the backup {string} holds the remembered file {string}', function (this: unknown, stamp: string, file: string) {
   const world = as(this);
   const want = world.remembered?.files?.get(file);

@@ -47,5 +47,15 @@ export function fileHomeLockStore(lockPath: string): HomeLockStore {
       fs.unlinkSync(lockPath);
       return 'removed';
     },
+    replaceIfSame(oldText, newText) {
+      const seen = read();
+      if (seen.kind === 'absent') return 'absent';
+      if (seen.kind !== 'file' || seen.text !== oldText) return 'changed';
+      const temporary = `${lockPath}.tmp`;
+      fs.rmSync(temporary, { force: true });
+      fs.writeFileSync(temporary, newText, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+      fs.renameSync(temporary, lockPath);
+      return 'replaced';
+    },
   };
 }

@@ -5,6 +5,12 @@ import type { FileRefusal } from '#state/application/files/atomicFiles.ts';
 import type { Loaded, StateFileFailure } from '#state/application/files/stateFiles.ts';
 import type { EnsureRefusal } from '#state/application/home/ensureFolder.ts';
 import type { UnlinkRefusal, UnlinkRequest } from '#state/application/links/removeOwnLink.ts';
+import type {
+  ManagedFolder,
+  ManagedTreeRefusal,
+  StagedTree,
+  StageRequest,
+} from '#state/application/store/managedTrees.ts';
 import type { HomeFolderRefusal } from '#state/application/home/createHomeFolder.ts';
 import type { RestoreFailure, RestoreOutcome } from '#state/application/journal/restoreJournal.ts';
 import type { SwitchedLink, SwitchFailure } from '#state/application/journal/switchLinks.ts';
@@ -47,6 +53,22 @@ export interface StateApi {
    * @returns what happened to the file
    */
   releaseLock(handle: HomeLockHandle): 'removed' | 'changed' | 'absent';
+
+  /**
+   * Tells whether the lock file still holds exactly this run's text.
+   *
+   * @param handle - what `acquireLock` or `refreshLock` returned
+   * @returns false when another run took the lock over (it was stale) or the file is gone
+   */
+  holdsLock(handle: HomeLockHandle): boolean;
+
+  /**
+   * Moves the start written in this run's lock to now by an atomic rewrite, after a prompt or a long fetch.
+   *
+   * @param handle - what `acquireLock` or the last `refreshLock` returned
+   * @returns the handle to use from now on, or `undefined` when the lock was lost
+   */
+  refreshLock(handle: HomeLockHandle): HomeLockHandle | undefined;
 
   /**
    * Loads `components.lock` from the home, if the previous run left one.
@@ -107,9 +129,15 @@ export interface StateApi {
    * Switches every link of the journal in order.
    *
    * @param journal - the journal that was just written
+   * @param targetRoots - folders outside the home that a link may point into: the folder of each `path` source and the agent-config checkout
+   * @param recordedLinks - the links `install-state.json` records, which another link may point at
    * @returns what each link became, or the first refusal
    */
-  switchLinks(journal: StateJournal): Result<readonly SwitchedLink[], SwitchFailure>;
+  switchLinks(
+    journal: StateJournal,
+    targetRoots?: readonly string[],
+    recordedLinks?: readonly string[],
+  ): Result<readonly SwitchedLink[], SwitchFailure>;
 
   /**
    * Restores the previous state from the journal of an interrupted run, at the start of `install` and in `doctor`.
@@ -123,9 +151,17 @@ export interface StateApi {
    *
    * @param lock - the new `components.lock`
    * @param state - the new `install-state.json`
-   * @returns `committed`, or why a file was refused
+   * @returns `committed`, `journal-kept` when both files are written but the journal could not be deleted, or why a file was refused
    */
-  commit(lock: StateComponentsLock, state: StateInstallState): Result<'committed', StateFileFailure>;
+  commit(lock: StateComponentsLock, state: StateInstallState): Result<'committed' | 'journal-kept', StateFileFailure>;
+
+  /**
+   * Hashes the text that `commit` writes for a lock, so the journal and the install state can name `components.lock` as a file the run writes.
+   *
+   * @param lock - the lock the run will commit
+   * @returns the SHA-256 of the file text, 64 hex characters
+   */
+  lockHash(lock: StateComponentsLock): string;
 
   /**
    * Copies what is about to be replaced or rewritten into a new backup folder with a manifest; makes no folder when nothing exists.
@@ -149,6 +185,23 @@ export interface StateApi {
    * @returns what happened, or why the path was refused
    */
   appendLog(entry: StateLogEntry): Result<'appended' | 'rotated-and-appended', string>;
+
+  /**
+   * Copies the checked-out clone of a git component into `store/<name>@<id>/` without `.git`, or reuses the tree that is there.
+   *
+   * @param request - the clone folder, the component name and the 12 hex characters of the id
+   * @returns the tree and whether it was made now, or why it was refused
+   */
+  stageTree(request: StageRequest): Result<StagedTree, ManagedTreeRefusal>;
+
+  /**
+   * Deletes one store tree or one managed clone as a whole: a tree this run staged when a check fails, or the clone of a component
+   * that left both lists.
+   *
+   * @param folder - which tree or clone
+   * @returns `removed`, `absent`, or why it was refused
+   */
+  removeManagedFolder(folder: ManagedFolder): Result<'removed' | 'absent', ManagedTreeRefusal>;
 
   /**
    * Deletes store trees older than the current and previous one of each component.

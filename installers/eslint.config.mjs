@@ -81,6 +81,11 @@ const outputSelectors = [
   "CallExpression[callee.property.name=/^(writeSync|write)$/][arguments.0.type='Literal'][arguments.0.raw=/^[12]$/]",
   "CallExpression[callee.name=/^(writeSync|write)$/][arguments.0.type='Literal'][arguments.0.raw=/^[12]$/]",
   'Property[key.name=/^(stdio|stdout|stderr)$/] Literal[raw=/^(1|2|\'inherit\'|"inherit")$/]',
+  // A default import of node:process names the same object as `process`, so `proc.stdout.write` would pass the rules above.
+  'ImportDeclaration[source.value=/^(node:)?process$/] > ImportDefaultSpecifier',
+  // The console by its device name: `/dev/stdout`, `/dev/stderr`, `/dev/tty` and `CON`, written with the fs functions that take a path.
+  "CallExpression[callee.property.name=/^(writeFileSync|appendFileSync|writeSync|openSync|createWriteStream)$/][arguments.0.type='Literal'][arguments.0.value=/^(\\/dev\\/(stdout|stderr|tty|fd\\/[12])|CON)$/]",
+  "CallExpression[callee.name=/^(writeFileSync|appendFileSync|writeSync|openSync|createWriteStream)$/][arguments.0.type='Literal'][arguments.0.value=/^(\\/dev\\/(stdout|stderr|tty|fd\\/[12])|CON)$/]",
 ];
 const noProcessOutput = outputSelectors.map((selector) => ({ selector, message: outputMessage }));
 

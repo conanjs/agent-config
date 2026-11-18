@@ -77,6 +77,17 @@ describe('the process rules', () => {
     ['a named import of stdout', "import { stdout } from 'node:process';\nstdout.write('x');\n"],
     ['a renamed import of stderr from process', "import { stderr as e } from 'process';\ne.write('x');\n"],
     ['a namespace import of node:process', "import * as p from 'node:process';\np.stdout.write('x');\n"],
+    ['a default import of node:process', "import proc from 'node:process';\nproc.stdout.write('x');\n"],
+    ['a default import of process', "import proc from 'process';\nproc['stderr'].write('x');\n"],
+    ['fs.writeFileSync to /dev/stdout', "import fs from 'node:fs';\nfs.writeFileSync('/dev/stdout', 'x');\n"],
+    ['fs.writeFileSync to /dev/stderr', "import fs from 'node:fs';\nfs.writeFileSync('/dev/stderr', 'x');\n"],
+    ['fs.appendFileSync to /dev/tty', "import fs from 'node:fs';\nfs.appendFileSync('/dev/tty', 'x');\n"],
+    ['fs.writeSync to /dev/fd/1', "import fs from 'node:fs';\nfs.writeSync(fs.openSync('/dev/fd/1', 'w'), 'x');\n"],
+    ['fs.writeFileSync to CON', "import fs from 'node:fs';\nfs.writeFileSync('CON', 'x');\n"],
+    [
+      'a named writeFileSync to /dev/stdout',
+      "import { writeFileSync } from 'node:fs';\nwriteFileSync('/dev/stdout', 'x');\n",
+    ],
     ['a computed process access', "process['stdout'].write('x');\n"],
     ['a computed access through globalThis', "globalThis['process'].stdout.write('x');\n"],
     ['globalThis.process', "globalThis.process.stdout.write('x');\n"],
@@ -106,6 +117,7 @@ describe('the process rules', () => {
 describe('what the process rules leave alone', () => {
   it.each([
     ['process.exitCode', 'process.exitCode = 1;\n'],
+    ['fs.writeFileSync to an ordinary file', "import fs from 'node:fs';\nfs.writeFileSync('/tmp/x.txt', 'x');\n"],
     ['process.env', "export const home = process.env['HOME'];\n"],
     ['process.platform', 'export const platform = process.platform;\n'],
     [
