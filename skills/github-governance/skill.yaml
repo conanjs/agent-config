@@ -1,0 +1,4 @@
+schema: skill-source/v1
+name: github-governance
+description: "Add standard GitHub repo governance to a repo: CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CODEOWNERS, issue and PR templates, branch protection. Use when asked to add governance or community files to a repository."
+targets: [claude, agents]

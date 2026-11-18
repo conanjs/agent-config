@@ -1,11 +1,11 @@
 # agent-config: rules for working in this repo
 
-These apply only when working in this repository. The global instructions every agent loads are `copilot/instructions/core.instructions.md`.
+These apply only when working in this repository. The global instructions every agent loads are `home/instructions/core.instructions.md`.
 
 - **Knowledge base (`copilot/knowledge/`):** every new doc follows `copilot/frameworks/knowledge/schemas/_system.md`: a typed `knowledge-doc/v1`, or a free-form `deep-dive/v1` for "deep dive" or "thorough" requests, later synthesized into typed docs. `node copilot/frameworks/knowledge/tools/validate-knowledge.mjs` must pass. Docs without a `schema:` key are legacy: never retrofit them.
-- **Company KBs (`copilot/companies/`):** read `copilot/frameworks/company-kb/schemas/_system.md` before writing or editing a doc there; it also defines the two repo layouts (flat or grouped by project).
-- **Patterns (`copilot/patterns/`):** a new pattern file follows `copilot/patterns/pattern.schema.md`.
-- **Before committing** any change under `copilot/knowledge/` or `copilot/procedures/`, and always for text drafted in another AI chat: use the `review-docs` skill (`copilot/procedures/review-docs.procedure.md`), validators first, then the checks they cannot do.
-- **Installers** (`installers/install.sh`, `.ps1`, `uninstall.*`): backups land at `~/.agent-config-backups/<timestamp>/` (`%USERPROFILE%\.agent-config-backups\<timestamp>\` on Windows). `SETUP.md` and the README's Usage section describe the mechanism; `copilot/patterns/backup-before-overwrite.pattern.md` is the general technique.
+- **Company KBs (`home/companies/`):** read `home/frameworks/company-kb/schemas/_system.md` before writing or editing a doc there; it also defines the two repo layouts (flat or grouped by project).
+- **Patterns (`home/patterns/`):** a new pattern file follows `home/patterns/pattern.schema.md`.
+- **Before committing** any change under `copilot/knowledge/` or `home/procedures/`, and always for text drafted in another AI chat: use the `review-docs` skill (`home/procedures/review-docs.procedure.md`), validators first, then the checks they cannot do.
+- **Installers** (`installers/install.sh`, `.ps1`, `uninstall.*`): backups land at `~/.agent-config-backups/<timestamp>/` (`%USERPROFILE%\.agent-config-backups\<timestamp>\` on Windows). `SETUP.md` and the README's Usage section describe the mechanism; `home/patterns/backup-before-overwrite.pattern.md` is the general technique.
 - **Measuring agent behavior or token cost** (instruction wordings, loading designs, benchmarks): run the tests only on Codex CLI or Copilot CLI with a cheap model, for example `codex exec -m gpt-6-luna` or `copilot --model gpt-5.4-mini`. Do not use Claude Code, or Opus, Sonnet or `gpt-6.1-sol`, unless V asks: these runs spend V's own subscription limits and AI credits. Name the agent and model in every recorded finding, and note that a cheap model may behave differently from the models V uses daily. The method is in `proposals/instruction-loading.md` section 6; record wording results in `copilot/knowledge/ai-agents/instruction-wording-findings.md`.
 - **Checks:** `scripts/check-docs.sh` runs every validator and the test suites; run it before committing.

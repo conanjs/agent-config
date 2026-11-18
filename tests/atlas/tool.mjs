@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { codesFromCalls, registerTool, repo } from '../support/tools.mjs';
 
-const tool = 'copilot/atlas/tools/atlas.mjs';
+const tool = 'home/atlas/tools/atlas.mjs';
 
 registerTool('atlas', {
   fixture: 'tests/atlas/fixtures/base',
@@ -13,5 +13,5 @@ registerTool('atlas', {
   header: /^atlas validate: /,
   quietPass: 'PASS (0 warning(s))',
   codes: () => codesFromCalls(tool),
-  rules: 'copilot/atlas/schemas',
+  rules: 'home/atlas/schemas',
 });

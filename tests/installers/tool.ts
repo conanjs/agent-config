@@ -25,15 +25,23 @@ function listPlan(world: PlanWorld, repoRoot: string, os: string): void {
 
 Given('a copy of the old installers and their mapping in {string}', function (this: PlanWorld, dir: string) {
   // plan.sh derives the repo from its own location and reads installers/ and mapping.yaml there.
-  for (const entry of ['installers', 'mapping.yaml', planScript]) {
+  // scripts/build.mjs is copied, not linked: it finds the repo from its own path.
+  for (const entry of ['installers', 'mapping.yaml', 'scripts/build.mjs', planScript]) {
     const to = path.join(this.at(dir), entry);
     fs.mkdirSync(path.dirname(to), { recursive: true });
     fs.cpSync(path.join(repo, entry), to, { recursive: true });
   }
   // The installer opens every mapping source, so each top-level source folder or file is a link to the real one.
   const mapping = fs.readFileSync(path.join(repo, 'mapping.yaml'), 'utf8');
-  const tops = new Set([...mapping.matchAll(/source: *([^,\s]+),/g)].map((m) => (m[1] ?? '').split('/')[0] ?? ''));
+  // The build reads the sources, the adapters and the vendored YAML library, so those are linked too.
+  const sources = [...mapping.matchAll(/source: *([^,\s]+),/g)].map((m) => m[1] ?? '');
+  const tops = new Set([...sources.filter((s) => !s.startsWith('../')).map((s) => s.split('/')[0] ?? ''), 'contracts', 'skills', 'agents', 'adapters', 'components.yaml']);
   for (const top of tops) fs.symlinkSync(path.join(repo, top), path.join(this.at(dir), top));
+  // A sibling component (../agent-knowledge) becomes a link next to the copy, to the real sibling.
+  for (const sibling of new Set(sources.filter((s) => s.startsWith('../')).map((s) => s.split('/')[1] ?? ''))) {
+    const at = path.join(this.at(dir), '..', sibling);
+    if (!fs.existsSync(at)) fs.symlinkSync(path.join(repo, '..', sibling), at);
+  }
 });
 
 When("the old installers' plan for {string} is listed", function (this: PlanWorld, os: string) {

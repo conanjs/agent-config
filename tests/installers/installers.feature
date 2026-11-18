@@ -279,15 +279,14 @@ Feature: Bash installers
 
   # ---- pinned as found -----------------------------------------------------------------------------------
 
-  Scenario: A mapping entry whose source does not exist still gets a symlink, which dangles
-    # Pinned as found: specs/008-installer-tests/research.md, finding F-3.
+  Scenario: A mapping entry whose source does not exist is skipped with a warning, so no link dangles
+    # Was F-3 (specs/008-installer-tests/research.md: a dangling link); changed when sibling components (../agent-knowledge) arrived.
     Given in "repo/mapping.yaml", `source: copilot/knowledge,` becomes `source: copilot/knowledgebase,`
     When the tool runs with "install.sh"
     Then it exits with 0 and prints:
       """
       Installing agent-config from {root}/repo (macOS)
       [symlink] copilot/knowledgebase -> ~/.copilot/knowledge
-        symlinked {root}/home/.copilot/knowledge -> {root}/repo/copilot/knowledgebase
       [symlink] claude/CLAUDE.md -> ~/.claude/CLAUDE.md
         symlinked {root}/home/.claude/CLAUDE.md -> {root}/repo/claude/CLAUDE.md
       [seed-once] claude/settings.json -> ~/.claude/settings.json
@@ -297,5 +296,6 @@ Feature: Bash installers
       [symlink] skills -> ~/.agents/skills
         symlinked {root}/home/.agents/skills -> {root}/repo/skills
       Done.
+        WARNING: {root}/repo/copilot/knowledgebase not found (clone or copy it next to this repo, see SETUP.md), skipped
       """
-    And "home/.copilot/knowledge" is a symlink to "repo/copilot/knowledgebase"
+    And "home/.copilot/knowledge" does not exist

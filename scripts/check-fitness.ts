@@ -1,5 +1,5 @@
 // The architecture fitness check (specs/022 T081; requirements: tests/fitness/fitness.feature, AC-1.6, FR-008).
-// It reads the architecture map from copilot/atlas/atlas.yaml and the recorded counts from docs/baselines/fitness.json and
+// It reads the architecture map from home/atlas/atlas.yaml and the recorded counts from docs/baselines/fitness.json and
 // fails in four cases: a declared edge the map forbids (FIT-1), a count of mentions that cross a component boundary
 // above its recorded baseline (FIT-2), a count the baseline lists under `hard-zero` that is above 0 whatever the baseline records (FIT-6), and an atlas edge that docs/architecture.md (its `layers` block, `may-depend-on`) does not
 // draw (FIT-4), or the reverse (FIT-5). A count below its baseline passes; lowering the baseline is a human edit.
@@ -27,7 +27,7 @@ import { readYaml } from '#contracts/lib/yaml.ts';
 /** Version of this tool, written into the baseline file with the method (T082). */
 export const TOOL_VERSION = '1';
 
-const ATLAS_FILE = 'copilot/atlas/atlas.yaml';
+const ATLAS_FILE = 'home/atlas/atlas.yaml';
 const BASELINE_FILE = 'docs/baselines/fitness.json';
 const ARCHITECTURE_FILE = 'docs/architecture.md';
 const CHECKS_COUNT = 'checks-reading-other-areas';
@@ -168,7 +168,7 @@ function readEdges(key: string, raw: unknown, known: ReadonlySet<string>, wildca
 /**
  * Reads the architecture map out of the atlas text.
  *
- * @param text - the contents of copilot/atlas/atlas.yaml
+ * @param text - the contents of home/atlas/atlas.yaml
  * @returns the registry, or the problems that make the map unusable
  */
 export function readRegistry(text: string): Parsed<Registry> {

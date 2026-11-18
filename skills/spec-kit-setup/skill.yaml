@@ -1,0 +1,4 @@
+schema: skill-source/v1
+name: spec-kit-setup
+description: "Set up spec-driven development (GitHub Spec Kit) for a project: install, initialize and run the workflow. Use when asked to set up Spec Kit, spec-driven development or /speckit commands for a repo."
+targets: [claude, agents]

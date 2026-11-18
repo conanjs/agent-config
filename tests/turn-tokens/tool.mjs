@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { registerTool, repo } from '../support/tools.mjs';
 
-const tool = 'copilot/hooks/turn-tokens/turn-tokens.mjs';
-const schema = 'copilot/hooks/turn-tokens/turn-tokens.schema.md';
+const tool = 'home/hooks/turn-tokens/turn-tokens.mjs';
+const schema = 'home/hooks/turn-tokens/turn-tokens.schema.md';
 
 registerTool('turn-tokens', {
   fixture: 'tests/turn-tokens/fixtures/base',
@@ -25,5 +25,5 @@ registerTool('turn-tokens', {
   quietPass: '',
   // The tool prints no rule codes; every TT rule of its schema must still be named by a scenario (TST-14).
   codes: () => [...fs.readFileSync(path.join(repo, schema), 'utf8').matchAll(/^\| (TT-\d+) \|/gm)].map((m) => m[1]),
-  rules: 'copilot/hooks/turn-tokens',
+  rules: 'home/hooks/turn-tokens',
 });

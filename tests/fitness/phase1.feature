@@ -25,7 +25,7 @@ Feature: Knowledge mentions of agentic-sdlc are a hard zero
 
   Background:
     Given the base fixture tree of "fitness"
-    And in "copilot/atlas/atlas.yaml", `mention: "agentic-sdlc" }` becomes `mention: "agentic-sdlc", mention-in: { knowledge: 'agentic-sdlc(?!-reference)' } }`
+    And in "home/atlas/atlas.yaml", `mention: "agentic-sdlc" }` becomes `mention: "agentic-sdlc", mention-in: { knowledge: 'agentic-sdlc(?!-reference)' } }`
     And the file "knowledge/a.md" contains:
       """
       Roles are described elsewhere.
@@ -132,7 +132,7 @@ Feature: Knowledge mentions of agentic-sdlc are a hard zero
 
   @T113
   Scenario: AC-9.1 The real atlas does not count the reference repository as a mention
-    Then the real file "copilot/atlas/atlas.yaml" has a line containing "agentic-sdlc(?!-reference)"
+    Then the real file "home/atlas/atlas.yaml" has a line containing "agentic-sdlc(?!-reference)"
 
   @T097 @T102 @T103 @T104 @T105 @T106 @T107 @T108 @T109 @T110 @T111 @T112 @T113
   Scenario: AC-9.1 SC-012 The real tree passes with every hard-zero count at 0
@@ -202,7 +202,7 @@ Feature: Knowledge mentions of agentic-sdlc are a hard zero
     Examples:
       | folder                            |
       | copilot/frameworks/knowledge      |
-      | copilot/frameworks/company-kb     |
+      | home/frameworks/company-kb     |
 
   Scenario Outline: AC-9.1 The files directly in <folder> hold no mention of the agentic-sdlc framework
     Then the markdown files directly in the real folder "<folder>" have no line matching "agentic-sdlc(?!-reference)"

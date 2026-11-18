@@ -1,0 +1,5 @@
+schema: agent-source/v1
+name: windows-software
+description: "On-demand Windows setup: download and install the latest stable Chrome, Brave, Firefox, Zalo, nvm, Notepad++, Git, and WinRAR. Keep installers in Downloads and the four development/utility apps in D:\\win11 software."
+auto-delegate: false
+targets: [copilot]

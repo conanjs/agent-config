@@ -1,0 +1,4 @@
+schema: skill-source/v1
+name: review-docs
+description: "Review knowledge docs and procedures before committing: run the doc validators, then check what they cannot (stands alone without the chat, each section does its job, no copied content, sourced claims, current external-tool behaviour, nothing erased). Use before committing any change under copilot/knowledge or home/procedures, and always for text drafted in another AI chat."
+targets: [claude, agents]

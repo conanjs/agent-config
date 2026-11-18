@@ -32,19 +32,19 @@ Feature: Architecture fitness check
     And the output has the line "check-fitness: counts equal the baseline"
 
   Scenario: AC-1.6 An added edge from knowledge to agentic-sdlc fails and names the edge
-    Given in "copilot/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: knowledge, to: agentic-sdlc }`
+    Given in "home/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: knowledge, to: agentic-sdlc }`
     When the tool runs
     Then it exits with 1
     And the output has the line "FIT-1 forbidden edge knowledge -> agentic-sdlc"
 
   Scenario: AC-1.6 An added edge from knowledge to companies fails and names the edge
-    Given in "copilot/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: knowledge, to: companies }`
+    Given in "home/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: knowledge, to: companies }`
     When the tool runs
     Then it exits with 1
     And the output has the line "FIT-1 forbidden edge knowledge -> companies"
 
   Scenario Outline: AC-1.6 An added edge from contracts to <target> fails and names the edge
-    Given in "copilot/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: contracts, to: <target> }`
+    Given in "home/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: contracts, to: <target> }`
     When the tool runs
     Then it exits with 1
     And the output has the line "FIT-1 forbidden edge contracts -> <target>"
@@ -57,7 +57,7 @@ Feature: Architecture fitness check
       | agentic-sdlc |
 
   Scenario: AC-1.6 An allowed edge that is not forbidden still passes
-    Given in "copilot/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: core, to: agentic-sdlc }`
+    Given in "home/atlas/atlas.yaml", `- { from: core, to: knowledge }` becomes `- { from: core, to: knowledge }\n  - { from: core, to: agentic-sdlc }`
     When the tool runs
     Then it exits with 0
 

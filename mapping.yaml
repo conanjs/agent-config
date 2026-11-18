@@ -12,28 +12,33 @@
 #                         for files that accumulate machine-local state
 #                         (e.g. ~/.claude/settings.json permissions, or
 #                         global-variables.md's machine-specific values).
+#
+# source is relative to this repo; ../ reaches a sibling folder.
 
-- { source: copilot/instructions,            target: ~/.copilot/instructions,            strategy: symlink }
-- { source: copilot/references,              target: ~/.copilot/references,              strategy: symlink }
-- { source: copilot/knowledge,               target: ~/.copilot/knowledge,               strategy: symlink }
-- { source: copilot/companies,               target: ~/.copilot/companies,               strategy: symlink }
-- { source: copilot/frameworks,               target: ~/.copilot/frameworks,               strategy: symlink }
-- { source: copilot/procedures,               target: ~/.copilot/procedures,               strategy: symlink }
-- { source: copilot/patterns,                 target: ~/.copilot/patterns,                 strategy: symlink }
-- { source: copilot/atlas,                    target: ~/.copilot/atlas,                    strategy: symlink }
-- { source: copilot/tracker,                  target: ~/.copilot/tracker,                  strategy: symlink }
-- { source: copilot/agents,                  target: ~/.copilot/agents,                  strategy: symlink }
-- { source: copilot/prompts,                  target: ~/.copilot/prompts,                 strategy: symlink }
-- { source: copilot/hooks,                   target: ~/.copilot/hooks,                   strategy: symlink }
-- { source: claude/CLAUDE.md,                target: ~/.claude/CLAUDE.md,                strategy: symlink }
-- { source: claude/plugins/blocklist.json,   target: ~/.claude/plugins/blocklist.json,   strategy: symlink }
-- { source: claude/settings.json,            target: ~/.claude/settings.json,            strategy: seed-once }
-- { source: claude/agents,                   target: ~/.claude/agents,                   strategy: symlink }
-- { source: copilot/instructions/core.instructions.md, target: ~/.codex/AGENTS.md,    strategy: symlink }
-- { source: codex/hooks.json,                target: ~/.codex/hooks.json,                strategy: symlink }
-- { source: codex/agents,                    target: ~/.codex/agents,                    strategy: symlink }
-# skills/ is tool-neutral (SKILL.md is the same format everywhere): ~/.claude/skills
-# for Claude Code, ~/.agents/skills for both Copilot and Codex.
-- { source: skills,                          target: ~/.claude/skills,                   strategy: symlink }
-- { source: skills,                          target: ~/.agents/skills,                   strategy: symlink }
-- { source: global-variables.md,             target: ~/.copilot/global-variables.md,     strategy: seed-once }
+# Core content (home/ in this repo).
+- { source: home/instructions,               target: ~/.copilot/instructions,               strategy: symlink }
+- { source: home/references,                 target: ~/.copilot/references,                 strategy: symlink }
+- { source: home/companies,                  target: ~/.copilot/companies,                  strategy: symlink }
+- { source: home/procedures,                 target: ~/.copilot/procedures,                 strategy: symlink }
+- { source: home/patterns,                   target: ~/.copilot/patterns,                   strategy: symlink }
+- { source: home/atlas,                      target: ~/.copilot/atlas,                      strategy: symlink }
+- { source: home/tracker,                    target: ~/.copilot/tracker,                    strategy: symlink }
+- { source: home/prompts,                    target: ~/.copilot/prompts,                    strategy: symlink }
+- { source: home/hooks,                      target: ~/.copilot/hooks,                      strategy: symlink }
+- { source: home/global-variables.md,        target: ~/.copilot/global-variables.md,        strategy: seed-once }
+# ~/.copilot/frameworks is a real folder with one link per framework, because they come from different folders.
+- { source: home/frameworks/agent-foundry,   target: ~/.copilot/frameworks/agent-foundry,   strategy: symlink }
+- { source: home/frameworks/company-kb,      target: ~/.copilot/frameworks/company-kb,      strategy: symlink }
+# Other components, cloned or copied next to this repo (see SETUP.md). A missing source is skipped with a warning.
+- { source: ../agent-knowledge/knowledge,            target: ~/.copilot/knowledge,              strategy: symlink }
+- { source: ../agent-knowledge/frameworks/knowledge, target: ~/.copilot/frameworks/knowledge,   strategy: symlink }
+- { source: ../agentic-sdlc,                         target: ~/.copilot/frameworks/agentic-sdlc, strategy: symlink }
+# Per-agent files that are not built (adapters/<agent>/).
+- { source: adapters/claude/CLAUDE.md,       target: ~/.claude/CLAUDE.md,                   strategy: symlink }
+- { source: adapters/claude/plugins/blocklist.json, target: ~/.claude/plugins/blocklist.json, strategy: symlink }
+- { source: adapters/claude/settings.json,   target: ~/.claude/settings.json,               strategy: seed-once }
+- { source: home/instructions/core.instructions.md, target: ~/.codex/AGENTS.md,             strategy: symlink }
+- { source: adapters/codex/hooks.json,       target: ~/.codex/hooks.json,                   strategy: symlink }
+# Skills and agents are not listed here: the installer runs `node scripts/build.mjs --link`, which builds them per agent
+# into dist/ and links each one into ~/.claude/skills, ~/.agents/skills, ~/.claude/agents, ~/.codex/agents and
+# ~/.copilot/agents (adapters/<agent>/fields.yaml names the folders).

@@ -1,6 +1,6 @@
 Feature: The tracker keeps the open work of a repo and reminds the next session of it (specs/015)
 
-  `copilot/tracker/tracker.mjs` checks `TRACKER.md` against `tracker/v1` (TR-1 … TR-10), prints the open items most
+  `home/tracker/tracker.mjs` checks `TRACKER.md` against `tracker/v1` (TR-1 … TR-10), prints the open items most
   urgent first, feeds them to the session-start hooks of Claude Code and Copilot CLI, and adds, updates, closes and
   drops items. "Today" is 2026-10-30 in every scenario.
 
@@ -559,7 +559,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       """
       # Done items
 
-      Items closed or dropped in TRACKER.md, newest first. Format and tool: tracker/v1 (agent-config, copilot/tracker/).
+      Items closed or dropped in TRACKER.md, newest first. Format and tool: tracker/v1 (agent-config, home/tracker/).
 
       ## Done
 
@@ -600,7 +600,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       """
       # Tracker
 
-      Work this repo still owes, carried from one session to the next. Format and tool: tracker/v1 (agent-config, copilot/tracker/).
+      Work this repo still owes, carried from one session to the next. Format and tool: tracker/v1 (agent-config, home/tracker/).
 
       ## Open
 
@@ -723,7 +723,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
       """
       # Done items
 
-      Items closed or dropped in TRACKER.md, newest first. Format and tool: tracker/v1 (agent-config, copilot/tracker/).
+      Items closed or dropped in TRACKER.md, newest first. Format and tool: tracker/v1 (agent-config, home/tracker/).
 
       ## Done
 

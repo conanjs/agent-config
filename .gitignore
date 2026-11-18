@@ -23,3 +23,6 @@ logs/
 **/synced
 # Tool-test dependencies (package.json, specs/003).
 node_modules/
+
+# Built skills and agents (scripts/build.mjs); rebuilt on every install.
+dist/

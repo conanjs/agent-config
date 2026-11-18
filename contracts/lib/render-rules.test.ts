@@ -156,10 +156,10 @@ describe('A-21 the allow-list keeps whole lines as written', () => {
 });
 
 describe('AC-16.4 the generated-from line (A-22)', () => {
-  const line = 'Generated from `copilot/instructions/x.md`; edit that file, not this copy.';
+  const line = 'Generated from `home/instructions/x.md`; edit that file, not this copy.';
 
   it('has the text of the contract', () => {
-    expect(generatedFromLine('copilot/instructions/x.md')).toBe(line);
+    expect(generatedFromLine('home/instructions/x.md')).toBe(line);
   });
 
   it('a path with a backtick or a line break cannot end the code span early', () => {
@@ -183,7 +183,7 @@ describe('AC-16.4 the generated-from line (A-22)', () => {
       `---\r\na: 1\r\n---\r\n${line}\r\nBody\r\n`,
     ],
   ])('%s', (_label, source, expected) => {
-    expect(addGeneratedFromLine(source, 'copilot/instructions/x.md')).toBe(expected);
+    expect(addGeneratedFromLine(source, 'home/instructions/x.md')).toBe(expected);
   });
 
   it.each([['First line.'], ['---\na: 1\n---\nBody'], ['']])('adding it twice adds it once (RC-4): %j', (source) => {
@@ -244,12 +244,12 @@ describe('A-28 rendering the dry run and the renderer share', () => {
   const context = on('darwin', '/Users/Vinh Đỗ/.agent-config', ['The home is {{AGENT_HOME}}.']);
 
   it('swaps the paths, keeps the listed line and puts the line after the front matter', () => {
-    expect(renderText(source, context, 'copilot/instructions/x.md')).toBe(
+    expect(renderText(source, context, 'home/instructions/x.md')).toBe(
       [
         '---',
         'applyTo: "**"',
         '---',
-        'Generated from `copilot/instructions/x.md`; edit that file, not this copy.',
+        'Generated from `home/instructions/x.md`; edit that file, not this copy.',
         'Read /Users/Vinh Đỗ/.agent-config/knowledge/x.md and /Users/Vinh Đỗ/.agent-config/a.md.',
         'The home is {{AGENT_HOME}}.',
         '',
@@ -258,13 +258,13 @@ describe('A-28 rendering the dry run and the renderer share', () => {
   });
 
   it('RC-4 the same input gives byte-identical output, and rendering the output again changes nothing', () => {
-    const first = renderText(source, context, 'copilot/instructions/x.md');
-    expect(renderText(source, context, 'copilot/instructions/x.md')).toBe(first);
-    expect(renderText(first, context, 'copilot/instructions/x.md')).toBe(first);
+    const first = renderText(source, context, 'home/instructions/x.md');
+    expect(renderText(source, context, 'home/instructions/x.md')).toBe(first);
+    expect(renderText(first, context, 'home/instructions/x.md')).toBe(first);
   });
 
   it('RC-5 no {{AGENT_HOME}} path is left except on the allow-list', () => {
-    const rendered = renderText(source, context, 'copilot/instructions/x.md');
+    const rendered = renderText(source, context, 'home/instructions/x.md');
     const left = rendered.split('\n').filter((line) => /\{\{AGENT_HOME\}\}/.test(line));
     expect(left).toEqual(['The home is {{AGENT_HOME}}.']);
   });

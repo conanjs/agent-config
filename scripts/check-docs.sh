@@ -24,13 +24,13 @@ cucumber="$root/node_modules/@cucumber/cucumber/bin/cucumber.js"
 
 status=0
 "$node_bin" "$root/copilot/frameworks/knowledge/tools/validate-knowledge.mjs" || status=1
-"$node_bin" "$root/copilot/procedures/tools/validate-procedures.mjs" || status=1
+"$node_bin" "$root/home/procedures/tools/validate-procedures.mjs" || status=1
 "$node_bin" "$root/copilot/frameworks/agentic-sdlc/tools/validate.mjs" --knowledge "$root/copilot/knowledge" --adapters "$root/adapters.json" || status=1
-"$node_bin" "$root/copilot/frameworks/agent-foundry/tools/validate-foundry.mjs" || status=1
+"$node_bin" "$root/home/frameworks/agent-foundry/tools/validate-foundry.mjs" || status=1
 # The atlas: every file under a kind, the tree whole, the generated map current (after adding files: atlas.mjs --write).
-"$node_bin" "$root/copilot/atlas/tools/atlas.mjs" || status=1
+"$node_bin" "$root/home/atlas/tools/atlas.mjs" || status=1
 # This repo's own TRACKER.md (tracker/v1).
-"$node_bin" "$root/copilot/tracker/tracker.mjs" "$root" || status=1
+"$node_bin" "$root/home/tracker/tracker.mjs" "$root" || status=1
 # The workflow graph (specs/019, 020, 021): the graph and its generated JSON and tables, then the tool's format check,
 # type check, lint (class-modeled rules and the stack reference's TSDoc rules, TSN-13), {@link} check and unit tests. Its development tools are a pnpm workspace package.
 wg="$root/copilot/frameworks/agentic-sdlc/tools/workflow-graph"

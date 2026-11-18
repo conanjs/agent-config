@@ -1,6 +1,6 @@
 Feature: The efficiency auditor finds token waste in the agents' session logs (proposals/efficiency-auditor.md)
 
-  `copilot/efficiency-audit/efficiency-audit.mjs` reads the logs Claude Code, Codex and GitHub Copilot write, and the
+  `home/efficiency-audit/efficiency-audit.mjs` reads the logs Claude Code, Codex and GitHub Copilot write, and the
   turn token history, and reports the patterns that waste tokens per session and per week (EA-1 … EA-10, AU-1 … AU-10).
   "Now" is 2026-11-05T12:00:00Z, so the default week is the one of Monday 2026-11-02, and times print in UTC.
 
@@ -173,9 +173,9 @@ Feature: The efficiency auditor finds token waste in the agents' session logs (p
         copilot/knowledge/ai-agents/agent-token-accounting.md: week of 2026-11-02, Claude Code: EA-5 same file read in full again, 5 findings in 10 turns (50 per 100 turns, median of the last 1 week 10); source: efficiency-audit.mjs week --week 2026-11-02
         copilot/knowledge/ai-agents/instruction-wording-findings.md: week of 2026-11-02, Codex: EA-2 instruction file read at session start, 1 finding in 2 turns (50 per 100 turns), 0.2 credits; source: efficiency-audit.mjs week --week 2026-11-02
       Tracker (run with --tracker <repo folder> to add):
-        node copilot/tracker/tracker.mjs --add "Efficiency audit 2026-11-02: Claude Code EA-2 instruction file read at session start" --next "Run efficiency-audit.mjs week --week 2026-11-02, read the top findings, then remove the pointer: the agent loads this file by itself (instruction-loading D2)"
-        node copilot/tracker/tracker.mjs --add "Efficiency audit 2026-11-02: Claude Code EA-5 same file read in full again" --next "Run efficiency-audit.mjs week --week 2026-11-02, read the top findings, then keep the facts from the first read; read only the range needed"
-        node copilot/tracker/tracker.mjs --add "Efficiency audit 2026-11-02: Codex EA-2 instruction file read at session start" --next "Run efficiency-audit.mjs week --week 2026-11-02, read the top findings, then remove the pointer: the agent loads this file by itself (instruction-loading D2)"
+        node home/tracker/tracker.mjs --add "Efficiency audit 2026-11-02: Claude Code EA-2 instruction file read at session start" --next "Run efficiency-audit.mjs week --week 2026-11-02, read the top findings, then remove the pointer: the agent loads this file by itself (instruction-loading D2)"
+        node home/tracker/tracker.mjs --add "Efficiency audit 2026-11-02: Claude Code EA-5 same file read in full again" --next "Run efficiency-audit.mjs week --week 2026-11-02, read the top findings, then keep the facts from the first read; read only the range needed"
+        node home/tracker/tracker.mjs --add "Efficiency audit 2026-11-02: Codex EA-2 instruction file read at session start" --next "Run efficiency-audit.mjs week --week 2026-11-02, read the top findings, then remove the pointer: the agent loads this file by itself (instruction-loading D2)"
       skipped: 1 unreadable line, 0 unreadable files
       """
 
@@ -228,7 +228,7 @@ Feature: The efficiency auditor finds token waste in the agents' session logs (p
     And the output has the line "  \"week\": \"2026-11-02\","
 
   Scenario: AU-8 the tool imports no network module and prints no message text
-    Given the repo's "copilot/efficiency-audit" folder is copied to "src"
+    Given the repo's "home/efficiency-audit" folder is copied to "src"
     Then the file "src/efficiency-audit.mjs" has no line containing "node:http"
     And the file "src/efficiency-audit.mjs" has no line containing "node:net"
     And the file "src/efficiency-audit.mjs" has no line containing "fetch("
@@ -244,10 +244,10 @@ Feature: The efficiency auditor finds token waste in the agents' session logs (p
       """
 
   Scenario: AU-10 a trigger whose text left the core fails the check
-    Given the repo's "copilot/efficiency-audit" folder is copied to "copilot/efficiency-audit"
-    And the repo's "copilot/instructions" folder is copied to "copilot/instructions"
-    And the repo's "copilot/hooks/turn-tokens" folder is copied to "copilot/hooks/turn-tokens"
-    And in "copilot/efficiency-audit/triggers.json", `"core": "~/.copilot/global-variables.md"` becomes `"core": "~/.copilot/vars.md"`
+    Given the repo's "home/efficiency-audit" folder is copied to "home/efficiency-audit"
+    And the repo's "home/instructions" folder is copied to "home/instructions"
+    And the repo's "home/hooks/turn-tokens" folder is copied to "home/hooks/turn-tokens"
+    And in "home/efficiency-audit/triggers.json", `"core": "~/.copilot/global-variables.md"` becomes `"core": "~/.copilot/vars.md"`
     When the tool runs with "check-triggers"
     Then it exits with 1 and prints:
       """

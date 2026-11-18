@@ -1,0 +1,6 @@
+schema: agent-source/v1
+name: foundry-knowledge-researcher
+description: "Agent Foundry knowledge researcher: researches one subject from authoritative online sources and writes a source-traced deep-dive doc (draft) into the knowledge base; suggest-only, never commits. Give it the subject, the questions, and optionally code to apply it to."
+model-tier: top
+launches-agents: false
+targets: [claude, copilot, codex]

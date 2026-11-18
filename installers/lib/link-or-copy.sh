@@ -55,7 +55,18 @@ apply_symlink() {
   local source_rel="$1" target_raw="$2"
   local target; target="$(expand_target "$target_raw")"
   local source_abs="$REPO_ROOT/$source_rel"
-  mkdir -p "$(dirname "$target")"
+  if [ ! -e "$source_abs" ]; then
+    echo "  WARNING: $source_abs not found (clone or copy it next to this repo, see SETUP.md), skipped" >&2
+    return
+  fi
+  # Normalise ../ so the link text matches on the next run.
+  source_abs="$(cd "$(dirname "$source_abs")" && pwd)/$(basename "$source_abs")"
+  # An old install linked the whole parent folder (for example ~/.copilot/frameworks) to this repo: make it a real folder.
+  local parent; parent="$(dirname "$target")"
+  if [ -L "$parent" ]; then
+    backup_existing "$parent" "" "$(basename "$parent")-folder-link" || true
+  fi
+  mkdir -p "$parent"
   if backup_existing "$target" "$source_abs" "$source_rel"; then
     ln -s "$source_abs" "$target"
     echo "  symlinked $target -> $source_abs"

@@ -175,7 +175,7 @@ describe('AC-1.6 running on a tree', () => {
   function tree(files: Record<string, string>): string {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fitness-'));
     folders.push(root);
-    const defaults = { 'copilot/atlas/atlas.yaml': atlas, 'docs/architecture.md': architecture };
+    const defaults = { 'home/atlas/atlas.yaml': atlas, 'docs/architecture.md': architecture };
     for (const [name, text] of Object.entries({ ...defaults, ...files })) {
       fs.mkdirSync(path.dirname(path.join(root, name)), { recursive: true });
       fs.writeFileSync(path.join(root, name), text);

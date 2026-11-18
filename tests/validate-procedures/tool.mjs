@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { codesFromCalls, registerTool, repo } from '../support/tools.mjs';
 
-const validator = 'copilot/procedures/tools/validate-procedures.mjs';
+const validator = 'home/procedures/tools/validate-procedures.mjs';
 
 registerTool('validate-procedures', {
   fixture: 'tests/validate-procedures/fixtures/base',
@@ -16,5 +16,5 @@ registerTool('validate-procedures', {
   normalize: [[/\(\d+ days ago/g, '(N days ago']],
   quietPass: 'PASS (0 warning(s))',
   codes: () => codesFromCalls(validator),
-  rules: 'copilot/procedures',
+  rules: 'home/procedures',
 });
