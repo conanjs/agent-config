@@ -157,6 +157,15 @@ Existing real content at a destination path is backed up before a link replaces 
 | `adapters/claude/settings.json` | **Not a copy of the real one.** The real `~/.claude/settings.json` on this Mac is ~150 permission entries full of this machine's absolute paths — not portable. This repo ships a minimal generic seed instead; see `seed-once` below. |
 | `home/global-variables.md` | `{{AGENT_HOME}}` (OS-fixed, no setup), `{{AGENT_CONFIG_REPO}}` (this machine's clone path), `{{LANGUAGE}}` (default: English), and one company-repo-root variable per company (e.g. `{{OTS_REPOS_ROOT}}`) — all filled in / kept current by SETUP.md, extensible for more. |
 
+## Integrating another repo
+
+agent-config installs only its own files. Any other repo (today agent-knowledge and agent-companies) joins the agent home the same way, by its own README section **"Integrate into the agent home"**, which an agent follows when asked:
+
+1. Clone the repo, for example into `~/workspace/<repo>`.
+2. Link its folders into the agent home (`~/.copilot/<name>`, `%USERPROFILE%\.copilot\<name>` on Windows); or, for something read only once, point at the clone directly.
+3. Install its plugin, if it ships skills (`.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`).
+4. Add one line to `home/instructions/core.instructions.md` that says when to read it, using the agent-home path (`~/.copilot/<name>/index.md`), never a placeholder.
+
 ## What's deliberately excluded
 
 - **Ephemeral/cache/session state** — `~/.copilot/session-state/` (179M), `session-store.db*` (11M), `logs/`, `command-history-state.json`, `copilot.zip`, `sidebar-sessions-state/`, `ide/`; `~/.claude/cache/`, `backups/`, `file-history/`, `shell-snapshots/`, `sessions/`, `telemetry/`, `session-env/`, `downloads/`, `ide/`. None of this is config — it's local runtime state, regenerated automatically.

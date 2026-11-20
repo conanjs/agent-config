@@ -13,13 +13,9 @@ link ~/.copilot/agents/foundry-ci-failure-triager.agent.md -> dist/copilot/agent
 link ~/.copilot/agents/foundry-knowledge-researcher.agent.md -> dist/copilot/agents/foundry-knowledge-researcher.agent.md
 link ~/.copilot/agents/foundry-pr-reviewer.agent.md -> dist/copilot/agents/foundry-pr-reviewer.agent.md
 link ~/.copilot/agents/windows-software.agent.md -> dist/copilot/agents/windows-software.agent.md
-link ~/.copilot/companies -> ../agent-companies/companies
 link ~/.copilot/frameworks/agent-foundry -> home/frameworks/agent-foundry
-link ~/.copilot/frameworks/company-kb -> ../agent-companies/frameworks/company-kb
-link ~/.copilot/frameworks/knowledge -> ../agent-knowledge/frameworks/knowledge
 link ~/.copilot/hooks -> home/hooks
 link ~/.copilot/instructions -> home/instructions
-link ~/.copilot/knowledge -> ../agent-knowledge/knowledge
 link ~/.copilot/patterns -> home/patterns
 link ~/.copilot/procedures -> home/procedures
 link ~/.copilot/prompts -> home/prompts

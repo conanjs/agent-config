@@ -13,7 +13,8 @@
 #                         (e.g. ~/.claude/settings.json permissions, or
 #                         global-variables.md's machine-specific values).
 #
-# source is relative to this repo; ../ reaches a sibling folder.
+# source is relative to this repo. Only this repo's own files are installed here: another repo (agent-knowledge,
+# agent-companies, ...) is integrated by its own README section "Integrate into the agent home".
 
 # Core content (home/ in this repo).
 - { source: home/instructions,               target: ~/.copilot/instructions,               strategy: symlink }
@@ -26,11 +27,6 @@
 - { source: home/global-variables.md,        target: ~/.copilot/global-variables.md,        strategy: seed-once }
 # ~/.copilot/frameworks is a real folder with one link per framework, because they come from different folders.
 - { source: home/frameworks/agent-foundry,   target: ~/.copilot/frameworks/agent-foundry,   strategy: symlink }
-# Other components, cloned or copied next to this repo (see SETUP.md). A missing source is skipped with a warning.
-- { source: ../agent-knowledge/knowledge,            target: ~/.copilot/knowledge,              strategy: symlink }
-- { source: ../agent-knowledge/frameworks/knowledge, target: ~/.copilot/frameworks/knowledge,   strategy: symlink }
-- { source: ../agent-companies/companies,            target: ~/.copilot/companies,              strategy: symlink }
-- { source: ../agent-companies/frameworks/company-kb, target: ~/.copilot/frameworks/company-kb,  strategy: symlink }
 # Per-agent files that are not built (adapters/<agent>/).
 - { source: adapters/claude/CLAUDE.md,       target: ~/.claude/CLAUDE.md,                   strategy: symlink }
 - { source: adapters/claude/plugins/blocklist.json, target: ~/.claude/plugins/blocklist.json, strategy: symlink }
