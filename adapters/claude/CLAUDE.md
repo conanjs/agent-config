@@ -1,1 +1,1 @@
-@~/.copilot/instructions/core.instructions.md
+@~/.agent-config/instructions/core.instructions.md

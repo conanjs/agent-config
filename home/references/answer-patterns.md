@@ -24,7 +24,7 @@ Treat the reader as having zero prior context. Sections:
    - include one worked example and one step-by-step flow (sequence diagram, numbered timeline or table) through a full pass.
 3. Details — edge cases and failure or interaction combinations as a matrix or table, not prose; supporting data and code.
 4. Sources — mark which claims were verified against source code or official docs and which are general, unverified knowledge.
-Precedent: the gRPC keepalive deep dive in `~/.copilot/knowledge/grpc/stale-connection-keepalive.md`.
+Precedent: the gRPC keepalive deep dive in `~/.agent-config/knowledge/grpc/stale-connection-keepalive.md`.
 
 ## quick  (tag: pattern:quick)
 One short paragraph. No headers, no sections.

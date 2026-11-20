@@ -5,7 +5,7 @@ last-updated: 2026-10-24
 
 # Agent Foundry: Schema System
 
-Same meta-schema as `{{AGENT_HOME}}/frameworks/agentic-sdlc/schemas/_system.md` §2: front-matter, required structure, rules, example, checks. This file lists what is specific to the Foundry.
+Same meta-schema as `~/.agent-config/frameworks/agentic-sdlc/schemas/_system.md` §2: front-matter, required structure, rules, example, checks. This file lists what is specific to the Foundry.
 
 ## 1. Registry
 

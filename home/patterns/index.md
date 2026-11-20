@@ -17,7 +17,7 @@ This repo follows a deliberate structural philosophy: every recurring shape gets
 | No Shorthand In Answers | [`no-shorthand-answers.pattern.md`](no-shorthand-answers.pattern.md) | Writing a reply that reports work (findings, numbers, a summary of what was just written): define every term at first use, introduce before you point, give each finding its why and a real example, spell out abbreviations, and run the checklist before sending |
 | Artifact Types | [`artifact-types.pattern.md`](artifact-types.pattern.md) | Adding anything new an agent will read or run, and deciding if it is an instruction, skill, prompt, agent, procedure, framework, knowledge or pattern |
 
-This catalog is meant to grow — add a row + a new `patterns/<name>.pattern.md` file when a second recurring shape shows up, rather than folding it into an existing pattern's file or leaving it undocumented. This folder now deploys to `{{AGENT_HOME}}/patterns/` (see `mapping.yaml`), so these patterns are available from any project, not only while working inside `agent-config` itself — worth checking here before designing a one-off reusable mechanism anywhere, not just here.
+This catalog is meant to grow — add a row + a new `patterns/<name>.pattern.md` file when a second recurring shape shows up, rather than folding it into an existing pattern's file or leaving it undocumented. This folder now deploys to `~/.agent-config/patterns/` (see `mapping.yaml`), so these patterns are available from any project, not only while working inside `agent-config` itself — worth checking here before designing a one-off reusable mechanism anywhere, not just here.
 
 ## References
 

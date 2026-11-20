@@ -45,7 +45,7 @@ KRS-Q7 Does the doc pass the schema and the validator?
 - **Criteria:** the requester's questions, the depth wanted, the audience. Then read `knowledge/index.md` and the topic `index.md` for docs on the same subject.
 - **Branches:**
   - NOT SCOPED → ask one focused question and stop
-  - COVERED → extend the existing doc, or report that the existing doc already answers it → KRS-Q2. Extending follows `{{AGENT_HOME}}/patterns/revise-without-erasing.pattern.md`:
+  - COVERED → extend the existing doc, or report that the existing doc already answers it → KRS-Q2. Extending follows `~/.agent-config/patterns/revise-without-erasing.pattern.md`:
     - edit the existing text in place;
     - change only what is wrong, unverifiable or outdated;
     - keep all other content at its level of detail, and add next to it.
@@ -131,7 +131,7 @@ KRS-Q7 Does the doc pass the schema and the validator?
 | How a versioned tool behaves | The newest official doc or changelog for the stated version, or a test | The older behaviour, with its version |
 | Whether a practice is good | Neither; present both with reasons | Which one the framework's rules choose, if any |
 
-**Hand-over contents:** the doc path; ✅/⚠️ counts; for a revision, the removal list with reasons and a version comparison per `{{AGENT_HOME}}/patterns/compare-every-version.pattern.md`; sources dropped as T4 and why; open questions; `[rule-candidate]` takeaways; an offer to synthesize (`deep-dive.schema.md` §Synthesis).
+**Hand-over contents:** the doc path; ✅/⚠️ counts; for a revision, the removal list with reasons and a version comparison per `~/.agent-config/patterns/compare-every-version.pattern.md`; sources dropped as T4 and why; open questions; `[rule-candidate]` takeaways; an offer to synthesize (`deep-dive.schema.md` §Synthesis).
 
 ## Recording
 
@@ -141,7 +141,7 @@ One deep dive per run, plus a scratch notes file while the run is long (outside 
 
 **Local artifacts:**
 - `charters/knowledge-researcher.charter.md`, `../principles.md`, `../resolver.md`.
-- `{{AGENT_HOME}}/frameworks/knowledge/schemas/deep-dive.schema.md`, `_system.md` (KB-1 … KB-6), `knowledge-doc.schema.md` (KD-2).
+- `~/.agent-config/frameworks/knowledge/schemas/deep-dive.schema.md`, `_system.md` (KB-1 … KB-6), `knowledge-doc.schema.md` (KD-2).
 
 **External authoritative sources:**
 - [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) — Anthropic, 2025. Backs: start wide then narrow (KRS-Q2); scale effort to complexity; agents preferring SEO content farms (T4, KRS-Q3); saving plans to memory before the context limit (KRS-Q6).

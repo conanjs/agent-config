@@ -348,8 +348,8 @@ function loadHistory(skipped) { // the turn token history (turn-tokens/v1), for 
 
 // ---- triggers (EA-3, AU-10) --------------------------------------------------------------------------------------
 const TRIGGERS = JSON.parse(fs.readFileSync(path.join(here, 'triggers.json'), 'utf8')).triggers;
-const triggerKey = (f) => f.replace(/^~\/\.copilot\//, '');
-const matchesTrigger = (p, trig) => { const k = triggerKey(trig.file); return p.endsWith(`/.copilot/${k}`) || p.endsWith(`/copilot/${k}`); };
+const triggerKey = (f) => f.replace(/^~\/\.(copilot|agent-config)\//, '');
+const matchesTrigger = (p, trig) => { const k = triggerKey(trig.file); return p.endsWith(`/.agent-config/${k}`) || p.endsWith(`/.copilot/${k}`) || p.endsWith(`/home/${k}`) || p.endsWith(`/copilot/${k}`); };
 const PATTERN_TAG = /^\s*pattern:(\S+)/i;
 const DEEP = /deep dive|thorough|in detail|complete flow explanation|explain all cases/i;
 function triggerHolds(trig, s, turn, before) {

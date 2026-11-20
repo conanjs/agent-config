@@ -2,7 +2,7 @@
 
 These apply only when working in this repository. The global instructions every agent loads are `home/instructions/core.instructions.md`.
 
-- **Skills (`plugin/skills/<name>/SKILL.md`):** one file for every coding agent (portable frontmatter: `name`, `description`), shipped as the `agent-config` plugin; `.claude-plugin/marketplace.json` (Claude Code, Copilot CLI) and `.agents/plugins/marketplace.json` (Codex) list it. Paths in a skill are written out (`~/.copilot/...`), never a placeholder. After an edit, run `codex plugin add agent-config@agent-config` so Codex refreshes its copy.
+- **Skills (`plugin/skills/<name>/SKILL.md`):** one file for every coding agent (portable frontmatter: `name`, `description`), shipped as the `agent-config` plugin; `.claude-plugin/marketplace.json` (Claude Code, Copilot CLI) and `.agents/plugins/marketplace.json` (Codex) list it. Paths in a skill are written out (`~/.agent-config/...`), never a placeholder. After an edit, run `codex plugin add agent-config@agent-config` so Codex refreshes its copy.
 - **Agents (`agents/<name>/`):** `body.md` is the text every coding agent gets; each coding agent that gets it has its own header file in its own keys (`claude.yaml`, `copilot.yaml`, `codex.toml`), no shared header. `adapters/<agent>/adapter.yaml` lists the checked keys. `node scripts/build.mjs` must pass.
 - **Patterns (`home/patterns/`):** a new pattern file follows `home/patterns/pattern.schema.md`.
 - **Before committing** any change under `home/procedures/`, and always for text drafted in another AI chat: use the `review-docs` skill (`home/procedures/review-docs.procedure.md`), validators first, then the checks they cannot do.

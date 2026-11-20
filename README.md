@@ -8,14 +8,14 @@ A dotfiles-style repo for global AI-coding-agent configuration (Claude Code, Git
 |---|---|
 | Find anything: where a file is, what checks it, what links to it, where a task starts | The atlas is parked in `../agent-atlas` until it is updated for the split repos (TRACKER) |
 | Set this repo up on a new machine | [`SETUP.md`](SETUP.md) |
-| Keep track of work left for later, across sessions and repos (and get reminded at session start) | [`home/tracker/tracker.schema.md`](home/tracker/tracker.schema.md): a `TRACKER.md` per repo, `node ~/.copilot/tracker/tracker.mjs --brief` / `--add` / `--close`; this repo's own: [`TRACKER.md`](TRACKER.md) |
+| Keep track of work left for later, across sessions and repos (and get reminded at session start) | [`home/tracker/tracker.schema.md`](home/tracker/tracker.schema.md): a `TRACKER.md` per repo, `node ~/.agent-config/tracker/tracker.mjs --brief` / `--add` / `--close`; this repo's own: [`TRACKER.md`](TRACKER.md) |
 | See what each Claude Code, Codex or GitHub Copilot turn used (tokens, tools, subagents, cost, 5-hour and weekly limits) and the running total | [`home/hooks/turn-tokens/turn-tokens.schema.md`](home/hooks/turn-tokens/turn-tokens.schema.md): a `Stop` hook in each tool (`SETUP.md` step 12); history in `~/.claude/turn-tokens/` and `~/.codex/turn-tokens/` |
 | Keep every agentic-sdlc run on the workflow: no skipped gate, no loop past its budget, a ledger of every step | [`copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md`](copilot/frameworks/agentic-sdlc/schemas/workflow-graph.schema.md): the graph `workflow.graph.yaml`, the ledger `.specify/runs/<run>/ledger.jsonl`, guard and approval hooks for Claude Code, Copilot CLI and Codex (`SETUP.md` step 13, specs/019) |
 | Let a program drive a whole agentic-sdlc run: roles headless in Claude Code, Copilot CLI or Codex, stopping at each gate for you | `workflow-graph run start … / run approve … / run resume …` ([`specs/020-workflow-runner/`](specs/020-workflow-runner/), `SETUP.md` step 14) |
 | Reuse a design technique before improvising a one-off | [`home/patterns/index.md`](home/patterns/index.md) |
-| Understand or extend the Company KB Framework | `frameworks/company-kb/index.md` in the private repo conanjs/agent-companies (`~/.copilot/frameworks/company-kb`) |
+| Understand or extend the Company KB Framework | `frameworks/company-kb/index.md` in the private repo conanjs/agent-companies (`~/.agent-config/frameworks/company-kb`) |
 | Write or check a global knowledge doc (schemas, deep dives, validator) | [`copilot/frameworks/knowledge/index.md`](copilot/frameworks/knowledge/index.md) |
-| Work inside a specific company's KB (e.g. OTS) | `companies/ots/index.md` in conanjs/agent-companies (`~/.copilot/companies/ots/index.md`) |
+| Work inside a specific company's KB (e.g. OTS) | `companies/ots/index.md` in conanjs/agent-companies (`~/.agent-config/companies/ots/index.md`) |
 | Bootstrap Spec-Driven Development (Spec Kit) in a project | [`home/procedures/spec-driven-development.procedure.md`](home/procedures/spec-driven-development.procedure.md) |
 | Review a knowledge doc or procedure before committing (validators + the checks they can't do) | [`home/procedures/review-docs.procedure.md`](home/procedures/review-docs.procedure.md); enable the automatic checks with `git config core.hooksPath .githooks` (see `SETUP.md` step 10) |
 | Change a validator, installer or script in this repo (spec first, then its Cucumber scenarios) | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) principle IV, [`specs/`](specs/) (one folder per change), [`tests/`](tests/) (one feature file per tool); `pnpm install` once, then `pnpm test` |
@@ -28,68 +28,31 @@ This file (`README.md`) is the general reference for everything else — structu
 
 ## How it works
 
-`copilot/` and `claude/` mirror the *real*, non-ephemeral parts of `~/.copilot` and `~/.claude` (on Windows: `%USERPROFILE%\.copilot` and `%USERPROFILE%\.claude` — same relative layout, verified in both products' own docs, see References). `mapping.yaml` is the **one** source/destination routing table both platforms read — bash and PowerShell each have their own installer logic, but neither hardcodes a path; both just interpret the same file.
+Three tiers. The repos hold the sources; the **agent home `~/.agent-config`** (`%USERPROFILE%\.agent-config` on Windows) holds what every coding agent reads, as links; each coding agent's own folder holds only its entry files, its built agents and its plugins.
 
 ```
-agent-config/
-├── SETUP.md                        # onboarding task list for a new machine — start here
-├── mapping.yaml                    # source -> destination routing table (shared by every OS)
-├── global-variables.md             # shipped template for {{AGENT_HOME}}/{{AGENT_CONFIG_REPO}}/{{LANGUAGE}} etc.
-├── installers/                     # every installer/uninstaller, grouped by OS
-│   ├── install.sh / uninstall.sh       # macOS/Linux entrypoints (bash) — dispatch by OS
-│   ├── install.ps1 / uninstall.ps1     # Windows entrypoint (PowerShell)
-│   ├── macos/install.sh                # macOS-specific implementation
-│   ├── linux/install.sh                # Linux-specific implementation (stub)
-│   └── lib/
-│       ├── os.sh, link-or-copy.sh      # bash: OS detection + symlink/seed logic
-│       └── link-or-copy.ps1            # PowerShell: symlink/seed logic + Windows fallbacks
-├── copilot/                        # -> ~/.copilot/* (or %USERPROFILE%\.copilot on Windows)
-│   ├── instructions/                   # core.instructions.md: the one always-loaded file
-│   ├── references/                     # read on demand: answer patterns, graph guide, SQL rules
-│   ├── knowledge/                      # cross-project knowledge base (general-purpose content, kept here for naming consistency — see note below)
-│   ├── companies/                      # per-company knowledge base INSTANCES (content only — e.g. companies/ots/)
-│   ├── frameworks/                     # framework DEFINITIONS — shared, not per-company (one subfolder per framework)
-│   │   ├── company-kb/                     # per-company knowledge base framework
-│   │   │   ├── index.md                        # start here: concise overview of this folder
-│   │   │   ├── conventions.md
-│   │   │   └── schemas/                        # one <type>.schema.md per document type
-│   │   ├── knowledge/                      # knowledge framework for copilot/knowledge/ (store B)
-│   │   │   ├── index.md                        # start here
-│   │   │   ├── schemas/                        # knowledge-doc, deep-dive, topic-index
-│   │   │   └── tools/validate-knowledge.mjs
-│   │   └── agentic-sdlc/                   # hierarchical multi-agent, spec-driven engineering framework
-│   │       ├── index.md                        # start here
-│   │       ├── conventions.md, schemas/, agents/ (role definitions)
-│   │       ├── foundations/                    # preset knowledge by subject: code/, design/, quality/, delivery/, review/
-│   │       ├── trees/, stacks/<id>/, paradigms/ # decision trees; stack + paradigm profiles
-│   │       └── tools/validate.mjs              # framework validator (node, no deps)
-│   ├── procedures/                     # one <name>.procedure.md per recurring task — grouped by artifact type, not by which framework it's about
-│   │   ├── init-repo-kb.procedure.md
-│   │   ├── spec-driven-development.procedure.md    # bootstrap GitHub Spec Kit in a project
-│   │   ├── init-github-governance.procedure.md     # add standard GitHub lifecycle/contribution files
-│   │   ├── bootstrap-agentic-sdlc.procedure.md     # adopt agentic-sdlc in one project repo
-│   │   └── init-system-workspace.procedure.md      # Company KB system/ docs + standard clone layout for a multi-repo system
-│   ├── patterns/                       # reusable design techniques, globally available (not agent-config-specific)
-│   │   ├── index.md                        # catalog — start here for pattern #4+
-│   │   ├── shared-procedure-thin-wrapper.pattern.md
-│   │   ├── backup-before-overwrite.pattern.md
-│   │   └── explaining-mechanisms.pattern.md
-│   ├── prompts/                        # Copilot slash-command prompts (thin wrappers, see patterns/)
-│   └── agents/, hooks/                 # genuinely Copilot-CLI-specific features
-├── claude/                         # -> ~/.claude/* (or %USERPROFILE%\.claude on Windows), incl. agents/ (sdlc-* role wrappers)
-├── adapters/codex/README.md                 # why ~/.codex/AGENTS.md links to home/instructions/core.instructions.md
-├── agents/                   # -> ~/.codex/agents (sdlc-* role wrappers, TOML)
-├── skills/                         # -> ~/.claude/skills AND ~/.agents/skills (Copilot + Codex) — tool-neutral SKILL.md
-├── .specify/, specs/               # NOT deployed — Spec Kit for this repo: constitution + one spec folder per change
-├── tests/                          # NOT deployed — Cucumber scenarios for every validator and installer (one folder per tool)
-├── package.json, cucumber.mjs      # NOT deployed — test dependencies only (pnpm install)
-└── home/templates/github-repo/          # NOT deployed via mapping.yaml — copied into OTHER repos on demand by
-                                     # init-github-governance.procedure.md, not into ~/.copilot at all
-    ├── CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, CODEOWNERS
-    └── .github/ISSUE_TEMPLATE/*.md, .github/PULL_REQUEST_TEMPLATE.md
-```
+agent-config/ (this repo)                  # sources; installed by installers/install.sh (mapping.yaml) and scripts/build.mjs
+├── home/                                  # -> ~/.agent-config/*: instructions, references, patterns, procedures, prompts,
+│                                          #    hooks, tracker, frameworks/agent-foundry, global-variables.md (seeded once)
+├── adapters/<agent>/                      # each coding agent's entry files (CLAUDE.md, settings.json, hooks.json) + adapter.yaml
+├── agents/<name>/                         # agent sources: body.md + claude.yaml / copilot.yaml / codex.toml -> built into dist/
+├── plugin/ + .claude-plugin/, .agents/plugins/   # the agent-config plugin: skills, one SKILL.md for every coding agent
+├── installers/, scripts/, tests/          # install, build, checks (not deployed)
+└── .specify/, specs/, proposals/          # design history (not deployed)
 
-**A naming note, since this moved twice during design:** `knowledge/`, `companies/`, and `frameworks/company-kb/` aren't actually Copilot-specific — no tool reads them automatically, they only work because an instructions file tells an agent to go read a path there. They briefly lived at the repo's top level for that reason. They're under `copilot/` because the user wants to be able to say "global Copilot knowledge" in conversation and have that phrase map directly onto both the folder name and the concept (see `core.instructions.md`'s term-recognition triggers). Functionally this changes nothing — the deployed destination has always been `~/.copilot/knowledge` (and now `~/.copilot/frameworks/company-kb`) either way, since `mapping.yaml`'s `source` (repo-internal) and `target` (disk destination) are independent of each other.
+~/.agent-config/ (the agent home)          # real folder of links; core instructions read everything here
+├── instructions/ references/ patterns/ procedures/ prompts/ hooks/ tracker/   -> agent-config/home/*
+├── frameworks/agent-foundry               -> agent-config/home/frameworks/agent-foundry
+├── knowledge/, frameworks/knowledge       -> agent-knowledge clone   (its README "Integrate into the agent home")
+├── companies/, frameworks/company-kb      -> agent-companies clone   (same)
+└── global-variables.md                    # machine values, seeded once
+
+Each coding agent's own folder
+├── ~/.claude/   CLAUDE.md (@imports ~/.agent-config/instructions/core.instructions.md), agents/<n>.md, plugins
+├── ~/.codex/    AGENTS.md (-> core.instructions.md), hooks.json, agents/<n>.toml, plugins (copied to its cache)
+└── ~/.copilot/  instructions/, hooks/, prompts/ (Copilot loads these itself, linked to the same home/ folders),
+                 agents/<n>.agent.md, plugins; ~/.agents/skills ignored (ignoredSkillsLocations)
+```
 
 ## Doc guards
 
@@ -106,9 +69,9 @@ Run everything locally: `pnpm install` once, then `scripts/check-docs.sh` (finds
 
 ## Path & preference variables
 
-Docs across this repo and the deployed knowledge base reference `{{AGENT_HOME}}`, `{{AGENT_CONFIG_REPO}}`, `{{LANGUAGE}}`, and per-company variables like `{{OTS_REPOS_ROOT}}` instead of hardcoding literal paths. All of these are defined in exactly one place: `global-variables.md` (shipped template here in the repo; deployed to `~/.copilot/global-variables.md` via the `seed-once` strategy, so a machine's filled-in values are never clobbered by a later `git pull`). `core.instructions.md` — the one file every agent always loads — points at it, so any agent reading a `{{VAR}}` placeholder knows where to resolve it.
+Docs across this repo and the deployed knowledge base reference `{{AGENT_HOME}}`, `{{AGENT_CONFIG_REPO}}`, `{{LANGUAGE}}`, and per-company variables like `{{OTS_REPOS_ROOT}}` instead of hardcoding literal paths. All of these are defined in exactly one place: `global-variables.md` (shipped template here in the repo; deployed to `~/.agent-config/global-variables.md` via the `seed-once` strategy, so a machine's filled-in values are never clobbered by a later `git pull`). `core.instructions.md` — the one file every agent always loads — points at it, so any agent reading a `{{VAR}}` placeholder knows where to resolve it.
 
-Why not just keep hardcoding `~/.copilot/knowledge/...` everywhere? Mostly future-proofing: if that live path is ever renamed (see "Related" below), there's one line to edit instead of 23. It does **not** fix a live problem today — agents already translate `~/.copilot/...` to `%USERPROFILE%\.copilot\...` on Windows correctly on their own.
+Why not just keep hardcoding `~/.agent-config/knowledge/...` everywhere? Mostly future-proofing: if that live path is ever renamed (see "Related" below), there's one line to edit instead of 23. It does **not** fix a live problem today — agents already translate `~/.copilot/...` to `%USERPROFILE%\.copilot\...` on Windows correctly on their own.
 
 ## Company KB Framework
 
@@ -140,14 +103,14 @@ Existing real content at a destination path is backed up before a link replaces 
 |---|---|
 | `home/instructions/` | `core.instructions.md`, the one global instruction file every agent loads: Copilot natively, Claude Code through `~/.claude/CLAUDE.md`, Codex as `~/.codex/AGENTS.md` |
 | `home/references/` | Files the core tells agents to read only when needed: the answer patterns other than the default, the code-review-graph guide, the SQL rules. Kept out of `home/instructions/` because Copilot loads everything there |
-| `../agent-companies` (sibling clone, private) | The **Company KB Framework** (`frameworks/company-kb/`) and one KB per company (`companies/ots/`), conanjs/agent-companies: linked to `~/.copilot/frameworks/company-kb` and `~/.copilot/companies` |
+| `../agent-companies` (sibling clone, private) | The **Company KB Framework** (`frameworks/company-kb/`) and one KB per company (`companies/ots/`), conanjs/agent-companies: linked to `~/.agent-config/frameworks/company-kb` and `~/.agent-config/companies` |
 | `home/frameworks/agent-foundry/` | The **Agent Foundry** (alias: Charter), v0.1 draft: builds scoped, learning agents from a Charter, a decision flow (`trees/`), a Resolver, non-waivable floors and a team Lens. First agent: `pr-reviewer`. Start at its [`index.md`](home/frameworks/agent-foundry/index.md); check with `node home/frameworks/agent-foundry/tools/validate-foundry.mjs` |
 | `agents/` | Agent sources, one folder each: `body.md` (the text every coding agent shares) and one header file per coding agent that gets the agent, written in that agent's own keys: `claude.yaml`, `copilot.yaml`, `codex.toml` |
 | `plugin/`, `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json` | The `agent-config` plugin: `plugin/skills/<name>/SKILL.md`, one file per skill for Claude Code, Copilot CLI and Codex. Install from the clone: `claude plugin marketplace add <clone> && claude plugin install agent-config@agent-config`, the same with `copilot plugin …`, and `codex plugin marketplace add <clone> && codex plugin add agent-config@agent-config`. How it works: agent-knowledge `knowledge/ai-agents/plugin-marketplace-install-flow.md` |
 | `adapters/<agent>/` | Per coding agent (`claude`, `copilot`, `codex`): `adapter.yaml` (where its built skills and agents go, which header file it reads, which keys are checked against its docs) and the files that agent loads as they are (`CLAUDE.md`, `settings.json`, `hooks.json`) |
 | `scripts/build.mjs` | The agent build: reads `agents/`, writes one file per coding agent (that agent's header file plus `body.md`) and with `--link` links each into `~/.claude/agents`, `~/.copilot/agents` and `~/.codex/agents`. The installers run it. Skills are not built: they ship in `plugin/` |
-| `../agent-knowledge` (sibling clone) | The knowledge base and its framework, [conanjs/agent-knowledge](https://github.com/conanjs/agent-knowledge): linked to `~/.copilot/knowledge` and `~/.copilot/frameworks/knowledge` |
-| `../agentic-sdlc` (sibling folder) | The **Agentic SDLC Framework** with its `sdlc-*` skill and agent sources: linked to `~/.copilot/frameworks/agentic-sdlc` |
+| `../agent-knowledge` (sibling clone) | The knowledge base and its framework, [conanjs/agent-knowledge](https://github.com/conanjs/agent-knowledge): linked to `~/.agent-config/knowledge` and `~/.agent-config/frameworks/knowledge` |
+| `../agentic-sdlc` (sibling folder) | The **Agentic SDLC Framework** with its `sdlc-*` skill and agent sources: linked to `~/.agent-config/frameworks/agentic-sdlc` |
 | `home/prompts/` | Copilot slash-command prompts — currently `init-repo-kb`, which bootstraps `repo-overview` KB docs for one, several, or all undocumented repos in a company. VS Code Copilot Chat only (Local or Copilot mode) — Copilot CLI's terminal tool doesn't support prompts/agents at all, per `github-copilot/copilot-cli-internals.md`. |
 | `home/hooks/` | User-authored hooks (e.g. `desktop-notify`) |
 | `adapters/claude/CLAUDE.md` | Claude Code's global entrypoint. `@import`s `home/instructions/core.instructions.md` — Claude Code's `@import` requires individual file paths, unlike Copilot CLI which auto-loads every `.instructions.md` in the folder natively. A new file in `home/instructions/` needs its own `@import` line here. |
@@ -162,9 +125,9 @@ Existing real content at a destination path is backed up before a link replaces 
 agent-config installs only its own files. Any other repo (today agent-knowledge and agent-companies) joins the agent home the same way, by its own README section **"Integrate into the agent home"**, which an agent follows when asked:
 
 1. Clone the repo, for example into `~/workspace/<repo>`.
-2. Link its folders into the agent home (`~/.copilot/<name>`, `%USERPROFILE%\.copilot\<name>` on Windows); or, for something read only once, point at the clone directly.
+2. Link its folders into the agent home (`~/.agent-config/<name>`, `%USERPROFILE%\.agent-config\<name>` on Windows); or, for something read only once, point at the clone directly.
 3. Install its plugin, if it ships skills (`.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`).
-4. Add one line to `home/instructions/core.instructions.md` that says when to read it, using the agent-home path (`~/.copilot/<name>/index.md`), never a placeholder.
+4. Add one line to `home/instructions/core.instructions.md` that says when to read it, using the agent-home path (`~/.agent-config/<name>/index.md`), never a placeholder.
 
 ## What's deliberately excluded
 
@@ -211,7 +174,7 @@ No native Windows support was attempted via Git Bash / WSL — `install.sh` dete
 - `home/patterns/index.md` — reusable design patterns, deployed globally to `{{AGENT_HOME}}/patterns/`, e.g. before adding another cross-tool capability or writing another "overwrite this path" script.
 - `global-variables.md` — path/preference variable definitions.
 - conanjs/agent-companies `companies/ots/index.md` — worked instance of the Company KB Framework.
-- **Deferred (2026-09-20):** renaming the live disk destination itself — e.g. `{{AGENT_HOME}}` from `~/.copilot` to something neutral — was explicitly considered and declined. `{{AGENT_HOME}}` now makes this cheap *if* it's ever revisited (one line in `global-variables.md`), but there's still no live problem motivating it today.
+- **Done (2026-11-20):** the agent home moved from `~/.copilot` to the neutral `~/.agent-config`; Copilot is one coding agent like the others, and only the folders it loads by itself (`instructions/`, `hooks/`, `prompts/`) are also linked into `~/.copilot`. (Declined on 2026-09-20, when Copilot was the only agent.)
 - Consider a real Windows machine/VM test of the symlink-denied → Junction/HardLink fallback path — this Mac can't reproduce a denied-symlink PowerShell session to test it end-to-end.
 - Consider a future pass on Linux support once actually needed on a second machine (stub exists, untested).
 - Consider a path-independent scheme for per-project memory once cross-machine repo paths are settled.

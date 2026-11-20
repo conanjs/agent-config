@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$HOME/.copilot/tracker/tracker-hook.sh\" --hook codex --stdin",
+            "command": "\"$HOME/.agent-config/tracker/tracker-hook.sh\" --hook codex --stdin",
             "commandWindows": "node \"%USERPROFILE%\\.copilot\\tracker\\tracker.mjs\" --hook codex --stdin",
             "timeout": 15
           }
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$HOME/.copilot/hooks/turn-tokens/turn-tokens-hook.sh\" --hook codex",
+            "command": "\"$HOME/.agent-config/hooks/turn-tokens/turn-tokens-hook.sh\" --hook codex",
             "commandWindows": "node \"%USERPROFILE%\\.copilot\\hooks\\turn-tokens\\turn-tokens.mjs\" --hook codex",
             "timeout": 15
           }

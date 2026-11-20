@@ -25,7 +25,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const YAML = await import(pathToFileURL(path.join(root, 'contracts/lib/vendor/yaml/index.js')).href);
 
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
-const HOME_RENDER = { posix: '~/.copilot', win32: '%USERPROFILE%/.copilot' };
+const HOME_RENDER = { posix: '~/.agent-config', win32: '%USERPROFILE%/.agent-config' };
 const KINDS = ['skills', 'agents'];
 
 function parseArgs(argv) {

@@ -11,7 +11,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$HOME/.copilot/tracker/tracker-hook.sh\" --hook claude \"$CLAUDE_PROJECT_DIR\"",
+            "command": "\"$HOME/.agent-config/tracker/tracker-hook.sh\" --hook claude \"$CLAUDE_PROJECT_DIR\"",
             "timeout": 15,
             "statusMessage": "Reading TRACKER.md"
           }
@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$HOME/.copilot/hooks/turn-tokens/turn-tokens-hook.sh\" --hook claude",
+            "command": "\"$HOME/.agent-config/hooks/turn-tokens/turn-tokens-hook.sh\" --hook claude",
             "timeout": 15
           }
         ]
@@ -32,6 +32,6 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "\"$HOME/.copilot/hooks/turn-tokens/turn-tokens-hook.sh\" --statusline"
+    "command": "\"$HOME/.agent-config/hooks/turn-tokens/turn-tokens-hook.sh\" --statusline"
   }
 }

@@ -358,7 +358,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
     When the tool runs with "--brief {root}"
     Then it exits with 0 and prints:
       """
-      TRACKER.md: 1 format error; run: node ~/.copilot/tracker/tracker.mjs to see it
+      TRACKER.md: 1 format error; run: node ~/.agent-config/tracker/tracker.mjs to see it
       """
 
   # ---- hooks ------------------------------------------------------------------------------------------
@@ -374,7 +374,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
         "systemMessage": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps",
         "hookSpecificOutput": {
           "hookEventName": "SessionStart",
-          "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+          "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.agent-config/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
         }
       }
       """
@@ -422,10 +422,10 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
     Then it exits with 0 and prints:
       """
       {
-        "systemMessage": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n… 1 more not listed; all of them: node ~/.copilot/tracker/tracker.mjs --brief",
+        "systemMessage": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n… 1 more not listed; all of them: node ~/.agent-config/tracker/tracker.mjs --brief",
         "hookSpecificOutput": {
           "hookEventName": "SessionStart",
-          "additionalContext": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n… 1 more not listed; all of them: node ~/.copilot/tracker/tracker.mjs --brief\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+          "additionalContext": "TRACKER.md: 6 open\n- T-1 One · next: a\n- T-2 Two · next: b\n- T-3 Three · next: c\n- T-4 Four · next: d\n- T-5 Five · next: e\n… 1 more not listed; all of them: node ~/.agent-config/tracker/tracker.mjs --brief\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.agent-config/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
         }
       }
       """
@@ -441,7 +441,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
         "systemMessage": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps",
         "hookSpecificOutput": {
           "hookEventName": "SessionStart",
-          "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+          "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.agent-config/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
         }
       }
       """
@@ -459,7 +459,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
     Then it exits with 0 and prints:
       """
       {
-        "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+        "additionalContext": "TRACKER.md: 2 open — 1 waiting\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n- T-1 Write the setup guide · next: Draft the install steps\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.agent-config/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
       }
       """
 
@@ -469,7 +469,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
     Then it exits with 0 and prints:
       """
       {
-        "additionalContext": "TRACKER.md: 2 open — 1 waiting\n… 2 more not listed (2 untouched for more than 2 days); all of them: node ~/.copilot/tracker/tracker.mjs --brief\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+        "additionalContext": "TRACKER.md: 2 open — 1 waiting\n… 2 more not listed (2 untouched for more than 2 days); all of them: node ~/.agent-config/tracker/tracker.mjs --brief\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.agent-config/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
       }
       """
 
@@ -480,7 +480,7 @@ Feature: The tracker keeps the open work of a repo and reminds the next session 
     Then it exits with 0 and prints:
       """
       {
-        "additionalContext": "TRACKER.md: 2 open — 1 high, 1 waiting\n- T-1 Write the setup guide · high priority · next: Draft the install steps\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.copilot/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
+        "additionalContext": "TRACKER.md: 2 open — 1 high, 1 waiting\n- T-1 Write the setup guide · high priority · next: Draft the install steps\n- T-2 Decide on the old stash · waiting on V · next: Pop it or drop it\n\nThese are the open items in this repo's TRACKER.md (tracker/v1). Tell the user about any item that looks done, and close it once they agree: node ~/.agent-config/tracker/tracker.mjs --close <id>. When this session leaves work undone, add it with --add; when it finishes an item, close it."
       }
       """
 

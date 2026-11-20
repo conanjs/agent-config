@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const NAME = 'TRACKER.md';
-const TOOL = '~/.copilot/tracker/tracker.mjs';
+const TOOL = '~/.agent-config/tracker/tracker.mjs';
 const KEYS = ['status', 'priority', 'next', 'waiting-on', 'due', 'done-when', 'from', 'updated', 'closed', 'why', 'note', 'links'];
 const NEEDS = { open: ['next', 'from'], doing: ['next', 'from'], waiting: ['next', 'waiting-on', 'from'], done: ['from', 'closed'], dropped: ['from', 'closed', 'why'] };
 const SECTION_OF = { open: 'Open', doing: 'Open', waiting: 'Open', done: 'Done', dropped: 'Done' };

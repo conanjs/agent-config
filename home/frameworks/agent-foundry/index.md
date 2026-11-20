@@ -137,5 +137,5 @@ This follows the Backplane idea in `proposals/loose-coupling-backplane.md`: Foun
 
 ## Related
 
-- `{{AGENT_HOME}}/frameworks/agentic-sdlc/index.md`: the SDLC framework (a different kind of agent system).
-- `{{AGENT_HOME}}/patterns/artifact-types.pattern.md`: how Charters become skills, prompts and agents per tool.
+- `~/.agent-config/frameworks/agentic-sdlc/index.md`: the SDLC framework (a different kind of agent system).
+- `~/.agent-config/patterns/artifact-types.pattern.md`: how Charters become skills, prompts and agents per tool.

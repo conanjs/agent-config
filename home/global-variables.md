@@ -2,13 +2,13 @@
 
 Single source of truth for every `{{VAR}}` symbol referenced in docs across this repo and the deployed knowledge base. Defined here once so nothing else needs per-machine edits.
 
-**Deployment:** this file is shipped as a template in the repo and deployed to `~/.copilot/global-variables.md` via the `seed-once` strategy in `mapping.yaml` — copied into place once, then never overwritten by future installs, so the machine-specific values below persist across `git pull`s of this repo. `home/instructions/core.instructions.md` points every agent at the deployed copy.
+**Deployment:** this file is shipped as a template in the repo and deployed to `~/.agent-config/global-variables.md` via the `seed-once` strategy in `mapping.yaml` — copied into place once, then never overwritten by future installs, so the machine-specific values below persist across `git pull`s of this repo. `home/instructions/core.instructions.md` points every agent at the deployed copy.
 
 ## Path variables
 
 | Variable | Value | Notes |
 |---|---|---|
-| `{{AGENT_HOME}}` | `~/.copilot` (macOS/Linux) or `%USERPROFILE%\.copilot` (Windows) | Deployed config root. Fixed per OS — no setup needed, correct as shipped. |
+| `{{AGENT_HOME}}` | `~/.agent-config` (macOS/Linux) or `%USERPROFILE%\.agent-config` (Windows) | The agent home every coding agent shares. Fixed per OS — no setup needed, correct as shipped. |
 | `{{REFERENCE_REPOS_ROOT}}` | `~/agentic-sdlc-references` | Where stack reference repos (e.g. `conanjs/agentic-sdlc-reference-typescript-node`) are cloned, read-only, at the commit pinned in `{{AGENT_HOME}}/frameworks/agentic-sdlc/stacks/<stack>/reference.md`. Deliberately outside `{{AGENT_HOME}}`, so their dependencies never land in the deployed config. The default is fine; change it only to keep clones elsewhere. |
 | `{{AGENT_CONFIG_REPO}}` | `<SETUP REQUIRED>` | This machine's actual clone path of the `agent-config` repo (e.g. `~/workspace/agent-config`). Filled in **automatically** by `SETUP.md` — the agent running setup detects this itself (e.g. via `git rev-parse --show-toplevel`) and writes it here; it then shows you the result to confirm before proceeding. If this still reads `<SETUP REQUIRED>`, setup wasn't completed. |
 

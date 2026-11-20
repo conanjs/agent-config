@@ -13,21 +13,27 @@
 #                         (e.g. ~/.claude/settings.json permissions, or
 #                         global-variables.md's machine-specific values).
 #
-# source is relative to this repo. Only this repo's own files are installed here: another repo (agent-knowledge,
-# agent-companies, ...) is integrated by its own README section "Integrate into the agent home".
+# source is relative to this repo. Only this repo's own files are installed here. The agent home is ~/.agent-config
+# (%USERPROFILE%\.agent-config on Windows); another repo (agent-knowledge, agent-companies, ...) joins it by its
+# own README section "Integrate into the agent home".
 
-# Core content (home/ in this repo).
+# The agent home ~/.agent-config: content every coding agent reads (home/ in this repo).
+- { source: home/instructions,               target: ~/.agent-config/instructions,          strategy: symlink }
+- { source: home/references,                 target: ~/.agent-config/references,            strategy: symlink }
+- { source: home/procedures,                 target: ~/.agent-config/procedures,            strategy: symlink }
+- { source: home/patterns,                   target: ~/.agent-config/patterns,              strategy: symlink }
+- { source: home/tracker,                    target: ~/.agent-config/tracker,               strategy: symlink }
+- { source: home/hooks,                      target: ~/.agent-config/hooks,                 strategy: symlink }
+- { source: home/prompts,                    target: ~/.agent-config/prompts,               strategy: symlink }
+- { source: home/global-variables.md,        target: ~/.agent-config/global-variables.md,   strategy: seed-once }
+# ~/.agent-config/frameworks is a real folder with one link per framework, because they come from different repos.
+- { source: home/frameworks/agent-foundry,   target: ~/.agent-config/frameworks/agent-foundry, strategy: symlink }
+# Copilot reads these from its own folder by itself, so they are linked there too.
 - { source: home/instructions,               target: ~/.copilot/instructions,               strategy: symlink }
-- { source: home/references,                 target: ~/.copilot/references,                 strategy: symlink }
-- { source: home/procedures,                 target: ~/.copilot/procedures,                 strategy: symlink }
-- { source: home/patterns,                   target: ~/.copilot/patterns,                   strategy: symlink }
-- { source: home/tracker,                    target: ~/.copilot/tracker,                    strategy: symlink }
-- { source: home/prompts,                    target: ~/.copilot/prompts,                    strategy: symlink }
 - { source: home/hooks,                      target: ~/.copilot/hooks,                      strategy: symlink }
-- { source: home/global-variables.md,        target: ~/.copilot/global-variables.md,        strategy: seed-once }
-# ~/.copilot/frameworks is a real folder with one link per framework, because they come from different folders.
-- { source: home/frameworks/agent-foundry,   target: ~/.copilot/frameworks/agent-foundry,   strategy: symlink }
-# Per-agent files that are not built (adapters/<agent>/).
+- { source: home/prompts,                    target: ~/.copilot/prompts,                    strategy: symlink }
+# Each coding agent's own entry files that are not built (adapters/<agent>/); Claude's CLAUDE.md imports
+# ~/.agent-config/instructions/core.instructions.md, Codex's AGENTS.md is that file.
 - { source: adapters/claude/CLAUDE.md,       target: ~/.claude/CLAUDE.md,                   strategy: symlink }
 - { source: adapters/claude/plugins/blocklist.json, target: ~/.claude/plugins/blocklist.json, strategy: symlink }
 - { source: adapters/claude/settings.json,   target: ~/.claude/settings.json,               strategy: seed-once }

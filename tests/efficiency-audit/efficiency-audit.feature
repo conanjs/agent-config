@@ -247,7 +247,7 @@ Feature: The efficiency auditor finds token waste in the agents' session logs (p
     Given the repo's "home/efficiency-audit" folder is copied to "home/efficiency-audit"
     And the repo's "home/instructions" folder is copied to "home/instructions"
     And the repo's "home/hooks/turn-tokens" folder is copied to "home/hooks/turn-tokens"
-    And in "home/efficiency-audit/triggers.json", `"core": "~/.copilot/global-variables.md"` becomes `"core": "~/.copilot/vars.md"`
+    And in "home/efficiency-audit/triggers.json", `"core": "~/.agent-config/global-variables.md"` becomes `"core": "~/.copilot/vars.md"`
     When the tool runs with "check-triggers"
     Then it exits with 1 and prints:
       """

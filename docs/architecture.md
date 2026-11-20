@@ -130,11 +130,11 @@ Rules on top of the table: only `src/CompositionRoot.ts` imports adapters and co
 | Store | Kind | Owned entities | Notes |
 |---|---|---|---|
 | `components.yaml`, `component.yaml` (repo root, from phase 2) | YAML files in git | Default component list; core's manifest | Public; changed by pull request |
-| `{{AGENT_HOME}}/components.local.yaml`, `variables.local.yaml` | YAML files | V's extra components, source overrides, variable values | Never tracked (AC-3.8); backed up before each rewrite |
-| `{{AGENT_HOME}}/components.lock`, `install-state.json`, `install-state.pending.json` | JSON files | Locked versions; every placed path with class and hash; the switch journal | Installer only; temp file + rename (DR-104, DR-202) |
-| `{{AGENT_HOME}}/store/<name>@<id>/` | Immutable folders | One tree per component version (checked out, rendered or built) | Current + previous kept |
-| `{{AGENT_HOME}}/generated/` | Files and links | Rendered copies (`generated/<component>`), routes, `global-variables.md`, `index.md`, Codex `AGENTS.md` and `hooks.json` | Rebuilt each install; never committed |
-| `{{AGENT_HOME}}/install-log.jsonl`, `install.lock` | JSON Lines, lock file | Who installed what when; one writer at a time | Rotated at 1 MB |
+| `~/.agent-config/components.local.yaml`, `variables.local.yaml` | YAML files | V's extra components, source overrides, variable values | Never tracked (AC-3.8); backed up before each rewrite |
+| `~/.agent-config/components.lock`, `install-state.json`, `install-state.pending.json` | JSON files | Locked versions; every placed path with class and hash; the switch journal | Installer only; temp file + rename (DR-104, DR-202) |
+| `~/.agent-config/store/<name>@<id>/` | Immutable folders | One tree per component version (checked out, rendered or built) | Current + previous kept |
+| `~/.agent-config/generated/` | Files and links | Rendered copies (`generated/<component>`), routes, `global-variables.md`, `index.md`, Codex `AGENTS.md` and `hooks.json` | Rebuilt each install; never committed |
+| `~/.agent-config/install-log.jsonl`, `install.lock` | JSON Lines, lock file | Who installed what when; one writer at a time | Rotated at 1 MB |
 | `~/.agent-config-backups/<timestamp>/` | Folders with `backup-manifest.json` | Anything the installer replaced | Owner-only; never deleted by a command |
 
 **Delivery classes** (FR-015): every file the installer places is one of **linked** (a link into a store tree or a `path` source; the knowledge base, whose links are already relative, so edits show at once), **rendered** (a read-only copy of a component that cites another, under `generated/<component>/`, with each citation's text the real absolute path and its target relative; agents load these paths, DR-307), **generated** (machine-specific files: routes, `global-variables.md`, Codex `AGENTS.md`, merged hook entries), or **compat** (a link at an old `~/.copilot/…` path, kept for one release, DR-204). Whether a component is rendered follows from its citations, not from a flag (DR-406).

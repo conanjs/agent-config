@@ -2,7 +2,7 @@
 // validate-procedures.mjs — checks home/procedures/**/*.procedure.md against procedure.schema.md.
 //
 // Usage: node validate-procedures.mjs [procedures-root] [--max-age <days>] [--upstream]
-//   procedures-root  default: <this tool>/..  (repo: home/procedures, installed: ~/.copilot/procedures)
+//   procedures-root  default: <this tool>/..  (repo: home/procedures, installed: ~/.agent-config/procedures)
 //   --max-age        days before a verified dependency counts as due for re-verification (default 90)
 //   --upstream       also ask GitHub for the latest release of every dependency with a `repo:` and warn when it
 //                    differs from `verified-against` (network; uses GITHUB_TOKEN when set, and GITHUB_API_URL when set,

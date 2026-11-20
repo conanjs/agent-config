@@ -5,7 +5,7 @@ last-updated: 2026-10-30
 
 # Schema: Tracker (`tracker/v1`)
 
-**Applies to:** `TRACKER.md` at the root of any repo (or of a folder that is not a repo) · **Written by:** agents at the end of a turn, and people · **Read by:** agents at session start (through the session-start hooks of Claude Code, Codex and Copilot CLI), people, and `tracker.mjs` · **Deployed to:** `~/.copilot/tracker/` (`mapping.yaml`)
+**Applies to:** `TRACKER.md` at the root of any repo (or of a folder that is not a repo) · **Written by:** agents at the end of a turn, and people · **Read by:** agents at session start (through the session-start hooks of Claude Code, Codex and Copilot CLI), people, and `tracker.mjs` · **Deployed to:** `~/.agent-config/tracker/` (`mapping.yaml`)
 
 A tracker is the list of work a repo still owes: what is left, its next step, and what it is waiting on. It lives in the repo, so it outlasts any one chat. A hook reads it at the start of every session and shows you what is still open, so nothing depends on anyone remembering.
 

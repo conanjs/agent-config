@@ -41,7 +41,7 @@ Goal: `pr-reviewer` reviewing one real pull request in **suggest-only** mode, wi
 
 1. **Pick one real repo.** Write its `zones.md` (copy `examples/orders-team/zones.md`; use real owners; mark vendored or other-team folders `foreign`).
 2. **Create a lens folder** for that repo, e.g. `docs/lens/` with `index.md` and `zones.md`. Leave `lessons/` and `waivers/` empty; the agent works without them.
-3. **Add a thin wrapper** so a tool can start the agent. It says only: "Read `{{AGENT_HOME}}/frameworks/agent-foundry/charters/pr-reviewer.charter.md`, follow it, using the lens at `<path>`." One wrapper per tool, following `patterns/shared-procedure-thin-wrapper.pattern.md`. (Written: `foundry-<charter-id>` in each tool's agents folder; tell it the lens path in your request.)
+3. **Add a thin wrapper** so a tool can start the agent. It says only: "Read `~/.agent-config/frameworks/agent-foundry/charters/pr-reviewer.charter.md`, follow it, using the lens at `<path>`." One wrapper per tool, following `patterns/shared-procedure-thin-wrapper.pattern.md`. (Written: `foundry-<charter-id>` in each tool's agents folder; tell it the lens path in your request.)
 4. **Run it on a closed PR you already know the answer to.** Compare its summary with what the humans said.
 5. **Fix the gaps in the tree or the rubric**, not by editing the model's behaviour in chat.
 6. **Then** add lessons by hand (write `LS-*.md`) once you see a repeated pattern.

@@ -94,7 +94,7 @@ The deep-dive file, plus a short hand-over note in `message/v2` shape. Its `prov
 
 **Local artifacts:**
 - `../schemas/charter.schema.md`, `../trees/knowledge-research.tree.md`, `../floors.md`, `../principles.md`.
-- `{{AGENT_HOME}}/frameworks/knowledge/schemas/deep-dive.schema.md`: the output shape.
+- `~/.agent-config/frameworks/knowledge/schemas/deep-dive.schema.md`: the output shape.
 
 **External authoritative sources:**
 - [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) — Anthropic, 2024. Backs: one agent with a clear loop before multi-agent designs; transparency of planning steps.
@@ -103,4 +103,4 @@ The deep-dive file, plus a short hand-over note in `message/v2` shape. Its `prov
 ## Related
 
 - `ci-failure-triager.charter.md`, `pr-reviewer.charter.md`.
-- `{{AGENT_HOME}}/knowledge/index.md`.
+- `~/.agent-config/knowledge/index.md`.
