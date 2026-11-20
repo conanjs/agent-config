@@ -21,11 +21,13 @@ printf '#!/bin/sh\necho %s\n' "$uname_out" > "$bin/uname"; chmod +x "$bin/uname"
 mode_of() { stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1"; }  # GNU stat, then BSD stat
 
 code=0
-env -i HOME="$home" PATH="$bin:/usr/bin:/bin" bash "$repo/installers/install.sh" >/dev/null 2>&1 || code=$?
+# The installer runs scripts/build.mjs, so node stays on PATH.
+node_dir="$(dirname "$(command -v node)")"
+env -i HOME="$home" PATH="$bin:$node_dir:/usr/bin:/bin" bash "$repo/installers/install.sh" >/dev/null 2>&1 || code=$?
 echo "# install plan of installers/install.sh, os=$os, exit=$code"
 
 home_real="$(cd "$home" && pwd -P)"
-rel_source() { local s="$1"; s="${s#"$repo"/}"; echo "$s"; }
+rel_source() { local s="$1"; s="${s#"$repo"/}"; s="${s/#"$(dirname "$repo")"\//../}"; echo "$s"; }
 while IFS= read -r p; do
   case "$p" in "$home_real"/.agent-config-backups/*) continue ;; esac
   t="~/${p#"$home_real"/}"

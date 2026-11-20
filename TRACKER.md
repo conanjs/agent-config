@@ -135,4 +135,59 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: Find the current pages replacing github.github.com/spec-kit/concepts/complex-features.html (ai-agents/graph-engineering-vs-sdd-ai-dlc-spec-kit.md) and github.github.io/spec-kit/guides/existing-projects.html (testing/characterization-tests.md), both HTTP 404 on 2026-11-11; update only those references
 - from: 2026-11-11
 
+### T-51 Spec 022 phase 2: T130 security follow-ups for T138/T142 (parked on feat/022-phase-2)
+- status: open
+- next: From the T130 security pass (2026-11-17): (1) installers/eslint.config.mjs noProcessOutput still allows a default or namespace import of node:process (proc.stdout.write) and fs.writeFileSync('/dev/stdout'|'/dev/stderr'|'/dev/tty'|'CON') outside the presenter: ban both when T138/T142 write ConsolePresenter.ts; (2) copyKnownFields keeps only string or boolean fields (new String(url) prints a secret one character at a time); (3) keep U+FE0E/FE0F only once right after an Extended_Pictographic character; (4) optionally redact again after escaping in redactDeep. Keep the needsRedaction refusal rule for T136/T208
+- from: 2026-11-18
+
+### T-52 Spec 022 phase 2: crashed-run lock and Windows owner-only permissions (parked on feat/022-phase-2)
+- status: open
+- next: From T132 (2026-11-17): (1) a killed install leaves install.lock; the next run refuses it until it is 10 minutes old (M-12, pid is informative only). Decide whether doctor (T139) may clear a lock whose pid is not alive on this host, or the message tells V to wait or remove it; EDGE-4's scenario moves the clock 11 minutes forward between runs. (2) Windows owner-only ACL (A-30, @windows safety scenarios): state setMode is a no-op on Windows; an icacls adapter is needed in T142 or later, tested on the Windows runner
+- from: 2026-11-18
+
+### T-53 Spec 022 phase 2: T136 wiring follow-ups and the T159 route note (parked on feat/022-phase-2)
+- status: open
+- next: From the T133/T136 security re-check (2026-11-17): (1) apply the ASCII rule to a route's when text; refuse a run of more than 8 spaces in a hook or service command, or show it as a count; (2) name the known limits of HookUsage.textNamesPath in its header (globs, ?, $(echo knowledge), cd then a relative path, Cyrillic lookalikes; doctor is the backstop); (3) T159: a route's hash leaves out the commit, so route file content can change without consent until phase 3
+- from: 2026-11-18
+
+### T-54 Rewrite references to the moved agentic-sdlc framework
+- status: open
+- next: Framework now lives in ~/workspace/agentic-sdlc (plain folder, not a repo; installed via the link ~/.copilot/frameworks/agentic-sdlc). Rewrite the ~119 repo files that still point to copilot/frameworks/agentic-sdlc (agents x3, skills/sdlc-*, atlas, contracts, tests/validate-sdlc, procedures, patterns, docs, README/SETUP/INTERFACES, scripts/check-docs.sh, pnpm-workspace.yaml); leave proposals/ and TRACKER.done.md as history. Then make scripts/check-docs.sh pass again (now FAIL 51: agentic-sdlc validate.mjs and workflow-graph missing)
+- from: 2026-11-18
+
+### T-55 Rewrite references to the knowledge base moved to conanjs/agent-knowledge
+- status: open
+- next: KB and frameworks/knowledge now live in ~/workspace/agent-knowledge (github.com/conanjs/agent-knowledge), linked at ~/.copilot/knowledge and ~/.copilot/frameworks/knowledge. Update the ~129 repo files naming copilot/knowledge or copilot/frameworks/knowledge (AGENTS.md, core instructions, review-docs procedure, atlas, scripts/check-docs.sh validate-knowledge step), and add a check workflow to agent-knowledge
+- from: 2026-11-18
+
+### T-56 Teach the installer the split layout before running it again
+- status: open
+- next: mapping.yaml still links ~/.copilot/knowledge and the whole ~/.copilot/frameworks to this repo; running installers/install.sh now would replace the per-entry links (agent-foundry, company-kb -> agent-config; knowledge -> agent-knowledge; agentic-sdlc -> ~/workspace/agentic-sdlc) and break knowledge and agentic-sdlc. Old links recorded in ~/.agent-config-backups/*-split/links-before.txt
+- from: 2026-11-18
+
+### T-57 Split the company KB into its own folder and repo
+- status: open
+- next: Move copilot/companies and copilot/frameworks/company-kb out of agent-config into their own folder and GitHub repo (history kept, like agent-knowledge); decide visibility first because copilot/companies holds company material (ots)
+- from: 2026-11-18
+
+### T-58 Check the new layout on Windows and in CI
+- status: open
+- next: Not run: (1) install.ps1 with scripts/build.mjs --link and the per-entry ~/.copilot/frameworks links on a Windows machine, then record tests/installers/golden/windows/windows.txt with golden/windows/plan.ps1; (2) CI has no ../agent-knowledge or ../agentic-sdlc next to the checkout, so the Mac golden plan (recorded with both present) and the build differ there: clone agent-knowledge in the workflow, and decide how CI gets agentic-sdlc (it is a plain folder today)
+- from: 2026-11-18
+
+### T-59 Bring the atlas back for the split repos
+- status: open
+- next: The atlas and the fitness check are parked in ~/workspace/agent-atlas (plain folder, not installed, not checked; ~/.copilot/atlas link removed, so the sdlc-coordinator agent cannot read it). Decide where it lives (its own repo or agentic-sdlc), rewrite atlas.yaml for agent-config, agent-knowledge, agent-companies and agentic-sdlc, re-home tests/atlas and tests/fitness with a test harness, then drop the AC-1.6 exemption in tests/coverage/exemptions.yaml
+- from: 2026-11-19
+
+### T-61 Point validate-foundry at the moved agentic-sdlc rules
+- status: open
+- next: home/frameworks/agent-foundry/tools/validate-foundry.mjs looks for rule ids in home/frameworks/agentic-sdlc/foundations, which moved to ../agentic-sdlc; it now warns and skips the rule-id check. Read the rules from ~/.copilot/frameworks/agentic-sdlc or make the check optional
+- from: 2026-11-19
+
+### T-63 Let the installers add the plugin marketplaces
+- status: open
+- next: installers/install.sh and install.ps1 build and link agents only; the agent-config and agent-knowledge plugins were installed by hand (claude/copilot plugin marketplace add <clone> + install, codex plugin marketplace add + codex plugin add). Decide whether the installer runs these when each CLI is present, and re-runs codex plugin add after a pull
+- from: 2026-11-20
+
 ## Done

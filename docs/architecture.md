@@ -41,24 +41,24 @@ Today's folders, each with the component it becomes (`target`) and the phase tha
 
 ```yaml
 components:
-  - { name: core-instructions, path: copilot/instructions/, kind: datastore, target: core, moves: "phase 8 to home/instructions/", decisions: [DR-302, DR-308] }
-  - { name: core-patterns, path: copilot/patterns/, kind: datastore, target: core, moves: "phase 8 to home/patterns/", decisions: [DR-308] }
-  - { name: core-references, path: copilot/references/, kind: datastore, target: core, moves: "phase 8 to home/references/", decisions: [DR-308] }
-  - { name: core-prompts, path: copilot/prompts/, kind: datastore, target: core, moves: "phase 8 to home/prompts/", decisions: [DR-308] }
-  - { name: core-procedures, path: copilot/procedures/, kind: script, stack: typescript-node, target: core, moves: "4 SDLC procedures to agentic-sdlc in phase 4 (DR-405); the rest to home/ in phase 8", decisions: [DR-101, DR-109, DR-405] }
-  - { name: atlas, path: copilot/atlas/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
-  - { name: tracker, path: copilot/tracker/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
-  - { name: agent-hooks, path: copilot/hooks/, kind: script, stack: typescript-node, target: core, moves: "workflow-graph.json to agentic-sdlc (DR-413); hook files become hooks/v1 entries in phase 5", decisions: [DR-101, DR-413] }
-  - { name: efficiency-audit, path: copilot/efficiency-audit/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
-  - { name: agent-foundry, path: copilot/frameworks/agent-foundry/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
+  - { name: core-instructions, path: home/instructions/, kind: datastore, target: core, moves: "phase 8 to home/instructions/", decisions: [DR-302, DR-308] }
+  - { name: core-patterns, path: home/patterns/, kind: datastore, target: core, moves: "phase 8 to home/patterns/", decisions: [DR-308] }
+  - { name: core-references, path: home/references/, kind: datastore, target: core, moves: "phase 8 to home/references/", decisions: [DR-308] }
+  - { name: core-prompts, path: home/prompts/, kind: datastore, target: core, moves: "phase 8 to home/prompts/", decisions: [DR-308] }
+  - { name: core-procedures, path: home/procedures/, kind: script, stack: typescript-node, target: core, moves: "4 SDLC procedures to agentic-sdlc in phase 4 (DR-405); the rest to home/ in phase 8", decisions: [DR-101, DR-109, DR-405] }
+  - { name: atlas, path: home/atlas/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
+  - { name: tracker, path: home/tracker/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
+  - { name: agent-hooks, path: home/hooks/, kind: script, stack: typescript-node, target: core, moves: "workflow-graph.json to agentic-sdlc (DR-413); hook files become hooks/v1 entries in phase 5", decisions: [DR-101, DR-413] }
+  - { name: efficiency-audit, path: home/efficiency-audit/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
+  - { name: agent-foundry, path: home/frameworks/agent-foundry/, kind: script, stack: typescript-node, target: core, decisions: [DR-101, DR-109] }
   - { name: templates, path: templates/, kind: datastore, target: core, moves: "phase 8 to home/templates/", decisions: [DR-308] }
   - { name: knowledge, path: copilot/knowledge/, kind: datastore, target: agent-knowledge, moves: "phase 6", decisions: [DR-404] }
   - { name: knowledge-framework, path: copilot/frameworks/knowledge/, kind: script, stack: typescript-node, target: agent-knowledge, moves: "phase 6", decisions: [DR-109, DR-404] }
-  - { name: company-kb-framework, path: copilot/frameworks/company-kb/, kind: datastore, target: agent-knowledge, moves: "phase 6", decisions: [DR-405] }
-  - { name: companies, path: copilot/companies/, kind: datastore, target: agent-companies, moves: "phase 3", decisions: [DR-405, DR-407] }
+  - { name: company-kb-framework, path: home/frameworks/company-kb/, kind: datastore, target: agent-knowledge, moves: "phase 6", decisions: [DR-405] }
+  - { name: companies, path: home/companies/, kind: datastore, target: agent-companies, moves: "phase 3", decisions: [DR-405, DR-407] }
   - { name: agentic-sdlc, path: copilot/frameworks/agentic-sdlc/, kind: library, stack: typescript-node, target: agentic-sdlc, moves: "phase 7", decisions: [DR-109, DR-415] }
   - { name: workflow-graph, path: copilot/frameworks/agentic-sdlc/tools/workflow-graph/, kind: script, stack: typescript-node, target: agentic-sdlc, moves: "phase 7, with agentic-sdlc", decisions: [DR-108, DR-109] }
-  - { name: copilot-agent-files, path: copilot/agents/, kind: datastore, target: "built output", moves: "replaced by agent-source/v1 builds in phase 4", decisions: [DR-409] }
+  - { name: copilot-agent-files, path: agents/, kind: datastore, target: "built output", moves: "replaced by agent-source/v1 builds in phase 4", decisions: [DR-409] }
   - { name: claude-adapter, path: claude/, kind: datastore, target: "adapters/claude", moves: "phase 4 (agents built), phase 8 (folder)", decisions: [DR-409, DR-410] }
   - { name: codex-adapter, path: codex/, kind: datastore, target: "adapters/codex", moves: "phase 4 (agents built), phase 8 (folder)", decisions: [DR-409, DR-410] }
   - { name: skills, path: skills/, kind: datastore, target: "skill sources", moves: "phase 4 to skill-source/v1", decisions: [DR-408] }
@@ -89,11 +89,11 @@ Repo-level tiers today, one block per target component with a representative fol
 
 ```yaml
 layers:
-  - { name: agent-knowledge, path: copilot/knowledge/, members: [copilot/knowledge/, copilot/frameworks/knowledge/, copilot/frameworks/company-kb/], may-depend-on: [] }
-  - { name: core, path: copilot/instructions/, members: [copilot/instructions/, copilot/patterns/, copilot/procedures/, copilot/references/, copilot/prompts/, copilot/atlas/, copilot/tracker/, copilot/hooks/, copilot/efficiency-audit/, copilot/frameworks/agent-foundry/, templates/], may-depend-on: [agent-knowledge] }
-  - { name: agent-companies, path: copilot/companies/, members: [copilot/companies/], may-depend-on: [agent-knowledge] }
+  - { name: agent-knowledge, path: copilot/knowledge/, members: [copilot/knowledge/, copilot/frameworks/knowledge/, home/frameworks/company-kb/], may-depend-on: [] }
+  - { name: core, path: home/instructions/, members: [home/instructions/, home/patterns/, home/procedures/, home/references/, home/prompts/, home/atlas/, home/tracker/, home/hooks/, home/efficiency-audit/, home/frameworks/agent-foundry/, templates/], may-depend-on: [agent-knowledge] }
+  - { name: agent-companies, path: home/companies/, members: [home/companies/], may-depend-on: [agent-knowledge] }
   - { name: agentic-sdlc, path: copilot/frameworks/agentic-sdlc/, members: [copilot/frameworks/agentic-sdlc/], may-depend-on: [agent-knowledge, core] }
-  - { name: platform-files, path: claude/, members: [claude/, codex/, copilot/agents/, skills/], may-depend-on: [core, agentic-sdlc] }
+  - { name: platform-files, path: claude/, members: [claude/, codex/, agents/, skills/], may-depend-on: [core, agentic-sdlc] }
   - { name: composition-root, path: installers/, members: [installers/, mapping.yaml, global-variables.md], may-depend-on: [agent-knowledge, core, agent-companies, agentic-sdlc, platform-files] }
   - { name: checks, path: tests/, members: [tests/, scripts/, cucumber.mjs], may-depend-on: [agent-knowledge, core, agent-companies, agentic-sdlc, platform-files, composition-root] }
 ```
@@ -130,11 +130,11 @@ Rules on top of the table: only `src/CompositionRoot.ts` imports adapters and co
 | Store | Kind | Owned entities | Notes |
 |---|---|---|---|
 | `components.yaml`, `component.yaml` (repo root, from phase 2) | YAML files in git | Default component list; core's manifest | Public; changed by pull request |
-| `{{AGENT_HOME}}/components.local.yaml`, `variables.local.yaml` | YAML files | V's extra components, source overrides, variable values | Never tracked (AC-3.8); backed up before each rewrite |
-| `{{AGENT_HOME}}/components.lock`, `install-state.json`, `install-state.pending.json` | JSON files | Locked versions; every placed path with class and hash; the switch journal | Installer only; temp file + rename (DR-104, DR-202) |
-| `{{AGENT_HOME}}/store/<name>@<id>/` | Immutable folders | One tree per component version (checked out, rendered or built) | Current + previous kept |
-| `{{AGENT_HOME}}/generated/` | Files and links | Rendered copies (`generated/<component>`), routes, `global-variables.md`, `index.md`, Codex `AGENTS.md` and `hooks.json` | Rebuilt each install; never committed |
-| `{{AGENT_HOME}}/install-log.jsonl`, `install.lock` | JSON Lines, lock file | Who installed what when; one writer at a time | Rotated at 1 MB |
+| `~/.agent-config/components.local.yaml`, `variables.local.yaml` | YAML files | V's extra components, source overrides, variable values | Never tracked (AC-3.8); backed up before each rewrite |
+| `~/.agent-config/components.lock`, `install-state.json`, `install-state.pending.json` | JSON files | Locked versions; every placed path with class and hash; the switch journal | Installer only; temp file + rename (DR-104, DR-202) |
+| `~/.agent-config/store/<name>@<id>/` | Immutable folders | One tree per component version (checked out, rendered or built) | Current + previous kept |
+| `~/.agent-config/generated/` | Files and links | Rendered copies (`generated/<component>`), routes, `global-variables.md`, `index.md`, Codex `AGENTS.md` and `hooks.json` | Rebuilt each install; never committed |
+| `~/.agent-config/install-log.jsonl`, `install.lock` | JSON Lines, lock file | Who installed what when; one writer at a time | Rotated at 1 MB |
 | `~/.agent-config-backups/<timestamp>/` | Folders with `backup-manifest.json` | Anything the installer replaced | Owner-only; never deleted by a command |
 
 **Delivery classes** (FR-015): every file the installer places is one of **linked** (a link into a store tree or a `path` source; the knowledge base, whose links are already relative, so edits show at once), **rendered** (a read-only copy of a component that cites another, under `generated/<component>/`, with each citation's text the real absolute path and its target relative; agents load these paths, DR-307), **generated** (machine-specific files: routes, `global-variables.md`, Codex `AGENTS.md`, merged hook entries), or **compat** (a link at an old `~/.copilot/…` path, kept for one release, DR-204). Whether a component is rendered follows from its citations, not from a flag (DR-406).

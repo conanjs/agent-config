@@ -24,7 +24,8 @@ function Expand-TargetPath {
 function Resolve-SourcePath {
   param([string]$RepoRoot, [string]$SourceRel)
   $rel = $SourceRel -replace '/', '\'
-  return (Join-Path $RepoRoot $rel)
+  # GetFullPath removes ..\ (sibling components such as ..\agent-knowledge) so the link text matches on the next run.
+  return [IO.Path]::GetFullPath((Join-Path $RepoRoot $rel))
 }
 
 function Test-AlreadyLinkedCorrectly {

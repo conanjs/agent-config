@@ -1,0 +1,8 @@
+{
+  "name": "agent-config",
+  "owner": { "name": "conanjs" },
+  "description": "V's general skills for coding agents.",
+  "plugins": [
+    { "name": "agent-config", "source": "./plugin", "description": "V's general skills for coding agents: repo governance, procedure review, Spec Kit setup, team docs." }
+  ]
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code PostToolUse hook (.claude/settings.json): after an edit under copilot/knowledge, copilot/procedures
+# Claude Code PostToolUse hook (.claude/settings.json): after an edit under copilot/knowledge, home/procedures
 # copilot/frameworks/knowledge, copilot/frameworks/agentic-sdlc or tests/, run the doc validators and their tests. On failure, exit 2 so Claude sees the errors and fixes them.
 f="$(jq -r '.tool_input.file_path // .tool_response.filePath // empty' 2>/dev/null)"
 root="$(cd "$(dirname "$0")/.." && pwd)"

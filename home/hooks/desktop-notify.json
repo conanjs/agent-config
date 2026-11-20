@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "bash": "node \"$HOME/.agent-config/hooks/scripts/desktop-notify.js\"",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}

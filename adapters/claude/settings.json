@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": []
+  },
+  "model": "sonnet",
+  "effortLevel": "high",
+  "agentPushNotifEnabled": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.agent-config/tracker/tracker-hook.sh\" --hook claude \"$CLAUDE_PROJECT_DIR\"",
+            "timeout": 15,
+            "statusMessage": "Reading TRACKER.md"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.agent-config/hooks/turn-tokens/turn-tokens-hook.sh\" --hook claude",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "\"$HOME/.agent-config/hooks/turn-tokens/turn-tokens-hook.sh\" --statusline"
+  }
+}

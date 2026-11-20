@@ -1,5 +1,2 @@
-packages:
-  - copilot/frameworks/agentic-sdlc/tools/workflow-graph
-# Only better-sqlite3 (the LangGraph checkpoint store of the workflow runner, specs/020) may run its install script.
-allowBuilds:
-  better-sqlite3: true
+# No sub-packages: the workflow-graph tool left with agentic-sdlc (now ../agentic-sdlc, not built here).
+packages: []

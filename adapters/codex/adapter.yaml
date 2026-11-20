@@ -1,0 +1,13 @@
+# Codex: where scripts/build.mjs puts built agents, and the header file each agent source gives for it. Skills are not built: they ship in plugin/ (one SKILL.md for every agent).
+# See adapters/claude/adapter.yaml for how the header file and `keys` are used. A Codex agent is TOML: the header is
+# codex.toml and the body becomes developer_instructions.
+# Keys and dates: agent-knowledge ai-agents/agent-skills-portability.md (2026-11-11) and codex-usage-reference.md (2026-11-09).
+adapter: codex
+agents:
+  folder: ~/.codex/agents
+  file: '{name}.toml'
+  header: codex.toml
+  format: toml
+  keys: [name, description, model, model_reasoning_effort]
+  source: https://learn.chatgpt.com/docs/agent-configuration/subagents
+  verified: 2026-11-09

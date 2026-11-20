@@ -1,0 +1,13 @@
+# Claude Code: where scripts/build.mjs puts built agents, and the header file each agent source gives for it. Skills are not built: they ship in plugin/ (one SKILL.md for every agent).
+# The header file is copied as written (comment lines dropped). `keys` are the header keys checked against the docs;
+# any other key builds with a warning until it is checked and added here.
+# Keys and dates: agent-knowledge ai-agents/agent-skills-portability.md and subagent-execution-boundaries.md (2026-11-11).
+adapter: claude
+agents:
+  folder: ~/.claude/agents
+  file: '{name}.md'
+  header: claude.yaml
+  format: markdown
+  keys: [name, description, tools, disallowedTools, model, skills]
+  source: https://code.claude.com/docs/en/sub-agents
+  verified: 2026-11-11

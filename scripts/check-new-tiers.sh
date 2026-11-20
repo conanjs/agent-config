@@ -27,8 +27,6 @@ status=0
 (cd "$root" && "$node_bin" node_modules/prettier/bin/prettier.cjs --check --log-level warn . && "$node_bin" node_modules/eslint/bin/eslint.js . --max-warnings 0 && "$node_bin" node_modules/typescript/bin/tsc --noEmit -p tsconfig.json && "$node_bin" node_modules/vitest/vitest.mjs run --silent) || status=1
 # The contract schema check over the shipped files.
 schemas_out="$(cd "$root" && "$node_bin" contracts/tools/check-schemas.ts contracts/index.md contracts/slots.yaml contracts/*/v1/examples/valid/* 2>&1)" || { printf '%s\n' "$schemas_out" >&2; status=1; }
-# The fitness check (fails only on a rise over docs/baselines/fitness.json).
-(cd "$root" && "$node_bin" scripts/check-fitness.ts --root "$root") || status=1
 # The coverage check for the delivered phases.
 (cd "$root" && "$node_bin" scripts/check-ac-coverage.ts --root "$root" --delivered 0,1) || status=1
 # The repo-layout check in report mode (lists findings, never fails until phase 1).

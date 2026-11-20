@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { codesFromCalls, registerTool, repo } from '../support/tools.mjs';
 
-const validator = 'copilot/frameworks/agent-foundry/tools/validate-foundry.mjs';
+const validator = 'home/frameworks/agent-foundry/tools/validate-foundry.mjs';
 
 registerTool('validate-foundry', {
   fixture: 'tests/validate-foundry/fixtures/base',

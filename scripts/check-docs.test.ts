@@ -33,12 +33,6 @@ describe('QB-7 the spec 022 steps of check-new-tiers.sh', () => {
     expect(line).toMatch(setsFailure);
   });
 
-  it('AC-1.6 runs the fitness check and a failure sets status=1', () => {
-    const line = stepLine('scripts/check-fitness.ts');
-    expect(line).toContain('--root "$root"');
-    expect(line).toMatch(setsFailure);
-  });
-
   it('QB-1 runs the coverage check for phase 0 and a failure sets status=1', () => {
     const line = stepLine('scripts/check-ac-coverage.ts');
     expect(line).toContain('--delivered 0,1');
@@ -66,31 +60,12 @@ describe('QB-7 the spec 022 steps of check-new-tiers.sh', () => {
     expect(line).toMatch(setsFailure);
   });
 
-  it('AC-9.1 runs the SDLC validator with the knowledge root and the adapter map, and a failure sets status=1', () => {
-    const found = docsLines.filter((l) => l.includes('agentic-sdlc/tools/validate.mjs'));
-    expect(found).toHaveLength(1);
-    const line = found[0] ?? '';
-    expect(line).toContain('--knowledge "$root/copilot/knowledge"');
-    expect(line).toContain('--adapters "$root/adapters.json"');
-    expect(line).toMatch(setsFailure);
-  });
-
   it('AC-9.1 runs build cite in check mode over the fixture tree (no --write) and a failure sets status=1', () => {
     const line = stepLine('contracts/tools/build.ts cite');
     expect(line).toContain('tests/build-cite/fixtures/base');
     expect(line).toContain('--slots "$root/contracts/slots.yaml"');
     expect(line).not.toContain('--write');
     expect(line).toMatch(setsFailure);
-  });
-
-  it('AC-9.1 the upstream check of the workflow passes the same two arguments', () => {
-    const workflow = fs.readFileSync(
-      path.join(import.meta.dirname, '..', '.github', 'workflows', 'validate-docs.yml'),
-      'utf8',
-    );
-    const upstream = workflow.split('\n').filter((l) => l.includes('agentic-sdlc/tools/validate.mjs'));
-    expect(upstream).toHaveLength(1);
-    expect(upstream[0]).toContain('--knowledge copilot/knowledge --adapters adapters.json');
   });
 
   it('runs the spec 022 scenarios unless --no-scenarios, and a failure sets status=1', () => {

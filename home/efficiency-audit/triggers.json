@@ -1,0 +1,9 @@
+{
+  "about": "The core triggers EA-3 checks (proposals/efficiency-auditor.md D5). Each entry: the file a trigger names, the visible condition that must hold before reading it, and the text that must appear in home/instructions/core.instructions.md (check-triggers, AU-10). Triggers that need judgment are left out.",
+  "triggers": [
+    { "file": "~/.agent-config/references/answer-patterns.md", "when": "pattern-tag-or-deep-dive", "core": "~/.agent-config/references/answer-patterns.md" },
+    { "file": "~/.agent-config/references/code-review-graph.md", "when": "graph-tools", "core": "~/.agent-config/references/code-review-graph.md" },
+    { "file": "~/.agent-config/global-variables.md", "when": "placeholder", "core": "~/.agent-config/global-variables.md" },
+    { "file": "~/.agent-config/companies/ots/index.md", "when": { "words": ["ots", "ne-manage-shipment-frontend", "ne-api-gateway", "ne-import-shipment-api", "ne-shipment-api"] }, "core": "~/.agent-config/companies/<company>/index.md" }
+  ]
+}

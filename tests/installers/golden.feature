@@ -32,8 +32,8 @@ Feature: Golden install plans of the old installers
     And in "copy/mapping.yaml", `target: ~/.claude/CLAUDE.md,` becomes `target: ~/.claude/CHANGED.md,`
     When the old installers' plan in "copy" for "darwin" is listed
     Then the plan differs from the golden file "posix/darwin.txt"
-    And the output has the line "link ~/.claude/CHANGED.md -> claude/CLAUDE.md"
-    And the output has no line "link ~/.claude/CLAUDE.md -> claude/CLAUDE.md"
+    And the output has the line "link ~/.claude/CHANGED.md -> adapters/claude/CLAUDE.md"
+    And the output has no line "link ~/.claude/CLAUDE.md -> adapters/claude/CLAUDE.md"
 
   @posix
   Scenario: AC-1.9 A copy with an unchanged mapping still equals the golden file

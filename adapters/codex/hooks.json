@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.agent-config/tracker/tracker-hook.sh\" --hook codex --stdin",
+            "commandWindows": "node \"%USERPROFILE%\\.copilot\\tracker\\tracker.mjs\" --hook codex --stdin",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.agent-config/hooks/turn-tokens/turn-tokens-hook.sh\" --hook codex",
+            "commandWindows": "node \"%USERPROFILE%\\.copilot\\hooks\\turn-tokens\\turn-tokens.mjs\" --hook codex",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -3,7 +3,7 @@
 name: validate-docs
 on:
   push:
-    paths: ['copilot/knowledge/**', 'copilot/procedures/**', 'copilot/frameworks/knowledge/**', 'copilot/frameworks/agentic-sdlc/**', 'copilot/frameworks/agent-foundry/**', 'copilot/atlas/**', 'scripts/check-docs.sh', 'tests/**', 'package.json', 'pnpm-lock.yaml', 'cucumber.mjs', '.nvmrc', '.github/workflows/validate-docs.yml']
+    paths: ['home/**', 'skills/**', 'agents/**', 'adapters/**', 'scripts/**', 'mapping.yaml', 'components.yaml', 'tests/**', 'package.json', 'pnpm-lock.yaml', 'cucumber.mjs', '.nvmrc', '.github/workflows/validate-docs.yml']
   # No paths filter on pull_request: this check is required on main, and GitHub leaves a required check from a
   # path-filtered (skipped) workflow "Pending", which blocks the merge. The job takes seconds.
   pull_request:
@@ -20,12 +20,10 @@ jobs:
           node-version-file: .nvmrc # 24, the current LTS line (Krypton); setup-node takes its newest release
           package-manager-cache: false
       - run: corepack enable && pnpm install --frozen-lockfile # pnpm version from package.json packageManager
-      - name: Validate knowledge, procedures and frameworks; run the tool scenarios
+      - name: Validate procedures, agent-foundry, the tracker and the build; run the tool scenarios
         run: scripts/check-docs.sh
       - name: Check upstream versions of procedure dependencies (warnings only)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          node copilot/procedures/tools/validate-procedures.mjs --upstream
-          node copilot/frameworks/agentic-sdlc/tools/validate.mjs --knowledge copilot/knowledge --adapters adapters.json --upstream
+        run: node home/procedures/tools/validate-procedures.mjs --upstream

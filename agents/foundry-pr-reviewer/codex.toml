@@ -1,0 +1,2 @@
+name = "foundry-pr-reviewer"
+description = "Agent Foundry PR reviewer: first-pass review of one pull request using the team's zone map and lens; suggest-only, never approves or merges. Give it the PR and the lens folder path."

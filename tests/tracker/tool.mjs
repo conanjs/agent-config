@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { codesFromCalls, registerTool, repo } from '../support/tools.mjs';
 
-const tool = 'copilot/tracker/tracker.mjs';
+const tool = 'home/tracker/tracker.mjs';
 
 registerTool('tracker', {
   fixture: 'tests/tracker/fixtures/base',
@@ -14,5 +14,5 @@ registerTool('tracker', {
   header: /^tracker check: /,
   quietPass: 'PASS (0 warning(s))',
   codes: () => codesFromCalls(tool),
-  rules: 'copilot/tracker',
+  rules: 'home/tracker',
 });
