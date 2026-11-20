@@ -46,3 +46,23 @@ exemptions:
     replacement: Read the estimate-marked token figure beside the character figure at each gate and note any difference (decisions/qa.md section 8).
 # SC-015 is not listed: its spec row holds counts only (placeholders left, writable rendered files, files without a generated-from
 # line, tracked rendered files, stale citations), and every count is checked by a scenario, so no part needs a manual check.
+  - id: AC-1.6
+    automated-part: None in this repo since 2026-11-19; the fitness check and its scenarios (tests/fitness) moved with the atlas to the parked agent-atlas folder.
+    reason: The check reads the atlas, which no longer lives here, and the components it guards (knowledge, companies, agentic-sdlc) are now separate repos.
+    replacement: Each split repo keeps its own boundary check (agent-knowledge FIT-6 scenarios); the atlas and fitness check return with TRACKER item "Bring the atlas back for the split repos".
+  - id: AC-9.1
+    automated-part: None in this repo since 2026-11-19; its scenarios moved with the validators they test (tests/validate-knowledge to agent-knowledge, tests/validate-sdlc to agentic-sdlc).
+    reason: The knowledge validator and the agentic-sdlc validator are no longer in agent-config, so their scenarios run in their own repos.
+    replacement: agent-knowledge npm run check (CI job check on every pull request) and agentic-sdlc npm test.
+  - id: AC-9.2
+    automated-part: None in this repo since 2026-11-19; its scenarios moved with the validators they test (tests/validate-knowledge to agent-knowledge, tests/validate-sdlc to agentic-sdlc).
+    reason: The knowledge validator and the agentic-sdlc validator are no longer in agent-config, so their scenarios run in their own repos.
+    replacement: agent-knowledge npm run check (CI job check on every pull request) and agentic-sdlc npm test.
+  - id: AC-9.3
+    automated-part: None in this repo since 2026-11-19; its scenarios moved with the validators they test (tests/validate-knowledge to agent-knowledge, tests/validate-sdlc to agentic-sdlc).
+    reason: The knowledge validator and the agentic-sdlc validator are no longer in agent-config, so their scenarios run in their own repos.
+    replacement: agent-knowledge npm run check (CI job check on every pull request) and agentic-sdlc npm test.
+  - id: AC-9.4
+    automated-part: None in this repo since 2026-11-19; its scenarios moved with the validators they test (tests/validate-knowledge to agent-knowledge, tests/validate-sdlc to agentic-sdlc).
+    reason: The knowledge validator and the agentic-sdlc validator are no longer in agent-config, so their scenarios run in their own repos.
+    replacement: agent-knowledge npm run check (CI job check on every pull request) and agentic-sdlc npm test.

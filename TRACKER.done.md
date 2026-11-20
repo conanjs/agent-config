@@ -4,6 +4,18 @@ Items closed or dropped in TRACKER.md, newest first. Format and tool: tracker/v1
 
 ## Done
 
+### T-62 Decide skill packaging: one SKILL.md per skill, shipped as a plugin per repo
+- status: done
+- next: Research 2026-11-19 (agent-knowledge agent-skills-portability.md): Claude Code, Codex and Copilot CLI all install skills from a plugin with one shared SKILL.md, and all read .claude-plugin/marketplace.json from a local folder. If V agrees: pilot with agent-knowledge skills/review-knowledge-doc (body + references/, no {{AGENT_HOME}}, no global-variables), install it in all three from the local clone, check names, live edits and listing; then decide whether agent-config's per-agent skill headers and build.mjs are kept for subagents only
+- from: 2026-11-19
+- closed: 2026-11-20 · Done 2026-11-20: skills ship as plugins (agent-knowledge: review-knowledge-doc; agent-config: 4 skills), one SKILL.md each, installed from the local clones in Claude Code, Copilot CLI and Codex; build.mjs now builds agents only
+
+### T-60 Stop Copilot listing each skill twice
+- status: done
+- next: Copilot CLI reads ~/.copilot/skills (its own build) and ~/.agents/skills (Codex's build); the same name is taken from the first (first found wins). Check with copilot whether both still cost listing tokens; if so, add ~/.agents/skills to Copilot's ignoredSkillsLocations (a change to V's Copilot config: ask first)
+- from: 2026-11-19
+- closed: 2026-11-19 · Done 2026-11-19: ~/.copilot/settings.json ignoredSkillsLocations [~/.agents/skills]; Copilot builds into ~/.copilot/skills, Codex into ~/.agents/skills; probe confirmed (Copilot CLI 1.0.109)
+
 ### T-48 Fast-path the workflow guard hook when no workflow run is active
 - status: done
 - next: workflow-graph-hook.sh starts Node twice (a version check, then main.ts) before every tool call in Codex (PreToolUse '*') and Copilot (preToolUse): 130-190 ms each, even with no agentic-sdlc run. Exit before starting Node when the repo has no active run (for example no .specify/runs/*/ledger.jsonl), and cache the Node version check; add scenarios in tests/workflow-graph

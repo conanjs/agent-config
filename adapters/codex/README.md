@@ -5,7 +5,7 @@ Codex CLI's files in this repo. `mapping.yaml` deploys them to `~/.codex/` (`%US
 | File | Deployed to | What it is |
 |---|---|---|
 | `hooks.json` | `~/.codex/hooks.json` | Codex hooks: the tracker brief at session start, the turn-token report, the workflow guard |
-| `agents/*.toml` | `~/.codex/agents/` | `sdlc-*` role wrappers |
+| `~/.codex/agents/*.toml` | `~/.codex/agents/` | built by scripts/build.mjs from agents/<name>/{codex.toml,body.md} |
 | (none) | `~/.codex/AGENTS.md` | Linked straight to `home/instructions/core.instructions.md`, the core every agent loads (decision D2 in `proposals/instruction-loading.md`) |
 
 ## Why `~/.codex/AGENTS.md` is the core itself

@@ -1,0 +1,7 @@
+{
+  "name": "agent-config",
+  "version": "0.1.0",
+  "description": "V's general skills for coding agents: repo governance, procedure review, Spec Kit setup, team docs.",
+  "author": { "name": "conanjs" },
+  "repository": "https://github.com/conanjs/agent-config"
+}

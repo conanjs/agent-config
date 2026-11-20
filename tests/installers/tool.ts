@@ -35,7 +35,14 @@ Given('a copy of the old installers and their mapping in {string}', function (th
   const mapping = fs.readFileSync(path.join(repo, 'mapping.yaml'), 'utf8');
   // The build reads the sources, the adapters and the vendored YAML library, so those are linked too.
   const sources = [...mapping.matchAll(/source: *([^,\s]+),/g)].map((m) => m[1] ?? '');
-  const tops = new Set([...sources.filter((s) => !s.startsWith('../')).map((s) => s.split('/')[0] ?? ''), 'contracts', 'skills', 'agents', 'adapters', 'components.yaml']);
+  const tops = new Set([
+    ...sources.filter((s) => !s.startsWith('../')).map((s) => s.split('/')[0] ?? ''),
+    'contracts',
+    'skills',
+    'agents',
+    'adapters',
+    'components.yaml',
+  ]);
   for (const top of tops) fs.symlinkSync(path.join(repo, top), path.join(this.at(dir), top));
   // A sibling component (../agent-knowledge) becomes a link next to the copy, to the real sibling.
   for (const sibling of new Set(sources.filter((s) => s.startsWith('../')).map((s) => s.split('/')[1] ?? ''))) {

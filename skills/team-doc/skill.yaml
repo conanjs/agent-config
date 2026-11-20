@@ -1,4 +1,0 @@
-schema: skill-source/v1
-name: team-doc
-description: "Write a document or Confluence page for V's team (not for V): a simple doc, an explanation for the team, a team guide. Use when asked to write something for the team or for Confluence."
-targets: [claude, agents]

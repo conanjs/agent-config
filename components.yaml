@@ -1,4 +1,0 @@
-# Folders besides this repo whose skills/ and agents/ sources scripts/build.mjs builds (paths relative to this repo).
-# A missing folder is skipped with a warning.
-components:
-  - { name: agentic-sdlc, path: ../agentic-sdlc }

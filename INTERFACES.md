@@ -17,7 +17,6 @@ its source, its usage comment and the doc named in the last column; each one is 
 | `home/procedures/tools/validate-procedures.mjs` | Checks procedures | `check-docs.sh` | not yet described | `home/procedures/procedure.schema.md` |
 | `copilot/frameworks/agentic-sdlc/tools/validate.mjs`, `validate-project.mjs` | Check the agentic-sdlc framework, and a project that uses it | `check-docs.sh`, role agents | not yet described | `copilot/frameworks/agentic-sdlc/schemas/_system.md` |
 | `home/frameworks/agent-foundry/tools/validate-foundry.mjs` | Checks agent-foundry charters and floors | `check-docs.sh` | not yet described | `home/frameworks/agent-foundry/` |
-| `home/atlas/tools/atlas.mjs` | Checks and writes the repo map | `check-docs.sh`, people | not yet described | `home/atlas/schemas/atlas.schema.md` |
 | `home/tracker/tracker.mjs`, `tracker-hook.sh` | Reads and updates `TRACKER.md`; session-start hook | people, agents, session hooks | not yet described | `home/tracker/tracker.schema.md` |
 | `home/hooks/turn-tokens/turn-tokens.mjs`, `turn-tokens-hook.sh` | The turn token report (Stop hook, status line) | Claude Code, Codex, Copilot CLI | not yet described | `home/hooks/turn-tokens/turn-tokens.schema.md` |
 | `home/hooks/scripts/desktop-notify.js` | Desktop notification hook | Copilot CLI | not yet described | `home/hooks/desktop-notify.json` |

@@ -16,7 +16,7 @@ Tool-agnostic review for any change under `knowledge/` or `procedures/` (store B
 
 ## Steps
 
-1. **Run the validators.** `scripts/check-docs.sh` from the repo root (it finds Node ≥ 18 itself). Fix every FAIL. Treat every `KB-7`, `KB-8` and `PR-4` warning as a question to answer in step 3, not as noise. For knowledge docs that cite URLs, also run `node copilot/frameworks/knowledge/tools/validate-knowledge.mjs --urls`.
+1. **Run the validators.** `scripts/check-docs.sh` from the repo root (it finds Node ≥ 18 itself). Fix every FAIL. Treat every `KB-7`, `KB-8` and `PR-4` warning as a question to answer in step 3, not as noise. Knowledge-base docs are reviewed by the `review-knowledge-doc` skill of agent-knowledge, not here.
 
 2. **Read every changed file in full**, not only the diff. A defect such as a duplicated paragraph is invisible in a diff that adds only one of the copies.
 

@@ -175,4 +175,19 @@ Work this repo still owes, carried from one session to the next. Format and tool
 - next: Not run: (1) install.ps1 with scripts/build.mjs --link and the per-entry ~/.copilot/frameworks links on a Windows machine, then record tests/installers/golden/windows/windows.txt with golden/windows/plan.ps1; (2) CI has no ../agent-knowledge or ../agentic-sdlc next to the checkout, so the Mac golden plan (recorded with both present) and the build differ there: clone agent-knowledge in the workflow, and decide how CI gets agentic-sdlc (it is a plain folder today)
 - from: 2026-11-18
 
+### T-59 Bring the atlas back for the split repos
+- status: open
+- next: The atlas and the fitness check are parked in ~/workspace/agent-atlas (plain folder, not installed, not checked; ~/.copilot/atlas link removed, so the sdlc-coordinator agent cannot read it). Decide where it lives (its own repo or agentic-sdlc), rewrite atlas.yaml for agent-config, agent-knowledge, agent-companies and agentic-sdlc, re-home tests/atlas and tests/fitness with a test harness, then drop the AC-1.6 exemption in tests/coverage/exemptions.yaml
+- from: 2026-11-19
+
+### T-61 Point validate-foundry at the moved agentic-sdlc rules
+- status: open
+- next: home/frameworks/agent-foundry/tools/validate-foundry.mjs looks for rule ids in home/frameworks/agentic-sdlc/foundations, which moved to ../agentic-sdlc; it now warns and skips the rule-id check. Read the rules from ~/.copilot/frameworks/agentic-sdlc or make the check optional
+- from: 2026-11-19
+
+### T-63 Let the installers add the plugin marketplaces
+- status: open
+- next: installers/install.sh and install.ps1 build and link agents only; the agent-config and agent-knowledge plugins were installed by hand (claude/copilot plugin marketplace add <clone> + install, codex plugin marketplace add + codex plugin add). Decide whether the installer runs these when each CLI is present, and re-runs codex plugin add after a pull
+- from: 2026-11-20
+
 ## Done

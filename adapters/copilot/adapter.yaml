@@ -1,0 +1,13 @@
+# GitHub Copilot: where scripts/build.mjs puts built agents, and the header file each agent source gives for it. Skills are not built: they ship in plugin/ (one SKILL.md for every agent).
+# See adapters/claude/adapter.yaml for how the header file and `keys` are used. Copilot CLI reads ~/.copilot/skills
+# before ~/.agents/skills (Codex's folder); a skill in both is taken from here (first found wins).
+# Keys and dates: agent-knowledge ai-agents/agent-skills-portability.md and subagent-execution-boundaries.md (2026-11-11).
+adapter: copilot
+agents:
+  folder: ~/.copilot/agents
+  file: '{name}.agent.md'
+  header: copilot.yaml
+  format: markdown
+  keys: [name, description, user-invocable, disable-model-invocation, skills, include-custom-instructions, model, tools]
+  source: https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference
+  verified: 2026-11-11

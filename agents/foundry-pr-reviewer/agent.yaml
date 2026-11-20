@@ -1,6 +1,0 @@
-schema: agent-source/v1
-name: foundry-pr-reviewer
-description: "Agent Foundry PR reviewer: first-pass review of one pull request using the team's zone map and lens; suggest-only, never approves or merges. Give it the PR and the lens folder path."
-model-tier: standard
-launches-agents: false
-targets: [claude, copilot, codex]

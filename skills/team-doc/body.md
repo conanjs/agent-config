@@ -1,1 +1,0 @@
-Read `{{AGENT_HOME}}/knowledge/documentation/doc-template-base.md` and follow it. It fixes the structure, the language level (Simple English, CEFR A1) and the References and Related sections; ask only about topic and length.
